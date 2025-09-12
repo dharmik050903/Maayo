@@ -441,134 +441,204 @@ export default function Login() {
     return Object.keys(next).length === 0
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault()
-    setMessage(null)
+  // async function handleSubmit(e) {
+  //   e.preventDefault()
+  //   setMessage(null)
+    
+  //   if (loginMethod === 'otp') {
+  //     handleVerifyOTP()
+  //     return
+  //   }
+    
+  //   if (!validate()) return
+  //   setLoading(true)
+
+  //   try {
+  //     if(API_BASE_URL && import.meta.env.VITE_API_BASE_URL){
+  //       const tempurl= "https://maayo-backend.onrender.com/"
+  //     }
+  //     const res = await fetch(`${tempurl}/login`, {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(form),
+  //     })
+
+  //     const data = await res.json()
+  //     setLoading(false)
+
+  //     if (data.token) {
+  //       localStorage.setItem("authToken", data.token)
+  //       localStorage.setItem("userData", JSON.stringify(data.user))
+        
+  //       localStorage.setItem("authHeaders", JSON.stringify({
+  //         token: data.token,
+  //         _id: data.user._id,
+  //         userRole: data.user.user_type,
+  //         userEmail: data.user.email
+  //       }))
+        
+  //       setMessage({ type: "success", text: "Login successful 🎉" })
+
+  //       console.log('=== DEBUG LOCALSTORAGE ===')
+  //       console.log('freelancer_profile_id:', localStorage.getItem('freelancer_profile_id'))
+  //       console.log('freelancer_personId:', localStorage.getItem('freelancer_personId'))
+  //       console.log('freelancer_profile_completed:', localStorage.getItem('freelancer_profile_completed'))
+  //       console.log('freelancer_profile_data:', localStorage.getItem('freelancer_profile_data'))
+  //       console.log('userType:', data.user.user_type)
+  //       console.log('current user _id:', data.user._id)
+  //       console.log('========================')
+
+
+
+  //       setTimeout(async () => {
+  //         try {
+  //           console.log('🚀 Login Debug: Starting profile existence check')
+  //           console.log('👤 User data:', data.user)
+  //           console.log('🆔 User _id:', data.user._id)
+  //           console.log('👥 User type:', data.user.user_type)
+            
+  //           if (data.user.user_type === 'freelancer') {
+  //             console.log('🔍 Checking freelancer profile for user:', data.user._id)
+  //             console.log('🔍 User data:', data.user)
+              
+  //             console.log('📝 Pre-check localStorage:')
+  //             console.log('  - freelancer_profile_id:', localStorage.getItem('freelancer_profile_id'))
+  //             console.log('  - freelancer_profile_completed:', localStorage.getItem('freelancer_profile_completed'))
+  //             console.log('  - freelancer_profile_data:', localStorage.getItem('freelancer_profile_data'))
+              
+  //             const profileExists = await checkFreelancerProfileExists(data.user._id)
+  //             console.log('📋 Freelancer profile exists result:', profileExists)
+              
+  //             if (profileExists) {
+  //               console.log('✅ Freelancer profile exists, redirecting to home page')
+  //               window.location.href = "/freelancer-home"
+  //             } else {
+  //               console.log('❌ No freelancer profile, redirecting to dashboard')
+  //               window.location.href = "/freelancer-dashboard"
+  //             }
+  //           } else if (data.user.user_type === 'client') {
+  //             console.log('🔍 Checking client profile for user:', data.user._id)
+  //             const profileExists = await checkClientProfileExists(data.user._id)
+  //             console.log('📋 Client profile exists result:', profileExists)
+              
+  //             if (profileExists) {
+  //               console.log('✅ Client profile exists in database, redirecting to home page')
+  //               window.location.href = "/client-home"
+  //             } else {
+  //               console.log('❌ No client profile in database, redirecting to dashboard')
+  //               window.location.href = "/client-dashboard"
+  //             }
+  //           }
+  //         } catch (error) {
+  //           console.error('❌ Error checking profile existence:', error)
+  //           console.log('🔄 Using fallback logic...')
+            
+  //           if (data.user.user_type === 'freelancer') {
+  //             const profileCompleted = localStorage.getItem('freelancer_profile_completed')
+  //             const profileData = localStorage.getItem('freelancer_profile_data')
+  //             console.log('📝 Fallback check - profileCompleted:', profileCompleted, 'profileData exists:', !!profileData)
+              
+  //             if (profileCompleted === 'true' && profileData) {
+  //               console.log('✅ Fallback: Profile exists, redirecting to home')
+  //               window.location.href = "/freelancer-home"
+  //             } else {
+  //               console.log('❌ Fallback: No profile, redirecting to dashboard')
+  //               window.location.href = "/freelancer-dashboard"
+  //             }
+  //           } else if (data.user.user_type === 'client') {
+  //             const profileCompleted = localStorage.getItem('client_profile_completed')
+  //             const profileData = localStorage.getItem('client_profile_data')
+  //             console.log('📝 Fallback check - profileCompleted:', profileCompleted, 'profileData exists:', !!profileData)
+              
+  //             if (profileCompleted === 'true' && profileData) {
+  //               console.log('✅ Fallback: Profile exists, redirecting to home')
+  //               window.location.href = "/client-home"
+  //             } else {
+  //               console.log('❌ Fallback: No profile, redirecting to dashboard')
+  //               window.location.href = "/client-dashboard"
+  //             }
+  //           }
+  //         }
+  //       }, 1500)
+  //     } else {
+  //       setMessage({ type: "error", text: data.message || "Invalid credentials" })
+  //     }
+  //   } catch (err) {
+  //     setLoading(false)
+  //     setMessage({ type: "error", text: "Something went wrong. Try again." })
+  //   }
+  // }
+    async function handleSubmit(e) {
+    e.preventDefault();
+    setMessage(null);
     
     if (loginMethod === 'otp') {
-      handleVerifyOTP()
-      return
+      handleVerifyOTP();
+      return;
     }
     
-    if (!validate()) return
-    setLoading(true)
+    if (!validate()) return;
+    setLoading(true);
 
     try {
-      if(API_BASE_URL && import.meta.env.VITE_API_BASE_URL){
-        const tempurl= "https://maayo-backend.onrender.com/"
-      }
-      const res = await fetch(`${tempurl}/login`, {
+      // This line will now automatically use your production URL when deployed
+      // and your localhost URL during development.
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      
+      const res = await fetch(`${API_BASE_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
-      })
+      });
 
-      const data = await res.json()
-      setLoading(false)
+      const data = await res.json();
+      setLoading(false);
 
       if (data.token) {
-        localStorage.setItem("authToken", data.token)
-        localStorage.setItem("userData", JSON.stringify(data.user))
+        localStorage.setItem("authToken", data.token);
+        localStorage.setItem("userData", JSON.stringify(data.user));
         
         localStorage.setItem("authHeaders", JSON.stringify({
           token: data.token,
           _id: data.user._id,
           userRole: data.user.user_type,
           userEmail: data.user.email
-        }))
+        }));
         
-        setMessage({ type: "success", text: "Login successful 🎉" })
+        setMessage({ type: "success", text: "Login successful 🎉" });
 
-        console.log('=== DEBUG LOCALSTORAGE ===')
-        console.log('freelancer_profile_id:', localStorage.getItem('freelancer_profile_id'))
-        console.log('freelancer_personId:', localStorage.getItem('freelancer_personId'))
-        console.log('freelancer_profile_completed:', localStorage.getItem('freelancer_profile_completed'))
-        console.log('freelancer_profile_data:', localStorage.getItem('freelancer_profile_data'))
-        console.log('userType:', data.user.user_type)
-        console.log('current user _id:', data.user._id)
-        console.log('========================')
-
-
-
+        // (The rest of your redirection logic here is fine)
         setTimeout(async () => {
           try {
-            console.log('🚀 Login Debug: Starting profile existence check')
-            console.log('👤 User data:', data.user)
-            console.log('🆔 User _id:', data.user._id)
-            console.log('👥 User type:', data.user.user_type)
-            
             if (data.user.user_type === 'freelancer') {
-              console.log('🔍 Checking freelancer profile for user:', data.user._id)
-              console.log('🔍 User data:', data.user)
-              
-              console.log('📝 Pre-check localStorage:')
-              console.log('  - freelancer_profile_id:', localStorage.getItem('freelancer_profile_id'))
-              console.log('  - freelancer_profile_completed:', localStorage.getItem('freelancer_profile_completed'))
-              console.log('  - freelancer_profile_data:', localStorage.getItem('freelancer_profile_data'))
-              
-              const profileExists = await checkFreelancerProfileExists(data.user._id)
-              console.log('📋 Freelancer profile exists result:', profileExists)
-              
+              const profileExists = await checkFreelancerProfileExists(data.user._id);
               if (profileExists) {
-                console.log('✅ Freelancer profile exists, redirecting to home page')
-                window.location.href = "/freelancer-home"
+                window.location.href = "/freelancer-home";
               } else {
-                console.log('❌ No freelancer profile, redirecting to dashboard')
-                window.location.href = "/freelancer-dashboard"
+                window.location.href = "/freelancer-dashboard";
               }
             } else if (data.user.user_type === 'client') {
-              console.log('🔍 Checking client profile for user:', data.user._id)
-              const profileExists = await checkClientProfileExists(data.user._id)
-              console.log('📋 Client profile exists result:', profileExists)
-              
+              const profileExists = await checkClientProfileExists(data.user._id);
               if (profileExists) {
-                console.log('✅ Client profile exists in database, redirecting to home page')
-                window.location.href = "/client-home"
+                window.location.href = "/client-home";
               } else {
-                console.log('❌ No client profile in database, redirecting to dashboard')
-                window.location.href = "/client-dashboard"
+                window.location.href = "/client-dashboard";
               }
             }
           } catch (error) {
-            console.error('❌ Error checking profile existence:', error)
-            console.log('🔄 Using fallback logic...')
-            
-            if (data.user.user_type === 'freelancer') {
-              const profileCompleted = localStorage.getItem('freelancer_profile_completed')
-              const profileData = localStorage.getItem('freelancer_profile_data')
-              console.log('📝 Fallback check - profileCompleted:', profileCompleted, 'profileData exists:', !!profileData)
-              
-              if (profileCompleted === 'true' && profileData) {
-                console.log('✅ Fallback: Profile exists, redirecting to home')
-                window.location.href = "/freelancer-home"
-              } else {
-                console.log('❌ Fallback: No profile, redirecting to dashboard')
-                window.location.href = "/freelancer-dashboard"
-              }
-            } else if (data.user.user_type === 'client') {
-              const profileCompleted = localStorage.getItem('client_profile_completed')
-              const profileData = localStorage.getItem('client_profile_data')
-              console.log('📝 Fallback check - profileCompleted:', profileCompleted, 'profileData exists:', !!profileData)
-              
-              if (profileCompleted === 'true' && profileData) {
-                console.log('✅ Fallback: Profile exists, redirecting to home')
-                window.location.href = "/client-home"
-              } else {
-                console.log('❌ Fallback: No profile, redirecting to dashboard')
-                window.location.href = "/client-dashboard"
-              }
-            }
+            console.error('Error checking profile, redirecting to dashboard:', error);
+            window.location.href = data.user.user_type === 'freelancer' ? "/freelancer-dashboard" : "/client-dashboard";
           }
-        }, 1500)
+        }, 1500);
+
       } else {
-        setMessage({ type: "error", text: data.message || "Invalid credentials" })
+        setMessage({ type: "error", text: data.message || "Invalid credentials" });
       }
     } catch (err) {
-      setLoading(false)
-      setMessage({ type: "error", text: "Something went wrong. Try again." })
+      setLoading(false);
+      setMessage({ type: "error", text: "Something went wrong. Check your connection or if the server is running." });
     }
   }
-
   if (pageLoading) {
     return <PageShimmer />
   }
