@@ -1,0 +1,225 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #173257;
+  --color-violet: #7635FF;
+  --color-coral: #FF5A69;
+  --color-mint: #23D1A4;
+  --color-base: #F6F6FB;
+  --color-graphite: #252525;
+  --color-coolgray: #8B94A6;
+}
+
+html, body, #root {
+  height: 100%;
+  background: var(--color-base);
+  color: var(--color-graphite);
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-white bg-primary hover:bg-[#132845] transition;
+}
+
+.btn-accent {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-white bg-violet hover:bg-[#5d1cff] transition;
+}
+
+.card {
+  @apply bg-white rounded-xl shadow-soft border border-[#E9ECF2];
+}
+
+.input {
+  @apply w-full px-4 py-3 rounded-lg border border-[#E3E8EF] bg-white placeholder-coolgray text-graphite focus:outline-none focus:ring-2 focus:ring-violet;
+}
+
+.link-accent { @apply text-violet hover:text-primary; }
+
+/* Remove any borders from logo links */
+.logo-link {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.logo-link:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Project description truncation */
+.project-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+  max-height: 4.2em; /* 3 lines * 1.4 line-height */
+}
+
+/* Global Smooth Transitions */
+* {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Smooth slide transitions for all elements */
+* {
+  transition-property: transform, opacity, background-color, border-color, color, box-shadow;
+  transition-duration: 0.3s;
+  transition-timing-function: ease-in-out;
+}
+
+/* Enhanced button transitions */
+button, .btn-primary, .btn-accent, [role="button"] {
+  transition: all 0.3s ease-in-out;
+  transform: translateY(0);
+}
+
+button:hover, .btn-primary:hover, .btn-accent:hover, [role="button"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+button:active, .btn-primary:active, .btn-accent:active, [role="button"]:active {
+  transform: translateY(0);
+  transition-duration: 0.1s;
+}
+
+/* Smooth card transitions */
+.card, .bg-white {
+  transition: all 0.3s ease-in-out;
+  transform: translateY(0);
+}
+
+.card:hover, .bg-white:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth input transitions */
+input, textarea, select {
+  transition: all 0.3s ease-in-out;
+  transform: translateY(0);
+}
+
+input:focus, textarea:focus, select:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(118, 53, 255, 0.2);
+}
+
+/* Smooth link transitions */
+a, .link-accent {
+  transition: all 0.3s ease-in-out;
+  transform: translateY(0);
+}
+
+a:hover, .link-accent:hover {
+  transform: translateY(-1px);
+}
+
+/* Smooth modal transitions */
+.modal, .fixed {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Smooth page transitions */
+.page-transition {
+  transition: all 0.3s ease-in-out;
+  transform: translateX(0);
+}
+
+/* Smooth fade transitions */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.fade-out {
+  animation: fadeOut 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* Smooth slide transitions */
+.slide-in-right {
+  animation: slideInRight 0.3s ease-in-out;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.3s ease-in-out;
+}
+
+.slide-in-up {
+  animation: slideInUp 0.3s ease-in-out;
+}
+
+.slide-in-down {
+  animation: slideInDown 0.3s ease-in-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
