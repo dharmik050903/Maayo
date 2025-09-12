@@ -119,7 +119,8 @@ export default function Signup() {
     setLoading(true)
 
     try {
-      const res = await fetch("http://localhost:5000/api/signup", {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
+      const res = await fetch(`${API_BASE_URL}/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
