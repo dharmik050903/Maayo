@@ -14,6 +14,6 @@ app.use(express.urlencoded({ extended: true }));
 
 connect();  
 
-app.use('/',router)
+app.use('/api',router)
 
 app.listen(PORT)

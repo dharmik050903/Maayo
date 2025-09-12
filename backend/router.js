@@ -30,51 +30,51 @@ const aiController = new AIController();
 // Auth routes
 
 //Login and Signup Controllers
-router.post("/api/signup",signupController.createuser);
-router.post("/api/signup/google",loginController.googleLogin);
-router.post("/api/login",loginController.authenticate);
+router.post("/signup",signupController.createuser);
+router.post("/signup/google",loginController.googleLogin);
+router.post("/login",loginController.authenticate);
 
 // OTP Authentication routes
-router.post("/api/otp/send-login", otpController.sendLoginOTP);
-router.post("/api/otp/verify-login", otpController.verifyLoginOTP);
-router.post("/api/otp/send-password-reset", otpController.sendPasswordResetOTP);
-router.post("/api/otp/verify-password-reset", otpController.verifyPasswordResetOTP);
-router.post("/api/otp/resend", otpController.resendOTP);
+router.post("/otp/send-login", otpController.sendLoginOTP);
+router.post("/otp/verify-login", otpController.verifyLoginOTP);
+router.post("/otp/send-password-reset", otpController.sendPasswordResetOTP);
+router.post("/otp/verify-password-reset", otpController.verifyPasswordResetOTP);
+router.post("/otp/resend", otpController.resendOTP);
 //Skills Controller
-router.post("/api/skills",skillsController.listskills);
+router.post("/skills",skillsController.listskills);
 //Freelancer and Client Info Controllers
-router.post("/api/freelancer/list",auth, freelancerinfo.listfreelancer);
-router.post("/api/freelancer/info",auth,freelancerinfo.createFreelancerInfo);
-router.post("/api/freelancer/info/update",auth,freelancerinfo.updateFreelancerInfo);
-router.post("/api/client/info",auth,clientinfo.createClientInfo);
-router.post("/api/client/info/update",auth,clientinfo.updateClientInfo);
+router.post("/freelancer/list",auth, freelancerinfo.listfreelancer);
+router.post("/freelancer/info",auth,freelancerinfo.createFreelancerInfo);
+router.post("/freelancer/info/update",auth,freelancerinfo.updateFreelancerInfo);
+router.post("/client/info",auth,clientinfo.createClientInfo);
+router.post("/client/info/update",auth,clientinfo.updateClientInfo);
 // Project routes
-router.post("/api/project/create", auth, projectController.createProject);
-router.post("/api/project/list", auth, projectController.listproject);
-router.post("/api/project/browse",projectController.listproject);
-router.post("/api/project/search", auth, projectController.searchProjects);
-router.post("/api/project/update", auth, projectController.updateProject);
-router.post("/api/project/delete", auth, projectController.deleteProject);
-router.post("/api/project/complete", auth, projectController.completeProject);
-router.post("/api/project/stats", auth, projectController.getProjectStats);
+router.post("/project/create", auth, projectController.createProject);
+router.post("/project/list", auth, projectController.listproject);
+router.post("/project/browse",projectController.listproject);
+router.post("/project/search", auth, projectController.searchProjects);
+router.post("/project/update", auth, projectController.updateProject);
+router.post("/project/delete", auth, projectController.deleteProject);
+router.post("/project/complete", auth, projectController.completeProject);
+router.post("/project/stats", auth, projectController.getProjectStats);
 
 // Review routes
-router.post("/api/review/create", auth, reviewController.createReview);
-router.post("/api/review/user", auth, reviewController.getUserReviews);
-router.post("/api/review/project", auth, reviewController.getProjectReviews);
-router.post("/api/review/update", auth, reviewController.updateReview);
-router.post("/api/review/delete", auth, reviewController.deleteReview);
+router.post("/review/create", auth, reviewController.createReview);
+router.post("/review/user", auth, reviewController.getUserReviews);
+router.post("/review/project", auth, reviewController.getProjectReviews);
+router.post("/review/update", auth, reviewController.updateReview);
+router.post("/review/delete", auth, reviewController.deleteReview);
 
 // Bid routes
-router.post("/api/bid/create", auth, bidController.createBid);
-router.post("/api/bid/project", auth, bidController.getProjectBids);
-router.post("/api/bid/freelancer", auth, bidController.getFreelancerBids);
-router.post("/api/bid/accept", auth, bidController.acceptBid);
-router.post("/api/bid/reject", auth, bidController.rejectBid);
-router.post("/api/bid/withdraw", auth, bidController.withdrawBid);
-router.post("/api/bid/update", auth, bidController.updateBid);
+router.post("/bid/create", auth, bidController.createBid);
+router.post("/bid/project", auth, bidController.getProjectBids);
+router.post("/bid/freelancer", auth, bidController.getFreelancerBids);
+router.post("/bid/accept", auth, bidController.acceptBid);
+router.post("/bid/reject", auth, bidController.rejectBid);
+router.post("/bid/withdraw", auth, bidController.withdrawBid);
+router.post("/bid/update", auth, bidController.updateBid);
 // AI routes
-router.post("/api/ai/generate-proposal", auth, aiController.generateProposal);
+router.post("/ai/generate-proposal", auth, aiController.generateProposal);
 
 
 export default router;
