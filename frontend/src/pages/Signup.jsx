@@ -119,7 +119,11 @@ export default function Signup() {
     setLoading(true)
 
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
+      let API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
+      if(API_BASE_URL && import.meta.env.VITE_API_BASE_URL ){
+        API_BASE_URL = "https://maayo-backend.onrender.com"
+        console.log(API_BASE_URL)
+      }
       const res = await fetch(`${API_BASE_URL}/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

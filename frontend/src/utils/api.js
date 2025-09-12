@@ -245,7 +245,10 @@ export function checkSession() {
  * @returns {Promise} Login response
  */
 export async function loginUser(credentials) {
-  const response = await fetch(`${API_BASE_URL}/login`, {
+  if(API_BASE_URL && import.meta.env.VITE_API_BASE_URL ){
+   const temproute = "https://maayo-backend.onrender.com"
+  }
+  const response = await fetch(`${temproute}/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -268,7 +271,10 @@ export async function loginUser(credentials) {
  * @returns {Promise} Registration response
  */
 export async function registerUser(userData) {
-  const response = await fetch(`${API_BASE_URL}/signup`, {
+  if(API_BASE_URL && import.meta.env.VITE_API_BASE_URL ){
+   const temproute = "https://maayo-backend.onrender.com"
+  }
+  const response = await fetch(`${temproute}/signup`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

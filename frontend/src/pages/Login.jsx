@@ -454,7 +454,10 @@ export default function Login() {
     setLoading(true)
 
     try {
-      const res = await fetch(`${API_BASE_URL}/login`, {
+      if(API_BASE_URL && import.meta.env.VITE_API_BASE_URL){
+        const tempurl= "https://maayo-backend.onrender.com/"
+      }
+      const res = await fetch(`${tempurl}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
