@@ -48,8 +48,8 @@ const checkFreelancerProfileExists = async (userId) => {
           'user_email': authHeaders.userEmail
         }
       })
-      
-      const response = await fetch('http://localhost:5000/api/freelancer/info/list', {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
+      const response = await fetch(`${API_BASE_URL}/freelancer/info/list`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -123,7 +123,7 @@ const checkClientProfileExists = async (userId) => {
     // Check database directly for profile existence
     console.log('🔍 Checking database for client profile...')
     try {
-      const response = await authenticatedFetch('http://localhost:5000/api/client/info/update', {
+      const response = await authenticatedFetch(`${API_BASE_URL}/client/info/update`, {
         method: 'POST',
         body: JSON.stringify({ personId: userId })
       })
@@ -454,7 +454,7 @@ export default function Login() {
     setLoading(true)
 
     try {
-      const res = await fetch("http://localhost:5000/api/login", {
+      const res = await fetch(`${API_BASE_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

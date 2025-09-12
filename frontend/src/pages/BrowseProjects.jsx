@@ -21,7 +21,8 @@ export default function BrowseProjects() {
     try {
       setLoading(true)
       // Use the new public browse endpoint that doesn't require authentication
-      const response = await fetch('http://localhost:5000/api/project/browse', {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
+      const response = await fetch(`${API_BASE_URL}/project/browse`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

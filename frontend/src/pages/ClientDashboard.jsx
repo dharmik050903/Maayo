@@ -53,7 +53,8 @@ export default function ClientDashboard() {
         console.log('Attempting to fetch client profile from database with ID:', profileId)
         
         // Try to fetch from database using update endpoint
-        const response = await authenticatedFetch('http://localhost:5000/api/client/info/update', {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
+        const response = await authenticatedFetch(`${API_BASE_URL}/client/info/update`, {
           method: 'POST',
           body: JSON.stringify({ _id: profileId })
         })

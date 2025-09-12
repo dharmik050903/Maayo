@@ -70,7 +70,8 @@ const GoogleSignIn = ({ onSuccess, onError, loading, disabled, buttonText = "Con
   const handleGoogleCallback = async (response) => {
     try {
       // Send the credential to backend
-      const res = await fetch('http://localhost:5000/api/signup/google', {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
+      const res = await fetch(`${API_BASE_URL}/signup/google`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

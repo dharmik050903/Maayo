@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import Button from '../components/Button'
 import { authenticatedFetch, isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
 
 export default function FreelancerDashboard() {
   const [userData, setUserData] = useState(null)
@@ -127,7 +128,7 @@ export default function FreelancerDashboard() {
         console.log('📝 Found stored profile ID, verifying in database...')
         
         try {
-          const verifyResponse = await authenticatedFetch('http://localhost:5000/api/freelancer/info/update', {
+          const verifyResponse = await authenticatedFetch(`${API_BASE_URL}/freelancer/info/update`, {
             method: 'POST',
             body: JSON.stringify({ 
               _id: storedProfileId,
@@ -210,8 +211,7 @@ export default function FreelancerDashboard() {
           method: 'POST',
           body: requestBody
         })
-        
-        const response = await authenticatedFetch('http://localhost:5000/api/freelancer/info/update', {
+        const response = await authenticatedFetch(`${API_BASE_URL}/freelancer/info/update`, {
           method: 'POST',
           body: JSON.stringify(requestBody)
         })
@@ -313,7 +313,7 @@ export default function FreelancerDashboard() {
 
   const fetchSkills = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/skills', {
+      const response = await fetch(`${API_BASE_URL}/skills`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       })
@@ -416,13 +416,13 @@ export default function FreelancerDashboard() {
       
       if (isFirstTime) {
         // First time - create profile
-        response = await authenticatedFetch('http://localhost:5000/api/freelancer/info', {
+        response = await authenticatedFetch(`${API_BASE_URL}/freelancer/info`, {
           method: 'POST',
           body: JSON.stringify(profilePayload)
         })
       } else {
         // Update existing profile
-        response = await authenticatedFetch('http://localhost:5000/api/freelancer/info/update', {
+        response = await authenticatedFetch(`${API_BASE_URL}/freelancer/info/update`, {
           method: 'POST',
           body: JSON.stringify({
             ...profilePayload,
@@ -487,14 +487,14 @@ export default function FreelancerDashboard() {
       
       if (isFirstTime) {
         // First time - create profile
-        apiEndpoint = 'http://localhost:5000/api/freelancer/info'
+        apiEndpoint = `${API_BASE_URL}/freelancer/info`
         response = await authenticatedFetch(apiEndpoint, {
           method: 'POST',
           body: JSON.stringify(profilePayload)
         })
       } else {
         // Update existing profile
-        apiEndpoint = 'http://localhost:5000/api/freelancer/info/update'
+        apiEndpoint = `${API_BASE_URL}/freelancer/info/update`
         response = await authenticatedFetch(apiEndpoint, {
           method: 'POST',
           body: JSON.stringify({
