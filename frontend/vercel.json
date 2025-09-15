@@ -1,7 +1,10 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!api/|MaayoLogo.jpg|vite.svg).*)",
+      "has": [
+        { "type": "host", "value": ".*" }
+      ],
       "destination": "/index.html"
     }
   ]
