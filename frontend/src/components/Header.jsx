@@ -32,6 +32,18 @@ export default function Header({ userType, onLogout, userData }) {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Ensure solid header on non-home routes (prevents white-on-white on internal pages)
+  const isHeaderSolid = isScrolled || location.pathname !== '/'
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      const previousOverflow = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      return () => { document.body.style.overflow = previousOverflow }
+    }
+  }, [mobileMenuOpen])
+
   // Fetch initial data for search
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -193,6 +205,9 @@ export default function Header({ userType, onLogout, userData }) {
     </>
   ) : (
     <>
+      <Link to="/" className={getLinkClasses('/')}> 
+        Home
+      </Link>
       <Link to="/browse" className={getLinkClasses('/browse')}>
         Find Work
       </Link>
@@ -208,11 +223,11 @@ export default function Header({ userType, onLogout, userData }) {
   return (
     <>
     <header className={`w-full fixed top-0 left-0 z-50 backdrop-blur-md border-b transition-all duration-300 ${
-      isScrolled ? 'bg-white/95 border-white/30' : 'bg-white/10 border-white/20'
+      isHeaderSolid ? 'bg-white/95 border-white/30' : 'bg-white/10 border-white/20'
     }`}>
       <div className="max-w-7xl mx-auto flex items-center justify-between p-4">
         <Link to={isAuthenticated ? `/${userType}-home` : "/"} className="logo-link flex items-center space-x-2 hover:opacity-80 transition-opacity">
-          <Logo theme={isScrolled ? "dark" : "light"} />
+          <Logo theme={isHeaderSolid ? "dark" : "light"} />
         </Link>
 
         {/* Global Search Bar */}
@@ -226,13 +241,13 @@ export default function Header({ userType, onLogout, userData }) {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className={`w-full px-4 py-2 pl-10 rounded-lg border-0 focus:ring-2 focus:ring-mint focus:border-transparent transition-all duration-300 ${
-                    isScrolled 
+                    isHeaderSolid 
                       ? 'bg-gray-100 text-graphite placeholder-gray-500' 
                       : 'bg-white/20 text-white placeholder-white/70 backdrop-blur-sm'
                   }`}
                 />
                 <svg className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
-                  isScrolled ? 'text-gray-500' : 'text-white/70'
+                  isHeaderSolid ? 'text-gray-500' : 'text-white/70'
                 }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
@@ -241,7 +256,7 @@ export default function Header({ userType, onLogout, userData }) {
                 type="submit"
                 disabled={isSearching}
                 className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                  isScrolled 
+                  isHeaderSolid 
                     ? 'bg-mint text-white hover:bg-mint/90' 
                     : 'bg-white/20 text-white hover:bg-white/30'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
@@ -348,14 +363,14 @@ export default function Header({ userType, onLogout, userData }) {
 
         {/* Desktop Navigation */}
         <nav className={`hidden md:flex gap-6 font-medium transition-colors duration-300 ${
-          isScrolled ? 'text-graphite' : 'text-white/90'
+          isHeaderSolid ? 'text-graphite' : 'text-white/90'
         }`}>
           {navLinks}
         </nav>
 
         {/* Mobile Hamburger Menu Button */}
         <div className="md:hidden flex items-center gap-3">
-          <button onClick={toggleMobileMenu} className={`text-2xl ${isScrolled ? 'text-graphite' : 'text-white'}`}>
+          <button onClick={toggleMobileMenu} className={`text-2xl ${isHeaderSolid ? 'text-graphite' : 'text-white'}`}>
             ☰
           </button>
         </div>
@@ -367,7 +382,7 @@ export default function Header({ userType, onLogout, userData }) {
                 <svg className="w-4 h-4 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-                <span className={`font-medium transition-colors duration-300 ${isScrolled ? 'text-graphite' : 'text-white'}`}>Logout</span>
+                <span className={`font-medium transition-colors duration-300 ${isHeaderSolid ? 'text-graphite' : 'text-white'}`}>Logout</span>
               </div>
               <div className="absolute inset-0 bg-gradient-to-r from-coral/20 to-mint/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
             </button>
@@ -385,23 +400,42 @@ export default function Header({ userType, onLogout, userData }) {
       </div>
 
       {/* Mobile Navigation Menu */}
-      {mobileMenuOpen && (
-        <nav className={`md:hidden bg-white/95 border-t border-white/20 shadow-lg transition-all duration-300`}>
-          <div className="flex flex-col gap-2 p-4">
-            {navLinks}
-            {isAuthenticated ? (
-              <button onClick={onLogout} className="hover:text-mint px-3 py-1 rounded-md transition-colors text-left">
-                Logout
-              </button>
-            ) : (
-              <>
-                <Link to="/login" className="hover:text-mint px-3 py-1 rounded-md transition-colors">Login</Link>
-                <Link to="/signup" className="hover:text-mint px-3 py-1 rounded-md transition-colors">Sign Up</Link>
-              </>
-            )}
-          </div>
-        </nav>
-      )}
+      {mobileMenuOpen && createPortal(
+        <div className="fixed inset-0 z-[70] md:hidden">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/40" onClick={toggleMobileMenu}></div>
+          {/* Drawer (positioned below header height) */}
+          <nav className="absolute left-0 right-0 top-16 bg-white shadow-xl border-t border-gray-100 rounded-b-xl overflow-hidden">
+            <div
+              className="flex flex-col gap-2 p-4"
+              onClick={(e) => {
+                if (e.target.closest('a,button')) setMobileMenuOpen(false)
+              }}
+            >
+              {/* Close Row */}
+              <div className="flex items-center justify-between pb-2 border-b border-gray-100 mb-2">
+                <span className="text-sm font-medium text-graphite">Menu</span>
+                <button onClick={toggleMobileMenu} aria-label="Close menu" className="p-2 -mr-2 rounded hover:bg-gray-100">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              {navLinks}
+              {isAuthenticated ? (
+                <button onClick={onLogout} className="hover:text-mint px-3 py-1 rounded-md transition-colors text-left">
+                  Logout
+                </button>
+              ) : (
+                <>
+                  <Link to="/login" className="hover:text-mint px-3 py-1 rounded-md transition-colors">Login</Link>
+                  <Link to="/signup" className="hover:text-mint px-3 py-1 rounded-md transition-colors">Sign Up</Link>
+                </>
+              )}
+            </div>
+          </nav>
+        </div>
+      , document.body)}
     </header>
 
       {/* Project Detail Modal */}
