@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from './Button'
+import RatingComponent from './RatingComponent'
 import { projectService } from '../services/projectService'
 import { skillsService } from '../services/skillsService'
 import { reviewService } from '../services/reviewService'
@@ -33,6 +34,10 @@ export default function MyProjects() {
   // Review modal state
   const [showReviewModal, setShowReviewModal] = useState(false)
   const [selectedProjectForReview, setSelectedProjectForReview] = useState(null)
+  const [showBidRequest, setShowBidRequest] = useState(false)   
+  const [selectedBid, setSelectedBid] = useState(null);
+  const [showRatingModal, setShowRatingModal] = useState(false)
+  const [selectedProjectForRating, setSelectedProjectForRating] = useState(null)
   const [reviewForm, setReviewForm] = useState({
     rating: 0,
     comment: '',
@@ -319,6 +324,21 @@ export default function MyProjects() {
     }
   }
 
+  // Rating functions
+  const handleRateProject = (project) => {
+    console.log('Opening rating modal for project:', project)
+    setSelectedProjectForRating(project)
+    setShowRatingModal(true)
+  }
+
+  const handleRatingSubmitted = (ratingData) => {
+    console.log('Rating submitted:', ratingData)
+    setShowRatingModal(false)
+    setSelectedProjectForRating(null)
+    // Refresh projects to show updated data
+    fetchMyProjects()
+  }
+
   // Review functions
   const handleReviewProject = (project) => {
     console.log('Opening review modal for project:', project)
@@ -362,7 +382,17 @@ export default function MyProjects() {
       status: selectedProjectForReview?.status
     })
 
-    // Get the freelancer ID from the project data
+const handleViewBidRequests = (bidData) => {
+  setSelectedBid(bidData);
+  setShowBidRequest(true);
+};
+
+const handleCloseBidRequest = () => {
+  setShowBidRequest(false);
+  setSelectedBid(null);
+};
+
+// Get the freelancer ID from the project data
     let freelancerId = null
     if (selectedProjectForReview?.freelancerid && Array.isArray(selectedProjectForReview.freelancerid) && selectedProjectForReview.freelancerid.length > 0) {
       freelancerId = selectedProjectForReview.freelancerid[0]?.freelancerid
@@ -628,6 +658,9 @@ export default function MyProjects() {
                   
                   {getProjectStatus(project) === 'open' && (
                     <>
+                      <Button variant="outline" size="sm" onClick={() => handleViewBidRequests({ project, bid_amount: 0, status: 'pending', cover_letter: 'No bids yet' })} className="flex-1 min-w-[120px] border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white">
+                        View Bids ({project.bid_count || 0})
+                      </Button>
                       <Button variant="success" size="sm" onClick={() => handleActivateProject(project._id)} className="flex-1 min-w-[120px]">
                         Activate Project
                       </Button>
@@ -659,10 +692,10 @@ export default function MyProjects() {
                       <Button 
                         variant="accent" 
                         size="sm" 
-                        onClick={() => handleReviewProject(project)} 
+                        onClick={() => handleRateProject(project)} 
                         className="flex-1 min-w-[120px]"
                       >
-                        ⭐ Write Review
+                        ⭐ Rate Project
                       </Button>
                     </div>
                   )}
@@ -925,6 +958,121 @@ export default function MyProjects() {
           </div>
         </div>
       )}
+
+      {/* Bid Request Modal */}
+      {showBidRequest && selectedBid && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-graphite">Bid Requests</h3>
+              <button 
+                onClick={handleCloseBidRequest}
+                className="text-coolgray hover:text-graphite transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Project Info */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="text-lg font-semibold text-graphite mb-2">{selectedBid.project?.title}</h4>
+                <p className="text-coolgray text-sm">{selectedBid.project?.description}</p>
+                <div className="flex items-center gap-4 mt-3 text-sm">
+                  <span className="text-mint font-medium">Budget: ${selectedBid.project?.budget}</span>
+                  <span className="text-violet font-medium">Duration: {selectedBid.project?.duration} days</span>
+                </div>
+              </div>
+
+              {/* Bid Details */}
+              <div className="space-y-4">
+                <h5 className="text-lg font-semibold text-graphite">Bid Details</h5>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <h6 className="font-medium text-graphite mb-2">Freelancer Information</h6>
+                    <p className="text-sm text-coolgray">Name: {selectedBid.freelancer?.name || 'N/A'}</p>
+                    <p className="text-sm text-coolgray">Email: {selectedBid.freelancer?.email || 'N/A'}</p>
+                    <p className="text-sm text-coolgray">Rate: ${selectedBid.bid_amount || 'N/A'}/hour</p>
+                  </div>
+                  <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <h6 className="font-medium text-graphite mb-2">Bid Information</h6>
+                    <p className="text-sm text-coolgray">Bid Amount: ${selectedBid.bid_amount || 'N/A'}</p>
+                    <p className="text-sm text-coolgray">Timeline: {selectedBid.timeline || 'N/A'} days</p>
+                    <p className="text-sm text-coolgray">Status: 
+                      <span className={`ml-1 px-2 py-1 rounded-full text-xs ${
+                        selectedBid.status === 'accepted' ? 'bg-green-100 text-green-800' :
+                        selectedBid.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {selectedBid.status || 'Pending'}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cover Letter */}
+              {selectedBid.cover_letter && (
+                <div>
+                  <h6 className="font-medium text-graphite mb-2">Cover Letter</h6>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <p className="text-coolgray text-sm leading-relaxed">{selectedBid.cover_letter}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
+                <Button 
+                  type="button"
+                  variant="outline" 
+                  onClick={handleCloseBidRequest}
+                  className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                >
+                  Close
+                </Button>
+                {selectedBid.status === 'pending' && (
+                  <>
+                    <Button 
+                      variant="success" 
+                      onClick={() => {
+                        // Handle accept bid
+                        console.log('Accepting bid:', selectedBid._id);
+                        handleCloseBidRequest();
+                      }}
+                      className="px-6"
+                    >
+                      Accept Bid
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        // Handle reject bid
+                        console.log('Rejecting bid:', selectedBid._id);
+                        handleCloseBidRequest();
+                      }}
+                      className="border-red-300 text-red-700 hover:bg-red-50"
+                    >
+                      Reject Bid
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rating Modal */}
+      <RatingComponent
+        isOpen={showRatingModal}
+        onClose={() => setShowRatingModal(false)}
+        projectId={selectedProjectForRating?._id}
+        freelancerId={selectedProjectForRating?.freelancerid}
+        onRatingSubmitted={handleRatingSubmitted}
+      />
     </div>
   )
 }

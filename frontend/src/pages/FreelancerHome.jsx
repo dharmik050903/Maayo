@@ -13,8 +13,7 @@ export default function FreelancerHome() {
   const [profileData, setProfileData] = useState(null)
   const [projects, setProjects] = useState([])
   const [projectSearchTerm, setProjectSearchTerm] = useState('')
-  const [showProjectSearch, setShowProjectSearch] = useState(false)
-  const [showMyBids, setShowMyBids] = useState(false)
+  const [activeView, setActiveView] = useState(null) // New state variable
   const [showBidForm, setShowBidForm] = useState(false)
   const [selectedProject, setSelectedProject] = useState(null)
   const [showProjectDetail, setShowProjectDetail] = useState(false)
@@ -359,7 +358,7 @@ export default function FreelancerHome() {
                 Welcome back, <span className="text-mint">{userData.first_name}!</span>
               </h1>
               <p className="text-lg text-white/80 mb-6">
-                {profileData ? `Ready to find your next ${profileData.experience_level?.toLowerCase() || 'exciting'} project?` : 'Ready to find your next exciting project?'}
+                {profileData ?` Ready to find your next ${profileData.experience_level?.toLowerCase() || 'exciting'} project?` : 'Ready to find your next exciting project?'}
               </p>
             </div>
           )}
@@ -381,17 +380,17 @@ export default function FreelancerHome() {
               variant="outline" 
               size="lg" 
               className="px-8 py-4 text-lg border-white text-white hover:bg-white hover:text-graphite"
-              onClick={() => setShowProjectSearch(!showProjectSearch)}
+              onClick={() => setActiveView(activeView === 'projects' ? null : 'projects')}
             >
-              {showProjectSearch ? 'Hide Projects' : 'Browse Projects'}
+              {activeView === 'projects' ? 'Hide Projects' : 'Browse Projects'}
             </Button>
             <Button 
               variant="outline" 
               size="lg" 
               className="px-8 py-4 text-lg border-white text-white hover:bg-white hover:text-graphite"
-              onClick={() => setShowMyBids(!showMyBids)}
+              onClick={() => setActiveView(activeView === 'bids' ? null : 'bids')}
             >
-              {showMyBids ? 'Hide My Bids' : 'My Bids'}
+              {activeView === 'bids' ? 'Hide My Bids' : 'My Bids'}
             </Button>
           </div>
 
@@ -436,7 +435,7 @@ export default function FreelancerHome() {
       </section>
 
       {/* Project Search Section */}
-      {showProjectSearch && (
+      {activeView === 'projects' && (
         <section className="py-16 px-6 bg-white/5">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl font-bold text-center mb-8">
@@ -697,7 +696,7 @@ export default function FreelancerHome() {
             {!loading && (
             <div id="projects-section" className="space-y-6">
               {getPaginatedProjects().map((project, index) => (
-                <div key={project._id} className="card p-6 bg-white/95 hover:bg-white transition-colors slide-in-up" style={{animationDelay: `${index * 0.1}s`}}>
+                <div key={project._id} className="card p-6 bg-white/95 hover:bg-white transition-colors slide-in-up" style={{animationDelay: `{index * 0.1}s`}}>
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">
                       <h3 
@@ -858,7 +857,7 @@ export default function FreelancerHome() {
       )}
 
       {/* My Bids Section */}
-      {showMyBids && (
+      {activeView === 'bids' && (
         <section className="py-16 px-6 bg-white/5">
           <div className="max-w-6xl mx-auto">
             <MyBids />
@@ -890,7 +889,7 @@ export default function FreelancerHome() {
             
             <div 
               className="card p-6 bg-white/95 hover:bg-white transition-colors group cursor-pointer"
-              onClick={() => setShowProjectSearch(!showProjectSearch)}
+              onClick={() => setActiveView(activeView === 'projects' ? null : 'projects')}
             >
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 bg-coral/20 rounded-lg flex items-center justify-center group-hover:bg-coral/30 transition-colors">
@@ -905,7 +904,9 @@ export default function FreelancerHome() {
               </div>
             </div>
             
-            <div className="card p-6 bg-white/95 hover:bg-white transition-colors group cursor-pointer">
+            <div className="card p-6 bg-white/95 hover:bg-white transition-colors group cursor-pointer"
+             onClick={() => setActiveView(activeView === 'bids' ? null : 'bids')}
+             >
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 bg-violet/20 rounded-lg flex items-center justify-center group-hover:bg-violet/30 transition-colors">
                   <svg className="w-6 h-6 text-violet" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1034,7 +1035,7 @@ export default function FreelancerHome() {
 
       {/* Bid Form Modal */}
       {showBidForm && selectedProject && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
           <div className="max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-2xl">
             <BidForm 
               project={selectedProject}
@@ -1047,7 +1048,7 @@ export default function FreelancerHome() {
 
       {/* Compact Project Detail Modal */}
       {showProjectDetail && selectedProjectDetail && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
           <div className="max-w-3xl w-full max-h-[85vh] overflow-y-auto bg-white rounded-lg shadow-xl">
             <div className="p-6">
               {/* Header */}
@@ -1162,5 +1163,3 @@ export default function FreelancerHome() {
     </div>
   )
 }
-
-

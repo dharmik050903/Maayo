@@ -15,8 +15,10 @@ import ProjectList from './pages/ProjectList'
 import ProjectDetail from './pages/ProjectDetail'
 import ProjectEdit from './pages/ProjectEdit'
 import ClientMyProjects from './pages/ClientMyProjects'
+import MyProjects from './components/MyProjects'
 import FindWork from './pages/FindWork'
 import BrowseProjects from './pages/BrowseProjects'
+import Freelancers from './pages/Freelancers'
 import SessionManager from './components/SessionManager'
 import Aboutus from './pages/Aboutus'
 
@@ -38,8 +40,10 @@ const router = createBrowserRouter([
       { path: '/freelancer-home', element: <FreelancerHome /> },
       { path: '/client-home', element: <ClientHome /> },
       { path: '/client/my-projects', element: <ClientMyProjects /> },
+      { path: '/my-projects', element: <MyProjects /> },
       { path: '/find-work', element: <FindWork /> },
       { path: '/browse', element: <BrowseProjects /> },
+      { path: '/freelancers', element: <Freelancers /> },
       { path: '/about', element: <Aboutus />}
     ],
   },
@@ -52,5 +56,3 @@ createRoot(document.getElementById('root')).render(
     </SessionManager>
   </React.StrictMode>
 )
-
-

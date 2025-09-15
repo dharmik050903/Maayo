@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'  // ✅ Added useRef, useEffect
 import { bidService } from '../services/bidService'
 import { aiService } from '../services/aiService'
 
@@ -13,6 +13,9 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
     milestones: []
   })
   
+  const formRef = useRef(null)          // ✅ Ref for scrolling into view
+  const coverLetterRef = useRef(null)   // ✅ Ref for focusing textarea after AI proposal
+
   const [milestoneTitle, setMilestoneTitle] = useState('')
   const [milestoneAmount, setMilestoneAmount] = useState('')
   const [milestoneDescription, setMilestoneDescription] = useState('')
@@ -23,12 +26,15 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
   const [aiLoading, setAiLoading] = useState(false)
   const [aiError, setAiError] = useState('')
 
+  useEffect(() => {
+    if (formRef.current) {
+      formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })   // ✅ Scroll on mount
+    }
+  }, [])
+
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    
-    // For proposed_duration and availability_hours, only allow whole numbers
     if (name === 'proposed_duration' || name === 'availability_hours') {
-      // Remove any decimal points and non-numeric characters except digits
       const cleanValue = value.replace(/[^\d]/g, '')
       setFormData(prev => ({
         ...prev,
@@ -42,15 +48,12 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
     }
   }
 
-  // Count words in cover letter
   const getWordCount = (text) => {
     return text.trim().split(/\s+/).filter(word => word.length > 0).length
   }
 
-  // Check if cover letter has at least 10 words
   const hasMinimumWords = getWordCount(formData.cover_letter) >= 10
 
-  // Generate AI proposal
   const handleGenerateAIProposal = async () => {
     if (!hasMinimumWords) {
       setAiError('Please write at least 10 words in your cover letter first')
@@ -67,16 +70,37 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
         budget: project.budget,
         bid_amount: formData.bid_amount,
         milestones: formData.milestones,
-        prompt: formData.cover_letter // Use current cover letter as prompt
+        prompt: formData.cover_letter
       }
 
       const response = await aiService.generateProposal(proposalData)
       
       if (response.status && response.data) {
+        // Append AI content to existing content instead of replacing
+        const existingContent = formData.cover_letter.trim()
+        const aiContent = response.data.proposalText.trim()
+        
+        let newContent = ``
+        if (existingContent) {
+          newContent =`${existingContent}\n\n--- AI Enhanced Proposal ---\n\n${aiContent}`
+        } else {
+          newContent = aiContent
+        }
+        
         setFormData(prev => ({
           ...prev,
-          cover_letter: response.data.proposalText
+          cover_letter: newContent
         }))
+
+        // ✅ Focus on textarea after AI content is inserted
+        setTimeout(() => {
+          if (coverLetterRef.current) {
+            coverLetterRef.current.focus()
+            // Move cursor to end of text
+            const length = newContent.length
+            coverLetterRef.current.setSelectionRange(length, length)
+          }
+        }, 100)
       } else {
         throw new Error(response.message || 'Failed to generate AI proposal')
       }
@@ -106,7 +130,6 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
       milestones: [...prev.milestones, newMilestone]
     }))
 
-    // Reset milestone form
     setMilestoneTitle('')
     setMilestoneAmount('')
     setMilestoneDescription('')
@@ -127,7 +150,6 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
     setError('')
 
     try {
-      // Validate required fields
       if (!formData.bid_amount || !formData.proposed_duration || !formData.cover_letter) {
         throw new Error('Bid amount, proposed duration, and cover letter are required')
       }
@@ -140,7 +162,6 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
         throw new Error('Proposed duration must be greater than 0')
       }
 
-      // Prepare bid data
       const bidData = {
         ...formData,
         bid_amount: parseFloat(formData.bid_amount),
@@ -152,7 +173,6 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
       
       if (response.status) {
         onBidSubmitted?.(response.data)
-        // Reset form
         setFormData({
           project_id: project?._id || '',
           bid_amount: '',
@@ -182,7 +202,7 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-8 max-w-4xl mx-auto relative">
+    <div ref={formRef} className="bg-white rounded-2xl shadow-xl p-8 max-w-4xl mx-auto relative">  {/* ✅ Attached formRef here */}
       {/* Cancel Button */}
       <button
         onClick={onCancel}
@@ -338,18 +358,18 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
             </div>
           )}
 
-          <textarea
-            id="cover_letter"
-            name="cover_letter"
-            value={formData.cover_letter}
-            onChange={handleInputChange}
-            rows="6"
-            maxLength="2000"
-            required
-            className="text-graphite w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-violet focus:border-violet transition-all duration-200 resize-none"
-            placeholder="Describe your approach, experience, and why you're the best fit for this project..."
-          />
-          
+      <textarea
+        ref={coverLetterRef}  
+        id="cover_letter"
+        name="cover_letter"
+        value={formData.cover_letter}
+        onChange={handleInputChange}
+        rows="6"
+        maxLength="2000"
+        required
+        className="text-graphite w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-violet focus:border-violet transition-all duration-200 resize-none"
+        placeholder="Describe your approach, experience, and why you're the best fit for this project..."
+      />  
           <div className="flex justify-between items-center">
             <p className="text-sm text-coolgray">
               {formData.cover_letter.length}/2000 characters
@@ -511,4 +531,3 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
 }
 
 export default BidForm
-

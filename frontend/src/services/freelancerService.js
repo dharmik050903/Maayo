@@ -78,7 +78,6 @@ export const freelancerService = {
   // Search freelancers using backend API
   async searchFreelancers(query, params = {}) {
     try {
-      console.log(`Searching freelancers with query: "${query}"`)
       
       const searchParams = {
         search: query,
@@ -89,7 +88,6 @@ export const freelancerService = {
       
       const result = await this.getAllFreelancers(searchParams)
       
-      console.log(`Found ${result.data?.length || 0} freelancers matching search: "${query}"`)
       
       return result
     } catch (error) {
