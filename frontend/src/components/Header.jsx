@@ -16,6 +16,7 @@ export default function Header({ userType, onLogout, userData }) {
   const [searchResults, setSearchResults] = useState({ projects: [], freelancers: [] })
   const [isSearching, setIsSearching] = useState(false)
   const [showSearchResults, setShowSearchResults] = useState(false)
+  const [showMobileSearch, setShowMobileSearch] = useState(false)
   const [projects, setProjects] = useState([])
   const [freelancers, setFreelancers] = useState([])
   const [selectedProject, setSelectedProject] = useState(null)
@@ -368,8 +369,17 @@ export default function Header({ userType, onLogout, userData }) {
           {navLinks}
         </nav>
 
-        {/* Mobile Hamburger Menu Button */}
-        <div className="md:hidden flex items-center gap-3">
+        {/* Mobile actions */}
+        <div className="md:hidden flex items-center gap-4">
+          <button
+            onClick={() => setShowMobileSearch((v) => !v)}
+            aria-label="Search"
+            className={`${isHeaderSolid ? 'text-graphite' : 'text-white'} p-1 rounded hover:bg-white/20`}
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
           <button onClick={toggleMobileMenu} className={`text-2xl ${isHeaderSolid ? 'text-graphite' : 'text-white'}`}>
             ☰
           </button>
@@ -398,6 +408,78 @@ export default function Header({ userType, onLogout, userData }) {
           )}
         </div>
       </div>
+
+      {/* Mobile Search Bar */}
+      {showMobileSearch && (
+        <div className="md:hidden px-4 pb-3 bg-white border-t border-gray-100 shadow-sm">
+          <form onSubmit={handleSearch} className="relative">
+            <input
+              type="text"
+              placeholder="Search projects or freelancers..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 pl-10 rounded-lg bg-gray-100 text-graphite placeholder-gray-500 focus:ring-2 focus:ring-mint focus:outline-none"
+            />
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <button
+              type="submit"
+              disabled={isSearching}
+              className="absolute right-1 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-md bg-mint text-white text-sm"
+            >
+              {isSearching ? '...' : 'Search'}
+            </button>
+          </form>
+
+          {showSearchResults && (
+            <div className="mt-2 rounded-lg shadow border border-gray-200 bg-white max-h-80 overflow-y-auto">
+              <div className="p-3">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-sm text-graphite">
+                    Found {searchResults.projects.length} projects and {searchResults.freelancers.length} freelancers
+                  </p>
+                  <button onClick={clearSearch} className="text-xs underline text-gray-500">Clear</button>
+                </div>
+
+                {searchResults.projects.length > 0 && (
+                  <div className="mb-3">
+                    <h4 className="text-sm font-semibold mb-1 text-graphite">Projects ({searchResults.projects.length})</h4>
+                    <div className="space-y-2">
+                      {searchResults.projects.slice(0, 3).map((project) => (
+                        <div key={project._id} className="p-2 rounded hover:bg-gray-100 cursor-pointer" onClick={() => handleProjectClick(project)}>
+                          <h5 className="text-sm font-medium line-clamp-1 text-graphite">{project.title}</h5>
+                          <p className="text-xs line-clamp-1 text-gray-600">{project.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {searchResults.freelancers.length > 0 && (
+                  <div className="mb-2">
+                    <h4 className="text-sm font-semibold mb-1 text-graphite">Freelancers ({searchResults.freelancers.length})</h4>
+                    <div className="space-y-2">
+                      {searchResults.freelancers.slice(0, 3).map((freelancer) => (
+                        <div key={freelancer._id} className="p-2 rounded hover:bg-gray-100 cursor-pointer" onClick={() => handleFreelancerClick(freelancer)}>
+                          <h5 className="text-sm font-medium line-clamp-1 text-graphite">{freelancer.name || 'Freelancer'}</h5>
+                          <p className="text-xs line-clamp-1 text-gray-600">{freelancer.title || 'Professional'}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {searchResults.projects.length === 0 && searchResults.freelancers.length === 0 && (
+                  <div className="text-center py-2">
+                    <p className="text-xs text-gray-500">No results found for "{searchQuery}"</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && createPortal(
