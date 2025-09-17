@@ -4,7 +4,7 @@ import MyProjects from '../components/MyProjects'
 import ClientMyBids from '../components/ClientMyBids'
 import { getCurrentUser } from '../utils/api'
 
-export default function ClientMyProjects() {
+export default function MyProjectsPage() {
   const [userData, setUserData] = useState(null)
   const [activeTab, setActiveTab] = useState('projects')
 
@@ -18,7 +18,7 @@ export default function ClientMyProjects() {
   return (
     <div className="min-h-screen flex flex-col bg-brand-gradient text-white">
       <Header 
-        userType="client" 
+        userType={userData?.user_type || 'client'} 
         userData={userData}
         onLogout={() => {
           localStorage.clear()
@@ -31,7 +31,7 @@ export default function ClientMyProjects() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-            Project <span className="text-mint">Management</span>
+            My <span className="text-mint">Projects</span>
           </h1>
           <p className="text-lg text-white/80 mt-4">
             Manage your projects and review bids from freelancers

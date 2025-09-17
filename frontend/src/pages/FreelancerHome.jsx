@@ -7,6 +7,7 @@ import { projectService } from '../services/projectService'
 import { skillsService } from '../services/skillsService'
 import MyBids from '../components/MyBids'
 import BidForm from '../components/BidForm'
+import confirmationService from '../services/confirmationService.jsx'
 
 export default function FreelancerHome() {
   const [userData, setUserData] = useState(null)
@@ -206,7 +207,7 @@ export default function FreelancerHome() {
     setShowBidForm(true)
   }
 
-  const handleBidSubmitted = (bidData) => {
+  const handleBidSubmitted = async (bidData) => {
     console.log('Bid submitted successfully:', bidData)
     setShowBidForm(false)
     
@@ -218,7 +219,10 @@ export default function FreelancerHome() {
     
     loadUserBids()
     
-    alert('Bid submitted successfully! You can view it in "My Bids" section.')
+    await confirmationService.alert(
+      'Bid submitted successfully! You can view it in "My Bids" section.',
+      'Success'
+    )
   }
 
   const handleBidFormCancel = () => {

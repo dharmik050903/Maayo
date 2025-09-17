@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Button from '../components/Button'
 import MyProjects from '../components/MyProjects'
@@ -7,6 +7,7 @@ import { authenticatedFetch, isAuthenticated, getCurrentUser, clearAuth } from '
 import { projectService } from '../services/projectService'
 
 export default function ClientDashboard() {
+  const navigate = useNavigate()
   const [userData, setUserData] = useState(null)
   const [clientInfo, setClientInfo] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -309,7 +310,11 @@ export default function ClientDashboard() {
                     <Button variant="primary" className="w-full border-violet text-violet hover:bg-violet hover:text-white">
                       Browse Freelancers
                     </Button>
-                    <Button variant="outline" className="w-full border-violet text-violet hover:bg-violet hover:text-white">
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-violet text-violet hover:bg-violet hover:text-white"
+                      onClick={() => navigate('/client/my-projects')}
+                    >
                       View Messages
                     </Button>
                     <Button 

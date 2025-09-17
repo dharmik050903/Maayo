@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { bidService } from '../services/bidService'
+import confirmationService from '../services/confirmationService.jsx'
 
 const BidList = ({ projectId, userRole, onBidAction }) => {
   const [bids, setBids] = useState([])
@@ -43,7 +44,11 @@ const BidList = ({ projectId, userRole, onBidAction }) => {
   }
 
   const handleAcceptBid = async (bidId) => {
-    if (!window.confirm('Are you sure you want to accept this bid? This will reject all other pending bids for this project.')) {
+    const confirmed = await confirmationService.confirm(
+      'Are you sure you want to accept this bid? This will reject all other pending bids for this project.',
+      'Accept Bid'
+    )
+    if (!confirmed) {
       return
     }
 
@@ -81,7 +86,11 @@ const BidList = ({ projectId, userRole, onBidAction }) => {
   }
 
   const handleWithdrawBid = async (bidId) => {
-    if (!window.confirm('Are you sure you want to withdraw this bid?')) {
+    const confirmed = await confirmationService.confirm(
+      'Are you sure you want to withdraw this bid?',
+      'Withdraw Bid'
+    )
+    if (!confirmed) {
       return
     }
 

@@ -6,6 +6,7 @@ import { projectService } from '../services/projectService'
 import { skillsService } from '../services/skillsService'
 import { getCurrentUser } from '../utils/api'
 import BidForm from '../components/BidForm'
+import confirmationService from '../services/confirmationService.jsx'
 
 export default function FindWork() {
   const userData = getCurrentUser()
@@ -155,7 +156,7 @@ export default function FindWork() {
     setShowBidForm(true)
   }
 
-  const handleBidSubmitted = (bidData) => {
+  const handleBidSubmitted = async (bidData) => {
     console.log('Bid submitted successfully:', bidData)
     setShowBidForm(false)
     
@@ -163,7 +164,10 @@ export default function FindWork() {
       markBidAsSubmitted(selectedProject._id)
     }
     
-    alert('Bid submitted successfully! You can view it in "My Bids" section.')
+    await confirmationService.alert(
+      'Bid submitted successfully! You can view it in "My Bids" section.',
+      'Success'
+    )
   }
 
   const handleBidFormCancel = () => {

@@ -5,6 +5,7 @@ import Button from '../components/Button'
 import { projectService } from '../services/projectService'
 import { PageShimmer } from '../components/Shimmer'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
+import confirmationService from '../services/confirmationService.jsx'
 
 export default function ProjectList() {
   const [userData, setUserData] = useState(null)
@@ -102,7 +103,11 @@ export default function ProjectList() {
   }
 
   const handleDeleteProject = async (projectId) => {
-    if (!window.confirm('Are you sure you want to delete this project?')) return
+    const confirmed = await confirmationService.confirm(
+      'Are you sure you want to delete this project?',
+      'Delete Project'
+    )
+    if (!confirmed) return
     
     try {
       const response = await projectService.deleteProject(projectId)
@@ -118,7 +123,11 @@ export default function ProjectList() {
   }
 
   const handleCompleteProject = async (projectId) => {
-    if (!window.confirm('Are you sure you want to mark this project as completed?')) return
+    const confirmed = await confirmationService.confirm(
+      'Are you sure you want to mark this project as completed?',
+      'Complete Project'
+    )
+    if (!confirmed) return
     
     try {
       const response = await projectService.completeProject(projectId)
