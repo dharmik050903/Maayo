@@ -2,6 +2,10 @@ import React, { useState, useEffect, useRef } from 'react'
 import { bidService } from '../services/bidService'
 import { projectService } from '../services/projectService'
 import Button from './Button'
+import Messaging from './Messaging'
+import ConfirmationModal from './ConfirmationModal'
+import NotificationModal from './NotificationModal'
+import { useConfirmation, useNotification } from '../hooks/useModal'
 
 export default function ClientMyBids() {
   const [bids, setBids] = useState([])
@@ -17,15 +21,20 @@ export default function ClientMyBids() {
   const [rejectMessage, setRejectMessage] = useState('')
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
+  const [showMessaging, setShowMessaging] = useState(false)
+  const [selectedBidForMessaging, setSelectedBidForMessaging] = useState(null)
   const dropdownRef = useRef(null)
   const hasInitialized = useRef(false)
   const isInitializing = useRef(false)
+  
+  // Modal hooks
+  const { confirmation, showConfirmation, hideConfirmation, setLoading: setConfirmationLoading } = useConfirmation()
+  const { notification, showNotification, hideNotification } = useNotification()
 
   useEffect(() => {
     if (!hasInitialized.current && !isInitializing.current) {
       hasInitialized.current = true
       isInitializing.current = true
-      console.log('ClientMyBids: useEffect running (first time)')
       
       const initializeData = async () => {
         // Fetch projects first, then use that data to fetch bids
@@ -34,8 +43,6 @@ export default function ClientMyBids() {
       }
       
       initializeData()
-    } else {
-      console.log('ClientMyBids: Skipping duplicate initialization due to StrictMode or already initializing')
     }
   }, [])
 
@@ -58,14 +65,12 @@ export default function ClientMyBids() {
     try {
       setLoading(true)
       setError(null)
-      console.log('ClientMyBids: Fetching projects and bids...')
       
       // Fetch projects first
       const projectsResponse = await projectService.getClientProjects()
       if (projectsResponse.status && projectsResponse.data) {
         const projectsData = projectsResponse.data
         setProjects(projectsData)
-        console.log('ClientMyBids: Projects fetched successfully:', projectsData.length)
         
         // Now fetch bids for all projects
         const projectIds = projectsData.map(project => project._id)
@@ -83,11 +88,9 @@ export default function ClientMyBids() {
         }
         
         setBids(allBids)
-        console.log('ClientMyBids: Bids fetched successfully:', allBids.length)
       } else {
         setProjects([])
         setBids([])
-        console.log('ClientMyBids: No projects found')
       }
     } catch (error) {
       console.error('ClientMyBids: Error fetching data:', error)
@@ -101,7 +104,6 @@ export default function ClientMyBids() {
     try {
       setLoading(true)
       setError(null)
-      console.log('ClientMyBids: Fetching bids only...')
       
       // Get all projects first to get their IDs
       const projectsResponse = await projectService.getClientProjects()
@@ -135,14 +137,11 @@ export default function ClientMyBids() {
 
   const fetchProjects = async () => {
     try {
-      console.log('ClientMyBids: Fetching projects only...')
       const response = await projectService.getClientProjects()
       if (response.status && response.data) {
         setProjects(response.data)
-        console.log('ClientMyBids: Projects fetched successfully:', response.data.length)
       } else {
         setProjects([])
-        console.log('ClientMyBids: No projects found')
       }
     } catch (error) {
       console.error('ClientMyBids: Error fetching projects:', error)
@@ -197,25 +196,49 @@ export default function ClientMyBids() {
   }
 
   const handleAcceptBid = async (bidId) => {
-    if (!window.confirm('Are you sure you want to accept this bid? This action cannot be undone.')) {
-      return
-    }
-
-    try {
-      setActionLoading(true)
+    showConfirmation({
+      title: 'Accept Bid',
+      message: 'Are you sure you want to accept this bid? This action cannot be undone.',
+      type: 'warning',
+      confirmText: 'Accept',
+      onConfirm: async () => {
+        try {
+          setConfirmationLoading(true)
       const response = await bidService.acceptBid(bidId)
       if (response.status) {
-        alert('Bid accepted successfully!')
+        // Find the accepted bid to open messaging
+        const acceptedBid = bids.find(bid => bid._id === bidId)
+        if (acceptedBid) {
+          setSelectedBidForMessaging(acceptedBid)
+          setShowMessaging(true)
+        } else {
+              showNotification({
+                title: 'Success',
+                message: 'Bid accepted successfully!',
+                type: 'success'
+              })
+        }
         fetchBids() // Refresh the list
+            hideConfirmation()
       } else {
-        alert(response.message || 'Failed to accept bid')
+            showNotification({
+              title: 'Error',
+              message: response.message || 'Failed to accept bid',
+              type: 'error'
+            })
       }
     } catch (error) {
       console.error('Error accepting bid:', error)
-      alert(error.message || 'Failed to accept bid')
+          showNotification({
+            title: 'Error',
+            message: error.message || 'Failed to accept bid',
+            type: 'error'
+          })
     } finally {
-      setActionLoading(false)
+          setConfirmationLoading(false)
     }
+      }
+    })
   }
 
   const handleRejectBid = (bid) => {
@@ -231,17 +254,29 @@ export default function ClientMyBids() {
       setActionLoading(true)
       const response = await bidService.rejectBid(selectedBid._id, rejectMessage)
       if (response.status) {
-        alert('Bid rejected successfully!')
+        showNotification({
+          title: 'Success',
+          message: 'Bid rejected successfully!',
+          type: 'success'
+        })
         setShowRejectModal(false)
         setSelectedBid(null)
         setRejectMessage('')
         fetchBids() // Refresh the list
       } else {
-        alert(response.message || 'Failed to reject bid')
+        showNotification({
+          title: 'Error',
+          message: response.message || 'Failed to reject bid',
+          type: 'error'
+        })
       }
     } catch (error) {
       console.error('Error rejecting bid:', error)
-      alert(error.message || 'Failed to reject bid')
+      showNotification({
+        title: 'Error',
+        message: error.message || 'Failed to reject bid',
+        type: 'error'
+      })
     } finally {
       setActionLoading(false)
     }
@@ -410,6 +445,7 @@ export default function ClientMyBids() {
         </div>
       </div>
 
+
       {/* Bids List */}
       {filteredBids.length === 0 ? (
         <div className="text-center py-12 text-white/70">
@@ -419,6 +455,9 @@ export default function ClientMyBids() {
           <h3 className="text-xl font-semibold text-white mb-2">No Bids Yet</h3>
           <p className="text-white/80 mb-4">You haven't received any bids on your projects yet.</p>
           <p className="text-sm text-white/60 mb-6">Create more projects to attract freelancers!</p>
+          {projects.length === 0 && (
+            <p className="text-sm text-white/50">No projects found. Create a project first to receive bids.</p>
+          )}
         </div>
       ) : (
         <div className="space-y-6">
@@ -523,6 +562,19 @@ export default function ClientMyBids() {
                   >
                     View Details
                   </Button>
+                  {bid.status === 'accepted' && (
+                    <Button 
+                      variant="accent" 
+                      size="sm" 
+                      className="flex-1 min-w-[120px] bg-mint text-white hover:bg-mint/90"
+                      onClick={() => {
+                        setSelectedBidForMessaging(bid)
+                        setShowMessaging(true)
+                      }}
+                    >
+                      Message
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
@@ -733,6 +785,55 @@ export default function ClientMyBids() {
           </div>
         </div>
       )}
+
+      {/* Messaging Modal */}
+      {showMessaging && selectedBidForMessaging && (
+        <Messaging
+          currentUser={{
+            id: 'client',
+            name: 'Client'
+          }}
+          otherUser={{
+            id: selectedBidForMessaging.freelancer_id?._id || selectedBidForMessaging.freelancer_id,
+            name: getFreelancerName(selectedBidForMessaging)
+          }}
+          project={{
+            id: selectedBidForMessaging.project_id,
+            title: getProjectTitle(selectedBidForMessaging.project_id)
+          }}
+          isClient={true}
+          onClose={() => {
+            setShowMessaging(false)
+            setSelectedBidForMessaging(null)
+          }}
+        />
+      )}
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={confirmation.isOpen}
+        onClose={hideConfirmation}
+        onConfirm={confirmation.onConfirm}
+        title={confirmation.title}
+        message={confirmation.message}
+        type={confirmation.type}
+        confirmText={confirmation.confirmText}
+        cancelText={confirmation.cancelText}
+        isLoading={confirmation.isLoading}
+      />
+
+      {/* Notification Modal */}
+      <NotificationModal
+        isOpen={notification.isOpen}
+        onClose={hideNotification}
+        title={notification.title}
+        message={notification.message}
+        type={notification.type}
+        autoClose={notification.autoClose}
+        autoCloseDelay={notification.autoCloseDelay}
+      />
     </div>
   )
 }
+
+

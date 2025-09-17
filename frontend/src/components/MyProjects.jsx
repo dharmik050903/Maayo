@@ -2,9 +2,14 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from './Button'
 import RatingComponent from './RatingComponent'
+import ConfirmationModal from './ConfirmationModal'
+import NotificationModal from './NotificationModal'
+import { useConfirmation, useNotification } from '../hooks/useModal'
 import { projectService } from '../services/projectService'
 import { skillsService } from '../services/skillsService'
 import { reviewService } from '../services/reviewService'
+import { bidService } from '../services/bidService'
+import confirmationService from '../services/confirmationService.jsx'
 
 export default function MyProjects() {
   const navigate = useNavigate()
@@ -12,6 +17,10 @@ export default function MyProjects() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const hasInitialized = useRef(false)
+  
+  // Modal hooks
+  const { confirmation, showConfirmation, hideConfirmation, setLoading: setConfirmationLoading } = useConfirmation()
+  const { notification, showNotification, hideNotification } = useNotification()
   const [statusFilter, setStatusFilter] = useState('all')
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedProject, setSelectedProject] = useState(null)
@@ -36,6 +45,9 @@ export default function MyProjects() {
   const [selectedProjectForReview, setSelectedProjectForReview] = useState(null)
   const [showBidRequest, setShowBidRequest] = useState(false)   
   const [selectedBid, setSelectedBid] = useState(null);
+  const [projectBids, setProjectBids] = useState([])
+  const [bidsLoading, setBidsLoading] = useState(false)
+  const [bidsError, setBidsError] = useState(null)
   const [showRatingModal, setShowRatingModal] = useState(false)
   const [selectedProjectForRating, setSelectedProjectForRating] = useState(null)
   const [reviewForm, setReviewForm] = useState({
@@ -49,11 +61,8 @@ export default function MyProjects() {
   useEffect(() => {
     if (!hasInitialized.current) {
       hasInitialized.current = true
-      console.log('MyProjects: useEffect running (first time)')
     fetchMyProjects()
     loadSkills()
-    } else {
-      console.log('MyProjects: Skipping duplicate initialization due to StrictMode')
     }
   }, [])
 
@@ -73,16 +82,13 @@ export default function MyProjects() {
       setLoading(true)
       setError(null)
       
-      console.log('Fetching client projects...')
       
       // Get projects for the current client
       const response = await projectService.getClientProjects()
       
       if (response.status && response.data) {
-        console.log('Client projects fetched successfully:', response.data.length)
         setProjects(response.data)
       } else {
-        console.log('No projects found or error in response')
         setProjects([])
       }
     } catch (error) {
@@ -208,7 +214,11 @@ export default function MyProjects() {
       await fetchMyProjects() // Refresh the list
     } catch (error) {
       console.error('Error updating project:', error)
-      alert('Failed to update project. Please try again.')
+      showNotification({
+        title: 'Error',
+        message: 'Failed to update project. Please try again.',
+        type: 'error'
+      })
     }
   }
 
@@ -268,71 +278,136 @@ export default function MyProjects() {
   )
 
   const handleDeleteProject = async (projectId) => {
-    if (!window.confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
-      return
-    }
-
-    try {
+    showConfirmation({
+      title: 'Delete Project',
+      message: 'Are you sure you want to delete this project? This action cannot be undone.',
+      type: 'danger',
+      confirmText: 'Delete',
+      onConfirm: async () => {
+        try {
+          setConfirmationLoading(true)
       await projectService.deleteProject(projectId)
       await fetchMyProjects() // Refresh the list
+          hideConfirmation()
+          showNotification({
+            title: 'Success',
+            message: 'Project deleted successfully!',
+            type: 'success'
+          })
     } catch (error) {
       console.error('Error deleting project:', error)
-      alert('Failed to delete project. Please try again.')
-    }
+          showNotification({
+            title: 'Error',
+            message: 'Failed to delete project. Please try again.',
+            type: 'error'
+          })
+        } finally {
+          setConfirmationLoading(false)
+        }
+      }
+    })
   }
 
   const handleCompleteProject = async (projectId) => {
-    if (!window.confirm('Are you sure you want to mark this project as completed?')) {
-      return
-    }
-
-    try {
-      console.log('Completing project:', projectId)
-      const result = await projectService.completeProject(projectId)
-      console.log('Project completion result:', result)
+    showConfirmation({
+      title: 'Complete Project',
+      message: 'Are you sure you want to mark this project as completed?',
+      type: 'warning',
+      confirmText: 'Complete',
+      onConfirm: async () => {
+        try {
+          setConfirmationLoading(true)
+          await projectService.completeProject(projectId)
       await fetchMyProjects() // Refresh the list
-      console.log('Project list refreshed after completion')
+          hideConfirmation()
+          showNotification({
+            title: 'Success',
+            message: 'Project completed successfully!',
+            type: 'success'
+          })
     } catch (error) {
       console.error('Error completing project:', error)
-      alert('Failed to complete project. Please try again.')
-    }
+          showNotification({
+            title: 'Error',
+            message: 'Failed to complete project. Please try again.',
+            type: 'error'
+          })
+        } finally {
+          setConfirmationLoading(false)
+        }
+      }
+    })
   }
 
   const handleActivateProject = async (projectId) => {
-    if (window.confirm('Are you sure you want to activate this project?')) {
-      try {
+    showConfirmation({
+      title: 'Activate Project',
+      message: 'Are you sure you want to activate this project?',
+      type: 'info',
+      confirmText: 'Activate',
+      onConfirm: async () => {
+        try {
+          setConfirmationLoading(true)
         await projectService.activateProject(projectId)
         await fetchMyProjects() // Refresh the list
-        alert('Project activated successfully!')
+          hideConfirmation()
+          showNotification({
+            title: 'Success',
+            message: 'Project activated successfully!',
+            type: 'success'
+          })
       } catch (error) {
         console.error('Error activating project:', error)
-        alert('Failed to activate project: ' + error.message)
+          showNotification({
+            title: 'Error',
+            message: 'Failed to activate project: ' + error.message,
+            type: 'error'
+          })
+        } finally {
+          setConfirmationLoading(false)
+        }
       }
-    }
+    })
   }
 
   const handleDeactivateProject = async (projectId) => {
-    if (window.confirm('Are you sure you want to deactivate this project?')) {
-      try {
+    showConfirmation({
+      title: 'Deactivate Project',
+      message: 'Are you sure you want to deactivate this project?',
+      type: 'warning',
+      confirmText: 'Deactivate',
+      onConfirm: async () => {
+        try {
+          setConfirmationLoading(true)
         await projectService.deactivateProject(projectId)
         await fetchMyProjects() // Refresh the list
-        alert('Project deactivated successfully!')
+          hideConfirmation()
+          showNotification({
+            title: 'Success',
+            message: 'Project deactivated successfully!',
+            type: 'success'
+          })
       } catch (error) {
         console.error('Error deactivating project:', error)
-        alert('Failed to deactivate project: ' + error.message)
+          showNotification({
+            title: 'Error',
+            message: 'Failed to deactivate project: ' + error.message,
+            type: 'error'
+          })
+        } finally {
+          setConfirmationLoading(false)
+        }
       }
-    }
+    })
   }
 
   // Rating functions
   const handleRateProject = (project) => {
-    console.log('Opening rating modal for project:', project)
     setSelectedProjectForRating(project)
     setShowRatingModal(true)
   }
 
   const handleRatingSubmitted = (ratingData) => {
-    console.log('Rating submitted:', ratingData)
     setShowRatingModal(false)
     setSelectedProjectForRating(null)
     // Refresh projects to show updated data
@@ -341,8 +416,6 @@ export default function MyProjects() {
 
   // Review functions
   const handleReviewProject = (project) => {
-    console.log('Opening review modal for project:', project)
-    console.log('Project freelancerid:', project.freelancerid)
     setSelectedProjectForReview(project)
     setReviewForm({
       rating: 0,
@@ -363,52 +436,70 @@ export default function MyProjects() {
 
   const handleSubmitReview = async () => {
     if (reviewForm.rating === 0) {
-      alert('Please select a rating.')
+      showNotification({
+        title: 'Validation Error',
+        message: 'Please select a rating.',
+        type: 'warning'
+      })
       return
     }
 
     if (!reviewForm.comment.trim()) {
-      alert('Please enter a review comment.')
+      showNotification({
+        title: 'Validation Error',
+        message: 'Please enter a review comment.',
+        type: 'warning'
+      })
       return
     }
 
-    console.log('Submitting review with data:', reviewForm)
-    console.log('Selected project:', selectedProjectForReview)
-    console.log('Project freelancerid:', selectedProjectForReview?.freelancerid)
-    console.log('Project status:', {
-      iscompleted: selectedProjectForReview?.iscompleted,
-      isactive: selectedProjectForReview?.isactive,
-      ispending: selectedProjectForReview?.ispending,
-      status: selectedProjectForReview?.status
-    })
 
-const handleViewBidRequests = (bidData) => {
-  setSelectedBid(bidData);
-  setShowBidRequest(true);
+const handleViewBidRequests = async (project) => {
+  try {
+    setBidsLoading(true)
+    setBidsError(null)
+    setSelectedBid(project)
+    
+    const response = await bidService.getProjectBids(project._id)
+    
+    if (response.status && response.data) {
+      setProjectBids(response.data)
+    } else {
+      setProjectBids([])
+    }
+    
+    setShowBidRequest(true)
+  } catch (error) {
+    console.error('Error fetching project bids:', error)
+    setBidsError(error.message || 'Failed to fetch bids')
+    setProjectBids([])
+    setShowBidRequest(true)
+  } finally {
+    setBidsLoading(false)
+  }
 };
 
 const handleCloseBidRequest = () => {
   setShowBidRequest(false);
   setSelectedBid(null);
+  setProjectBids([]);
+  setBidsError(null);
 };
 
 // Get the freelancer ID from the project data
     let freelancerId = null
     if (selectedProjectForReview?.freelancerid && Array.isArray(selectedProjectForReview.freelancerid) && selectedProjectForReview.freelancerid.length > 0) {
       freelancerId = selectedProjectForReview.freelancerid[0]?.freelancerid
-      console.log('Found freelancer ID from array:', freelancerId)
     } else if (selectedProjectForReview?.freelancerid) {
       freelancerId = selectedProjectForReview.freelancerid.freelancerid || selectedProjectForReview.freelancerid
-      console.log('Found freelancer ID from object:', freelancerId)
     }
 
     if (!freelancerId) {
-      console.log('No freelancer ID found. Project structure:', {
-        freelancerid: selectedProjectForReview?.freelancerid,
-        isArray: Array.isArray(selectedProjectForReview?.freelancerid),
-        length: selectedProjectForReview?.freelancerid?.length
+      showNotification({
+        title: 'Cannot Submit Review',
+        message: 'This project does not have a freelancer assigned yet. Reviews can only be submitted for projects with assigned freelancers.',
+        type: 'warning'
       })
-      alert('This project does not have a freelancer assigned yet. Reviews can only be submitted for projects with assigned freelancers.')
       return
     }
 
@@ -420,7 +511,6 @@ const handleCloseBidRequest = () => {
         comment: reviewForm.comment.trim()
       }
       
-      console.log('Final review data:', reviewData)
       
       await reviewService.createReview(reviewData)
       setShowReviewModal(false)
@@ -432,10 +522,18 @@ const handleCloseBidRequest = () => {
         freelancer_id: ''
       })
       setHoveredStar(0)
-      alert('Review submitted successfully!')
+      showNotification({
+        title: 'Success',
+        message: 'Review submitted successfully!',
+        type: 'success'
+      })
     } catch (error) {
       console.error('Error submitting review:', error)
-      alert(`Failed to submit review: ${error.message}`)
+      showNotification({
+        title: 'Error',
+        message: `Failed to submit review: ${error.message}`,
+        type: 'error'
+      })
     }
   }
 
@@ -450,16 +548,6 @@ const handleCloseBidRequest = () => {
         return project.isactive === 1 && project.iscompleted === 0
       case 'completed':
         const isCompleted = project.iscompleted === 1
-        if (isCompleted) {
-          console.log('Found completed project:', {
-            id: project._id,
-            title: project.title,
-            iscompleted: project.iscompleted,
-            isactive: project.isactive,
-            ispending: project.ispending,
-            freelancerid: project.freelancerid
-          })
-        }
         return isCompleted
       case 'cancelled':
         return project.status === 'cancelled'
@@ -658,7 +746,7 @@ const handleCloseBidRequest = () => {
                   
                   {getProjectStatus(project) === 'open' && (
                     <>
-                      <Button variant="outline" size="sm" onClick={() => handleViewBidRequests({ project, bid_amount: 0, status: 'pending', cover_letter: 'No bids yet' })} className="flex-1 min-w-[120px] border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white">
+                      <Button variant="outline" size="sm" onClick={() => handleViewBidRequests(project)} className="flex-1 min-w-[120px] border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white">
                         View Bids ({project.bid_count || 0})
                       </Button>
                       <Button variant="success" size="sm" onClick={() => handleActivateProject(project._id)} className="flex-1 min-w-[120px]">
@@ -962,9 +1050,9 @@ const handleCloseBidRequest = () => {
       {/* Bid Request Modal */}
       {showBidRequest && selectedBid && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg p-6 max-w-6xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-graphite">Bid Requests</h3>
+              <h3 className="text-2xl font-bold text-graphite">Bid Requests for "{selectedBid.title}"</h3>
               <button 
                 onClick={handleCloseBidRequest}
                 className="text-coolgray hover:text-graphite transition-colors"
@@ -978,53 +1066,211 @@ const handleCloseBidRequest = () => {
             <div className="space-y-6">
               {/* Project Info */}
               <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="text-lg font-semibold text-graphite mb-2">{selectedBid.project?.title}</h4>
-                <p className="text-coolgray text-sm">{selectedBid.project?.description}</p>
-                <div className="flex items-center gap-4 mt-3 text-sm">
-                  <span className="text-mint font-medium">Budget: ${selectedBid.project?.budget}</span>
-                  <span className="text-violet font-medium">Duration: {selectedBid.project?.duration} days</span>
+                <h4 className="text-lg font-semibold text-graphite mb-2">{selectedBid.title}</h4>
+                <p className="text-coolgray text-sm mb-3">{selectedBid.description}</p>
+                <div className="flex items-center gap-4 text-sm">
+                  <span className="text-mint font-medium">Budget: ${selectedBid.budget}</span>
+                  <span className="text-violet font-medium">Duration: {selectedBid.duration} days</span>
+                  <span className="text-coral font-medium">Bids: {projectBids.length}</span>
                 </div>
               </div>
 
-              {/* Bid Details */}
-              <div className="space-y-4">
-                <h5 className="text-lg font-semibold text-graphite">Bid Details</h5>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-white border border-gray-200 rounded-lg p-4">
-                    <h6 className="font-medium text-graphite mb-2">Freelancer Information</h6>
-                    <p className="text-sm text-coolgray">Name: {selectedBid.freelancer?.name || 'N/A'}</p>
-                    <p className="text-sm text-coolgray">Email: {selectedBid.freelancer?.email || 'N/A'}</p>
-                    <p className="text-sm text-coolgray">Rate: ${selectedBid.bid_amount || 'N/A'}/hour</p>
-                  </div>
-                  <div className="bg-white border border-gray-200 rounded-lg p-4">
-                    <h6 className="font-medium text-graphite mb-2">Bid Information</h6>
-                    <p className="text-sm text-coolgray">Bid Amount: ${selectedBid.bid_amount || 'N/A'}</p>
-                    <p className="text-sm text-coolgray">Timeline: {selectedBid.timeline || 'N/A'} days</p>
-                    <p className="text-sm text-coolgray">Status: 
-                      <span className={`ml-1 px-2 py-1 rounded-full text-xs ${
-                        selectedBid.status === 'accepted' ? 'bg-green-100 text-green-800' :
-                        selectedBid.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {selectedBid.status || 'Pending'}
-                      </span>
-                    </p>
-                  </div>
+              {/* Loading State */}
+              {bidsLoading && (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-mint mx-auto mb-4"></div>
+                  <p className="text-coolgray">Loading bids...</p>
                 </div>
-              </div>
+              )}
 
-              {/* Cover Letter */}
-              {selectedBid.cover_letter && (
-                <div>
-                  <h6 className="font-medium text-graphite mb-2">Cover Letter</h6>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-coolgray text-sm leading-relaxed">{selectedBid.cover_letter}</p>
+              {/* Error State */}
+              {bidsError && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
+                  <div className="flex items-center">
+                    <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <p className="font-semibold">Error loading bids</p>
+                      <p className="text-sm">{bidsError}</p>
+                    </div>
                   </div>
                 </div>
               )}
 
-              {/* Action Buttons */}
-              <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
+              {/* No Bids State */}
+              {!bidsLoading && !bidsError && projectBids.length === 0 && (
+                <div className="text-center py-12 text-coolgray">
+                  <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <h3 className="text-xl font-semibold text-graphite mb-2">No Bids Yet</h3>
+                  <p className="text-coolgray">This project hasn't received any bids yet.</p>
+                </div>
+              )}
+
+              {/* Bids List */}
+              {!bidsLoading && !bidsError && projectBids.length > 0 && (
+                <div className="space-y-4">
+                  <h5 className="text-lg font-semibold text-graphite">Received Bids ({projectBids.length})</h5>
+                  {projectBids.map((bid) => (
+                    <div key={bid._id} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                      <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
+                        <div className="flex-1">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+                            <h6 className="text-lg font-semibold text-graphite">
+                              {bid.freelancer_id?.first_name && bid.freelancer_id?.last_name 
+                                ? `${bid.freelancer_id.first_name} ${bid.freelancer_id.last_name}`
+                                : 'Unknown Freelancer'
+                              }
+                            </h6>
+                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                              bid.status === 'accepted' ? 'bg-green-100 text-green-800' :
+                              bid.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                              'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {bid.status.charAt(0).toUpperCase() + bid.status.slice(1)}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                            <div className="flex items-center">
+                              <svg className="w-4 h-4 mr-2 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                              </svg>
+                              <div>
+                                <p className="text-sm text-coolgray">Bid Amount</p>
+                                <p className="font-semibold text-mint">${bid.bid_amount}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center">
+                              <svg className="w-4 h-4 mr-2 text-violet" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              <div>
+                                <p className="text-sm text-coolgray">Duration</p>
+                                <p className="font-semibold text-violet">{bid.proposed_duration} days</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center">
+                              <svg className="w-4 h-4 mr-2 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                              </svg>
+                              <div>
+                                <p className="text-sm text-coolgray">Availability</p>
+                                <p className="font-semibold text-coral">{bid.availability_hours || 40}h/week</p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="mb-4">
+                            <h6 className="font-semibold text-graphite mb-2 flex items-center">
+                              <svg className="w-4 h-4 mr-2 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                              Cover Letter
+                            </h6>
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                              <p className="text-coolgray text-sm leading-relaxed line-clamp-3">{bid.cover_letter}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center text-xs text-coolgray bg-gray-50 p-3 rounded-lg">
+                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Submitted: {new Date(bid.createdAt).toLocaleDateString()}</span>
+                            {bid.freelancer_id?.email && (
+                              <>
+                                <span className="mx-2">•</span>
+                                <span>Email: {bid.freelancer_id.email}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        {bid.status === 'pending' && (
+                          <div className="flex flex-col gap-2 min-w-[200px]">
+                            <Button 
+                              variant="success" 
+                              size="sm" 
+                              onClick={async () => {
+                                try {
+                                  const response = await bidService.acceptBid(bid._id);
+                                  if (response.status) {
+                                    showNotification({
+                                      title: 'Success',
+                                      message: 'Bid accepted successfully!',
+                                      type: 'success'
+                                    });
+                                    // Refresh the bids list
+                                    handleViewBidRequests(selectedBid);
+                                  } else {
+                                    showNotification({
+                                      title: 'Error',
+                                      message: response.message || 'Failed to accept bid',
+                                      type: 'error'
+                                    });
+                                  }
+                                } catch (error) {
+                                  console.error('Error accepting bid:', error);
+                                  showNotification({
+                                    title: 'Error',
+                                    message: 'Failed to accept bid: ' + error.message,
+                                    type: 'error'
+                                  });
+                                }
+                              }}
+                              className="w-full"
+                            >
+                              Accept Bid
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={async () => {
+                                try {
+                                  const rejectMessage = prompt('Enter rejection reason (optional):');
+                                  const response = await bidService.rejectBid(bid._id, rejectMessage || '');
+                                  if (response.status) {
+                                    showNotification({
+                                      title: 'Success',
+                                      message: 'Bid rejected successfully!',
+                                      type: 'success'
+                                    });
+                                    // Refresh the bids list
+                                    handleViewBidRequests(selectedBid);
+                                  } else {
+                                    showNotification({
+                                      title: 'Error',
+                                      message: response.message || 'Failed to reject bid',
+                                      type: 'error'
+                                    });
+                                  }
+                                } catch (error) {
+                                  console.error('Error rejecting bid:', error);
+                                  showNotification({
+                                    title: 'Error',
+                                    message: 'Failed to reject bid: ' + error.message,
+                                    type: 'error'
+                                  });
+                                }
+                              }}
+                              className="w-full border-red-300 text-red-700 hover:bg-red-50"
+                            >
+                              Reject Bid
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Close Button */}
+              <div className="flex justify-end pt-6 border-t border-gray-200">
                 <Button 
                   type="button"
                   variant="outline" 
@@ -1033,32 +1279,6 @@ const handleCloseBidRequest = () => {
                 >
                   Close
                 </Button>
-                {selectedBid.status === 'pending' && (
-                  <>
-                    <Button 
-                      variant="success" 
-                      onClick={() => {
-                        // Handle accept bid
-                        console.log('Accepting bid:', selectedBid._id);
-                        handleCloseBidRequest();
-                      }}
-                      className="px-6"
-                    >
-                      Accept Bid
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => {
-                        // Handle reject bid
-                        console.log('Rejecting bid:', selectedBid._id);
-                        handleCloseBidRequest();
-                      }}
-                      className="border-red-300 text-red-700 hover:bg-red-50"
-                    >
-                      Reject Bid
-                    </Button>
-                  </>
-                )}
               </div>
             </div>
           </div>
@@ -1072,6 +1292,30 @@ const handleCloseBidRequest = () => {
         projectId={selectedProjectForRating?._id}
         freelancerId={selectedProjectForRating?.freelancerid}
         onRatingSubmitted={handleRatingSubmitted}
+      />
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={confirmation.isOpen}
+        onClose={hideConfirmation}
+        onConfirm={confirmation.onConfirm}
+        title={confirmation.title}
+        message={confirmation.message}
+        type={confirmation.type}
+        confirmText={confirmation.confirmText}
+        cancelText={confirmation.cancelText}
+        isLoading={confirmation.isLoading}
+      />
+
+      {/* Notification Modal */}
+      <NotificationModal
+        isOpen={notification.isOpen}
+        onClose={hideNotification}
+        title={notification.title}
+        message={notification.message}
+        type={notification.type}
+        autoClose={notification.autoClose}
+        autoCloseDelay={notification.autoCloseDelay}
       />
     </div>
   )

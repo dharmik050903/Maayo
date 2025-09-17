@@ -4,6 +4,7 @@ import Header from '../components/Header'
 import Button from '../components/Button'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 import { freelancerService } from '../services/freelancerService'
+import confirmationService from '../services/confirmationService.jsx'
 
 export default function ClientHome() {
   const [userData, setUserData] = useState(null)
@@ -177,9 +178,12 @@ export default function ClientHome() {
     setSelectedFreelancer(null)
   }
 
-  const handleContactFreelancer = (freelancer) => {
+  const handleContactFreelancer = async (freelancer) => {
     // In a real app, this would open a contact form or messaging system
-    alert(`Contact form for ${freelancer.name} would open here. This would integrate with your messaging system.`)
+    await confirmationService.alert(
+      `Contact form for ${freelancer.name} would open here. This would integrate with your messaging system.`,
+      'Contact Freelancer'
+    )
   }
 
   const getFilteredAndSortedFreelancers = () => {

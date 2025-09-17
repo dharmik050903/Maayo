@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { bidService } from '../services/bidService'
 import Button from './Button'
+import confirmationService from '../services/confirmationService.jsx'
+import Messaging from './Messaging'
 
 const MyBids = () => {
   const [bids, setBids] = useState([])
@@ -10,6 +12,8 @@ const MyBids = () => {
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [selectedBid, setSelectedBid] = useState(null)
   const [updateData, setUpdateData] = useState({})
+  const [showMessaging, setShowMessaging] = useState(false)
+  const [selectedBidForMessaging, setSelectedBidForMessaging] = useState(null)
   const hasInitialized = useRef(false)
 
   useEffect(() => {
@@ -44,7 +48,11 @@ const MyBids = () => {
   }
 
   const handleWithdrawBid = async (bidId) => {
-    if (!window.confirm('Are you sure you want to withdraw this bid?')) {
+    const confirmed = await confirmationService.confirm(
+      'Are you sure you want to withdraw this bid?',
+      'Withdraw Bid'
+    )
+    if (!confirmed) {
       return
     }
 
@@ -352,15 +360,26 @@ const MyBids = () => {
 
                 {bid.status === 'accepted' && (
                   <div className="min-w-[200px]">
-                    <div className="bg-gradient-to-r from-green-50 to-mint/10 border border-green-200 rounded-lg p-4">
+                    <div className="bg-gradient-to-r from-green-50 to-mint/10 border border-green-200 rounded-lg p-4 mb-3">
                       <div className="flex items-center mb-2">
                         <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
                           <span className="text-green-600 text-lg">🎉</span>
                         </div>
                         <p className="text-green-800 font-semibold text-sm">Congratulations!</p>
                       </div>
-                      <p className="text-green-700 text-xs">Your bid has been accepted. Check your messages for next steps.</p>
+                      <p className="text-green-700 text-xs">Your bid has been accepted. Start messaging the client!</p>
                     </div>
+                    <Button
+                      variant="accent"
+                      size="sm"
+                      className="w-full bg-mint text-white hover:bg-mint/90"
+                      onClick={() => {
+                        setSelectedBidForMessaging(bid)
+                        setShowMessaging(true)
+                      }}
+                    >
+                      Message Client
+                    </Button>
                   </div>
                 )}
 
@@ -519,9 +538,31 @@ const MyBids = () => {
           </div>
         </div>
       )}
+
+      {/* Messaging Modal */}
+      {showMessaging && selectedBidForMessaging && (
+        <Messaging
+          currentUser={{
+            id: 'freelancer',
+            name: 'Freelancer'
+          }}
+          otherUser={{
+            id: selectedBidForMessaging.client_id?._id || selectedBidForMessaging.client_id,
+            name: 'Client'
+          }}
+          project={{
+            id: selectedBidForMessaging.project_id,
+            title: selectedBidForMessaging.project_title || 'Project'
+          }}
+          isClient={false}
+          onClose={() => {
+            setShowMessaging(false)
+            setSelectedBidForMessaging(null)
+          }}
+        />
+      )}
     </div>
   )
 }
 
 export default MyBids
-
