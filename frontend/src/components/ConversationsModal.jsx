@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Button from './Button'
 import { authenticatedFetch } from '../utils/api'
 import messagingService from '../services/messagingService.jsx'
+import messageApiService from '../services/messageApiService'
 
 export default function ConversationsModal({ isOpen, onClose, currentUser }) {
   const [conversations, setConversations] = useState([])
@@ -16,28 +17,21 @@ export default function ConversationsModal({ isOpen, onClose, currentUser }) {
   }, [isOpen, currentUser])
 
   const fetchConversations = async () => {
-    if (!currentUser?.id) return
+    if (!currentUser?._id) return
 
     try {
       setLoading(true)
-      const response = await authenticatedFetch(`${API_BASE_URL}/messages/conversations`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setConversations(data.data || [])
+      const response = await messageApiService.getConversations()
+      
+      if (response.success) {
+        setConversations(response.data || [])
       } else {
-        // If API doesn't exist, create mock conversations from bids
-        createMockConversations()
+        console.error('Error fetching conversations:', response.error)
+        setConversations([])
       }
     } catch (error) {
       console.error('Error fetching conversations:', error)
-      // Create mock conversations from bids
-      createMockConversations()
+      setConversations([])
     } finally {
       setLoading(false)
     }
@@ -93,7 +87,18 @@ export default function ConversationsModal({ isOpen, onClose, currentUser }) {
   }
 
   const handleStartChat = (conversation) => {
-    messagingService.show(conversation.otherUser, conversation.project)
+    // Create user and project objects for the messaging service
+    const otherUser = {
+      id: conversation.freelancer_id || conversation.client_id,
+      name: conversation.freelancer_name || conversation.client_name
+    }
+    
+    const project = {
+      id: conversation.project_id,
+      title: conversation.project_title
+    }
+    
+    messagingService.show(otherUser, project, conversation.bid_id)
     onClose()
   }
 
@@ -167,7 +172,7 @@ export default function ConversationsModal({ isOpen, onClose, currentUser }) {
             <div className="space-y-3">
               {conversations.map((conversation) => (
                 <div
-                  key={conversation.id}
+                  key={conversation.bid_id}
                   onClick={() => handleStartChat(conversation)}
                   className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
                 >
@@ -175,31 +180,26 @@ export default function ConversationsModal({ isOpen, onClose, currentUser }) {
                     <div className="flex items-center space-x-3">
                       <div className="w-12 h-12 bg-mint/20 rounded-full flex items-center justify-center">
                         <span className="text-mint font-semibold text-lg">
-                          {conversation.otherUser.name.charAt(0).toUpperCase()}
+                          {(conversation.freelancer_name || conversation.client_name || 'U').charAt(0).toUpperCase()}
                         </span>
                       </div>
                       <div>
                         <h4 className="font-semibold text-graphite">
-                          {conversation.otherUser.name}
+                          {conversation.freelancer_name || conversation.client_name || 'Unknown User'}
                         </h4>
                         <p className="text-sm text-coolgray">
-                          Project: {conversation.project.title}
+                          Project: {conversation.project_title || 'Unknown Project'}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
                       <p className="text-xs text-coolgray">
-                        {formatTime(conversation.lastMessage.timestamp)}
+                        {formatTime(conversation.latest_message_time)}
                       </p>
-                      {conversation.unreadCount > 0 && (
-                        <span className="inline-block w-5 h-5 bg-mint text-white text-xs rounded-full flex items-center justify-center mt-1">
-                          {conversation.unreadCount}
-                        </span>
-                      )}
                     </div>
                   </div>
                   <p className="text-sm text-coolgray mt-2 line-clamp-1">
-                    {conversation.lastMessage.text}
+                    {conversation.latest_message || 'No messages yet'}
                   </p>
                 </div>
               ))}

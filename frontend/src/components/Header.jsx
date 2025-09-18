@@ -183,7 +183,18 @@ export default function Header({ userType, onLogout, userData }) {
     if (isActive) {
       return `${baseClasses} text-mint font-semibold bg-mint/10 border-b-2 border-mint`
     }
-    return `${baseClasses} hover:text-mint`
+    return `${baseClasses} hover:text-mint text-graphite`
+  }
+
+  // Helper function to get mobile-specific link classes
+  const getMobileLinkClasses = (path) => {
+    const baseClasses = "px-3 py-1 rounded-md transition-colors mobile-nav-link"
+    const isActive = isActiveLink(path)
+    
+    if (isActive) {
+      return `${baseClasses} text-mint font-semibold bg-mint/10 border-b-2 border-mint`
+    }
+    return `${baseClasses} hover:text-mint text-graphite`
   }
 
   const navLinks = isAuthenticated ? (
@@ -208,7 +219,7 @@ export default function Header({ userType, onLogout, userData }) {
       
       <button 
         onClick={handleMessagesClick}
-        className="hover:text-mint px-3 py-1 rounded-md transition-colors"
+        className="hover:text-mint px-3 py-1 rounded-md transition-colors text-graphite"
       >
         Messages
       </button>
@@ -239,33 +250,87 @@ export default function Header({ userType, onLogout, userData }) {
     </>
   )
 
+  // Mobile-specific navigation links with proper text colors
+  const mobileNavLinks = isAuthenticated ? (
+    <>
+      <Link to={`/${userType}-home`} className={getMobileLinkClasses(`/${userType}-home`)}>
+        Home
+      </Link>
+      {userType === 'freelancer' ? (
+        <Link to="/find-work" className={getMobileLinkClasses('/find-work')}>
+          Find Work
+        </Link>
+      ) : (
+        <Link to="/project/create" className={getMobileLinkClasses('/project/create')}>
+            Post a Project
+          </Link>
+      )}
+      
+      {/* My Projects Link */}
+      <Link to="/my-projects" className={getMobileLinkClasses('/my-projects')}>
+        My Projects
+      </Link>
+      
+      <button 
+        onClick={handleMessagesClick}
+        className="hover:text-mint px-3 py-1 rounded-md transition-colors text-graphite"
+      >
+        Messages
+      </button>
+      <Link to={`/${userType}-dashboard`} className={getMobileLinkClasses(`/${userType}-dashboard`)}>
+        Profile
+      </Link>
+      <Link to="/pricing" className={getMobileLinkClasses('/pricing')}>
+        Pricing
+      </Link>
+    </>
+  ) : (
+    <>
+      <Link to="/" className={getMobileLinkClasses('/')}>
+        Home
+      </Link>
+      <Link to="/browse" className={getMobileLinkClasses('/browse')}>
+        Find Work
+      </Link>
+      <Link to="/project/create" className={getMobileLinkClasses('/project/create')}>
+        Post a Project
+      </Link>
+      <Link to="/pricing" className={getMobileLinkClasses('/pricing')}>
+        Pricing
+      </Link>
+      <Link to="/about" className={getMobileLinkClasses('/about')}>
+        About
+      </Link>
+    </>
+  )
+
   return (
     <>
     <header className={`w-full fixed top-0 left-0 z-50 backdrop-blur-md border-b transition-all duration-300 ${
       isScrolled ? 'bg-white/95 border-white/30' : 'bg-white/10 border-white/20'
     }`}>
-      <div className="max-w-7xl mx-auto flex items-center justify-between p-4">
+      <div className="max-w-7xl mx-auto flex items-center justify-between p-2 md:p-4">
         <Link to={isAuthenticated ? `/${userType}-home` : "/"} className="logo-link flex items-center space-x-2 hover:opacity-80 transition-opacity">
           <Logo theme={isScrolled ? "dark" : "light"} />
         </Link>
 
         {/* Global Search Bar */}
-        <div className="hidden md:block flex-1 max-w-md mx-8 relative search-container">
+        <div className="flex-1 max-w-md mx-1 md:mx-8 relative search-container">
           <form onSubmit={handleSearch} className="relative">
-            <div className="flex gap-2">
+            <div className="flex gap-1 md:gap-2">
               <div className="relative flex-1">
                 <input
                   type="text"
-                  placeholder="Search projects or freelancers..."
+                  placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className={`w-full px-4 py-2 pl-10 rounded-lg border-0 focus:ring-2 focus:ring-mint focus:border-transparent transition-all duration-300 ${
+                  className={`w-full px-3 md:px-4 py-2 pl-8 md:pl-10 rounded-lg border-0 focus:ring-2 focus:ring-mint focus:border-transparent transition-all duration-300 text-sm md:text-base ${
                     isScrolled 
                       ? 'bg-gray-100 text-graphite placeholder-gray-500' 
-                      : 'bg-white/20 text-white placeholder-white/70 backdrop-blur-sm'
+                      : 'bg-white/30 text-white placeholder-white/80 backdrop-blur-sm'
                   }`}
                 />
-                <svg className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+                <svg className={`absolute left-2 md:left-3 top-1/2 transform -translate-y-1/2 w-3 h-3 md:w-4 md:h-4 ${
                   isScrolled ? 'text-gray-500' : 'text-white/70'
                 }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -274,13 +339,14 @@ export default function Header({ userType, onLogout, userData }) {
               <button
                 type="submit"
                 disabled={isSearching}
-                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                className={`px-2 md:px-4 py-2 rounded-lg font-semibold transition-colors text-xs md:text-sm ${
                   isScrolled 
                     ? 'bg-mint text-white hover:bg-mint/90' 
-                    : 'bg-white/20 text-white hover:bg-white/30'
+                    : 'bg-white/30 text-white hover:bg-white/40'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                {isSearching ? '...' : 'Search'}
+                {isSearching ? '...' : <span className="hidden md:inline">Search</span>}
+                <span className="md:hidden">🔍</span>
               </button>
             </div>
           </form>
@@ -422,15 +488,15 @@ export default function Header({ userType, onLogout, userData }) {
       {mobileMenuOpen && (
         <nav className={`md:hidden bg-white/95 border-t border-white/20 shadow-lg transition-all duration-300`}>
           <div className="flex flex-col gap-2 p-4">
-            {navLinks}
+            {mobileNavLinks}
             {isAuthenticated ? (
-              <button onClick={onLogout} className="hover:text-mint px-3 py-1 rounded-md transition-colors text-left">
+              <button onClick={onLogout} className="hover:text-mint px-3 py-1 rounded-md transition-colors text-left text-graphite">
                 Logout
               </button>
             ) : (
               <>
-                <Link to="/login" className="hover:text-mint px-3 py-1 rounded-md transition-colors">Login</Link>
-                <Link to="/signup" className="hover:text-mint px-3 py-1 rounded-md transition-colors">Sign Up</Link>
+                <Link to="/login" className="hover:text-mint px-3 py-1 rounded-md transition-colors text-graphite">Login</Link>
+                <Link to="/signup" className="hover:text-mint px-3 py-1 rounded-md transition-colors text-graphite">Sign Up</Link>
               </>
             )}
           </div>

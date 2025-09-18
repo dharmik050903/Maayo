@@ -233,17 +233,7 @@ export default function Home() {
         </Link>
       </section>
 
-      {/* Footer */}
-      <footer className="py-6 border-t border-white/20">
-        <div className="max-w-6xl mx-auto flex justify-between items-center px-6 text-white/85">
-          <p className="text-sm">© {new Date().getFullYear()} Maayo. All rights reserved.</p>
-          <div className="flex gap-4 text-sm">
-            <Link to="/about" className="hover:text-mint">About</Link>
-            <Link to="/privacy" className="hover:text-mint">Privacy</Link>
-            <Link to="/terms" className="hover:text-mint">Terms</Link>
-          </div>
-        </div>
-      </footer>
+........
     </div>
   )
 }

@@ -12,14 +12,28 @@ export default function AboutUs() {
         <section className="bg-brand-gradient text-white py-16">
           <div className="max-w-6xl mx-auto px-6 text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              About <span className="text-mint">Maayo</span>
+              📖 About <span className="text-mint">Maayo</span>
         </h1>
-            <p className="text-xl text-white/90 mb-8">
-              India's Most Trusted Freelance Marketplace
+            <p className="text-xl text-white/90 mb-4">
+              Empowering Borderless Work & Hiring
             </p>
-            <p className="text-lg text-white/80">
-          Empowering Dreams · Connecting Talent · Building Success
-        </p>
+            <p className="text-lg text-white/80 mb-8">
+              Maayo is a next-generation freelance marketplace connecting top clients and elite talent across the globe. Founded on principles of trust, transparency, and performance, Maayo allows businesses to effortlessly post projects and freelance professionals to build rewarding careers—all with zero hidden client fees and industry-leading compliance.
+            </p>
+            <div className="grid md:grid-cols-3 gap-6 mt-8">
+              <div className="bg-white/10 rounded-lg p-4">
+                <h3 className="text-2xl font-bold text-mint">20,000+</h3>
+                <p className="text-white/90">Active Projects Worldwide</p>
+              </div>
+              <div className="bg-white/10 rounded-lg p-4">
+                <h3 className="text-2xl font-bold text-mint">₹2 Million+</h3>
+                <p className="text-white/90">in Freelancer Earnings Paid</p>
+              </div>
+              <div className="bg-white/10 rounded-lg p-4">
+                <h3 className="text-2xl font-bold text-mint">5,000+</h3>
+                <p className="text-white/90">Satisfied Businesses</p>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -281,17 +295,6 @@ export default function AboutUs() {
           </section>
         </div>
 
-        {/* Footer */}
-        <footer className="py-8 border-t border-gray-200 bg-white">
-          <div className="max-w-6xl mx-auto flex justify-between items-center px-6 text-coolgray">
-            <p className="text-sm">© {new Date().getFullYear()} Maayo. All rights reserved.</p>
-            <div className="flex gap-6 text-sm">
-              <Link to="/about" className="hover:text-mint transition-colors">About</Link>
-              <Link to="/privacy" className="hover:text-mint transition-colors">Privacy</Link>
-              <Link to="/terms" className="hover:text-mint transition-colors">Terms</Link>
-            </div>
-          </div>
-        </footer>
         </div>
       </div>
     );
