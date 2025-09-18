@@ -21,7 +21,12 @@ import BrowseProjects from './pages/BrowseProjects'
 import Freelancers from './pages/Freelancers'
 import SessionManager from './components/SessionManager'
 import Aboutus from './pages/Aboutus'
+import ContactUs from './pages/ContactUs'
 import SubscriptionPage from './pages/subscritionPage'
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import TermsAndConditions from './pages/TermsAndConditions'
+import CancellationRefunds from './pages/CancellationRefunds'
+import ShippingPolicy from './pages/ShippingPolicy'
 
 const router = createBrowserRouter([
   {
@@ -46,7 +51,12 @@ const router = createBrowserRouter([
       { path: '/browse', element: <BrowseProjects /> },
       { path: '/freelancers', element: <Freelancers /> },
       { path: '/about', element: <Aboutus />},
-      { path: '/pricing', element: <SubscriptionPage />}
+      { path: '/contact', element: <ContactUs />},
+      { path: '/pricing', element: <SubscriptionPage />},
+      { path: '/privacy', element: <PrivacyPolicy />},
+      { path: '/terms', element: <TermsAndConditions />},
+      { path: '/cancellation-refunds', element: <CancellationRefunds />},
+      { path: '/shipping', element: <ShippingPolicy />}
     ],
   },
 ])
