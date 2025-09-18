@@ -17,16 +17,36 @@ const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
   .map(o => o.trim())
   .filter(Boolean)
 
+// Default origins if none specified in environment
+const defaultOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'https://maayo-frontend.vercel.app',
+  'https://maayo.vercel.app'
+]
+
+const finalOrigins = allowedOrigins.length > 0 ? allowedOrigins : defaultOrigins
+
 app.use(cors({
   origin: function(origin, callback) {
     if (!origin) return callback(null, true) // mobile apps, curl, same-origin
-    if (allowedOrigins.includes(origin)) return callback(null, true)
+    if (finalOrigins.includes(origin)) return callback(null, true)
     return callback(new Error('Not allowed by CORS'))
   },
   credentials: true,
   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization']
+  allowedHeaders: ['Content-Type','Authorization','user_role','user_email','id']
 }));
+
+// Handle preflight OPTIONS requests
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,user_role,user_email,id');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.status(200).end();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -35,6 +55,6 @@ connect();
 app.use('/api',router)
 
 // Initialize Socket.IO using the same CORS allowlist
-const io = initSocketServer(httpServer, allowedOrigins);
+const io = initSocketServer(httpServer, finalOrigins);
 
 httpServer.listen(PORT)

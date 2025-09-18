@@ -1,7 +1,12 @@
 import jwt from 'jsonwebtoken';
 
 export default function auth(req, res, next) {
- const token = req.header('Authorization')?.replace('Bearer ', '');
+  // Skip authentication for OPTIONS requests (CORS preflight)
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+  
+  const token = req.header('Authorization')?.replace('Bearer ', '');
   if (!token) {
     return res.status(401).json({ error: 'Access denied. No token provided.' });
   }
