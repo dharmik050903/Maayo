@@ -115,3 +115,4 @@ Server emissions:
 - No realtime updates: verify socket connects with `userId` and you joined `chat:{bid_id}`
 - 403 on send/list: ensure bid is accepted and the caller is either client or accepted freelancer
 
+

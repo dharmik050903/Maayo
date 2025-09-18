@@ -92,7 +92,7 @@ export default class Login {
                         last_name: family_name || ' ',
                         personName: name,
                         profile_pic: picture,
-                        user_type: 'client', // Or determine this from frontend
+                        user_type: req.headers.userRole, // Or determine this from frontend
                         email_verified: 1,
                         status: 1,
                     });
