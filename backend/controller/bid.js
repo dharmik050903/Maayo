@@ -1,6 +1,7 @@
 import Bid from "../schema/bid.js";
 import projectinfo from "../schema/projectinfo.js";
 import PersonMaster from "../schema/PersonMaster.js";
+import { getIO } from "../services/socket.js";
 
 export default class BidController {
     // Create a new bid
@@ -330,6 +331,17 @@ export default class BidController {
                     freelancername: '' // Will be populated when needed
                 }]
             });
+
+            // Notify client and freelancer that chat is enabled for this bid
+            try {
+                const io = getIO();
+                const clientId = bid.project_id.personid?.toString();
+                const freelancerId = bid.freelancer_id?.toString();
+                io.to(`user:${clientId}`).emit('chat:enabled', { bid_id, project_id: bid.project_id._id });
+                io.to(`user:${freelancerId}`).emit('chat:enabled', { bid_id, project_id: bid.project_id._id });
+            } catch (_) {
+                // Socket may not be initialized in some environments; ignore
+            }
 
             return res.status(200).json({
                 status: true,

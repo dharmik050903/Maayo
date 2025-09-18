@@ -1,20 +1,81 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Button from './Button'
-import { authenticatedFetch } from '../utils/api'
+import { authenticatedFetch, getCurrentUser } from '../utils/api'
+import messageApiService from '../services/messageApiService'
+import socketService from '../services/socketService'
 
-export default function MessagingModal({ isOpen, onClose, currentUser, otherUser, project }) {
+export default function MessagingModal({ isOpen, onClose, currentUser, otherUser, project, bidId }) {
   const [messages, setMessages] = useState([])
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [sending, setSending] = useState(false)
+  const [error, setError] = useState('')
   const messagesEndRef = useRef(null)
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && bidId) {
       fetchMessages()
+      // Initialize socket connection
+      const user = getCurrentUser()
+      if (user?._id) {
+        console.log('Initializing socket connection for user:', user._id, 'bid:', bidId)
+        socketService.connect(user._id)
+        
+        // Wait for connection before joining room
+        const socket = socketService.getSocket()
+        if (socket) {
+          socket.on('connect', () => {
+            console.log('Socket connected, joining room for bid:', bidId)
+            socketService.testConnection()
+            socketService.joinChatRoom(bidId)
+          })
+          
+          // If already connected, join immediately
+          if (socketService.isSocketConnected()) {
+            console.log('Socket already connected, joining room immediately')
+            socketService.testConnection()
+            socketService.joinChatRoom(bidId)
+          }
+        }
+      }
     }
-  }, [isOpen, otherUser, project])
+    
+    return () => {
+      if (bidId) {
+        console.log('Leaving chat room for bid:', bidId)
+        socketService.leaveChatRoom(bidId)
+      }
+    }
+  }, [isOpen, bidId])
+
+  // Set up real-time message listening
+  useEffect(() => {
+    if (isOpen && bidId) {
+      const handleNewMessage = (data) => {
+        console.log('Received new message:', data)
+        if (data.bid_id === bidId) {
+          console.log('Adding message to chat:', data.message)
+          setMessages(prev => [...prev, data.message])
+        }
+      }
+
+      // Set up message listener
+      socketService.onNewMessage(handleNewMessage)
+
+      // Also set up direct socket listener as backup
+      const socket = socketService.getSocket()
+      if (socket) {
+        socket.on('chat:new-message', handleNewMessage)
+      }
+
+      return () => {
+        socketService.offNewMessage(handleNewMessage)
+        if (socket) {
+          socket.off('chat:new-message', handleNewMessage)
+        }
+      }
+    }
+  }, [isOpen, bidId])
 
   useEffect(() => {
     scrollToBottom()
@@ -25,32 +86,28 @@ export default function MessagingModal({ isOpen, onClose, currentUser, otherUser
   }
 
   const fetchMessages = async () => {
-    if (!otherUser?.id || !project?.id) return
+    if (!bidId) {
+      setError('No bid ID provided for messaging')
+      return
+    }
 
+    setLoading(true)
+    setError('')
+    
     try {
-      setLoading(true)
-      const response = await authenticatedFetch(`${API_BASE_URL}/messages/conversation`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          other_user_id: otherUser.id,
-          project_id: project.id
-        })
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setMessages(data.data || [])
+      const response = await messageApiService.getMessages(bidId)
+      
+      if (response.success) {
+        setMessages(response.data || [])
       } else {
-        // Create mock messages for demonstration
-        createMockMessages()
+        setError(response.error || 'Failed to fetch messages')
+        // Fallback to empty array if API fails
+        setMessages([])
       }
     } catch (error) {
       console.error('Error fetching messages:', error)
-      // Create mock messages for demonstration
-      createMockMessages()
+      setError('Failed to fetch messages')
+      setMessages([])
     } finally {
       setLoading(false)
     }
@@ -85,50 +142,28 @@ export default function MessagingModal({ isOpen, onClose, currentUser, otherUser
 
   const sendMessage = async (e) => {
     e.preventDefault()
-    if (!newMessage.trim() || !otherUser?.id || !project?.id) return
+    if (!newMessage.trim() || !bidId) return
 
     try {
       setSending(true)
-      const response = await authenticatedFetch(`${API_BASE_URL}/messages/send`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          recipient_id: otherUser.id,
-          project_id: project.id,
-          message: newMessage.trim()
-        })
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setMessages(prev => [...prev, data.data])
+      setError('')
+      
+      console.log('Sending message for bid:', bidId, 'message:', newMessage.trim())
+      
+      const response = await messageApiService.sendMessage(bidId, newMessage.trim())
+      
+      if (response.success) {
+        console.log('Message sent successfully:', response.data)
+        // Add message immediately for better UX, Socket.IO will handle real-time for other user
+        setMessages(prev => [...prev, response.data])
         setNewMessage('')
       } else {
-        // Add mock message for demonstration
-        const mockMessage = {
-          _id: `msg_${Date.now()}`,
-          message: newMessage.trim(),
-          sender_id: currentUser?.id,
-          sender_name: currentUser?.name || 'You',
-          createdAt: new Date().toISOString()
-        }
-        setMessages(prev => [...prev, mockMessage])
-        setNewMessage('')
+        console.error('Failed to send message:', response.error)
+        setError(response.error || 'Failed to send message')
       }
     } catch (error) {
       console.error('Error sending message:', error)
-      // Add mock message for demonstration
-      const mockMessage = {
-        _id: `msg_${Date.now()}`,
-        message: newMessage.trim(),
-        sender_id: currentUser?.id,
-        sender_name: currentUser?.name || 'You',
-        createdAt: new Date().toISOString()
-      }
-      setMessages(prev => [...prev, mockMessage])
-      setNewMessage('')
+      setError('Failed to send message')
     } finally {
       setSending(false)
     }
@@ -164,19 +199,35 @@ export default function MessagingModal({ isOpen, onClose, currentUser, otherUser
                 </p>
               </div>
             </div>
-            <button
-              onClick={onClose}
-              className="text-coolgray hover:text-graphite transition-colors"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={fetchMessages}
+                className="text-coolgray hover:text-graphite transition-colors p-1"
+                title="Refresh messages"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+              <button
+                onClick={onClose}
+                className="text-coolgray hover:text-graphite transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4 min-h-0">
+          {error && (
+            <div className="bg-coral/20 text-coral border border-coral/30 rounded-lg p-3 text-sm">
+              {error}
+            </div>
+          )}
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-mint"></div>
@@ -192,28 +243,28 @@ export default function MessagingModal({ isOpen, onClose, currentUser, otherUser
             messages.map((message) => (
               <div
                 key={message._id}
-                className={`flex ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
+                className={`flex ${message.from_person_id === currentUser?._id ? 'justify-end' : 'justify-start'}`}
               >
-                <div className={`max-w-xs lg:max-w-md ${message.sender_id === currentUser?.id ? 'ml-12' : 'mr-12'}`}>
+                <div className={`max-w-xs lg:max-w-md ${message.from_person_id === currentUser?._id ? 'ml-12' : 'mr-12'}`}>
                   <p className={`text-xs mb-1 ${
-                    message.sender_id === currentUser?.id ? 'text-right text-mint' : 'text-left text-coolgray'
+                    message.from_person_id === currentUser?._id ? 'text-right text-mint' : 'text-left text-coolgray'
                   }`}>
-                    {message.sender_name || (message.sender_id === currentUser?.id ? 'You' : 'Other')}
+                    {message.from_person_name || (message.from_person_id === currentUser?._id ? 'You' : 'Other')}
                   </p>
                   <div
                     className={`px-4 py-2 rounded-lg ${
-                      message.sender_id === currentUser?.id
+                      message.from_person_id === currentUser?._id
                         ? 'bg-mint text-white'
                         : 'bg-gray-100 text-graphite'
                     }`}
                   >
                     <p className="text-sm">{message.message}</p>
                     <p className={`text-xs mt-1 ${
-                      message.sender_id === currentUser?.id
+                      message.from_person_id === currentUser?._id
                         ? 'text-mint-100'
                         : 'text-coolgray'
                     }`}>
-                      {formatTime(message.createdAt)}
+                      {formatTime(message.sent_at)}
                     </p>
                   </div>
                 </div>

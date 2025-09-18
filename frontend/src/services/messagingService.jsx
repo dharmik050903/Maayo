@@ -20,7 +20,7 @@ class MessagingService {
     this.currentUser = user
   }
 
-  show(otherUser, project = null) {
+  show(otherUser, project = null, bidId = null) {
     if (!this.container) {
       this.init()
     }
@@ -36,6 +36,7 @@ class MessagingService {
         currentUser={this.currentUser}
         otherUser={otherUser}
         project={project}
+        bidId={bidId}
       />,
       this.container
     )
