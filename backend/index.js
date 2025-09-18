@@ -38,23 +38,35 @@ app.use(cors({
   allowedHeaders: ['Content-Type','Authorization','user_role','user_email','id']
 }));
 
-// Handle preflight OPTIONS requests
-app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,user_role,user_email,id');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.status(200).end();
-});
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 connect();  
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    message: 'Server is running',
+    timestamp: new Date().toISOString()
+  });
+});
 
 app.use('/api',router)
 
 // Initialize Socket.IO using the same CORS allowlist
 const io = initSocketServer(httpServer, finalOrigins);
 
-httpServer.listen(PORT)
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({ 
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+  });
+});
+
+httpServer.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`CORS enabled for origins: ${finalOrigins.join(', ')}`);
+})
