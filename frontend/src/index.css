@@ -49,6 +49,27 @@ html, body, #root {
   box-shadow: none !important;
 }
 
+/* Mobile navigation link styling */
+.mobile-nav-link {
+  color: var(--color-graphite) !important;
+}
+
+.mobile-nav-link:hover {
+  color: var(--color-mint) !important;
+}
+
+/* Ensure mobile navigation text is visible */
+@media (max-width: 768px) {
+  .mobile-nav-link {
+    color: #252525 !important;
+    font-weight: 500;
+  }
+  
+  .mobile-nav-link:hover {
+    color: var(--color-mint) !important;
+  }
+}
+
 /* Project description truncation */
 .project-description {
   display: -webkit-box;
