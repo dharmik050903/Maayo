@@ -17,20 +17,25 @@ export default function ConversationsModal({ isOpen, onClose, currentUser }) {
   }, [isOpen, currentUser])
 
   const fetchConversations = async () => {
-    if (!currentUser?._id) return
+    if (!currentUser?._id) {
+      console.log('ConversationsModal: No current user ID, skipping fetch')
+      return
+    }
 
     try {
       setLoading(true)
+      console.log('ConversationsModal: Fetching conversations for user:', currentUser._id)
       const response = await messageApiService.getConversations()
       
       if (response.success) {
+        console.log('ConversationsModal: Successfully fetched conversations:', response.data)
         setConversations(response.data || [])
       } else {
-        console.error('Error fetching conversations:', response.error)
+        console.error('ConversationsModal: Error fetching conversations:', response.error)
         setConversations([])
       }
     } catch (error) {
-      console.error('Error fetching conversations:', error)
+      console.error('ConversationsModal: Error fetching conversations:', error)
       setConversations([])
     } finally {
       setLoading(false)

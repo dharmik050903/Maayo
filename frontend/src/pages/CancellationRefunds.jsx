@@ -30,18 +30,20 @@ const CancellationRefunds = () => {
               <div className="text-coolgray space-y-4">
                 <h3 className="text-xl font-semibold text-graphite mb-2">Client Cancellation:</h3>
                 <ul className="list-disc pl-6 space-y-2 mb-4">
-                  <li>Can cancel before work begins: Full refund</li>
-                  <li>Can cancel after work starts: Partial refund based on work completed</li>
-                  <li>Must provide valid reason for cancellation</li>
-                  <li>48-hour notice required for cancellation</li>
+                  <li><strong>Before work begins:</strong> Full refund (100%)</li>
+                  <li><strong>After work starts:</strong> Partial refund based on work completed</li>
+                  <li><strong>Must provide valid reason</strong> for cancellation</li>
+                  <li><strong>48-hour notice required</strong> for cancellation</li>
+                  <li>All payments and communication must occur on Maayo platform</li>
                 </ul>
                 
                 <h3 className="text-xl font-semibold text-graphite mb-2">Freelancer Cancellation:</h3>
                 <ul className="list-disc pl-6 space-y-2">
-                  <li>Can withdraw bid before acceptance: No penalty</li>
-                  <li>Cannot cancel after project acceptance without valid reason</li>
-                  <li>Must provide 24-hour notice for cancellation</li>
-                  <li>May affect freelancer rating</li>
+                  <li><strong>Before acceptance:</strong> Can withdraw bid with no penalty</li>
+                  <li><strong>After acceptance:</strong> Cannot cancel without valid reason</li>
+                  <li><strong>24-hour notice required</strong> for cancellation</li>
+                  <li><strong>May affect freelancer rating</strong> and future opportunities</li>
+                  <li>Must complete ongoing projects before taking new ones</li>
                 </ul>
               </div>
             </section>
@@ -67,8 +69,10 @@ const CancellationRefunds = () => {
                   <li>Submit refund request through platform</li>
                   <li>Provide detailed reason for refund</li>
                   <li>Our team reviews the request within 48 hours</li>
-                  <li>If approved, refund processed within 5-7 business days</li>
+                  <li><strong>If approved, refund processed within 5 days</strong></li>
+                  <li><strong>Gateway/service fees & used milestone work are non-refundable</strong></li>
                   <li>Refund credited to original payment method</li>
+                  <li>RBI-compliant escrow ensures secure refund processing</li>
                 </ol>
               </div>
             </section>
@@ -153,8 +157,10 @@ const CancellationRefunds = () => {
                 </p>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p><strong>Email:</strong> support@maayo.com</p>
-                  <p><strong>Phone:</strong> +91-XXXX-XXXX</p>
-                  <p><strong>Live Chat:</strong> Available 24/7 on our platform</p>
+                  <p><strong>Phone/WhatsApp:</strong> +91 76228 57376</p>
+                  <p><strong>LinkedIn:</strong> Connect on LinkedIn</p>
+                  <p><strong>Response Time:</strong> Most queries within 2 business hours</p>
+                  <p><strong>24/7 knowledge base</strong> with FAQs, tutorials, and onboarding videos</p>
                 </div>
               </div>
             </section>

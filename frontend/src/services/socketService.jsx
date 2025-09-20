@@ -21,7 +21,12 @@ class SocketService {
 
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
     // Socket.IO runs on the same port as the HTTP server, so we need the base URL without /api
-    const socketUrl = API_BASE_URL.replace('/api', '')
+    let socketUrl = API_BASE_URL.replace('/api', '')
+    
+    // Handle different URL formats properly
+    if (socketUrl.endsWith('/')) {
+      socketUrl = socketUrl.slice(0, -1)
+    }
     
     // Ensure we have the correct protocol and port
     const finalSocketUrl = socketUrl.startsWith('http') ? socketUrl : `http://${socketUrl}`
@@ -73,8 +78,14 @@ class SocketService {
     if (this.socket && this.isConnected) {
       this.socket.emit('chat:join', { bid_id: bidId })
       console.log('Joined chat room for bid:', bidId)
+    } else if (this.socket) {
+      // If socket exists but not connected, wait for connection
+      this.socket.on('connect', () => {
+        this.socket.emit('chat:join', { bid_id: bidId })
+        console.log('Joined chat room for bid after reconnection:', bidId)
+      })
     } else {
-      console.warn('Socket not connected, cannot join room:', bidId)
+      console.warn('Socket not initialized, cannot join room:', bidId)
     }
   }
 
@@ -99,6 +110,14 @@ class SocketService {
     if (this.socket) {
       this.socket.off('chat:new-message', callback)
       this.listeners.delete('chat:new-message')
+    }
+  }
+
+  // Remove all listeners
+  removeAllListeners() {
+    if (this.socket) {
+      this.socket.removeAllListeners()
+      this.listeners.clear()
     }
   }
 

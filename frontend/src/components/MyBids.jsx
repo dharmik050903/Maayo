@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { bidService } from '../services/bidService'
 import Button from './Button'
 import confirmationService from '../services/confirmationService.jsx'
-import Messaging from './Messaging'
+import messagingService from '../services/messagingService'
 
 const MyBids = () => {
   const [bids, setBids] = useState([])
@@ -12,8 +12,7 @@ const MyBids = () => {
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [selectedBid, setSelectedBid] = useState(null)
   const [updateData, setUpdateData] = useState({})
-  const [showMessaging, setShowMessaging] = useState(false)
-  const [selectedBidForMessaging, setSelectedBidForMessaging] = useState(null)
+  // Removed local messaging state - using messagingService instead
   const hasInitialized = useRef(false)
 
   useEffect(() => {
@@ -374,8 +373,28 @@ const MyBids = () => {
                       size="sm"
                       className="w-full bg-mint text-white hover:bg-mint/90"
                       onClick={() => {
-                        setSelectedBidForMessaging(bid)
-                        setShowMessaging(true)
+                        console.log('MyBids: Message button clicked for bid:', bid)
+                        console.log('MyBids: Client info:', {
+                          id: bid.client_id?._id || bid.client_id,
+                          name: bid.client_name || 'Client'
+                        })
+                        console.log('MyBids: Project info:', {
+                          id: bid.project_id,
+                          title: bid.project_title || 'Project'
+                        })
+                        console.log('MyBids: Bid ID:', bid._id)
+                        
+                        messagingService.show(
+                          {
+                            id: bid.client_id?._id || bid.client_id,
+                            name: bid.client_name || 'Client'
+                          },
+                          {
+                            id: bid.project_id,
+                            title: bid.project_title || 'Project'
+                          },
+                          bid._id
+                        )
                       }}
                     >
                       Message Client
@@ -539,28 +558,7 @@ const MyBids = () => {
         </div>
       )}
 
-      {/* Messaging Modal */}
-      {showMessaging && selectedBidForMessaging && (
-        <Messaging
-          currentUser={{
-            id: 'freelancer',
-            name: 'Freelancer'
-          }}
-          otherUser={{
-            id: selectedBidForMessaging.client_id?._id || selectedBidForMessaging.client_id,
-            name: 'Client'
-          }}
-          project={{
-            id: selectedBidForMessaging.project_id,
-            title: selectedBidForMessaging.project_title || 'Project'
-          }}
-          isClient={false}
-          onClose={() => {
-            setShowMessaging(false)
-            setSelectedBidForMessaging(null)
-          }}
-        />
-      )}
+      {/* Messaging handled by messagingService */}
     </div>
   )
 }

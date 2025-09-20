@@ -38,7 +38,18 @@ export const bidService = {
       }
     } catch (error) {
       console.error('Error creating bid:', error)
-      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+      console.error('Error type:', typeof error)
+      console.error('Error message:', error.message)
+      console.error('Error name:', error.name)
+      
+      // Check for various network/connection errors
+      if (error.message.includes('Failed to fetch') || 
+          error.message.includes('NetworkError') ||
+          error.message.includes('fetch') ||
+          error.name === 'TypeError' ||
+          error.message.includes('ERR_NETWORK') ||
+          error.message.includes('ERR_CONNECTION_REFUSED') ||
+          error.message.includes('ERR_INTERNET_DISCONNECTED')) {
         throw new Error('Unable to connect to server. Please check if the backend is running.')
       }
       throw error

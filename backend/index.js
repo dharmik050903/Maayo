@@ -12,7 +12,7 @@ const httpServer = http.createServer(app);
 const PORT = process.env.PORT || 5000;  
 
 // Configure CORS to allow specific frontend origins
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173,http://127.0.0.1:3000')
   .split(',')
   .map(o => o.trim())
   .filter(Boolean)
@@ -29,13 +29,26 @@ const finalOrigins = allowedOrigins.length > 0 ? allowedOrigins : defaultOrigins
 
 app.use(cors({
   origin: function(origin, callback) {
-    if (!origin) return callback(null, true) // mobile apps, curl, same-origin
-    if (finalOrigins.includes(origin)) return callback(null, true)
+
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true)
+  
+    // Allow localhost and 127.0.0.1 for development
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return callback(null, true)
+    }
+    
+    // Check against allowed origins
+    if (allowedOrigins.includes(origin)) return callback(null, true)
+    
+    // Log the blocked origin for debugging
+    console.log('CORS: Blocked origin:', origin)
+
     return callback(new Error('Not allowed by CORS'))
   },
   credentials: true,
   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization','user_role','user_email','id']
+  allowedHeaders: ['Content-Type','Authorization','id','user_role','user_email','first_name','last_name']
 }));
 
 app.use(express.json());
@@ -57,16 +70,9 @@ app.use('/api',router)
 // Initialize Socket.IO using the same CORS allowlist
 const io = initSocketServer(httpServer, finalOrigins);
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  res.status(500).json({ 
-    error: 'Internal Server Error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
-  });
-});
-
 httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`CORS enabled for origins: ${finalOrigins.join(', ')}`);
-})
+    console.log(`🚀 Server is running on port ${PORT}`);
+    console.log(`📡 API endpoints available at http://localhost:${PORT}/api`);
+    console.log(`🔌 Socket.IO server initialized`);
+    console.log(`🌐 CORS allowed origins:`, allowedOrigins.length > 0 ? allowedOrigins : 'All localhost origins allowed');
+});

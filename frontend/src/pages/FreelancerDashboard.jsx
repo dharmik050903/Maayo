@@ -49,6 +49,13 @@ export default function FreelancerDashboard() {
       console.log('FreelancerDashboard: User data:', user)
       
       if (user) {
+        // Check if user should be on this dashboard
+        if (user.user_type === 'client') {
+          console.log('FreelancerDashboard: User is client, redirecting to client dashboard')
+          window.location.href = '/client-dashboard'
+          return
+        }
+        
         setUserData(user)
         
         // Check if user already has a profile in database

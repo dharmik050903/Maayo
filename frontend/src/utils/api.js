@@ -9,21 +9,34 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000
  */
 export function getAuthHeaders() {
   const authHeaders = localStorage.getItem('authHeaders')
+  console.log('getAuthHeaders: Raw authHeaders from localStorage:', authHeaders)
+  
   if (!authHeaders) {
+    console.log('getAuthHeaders: No auth headers found in localStorage')
     return {}
   }
   
   try {
     const { token, _id, userRole, userEmail } = JSON.parse(authHeaders)
-    return {
+    
+    // Get user data to include name in headers
+    const userData = getCurrentUser()
+    const firstName = userData?.first_name || userData?.personName?.split(' ')[0] || ''
+    const lastName = userData?.last_name || userData?.personName?.split(' ').slice(1).join(' ') || ''
+    
+    const headers = {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
       'id': _id,
       'user_role': userRole,
-      'user_email': userEmail
+      'user_email': userEmail,
+      'first_name': firstName,
+      'last_name': lastName
     }
+    console.log('getAuthHeaders: Parsed headers:', headers)
+    return headers
   } catch (error) {
-    console.error('Error parsing auth headers:', error)
+    console.error('getAuthHeaders: Error parsing auth headers:', error)
     return {}
   }
 }
@@ -43,20 +56,35 @@ export async function authenticatedFetch(url, options = {}) {
     ...options.headers
   }
   
-  const response = await fetch(url, {
-    ...options,
-    headers
-  })
+  console.log('authenticatedFetch: Making request to:', url)
+  console.log('authenticatedFetch: Headers:', headers)
+  console.log('authenticatedFetch: Options:', options)
   
-  // Handle 401 Unauthorized responses
-  if (response.status === 401) {
-    console.log('Unauthorized access, clearing auth data')
-    clearAuth()
-    window.location.href = '/login'
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers
+    })
+    
+    console.log('authenticatedFetch: Response status:', response.status)
+    console.log('authenticatedFetch: Response ok:', response.ok)
+    
+    // Handle 401 Unauthorized responses
+    if (response.status === 401) {
+      console.log('Unauthorized access, clearing auth data')
+      clearAuth()
+      window.location.href = '/login'
+      return response
+    }
+    
     return response
+  } catch (error) {
+    console.error('authenticatedFetch: Error making request:', error)
+    console.error('authenticatedFetch: Error type:', typeof error)
+    console.error('authenticatedFetch: Error message:', error.message)
+    console.error('authenticatedFetch: Error name:', error.name)
+    throw error
   }
-  
-  return response
 }
 
 /**
@@ -245,10 +273,7 @@ export function checkSession() {
  * @returns {Promise} Login response
  */
 export async function loginUser(credentials) {
-  if(API_BASE_URL && import.meta.env.VITE_API_BASE_URL ){
-   const temproute = "https://maayo-backend.onrender.com"
-  }
-  const response = await fetch(`${temproute}/login`, {
+  const response = await fetch(`${API_BASE_URL}/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -271,10 +296,7 @@ export async function loginUser(credentials) {
  * @returns {Promise} Registration response
  */
 export async function registerUser(userData) {
-  if(API_BASE_URL && import.meta.env.VITE_API_BASE_URL ){
-   const temproute = "https://maayo-backend.onrender.com"
-  }
-  const response = await fetch(`${temproute}/signup`, {
+  const response = await fetch(`${API_BASE_URL}/signup`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

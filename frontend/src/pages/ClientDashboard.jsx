@@ -33,6 +33,13 @@ export default function ClientDashboard() {
       console.log('ClientDashboard: User data:', user)
       
       if (user) {
+        // Check if user should be on this dashboard
+        if (user.user_type === 'freelancer') {
+          console.log('ClientDashboard: User is freelancer, redirecting to freelancer dashboard')
+          window.location.href = '/freelancer-dashboard'
+          return
+        }
+        
         setUserData(user)
         fetchClientInfo()
         fetchTotalProjects()
@@ -278,7 +285,7 @@ export default function ClientDashboard() {
                   <div className="mt-6 space-y-4">
                     <div>
                       <h4 className="font-medium text-graphite">User Type</h4>
-                      <p className="text-coolgray capitalize">{userData?.user_type}</p>
+                      <p className="text-coolgray capitalize">Client</p>
                     </div>
                     <div>
                       <h4 className="font-medium text-graphite">Member Since</h4>

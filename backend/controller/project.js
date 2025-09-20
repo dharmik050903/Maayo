@@ -53,6 +53,9 @@ export default class Project {
     }
     async listproject(req, res) {
         try {
+            console.log('Project list request headers:', req.headers);
+            console.log('Project list request body:', req.body);
+            
             const { id, personid, isactive, ispending, iscompleted, status, page, limit } = req.body || {};
 
             // If specific id provided, return single project

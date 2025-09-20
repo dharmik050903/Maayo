@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { bidService } from '../services/bidService'
 import { projectService } from '../services/projectService'
 import Button from './Button'
-import Messaging from './Messaging'
+import messagingService from '../services/messagingService'
 import ConfirmationModal from './ConfirmationModal'
 import NotificationModal from './NotificationModal'
 import { useConfirmation, useNotification } from '../hooks/useModal'
@@ -21,8 +21,7 @@ export default function ClientMyBids() {
   const [rejectMessage, setRejectMessage] = useState('')
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
-  const [showMessaging, setShowMessaging] = useState(false)
-  const [selectedBidForMessaging, setSelectedBidForMessaging] = useState(null)
+  // Removed local messaging state - using messagingService instead
   const dropdownRef = useRef(null)
   const hasInitialized = useRef(false)
   const isInitializing = useRef(false)
@@ -209,8 +208,17 @@ export default function ClientMyBids() {
         // Find the accepted bid to open messaging
         const acceptedBid = bids.find(bid => bid._id === bidId)
         if (acceptedBid) {
-          setSelectedBidForMessaging(acceptedBid)
-          setShowMessaging(true)
+          messagingService.show(
+            {
+              id: acceptedBid.freelancer_id?._id || acceptedBid.freelancer_id,
+              name: acceptedBid.freelancer_name || 'Freelancer'
+            },
+            {
+              id: acceptedBid.project_id,
+              title: acceptedBid.project_title || 'Project'
+            },
+            acceptedBid._id
+          )
         } else {
               showNotification({
                 title: 'Success',
@@ -568,8 +576,28 @@ export default function ClientMyBids() {
                       size="sm" 
                       className="flex-1 min-w-[120px] bg-mint text-white hover:bg-mint/90"
                       onClick={() => {
-                        setSelectedBidForMessaging(bid)
-                        setShowMessaging(true)
+                        console.log('ClientMyBids: Message button clicked for bid:', bid)
+                        console.log('ClientMyBids: Freelancer info:', {
+                          id: bid.freelancer_id?._id || bid.freelancer_id,
+                          name: bid.freelancer_name || 'Freelancer'
+                        })
+                        console.log('ClientMyBids: Project info:', {
+                          id: bid.project_id,
+                          title: bid.project_title || 'Project'
+                        })
+                        console.log('ClientMyBids: Bid ID:', bid._id)
+                        
+                        messagingService.show(
+                          {
+                            id: bid.freelancer_id?._id || bid.freelancer_id,
+                            name: bid.freelancer_name || 'Freelancer'
+                          },
+                          {
+                            id: bid.project_id,
+                            title: bid.project_title || 'Project'
+                          },
+                          bid._id
+                        )
                       }}
                     >
                       Message
@@ -786,28 +814,7 @@ export default function ClientMyBids() {
         </div>
       )}
 
-      {/* Messaging Modal */}
-      {showMessaging && selectedBidForMessaging && (
-        <Messaging
-          currentUser={{
-            id: 'client',
-            name: 'Client'
-          }}
-          otherUser={{
-            id: selectedBidForMessaging.freelancer_id?._id || selectedBidForMessaging.freelancer_id,
-            name: getFreelancerName(selectedBidForMessaging)
-          }}
-          project={{
-            id: selectedBidForMessaging.project_id,
-            title: getProjectTitle(selectedBidForMessaging.project_id)
-          }}
-          isClient={true}
-          onClose={() => {
-            setShowMessaging(false)
-            setSelectedBidForMessaging(null)
-          }}
-        />
-      )}
+      {/* Messaging handled by messagingService */}
 
       {/* Confirmation Modal */}
       <ConfirmationModal
@@ -835,5 +842,3 @@ export default function ClientMyBids() {
     </div>
   )
 }
-
-

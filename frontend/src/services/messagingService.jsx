@@ -1,11 +1,13 @@
-import { createPortal } from 'react-dom'
+import React from 'react'
+import { createRoot } from 'react-dom/client'
 import MessagingModal from '../components/MessagingModal'
 
 class MessagingService {
   constructor() {
     this.container = null
-    this.currentModal = null
+    this.root = null
     this.currentUser = null
+    this.isOpen = false
   }
 
   init() {
@@ -13,6 +15,7 @@ class MessagingService {
       this.container = document.createElement('div')
       this.container.id = 'messaging-modal-container'
       document.body.appendChild(this.container)
+      this.root = createRoot(this.container)
     }
   }
 
@@ -21,15 +24,22 @@ class MessagingService {
   }
 
   show(otherUser, project = null, bidId = null) {
+    console.log('MessagingService: Opening modal with:', { otherUser, project, bidId })
+    
     if (!this.container) {
       this.init()
+    }
+
+    if (!this.root) {
+      this.root = createRoot(this.container)
     }
 
     const handleClose = () => {
       this.hide()
     }
 
-    this.currentModal = createPortal(
+    this.isOpen = true
+    this.root.render(
       <MessagingModal
         isOpen={true}
         onClose={handleClose}
@@ -37,23 +47,15 @@ class MessagingService {
         otherUser={otherUser}
         project={project}
         bidId={bidId}
-      />,
-      this.container
+      />
     )
-
-    this.forceUpdate()
   }
 
   hide() {
-    if (this.currentModal) {
-      this.currentModal = null
-      this.forceUpdate()
-    }
-  }
-
-  forceUpdate() {
-    if (this.container) {
-      this.container.innerHTML = ''
+    console.log('MessagingService: Closing modal')
+    this.isOpen = false
+    if (this.root) {
+      this.root.render(null)
     }
   }
 }

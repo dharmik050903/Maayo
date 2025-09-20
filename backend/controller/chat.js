@@ -119,6 +119,78 @@ export default class ChatController {
             return res.status(500).json({ status: false, message: 'Failed to fetch messages', error: error.message });
         }
     }
+
+    // Get all conversations for a user (accepted bids with latest messages)
+    async getConversations(req, res) {
+        try {
+            const userId = req.headers.id;
+            const userRole = req.headers.user_role;
+
+            let acceptedBids = [];
+
+            if (userRole === 'client') {
+                // Get all accepted bids for client's projects
+                const projects = await projectinfo.find({ personid: userId });
+                const projectIds = projects.map(p => p._id);
+
+                acceptedBids = await Bid.find({
+                    project_id: { $in: projectIds },
+                    status: 'accepted'
+                }).populate('freelancer_id', 'first_name last_name')
+                  .populate('project_id', 'title');
+
+            } else if (userRole === 'freelancer') {
+                // Get all accepted bids by freelancer
+                acceptedBids = await Bid.find({
+                    freelancer_id: userId,
+                    status: 'accepted'
+                }).populate('project_id', 'title personid')
+                  .populate('project_id.personid', 'first_name last_name');
+            } else {
+                return res.status(403).json({ status: false, message: "Invalid user role" });
+            }
+
+            // Get conversations with latest messages
+            const conversations = [];
+            for (const bid of acceptedBids) {
+                const latestMessage = await Chat.findOne({ bid_id: bid._id })
+                    .sort({ sent_at: -1 })
+                    .limit(1);
+
+                const conversation = {
+                    bid_id: bid._id,
+                    project_id: bid.project_id._id,
+                    project_title: bid.project_id.title,
+                    status: bid.status,
+                    latest_message: latestMessage ? latestMessage.message : 'Bid accepted! Start the conversation.',
+                    latest_message_time: latestMessage ? latestMessage.sent_at : (bid.client_decision_date || bid.createdAt)
+                };
+
+                if (userRole === 'client') {
+                    conversation.freelancer_id = bid.freelancer_id._id;
+                    conversation.freelancer_name = `${bid.freelancer_id.first_name} ${bid.freelancer_id.last_name}`.trim();
+                    conversation.client_id = userId;
+                    conversation.client_name = 'You';
+                } else {
+                    conversation.freelancer_id = userId;
+                    conversation.freelancer_name = 'You';
+                    conversation.client_id = bid.project_id.personid._id;
+                    conversation.client_name = `${bid.project_id.personid.first_name} ${bid.project_id.personid.last_name}`.trim();
+                }
+
+                conversations.push(conversation);
+            }
+
+            return res.status(200).json({
+                status: true,
+                message: "Conversations fetched",
+                data: conversations
+            });
+        } catch (error) {
+            console.error('Error fetching conversations:', error);
+            return res.status(500).json({ status: false, message: 'Failed to fetch conversations', error: error.message });
+        }
+    }
 }
 
 

@@ -19,10 +19,14 @@ const ShippingPolicy = () => {
               <h2 className="text-2xl font-semibold text-graphite mb-4">1. Overview</h2>
               <div className="text-coolgray space-y-4">
                 <p>
-                  This shipping policy applies to physical deliverables and digital products on the 
-                  Maayo platform. Since we primarily deal with digital services, this policy covers 
-                  both scenarios.
+                  This delivery policy applies to all projects on the Maayo platform. While we primarily 
+                  deal with digital services, this policy covers both digital and physical deliverables 
+                  to ensure complete transparency and satisfaction.
                 </p>
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <p><strong>Note:</strong> Maayo is a digital-first platform focused on freelance services. 
+                  Most projects involve digital deliverables, but we also support physical projects when needed.</p>
+                </div>
               </div>
             </section>
 
@@ -159,12 +163,14 @@ const ShippingPolicy = () => {
               <h2 className="text-2xl font-semibold text-graphite mb-4">11. Contact Information</h2>
               <div className="text-coolgray space-y-4">
                 <p>
-                  For shipping-related questions or issues, contact our logistics team:
+                  For delivery-related questions or issues, contact our support team:
                 </p>
                 <div className="bg-gray-50 p-4 rounded-lg">
-                  <p><strong>Email:</strong> shipping@maayo.com</p>
-                  <p><strong>Phone:</strong> +91-XXXX-XXXX</p>
-                  <p><strong>Live Chat:</strong> Available 24/7 on our platform</p>
+                  <p><strong>Email:</strong> support@maayo.com</p>
+                  <p><strong>Phone/WhatsApp:</strong> +91 76228 57376</p>
+                  <p><strong>LinkedIn:</strong> Connect on LinkedIn</p>
+                  <p><strong>Response Time:</strong> Most queries within 2 business hours</p>
+                  <p><strong>24/7 knowledge base</strong> with FAQs, tutorials, and onboarding videos</p>
                 </div>
               </div>
             </section>

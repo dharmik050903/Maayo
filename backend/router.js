@@ -81,6 +81,16 @@ router.post("/ai/generate-proposal", auth, aiController.generateProposal);
 // Chat routes
 router.post("/chat/send", auth, chatController.sendMessage);
 router.post("/chat/list", auth, chatController.getMessages);
+router.post("/chat/conversations", auth, chatController.getConversations);
+
+// Health check for chat endpoints
+router.get("/chat/health", (req, res) => {
+    res.json({ 
+        status: true, 
+        message: "Chat service is running",
+        timestamp: new Date().toISOString()
+    });
+});
 
 
 export default router;

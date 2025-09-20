@@ -13,38 +13,56 @@ export default function MessagingModal({ isOpen, onClose, currentUser, otherUser
   const messagesEndRef = useRef(null)
 
   useEffect(() => {
+    console.log('MessagingModal: useEffect triggered with isOpen:', isOpen, 'bidId:', bidId)
+    
     if (isOpen && bidId) {
-      fetchMessages()
+      console.log('MessagingModal: Opening modal and testing backend connection')
+      
+      // First test backend connection
+      messageApiService.healthCheck().then(healthResult => {
+        if (healthResult.success) {
+          console.log('MessagingModal: Backend is healthy, fetching messages')
+          fetchMessages()
+        } else {
+          console.error('MessagingModal: Backend health check failed:', healthResult.error)
+          setError('Backend server is not responding. Please check if the server is running.')
+        }
+      })
+      
       // Initialize socket connection
       const user = getCurrentUser()
       if (user?._id) {
-        console.log('Initializing socket connection for user:', user._id, 'bid:', bidId)
+        console.log('MessagingModal: Initializing socket connection for user:', user._id, 'bid:', bidId)
         socketService.connect(user._id)
         
         // Wait for connection before joining room
         const socket = socketService.getSocket()
         if (socket) {
           socket.on('connect', () => {
-            console.log('Socket connected, joining room for bid:', bidId)
+            console.log('MessagingModal: Socket connected, joining room for bid:', bidId)
             socketService.testConnection()
             socketService.joinChatRoom(bidId)
           })
           
           // If already connected, join immediately
           if (socketService.isSocketConnected()) {
-            console.log('Socket already connected, joining room immediately')
+            console.log('MessagingModal: Socket already connected, joining room immediately')
             socketService.testConnection()
             socketService.joinChatRoom(bidId)
           }
         }
+      } else {
+        console.error('MessagingModal: No user ID found')
       }
     }
     
     return () => {
       if (bidId) {
-        console.log('Leaving chat room for bid:', bidId)
+        console.log('MessagingModal: Leaving chat room for bid:', bidId)
         socketService.leaveChatRoom(bidId)
       }
+      // Clean up all socket listeners when component unmounts
+      socketService.removeAllListeners()
     }
   }, [isOpen, bidId])
 
@@ -53,26 +71,32 @@ export default function MessagingModal({ isOpen, onClose, currentUser, otherUser
     if (isOpen && bidId) {
       const handleNewMessage = (data) => {
         console.log('Received new message:', data)
+        console.log('Current bidId:', bidId)
+        console.log('Message bid_id:', data.bid_id)
         if (data.bid_id === bidId) {
           console.log('Adding message to chat:', data.message)
-          setMessages(prev => [...prev, data.message])
+          console.log('Message from_person_id:', data.message.from_person_id)
+          console.log('Current user ID:', currentUser?._id || currentUser?.id)
+          
+          // Check if message already exists to prevent duplicates
+          setMessages(prev => {
+            const messageExists = prev.some(msg => msg._id === data.message._id)
+            if (messageExists) {
+              console.log('Message already exists, not adding duplicate')
+              return prev
+            }
+            return [...prev, data.message]
+          })
+        } else {
+          console.log('Message not for this bid, ignoring')
         }
       }
 
       // Set up message listener
       socketService.onNewMessage(handleNewMessage)
 
-      // Also set up direct socket listener as backup
-      const socket = socketService.getSocket()
-      if (socket) {
-        socket.on('chat:new-message', handleNewMessage)
-      }
-
       return () => {
         socketService.offNewMessage(handleNewMessage)
-        if (socket) {
-          socket.off('chat:new-message', handleNewMessage)
-        }
       }
     }
   }, [isOpen, bidId])
@@ -87,6 +111,7 @@ export default function MessagingModal({ isOpen, onClose, currentUser, otherUser
 
   const fetchMessages = async () => {
     if (!bidId) {
+      console.error('MessagingModal: No bid ID provided for messaging')
       setError('No bid ID provided for messaging')
       return
     }
@@ -95,18 +120,35 @@ export default function MessagingModal({ isOpen, onClose, currentUser, otherUser
     setError('')
     
     try {
+      console.log('MessagingModal: Fetching messages for bid:', bidId)
       const response = await messageApiService.getMessages(bidId)
       
       if (response.success) {
+        console.log('MessagingModal: Successfully fetched messages:', response.data)
         setMessages(response.data || [])
       } else {
-        setError(response.error || 'Failed to fetch messages')
+        console.error('MessagingModal: Error fetching messages:', response.error)
+        
+        // Check if it's a server error (HTML response)
+        if (response.error && response.error.includes('Server returned an error page')) {
+          setError('Backend server is not responding correctly. Please check if the server is running.')
+        } else {
+          setError(response.error || 'Failed to fetch messages')
+        }
+        
         // Fallback to empty array if API fails
         setMessages([])
       }
     } catch (error) {
-      console.error('Error fetching messages:', error)
-      setError('Failed to fetch messages')
+      console.error('MessagingModal: Error fetching messages:', error)
+      
+      // Check if it's a JSON parsing error
+      if (error.message && error.message.includes('Unexpected token')) {
+        setError('Server returned an invalid response. Please check if the backend is running correctly.')
+      } else {
+        setError('Failed to fetch messages: ' + error.message)
+      }
+      
       setMessages([])
     } finally {
       setLoading(false)
@@ -155,7 +197,14 @@ export default function MessagingModal({ isOpen, onClose, currentUser, otherUser
       if (response.success) {
         console.log('Message sent successfully:', response.data)
         // Add message immediately for better UX, Socket.IO will handle real-time for other user
-        setMessages(prev => [...prev, response.data])
+        setMessages(prev => {
+          const messageExists = prev.some(msg => msg._id === response.data._id)
+          if (messageExists) {
+            console.log('Message already exists, not adding duplicate')
+            return prev
+          }
+          return [...prev, response.data]
+        })
         setNewMessage('')
       } else {
         console.error('Failed to send message:', response.error)
@@ -176,8 +225,14 @@ export default function MessagingModal({ isOpen, onClose, currentUser, otherUser
     })
   }
 
-  if (!isOpen) return null
+  console.log('MessagingModal: Rendering with isOpen:', isOpen, 'bidId:', bidId)
+  
+  if (!isOpen) {
+    console.log('MessagingModal: Not rendering - isOpen is false')
+    return null
+  }
 
+  console.log('MessagingModal: Rendering modal')
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center p-4 pt-8">
       <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col">
@@ -240,36 +295,45 @@ export default function MessagingModal({ isOpen, onClose, currentUser, otherUser
               <p>No messages yet. Start the conversation!</p>
             </div>
           ) : (
-            messages.map((message) => (
-              <div
-                key={message._id}
-                className={`flex ${message.from_person_id === currentUser?._id ? 'justify-end' : 'justify-start'}`}
-              >
-                <div className={`max-w-xs lg:max-w-md ${message.from_person_id === currentUser?._id ? 'ml-12' : 'mr-12'}`}>
-                  <p className={`text-xs mb-1 ${
-                    message.from_person_id === currentUser?._id ? 'text-right text-mint' : 'text-left text-coolgray'
-                  }`}>
-                    {message.from_person_name || (message.from_person_id === currentUser?._id ? 'You' : 'Other')}
-                  </p>
-                  <div
-                    className={`px-4 py-2 rounded-lg ${
-                      message.from_person_id === currentUser?._id
-                        ? 'bg-mint text-white'
-                        : 'bg-gray-100 text-graphite'
-                    }`}
-                  >
-                    <p className="text-sm">{message.message}</p>
-                    <p className={`text-xs mt-1 ${
-                      message.from_person_id === currentUser?._id
-                        ? 'text-mint-100'
-                        : 'text-coolgray'
+            messages.map((message) => {
+              const currentUserId = currentUser?._id || currentUser?.id
+              const isOwnMessage = message.from_person_id === currentUserId
+              console.log('Rendering message:', message)
+              console.log('Current user ID:', currentUserId)
+              console.log('Message from_person_id:', message.from_person_id)
+              console.log('Is own message:', isOwnMessage)
+              
+              return (
+                <div
+                  key={message._id}
+                  className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div className={`max-w-xs lg:max-w-md ${isOwnMessage ? 'ml-12' : 'mr-12'}`}>
+                    <p className={`text-xs mb-1 ${
+                      isOwnMessage ? 'text-right text-mint' : 'text-left text-coolgray'
                     }`}>
-                      {formatTime(message.sent_at)}
+                      {message.from_person_name || (isOwnMessage ? 'You' : 'Other')}
                     </p>
+                    <div
+                      className={`px-4 py-2 rounded-lg ${
+                        isOwnMessage
+                          ? 'bg-mint text-white'
+                          : 'bg-gray-100 text-graphite'
+                      }`}
+                    >
+                      <p className="text-sm">{message.message}</p>
+                      <p className={`text-xs mt-1 ${
+                        isOwnMessage
+                          ? 'text-mint-100'
+                          : 'text-coolgray'
+                      }`}>
+                        {formatTime(message.sent_at)}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              )
+            })
           )}
           <div ref={messagesEndRef} />
         </div>

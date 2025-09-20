@@ -144,6 +144,8 @@ export default function Header({ userType, onLogout, userData }) {
   }
 
   const handleMessagesClick = () => {
+    console.log('Header: Messages button clicked')
+    console.log('Header: Current user:', userData)
     setShowConversationsModal(true)
   }
 
