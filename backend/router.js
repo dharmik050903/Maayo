@@ -11,7 +11,7 @@ import Bid from "./controller/bid.js";
 import OTP from "./controller/otp.js";
 import AIController from "./controller/aiController.js";
 import ChatController from "./controller/chat.js";
-
+import PaymentGateway from "./controller/paymentcontroller.js";
 
 const router = express.Router();
 //Login and Signup Controllers
@@ -26,6 +26,7 @@ const bidController = new Bid();
 const otpController = new OTP();
 const aiController = new AIController();
 const chatController = new ChatController();
+const paymentGateway = new PaymentGateway();
 
 
 
@@ -82,6 +83,11 @@ router.post("/ai/generate-proposal", auth, aiController.generateProposal);
 router.post("/chat/send", auth, chatController.sendMessage);
 router.post("/chat/list", auth, chatController.getMessages);
 router.post("/chat/conversations", auth, chatController.getConversations);
+
+//PaymentGateway routes
+router.post("/payment/create-session", auth, paymentGateway.createOrder);
+router.post("/payment/verify", auth, paymentGateway.verifyPayment);
+router.post("/payment/history", auth, paymentGateway.paymentHistory);
 
 // Health check for chat endpoints
 router.get("/chat/health", (req, res) => {
