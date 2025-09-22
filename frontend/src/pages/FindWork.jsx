@@ -5,6 +5,7 @@ import Button from '../components/Button'
 import { projectService } from '../services/projectService'
 import { skillsService } from '../services/skillsService'
 import { getCurrentUser } from '../utils/api'
+import { formatBudget } from '../utils/currency'
 import BidForm from '../components/BidForm'
 import confirmationService from '../services/confirmationService.jsx'
 
@@ -374,7 +375,7 @@ export default function FindWork() {
                                 : 'bg-white/20 text-white hover:bg-white/30'
                             }`}
                           >
-                            ${amount.toLocaleString()}+
+                            {formatBudget(amount, false)}+
                           </button>
                         ))}
                       </div>
@@ -397,7 +398,7 @@ export default function FindWork() {
                         )}
                         {maxBudget && (
                           <span className="px-2 py-1 bg-mint/20 text-mint rounded text-sm">
-                            Max ${parseFloat(maxBudget).toLocaleString()}
+                            Max {formatBudget(parseFloat(maxBudget), false)}
                           </span>
                         )}
                       </div>
@@ -455,7 +456,7 @@ export default function FindWork() {
                       <div className="grid grid-cols-2 gap-4 mb-4">
                         <div>
                           <p className="text-xs text-coolgray">Budget</p>
-                          <p className="font-semibold text-mint">{project.budget?.toLocaleString()}</p>
+                          <p className="font-semibold text-mint">{formatBudget(project.budget)}</p>
                         </div>
                         <div>
                           <p className="text-xs text-coolgray">Duration</p>
@@ -641,7 +642,7 @@ export default function FindWork() {
                     </div>
                     <div>
                       <p className="text-sm text-coolgray">Budget</p>
-                      <p className="text-2xl font-bold text-mint">{selectedProjectDetail.budget?.toLocaleString()}</p>
+                      <p className="text-2xl font-bold text-mint">{formatBudget(selectedProjectDetail.budget)}</p>
                     </div>
                   </div>
                 </div>

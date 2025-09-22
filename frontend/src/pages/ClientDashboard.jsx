@@ -5,6 +5,7 @@ import Button from '../components/Button'
 import MyProjects from '../components/MyProjects'
 import { authenticatedFetch, isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 import { projectService } from '../services/projectService'
+import { formatBudget } from '../utils/currency'
 
 export default function ClientDashboard() {
   const navigate = useNavigate()
@@ -203,7 +204,7 @@ export default function ClientDashboard() {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-coolgray">Total Spend</p>
                     <p className="text-2xl font-bold text-graphite">
-                      ${clientInfo?.total_spend || '0'}
+                      {formatBudget(clientInfo?.total_spend || 0)}
                     </p>
                   </div>
                 </div>
@@ -377,19 +378,19 @@ export default function ClientDashboard() {
                       <h4 className="font-medium text-graphite">Website Development</h4>
                       <p className="text-sm text-coolgray">Freelancer: John Doe</p>
                       <p className="text-sm text-coolgray">Status: In Progress</p>
-                      <p className="text-sm text-coolgray">Budget: $2,500</p>
+                      <p className="text-sm text-coolgray">Budget: {formatBudget(2500)}</p>
                     </div>
                     <div className="border-l-4 border-mint pl-4">
                       <h4 className="font-medium text-graphite">Logo Design</h4>
                       <p className="text-sm text-coolgray">Freelancer: Jane Smith</p>
                       <p className="text-sm text-coolgray">Status: Completed</p>
-                      <p className="text-sm text-coolgray">Budget: $500</p>
+                      <p className="text-sm text-coolgray">Budget: {formatBudget(500)}</p>
                     </div>
                     <div className="border-l-4 border-coral pl-4">
                       <h4 className="font-medium text-graphite">Mobile App</h4>
                       <p className="text-sm text-coolgray">Freelancer: Mike Johnson</p>
                       <p className="text-sm text-coolgray">Status: Pending Review</p>
-                      <p className="text-sm text-coolgray">Budget: $5,000</p>
+                      <p className="text-sm text-coolgray">Budget: {formatBudget(5000)}</p>
                     </div>
                   </div>
                 </div>

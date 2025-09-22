@@ -1,21 +1,53 @@
 import { useState, useEffect, useRef } from 'react'
 import Header from '../components/Header'
+import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
+import { formatBudget } from '../utils/currency'
 
 export default function BrowseProjects() {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [userData, setUserData] = useState(null)
+  const [authLoading, setAuthLoading] = useState(true)
   const hasFetched = useRef(false)
+  const hasInitialized = useRef(false)
+
+  // Authentication check
+  useEffect(() => {
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      console.log('BrowseProjects: useEffect running (first time)');
+      
+      // Check if user is authenticated
+      const authStatus = isAuthenticated();
+      console.log('BrowseProjects: Authentication status:', authStatus);
+      
+      if (authStatus) {
+        // Get user data if authenticated
+        const user = getCurrentUser();
+        console.log('BrowseProjects: User data:', user);
+        
+        if (user) {
+          setUserData(user);
+        }
+      }
+      
+      // Set auth loading to false after initialization
+      setAuthLoading(false);
+    } else {
+      console.log('BrowseProjects: Skipping duplicate initialization due to StrictMode');
+    }
+  }, []);
 
   useEffect(() => {
-    if (!hasFetched.current) {
+    if (!hasFetched.current && !authLoading) {
       hasFetched.current = true
       console.log('BrowseProjects component: Fetching projects (first time)')
       fetchProjects()
     } else {
       console.log('BrowseProjects component: Skipping duplicate fetch due to StrictMode')
     }
-  }, [])
+  }, [authLoading])
 
   const fetchProjects = async () => {
     try {
@@ -44,10 +76,25 @@ export default function BrowseProjects() {
     }
   }
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-brand-gradient text-white">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-brand-gradient text-white">
-        <Header />
+        <Header 
+          userType={userData?.user_type || 'client'} 
+          userData={userData} 
+          onLogout={clearAuth}
+        />
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
@@ -61,7 +108,11 @@ export default function BrowseProjects() {
   if (error) {
     return (
       <div className="min-h-screen bg-brand-gradient text-white">
-        <Header />
+        <Header 
+          userType={userData?.user_type || 'client'} 
+          userData={userData} 
+          onLogout={clearAuth}
+        />
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <p className="text-white/80">{error}</p>
@@ -73,7 +124,11 @@ export default function BrowseProjects() {
 
   return (
     <div className="min-h-screen bg-brand-gradient text-white page-transition">
-      <Header />
+      <Header 
+        userType={userData?.user_type || 'client'} 
+        userData={userData} 
+        onLogout={clearAuth}
+      />
       
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 pt-28 pb-8">
@@ -114,7 +169,7 @@ export default function BrowseProjects() {
                     <div className="grid grid-cols-2 gap-4 mb-4">
                       <div>
                         <p className="text-xs text-coolgray uppercase tracking-wide">Budget</p>
-                        <p className="text-lg font-semibold text-mint">{project.budget?.toLocaleString()}</p>
+                        <p className="text-lg font-semibold text-mint">{formatBudget(project.budget)}</p>
                       </div>
                       <div>
                         <p className="text-xs text-coolgray uppercase tracking-wide">Duration</p>

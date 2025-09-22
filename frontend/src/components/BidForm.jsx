@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'  // ✅ Added useRef, useEffect
 import { bidService } from '../services/bidService'
 import { aiService } from '../services/aiService'
+import { formatBudget } from '../utils/currency'
 
 const BidForm = ({ project, onBidSubmitted, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -477,7 +478,7 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
                       <p className="text-coolgray mb-3">{milestone.description}</p>
                     )}
                     <div className="flex gap-6 text-sm">
-                      <span className="text-violet font-semibold">Amount: ${milestone.amount?.toLocaleString()}</span>
+                      <span className="text-violet font-semibold">Amount: {formatBudget(milestone.amount)}</span>
                       {milestone.due_date && <span className="text-mint font-semibold">Due: {milestone.due_date}</span>}
                     </div>
                   </div>

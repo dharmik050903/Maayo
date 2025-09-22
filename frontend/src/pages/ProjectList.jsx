@@ -5,6 +5,7 @@ import Button from '../components/Button'
 import { projectService } from '../services/projectService'
 import { PageShimmer } from '../components/Shimmer'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
+import { formatBudget } from '../utils/currency'
 import confirmationService from '../services/confirmationService.jsx'
 
 export default function ProjectList() {
@@ -337,7 +338,7 @@ export default function ProjectList() {
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between text-sm">
                     <span className="text-coolgray">Budget:</span>
-                    <span className="font-medium text-graphite">${project.budget}</span>
+                    <span className="font-medium text-graphite">{formatBudget(project.budget)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-coolgray">Duration:</span>

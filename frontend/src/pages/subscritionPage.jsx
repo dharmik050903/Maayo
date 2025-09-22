@@ -1,50 +1,107 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Header from '../components/Header';
 import Button from '../components/Button';
 import { Link } from 'react-router-dom';
+import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api';
+import { SUBSCRIPTION_PLANS, BILLING_CYCLES } from '../data/plans';
+import { processSubscriptionPayment } from '../utils/razorpay';
+import confirmationService from '../services/confirmationService.jsx';
 
 export default function SubscriptionPage() {
   const [billingCycle, setBillingCycle] = useState('yearly'); // yearly or monthly
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [processingPayment, setProcessingPayment] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const hasInitialized = useRef(false);
 
-  const maayoPlus = {
-    name: 'Maayo Plus',
-    yearlyPrice: '₹999',
-    monthlyPrice: '₹249',
-    yearlyPeriod: 'per year (valid for 12 months)',
-    monthlyPeriod: 'per month (valid for 1 month)',
-    features: [
-      '100 project or job applications included (per year)',
-      'Each additional application costs ₹9.99',
-      'Access to advanced proposal analytics',
-      'Early access to new projects',
-      'Premium chat support',
-      'Personalized guidance on client acquisition and income growth'
-    ],
-    isPopular: false
-  };
+  useEffect(() => {
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      console.log('SubscriptionPage: useEffect running (first time)');
+      
+      // Check if user is authenticated
+      const authStatus = isAuthenticated();
+      console.log('SubscriptionPage: Authentication status:', authStatus);
+      
+      if (authStatus) {
+        // Get user data if authenticated
+        const user = getCurrentUser();
+        console.log('SubscriptionPage: User data:', user);
+        
+        if (user) {
+          setUserData(user);
+        }
+      }
+      
+      // Set loading to false after initialization
+      setLoading(false);
+    } else {
+      console.log('SubscriptionPage: Skipping duplicate initialization due to StrictMode');
+    }
+  }, []);
 
-  const maayoPlusPro = {
-    name: 'Maayo Plus Pro',
-    yearlyPrice: '₹6,000',
-    monthlyPrice: '₹999',
-    yearlyPeriod: 'per year (a savings of ₹5,989)',
-    monthlyPeriod: 'per month',
-    features: [
-      'Everything included in the Maayo Plus plan',
-      'Unlimited project/job applications',
-      'VIP profile visibility and priority search ranking',
-      'A "Pro" badge on the profile for enhanced trust',
-      'Special access to priority and "Plus-Pro-Only" projects',
-      'Early access to premium jobs (8 hours before standard users)',
-      'Top-tier profile boost—highlighted in all searches and categories',
-      'Monthly personalized profile/gig review by the Maayo Success Team',
-      'Priority invitations to exclusive projects and features',
-      '1:1 strategy session with a Maayo Success Manager',
-      'Discounts on featured profile/gig promotions (when available)',
-      'Beta access to new Maayo tools and features'
-    ],
-    isPopular: true
-  };
+  // Payment processing function
+  const handleSubscribe = async (planId) => {
+    if (!userData) {
+      await confirmationService.alert(
+        'Please log in to subscribe to a plan.',
+        'Authentication Required'
+      )
+      return
+    }
+
+    const plan = SUBSCRIPTION_PLANS[planId]
+    if (!plan) {
+      await confirmationService.alert(
+        'Invalid plan selected. Please try again.',
+        'Error'
+      )
+      return
+    }
+
+    const planDetails = plan[billingCycle]
+    if (!planDetails) {
+      await confirmationService.alert(
+        'Invalid billing cycle selected. Please try again.',
+        'Error'
+      )
+      return
+    }
+
+    setProcessingPayment(true)
+    setSelectedPlan(planId)
+
+    try {
+      const paymentResult = await processSubscriptionPayment(planDetails, userData)
+      
+      if (paymentResult.success) {
+        await confirmationService.alert(
+          `🎉 Payment successful! Your ${plan.name} subscription is now active. You can start enjoying all the premium features immediately.`,
+          'Subscription Activated'
+        )
+        // Here you could redirect to dashboard or refresh user data
+      } else {
+        await confirmationService.alert(
+          paymentResult.message || 'Payment failed. Please try again.',
+          'Payment Failed'
+        )
+      }
+    } catch (error) {
+      console.error('Payment error:', error)
+      await confirmationService.alert(
+        error.message || 'An error occurred during payment. Please try again.',
+        'Payment Error'
+      )
+    } finally {
+      setProcessingPayment(false)
+      setSelectedPlan(null)
+    }
+  }
+
+  // Get plan data from configuration
+  const maayoPlus = SUBSCRIPTION_PLANS.MAYYO_PLUS
+  const maayoPlusPro = SUBSCRIPTION_PLANS.MAYYO_PLUS_PRO
 
   const comparisonFeatures = [
     { feature: 'Price', plus: '₹999/year or ₹249/month', pro: '₹999/month or ₹6,000/year' },
@@ -63,9 +120,24 @@ export default function SubscriptionPage() {
     { feature: 'Beta Features Access', plus: '—', pro: '✓' }
   ];
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-brand-gradient text-white">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-brand-gradient text-white">
-      <Header userType="client" />
+      <Header 
+        userType={userData?.user_type || 'client'} 
+        userData={userData} 
+        onLogout={clearAuth}
+      />
       
       {/* Hero Section */}
       <section className="py-20 px-6 text-center">
@@ -121,15 +193,20 @@ export default function SubscriptionPage() {
             <div className="mb-6">
               <div className="flex items-baseline">
                 <span className="text-5xl font-bold text-graphite">
-                  {billingCycle === 'yearly' ? maayoPlus.yearlyPrice : maayoPlus.monthlyPrice}
+                  ₹{billingCycle === 'yearly' ? maayoPlus.yearly.price : maayoPlus.monthly.price}
                 </span>
                 <span className="text-lg text-coolgray ml-2">
                   {billingCycle === 'yearly' ? '/year' : '/month'}
                 </span>
               </div>
               <p className="text-sm text-coolgray mt-2">
-                {billingCycle === 'yearly' ? maayoPlus.yearlyPeriod : maayoPlus.monthlyPeriod}
+                {billingCycle === 'yearly' ? maayoPlus.yearly.periodText : maayoPlus.monthly.periodText}
               </p>
+              {billingCycle === 'yearly' && maayoPlus.yearly.savings && (
+                <p className="text-sm text-mint mt-1 font-semibold">
+                  Save ₹{maayoPlus.yearly.savings} compared to monthly
+                </p>
+              )}
             </div>
 
             <ul className="space-y-3 mb-8 flex-grow">
@@ -147,8 +224,11 @@ export default function SubscriptionPage() {
               variant="accent"
               size="lg"
               className="w-full py-4 text-lg bg-mint text-white hover:bg-mint/90 mt-auto"
+              onClick={() => handleSubscribe('MAYYO_PLUS')}
+              loading={processingPayment && selectedPlan === 'MAYYO_PLUS'}
+              disabled={processingPayment}
             >
-              Choose Maayo Plus
+              {processingPayment && selectedPlan === 'MAYYO_PLUS' ? 'Processing...' : 'Choose Maayo Plus'}
             </Button>
           </div>
 
@@ -169,16 +249,21 @@ export default function SubscriptionPage() {
             <div className="mb-6">
               <div className="flex items-baseline">
                 <span className="text-5xl font-bold text-graphite">
-                  {billingCycle === 'yearly' ? maayoPlusPro.yearlyPrice : maayoPlusPro.monthlyPrice}
-                  </span>
+                  ₹{billingCycle === 'yearly' ? maayoPlusPro.yearly.price : maayoPlusPro.monthly.price}
+                </span>
                 <span className="text-lg text-coolgray ml-2">
                   {billingCycle === 'yearly' ? '/year' : '/month'}
-                    </span>
+                </span>
               </div>
               <p className="text-sm text-coolgray mt-2">
-                {billingCycle === 'yearly' ? maayoPlusPro.yearlyPeriod : maayoPlusPro.monthlyPeriod}
+                {billingCycle === 'yearly' ? maayoPlusPro.yearly.periodText : maayoPlusPro.monthly.periodText}
               </p>
-              </div>
+              {billingCycle === 'yearly' && maayoPlusPro.yearly.savings && (
+                <p className="text-sm text-mint mt-1 font-semibold">
+                  Save ₹{maayoPlusPro.yearly.savings} compared to monthly
+                </p>
+              )}
+            </div>
               
             <ul className="space-y-3 mb-8 flex-grow">
               {maayoPlusPro.features.map((feature, idx) => (
@@ -191,13 +276,16 @@ export default function SubscriptionPage() {
                 ))}
               </ul>
               
-                <Button
+            <Button
               variant="accent"
-                  size="lg"
+              size="lg"
               className="w-full py-4 text-lg bg-mint text-white hover:bg-mint/90 mt-auto"
+              onClick={() => handleSubscribe('MAYYO_PLUS_PRO')}
+              loading={processingPayment && selectedPlan === 'MAYYO_PLUS_PRO'}
+              disabled={processingPayment}
             >
-              Choose Maayo Plus Pro
-                </Button>
+              {processingPayment && selectedPlan === 'MAYYO_PLUS_PRO' ? 'Processing...' : 'Choose Maayo Plus Pro'}
+            </Button>
           </div>
             </div>
       </section>

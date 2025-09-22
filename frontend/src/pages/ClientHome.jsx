@@ -4,6 +4,7 @@ import Header from '../components/Header'
 import Button from '../components/Button'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 import { freelancerService } from '../services/freelancerService'
+import { formatHourlyRate } from '../utils/currency'
 import confirmationService from '../services/confirmationService.jsx'
 
 export default function ClientHome() {
@@ -617,7 +618,7 @@ export default function ClientHome() {
                       <span className="text-xs text-coolgray">({freelancer.completed_projects} projects)</span>
                     </div>
                     <div className="flex justify-between text-sm text-coolgray">
-                      <span className="font-semibold text-graphite">${freelancer.hourly_rate}/hr</span>
+                      <span className="font-semibold text-graphite">{formatHourlyRate(freelancer.hourly_rate)}</span>
                       <span>Responds in {freelancer.response_time}</span>
                     </div>
                   </div>
@@ -898,7 +899,7 @@ export default function ClientHome() {
                   <p className="text-sm text-coolgray">Projects Completed</p>
                 </div>
                 <div className="text-center p-4 bg-coral/10 rounded-lg">
-                  <p className="text-2xl font-bold text-graphite">${selectedFreelancer.hourly_rate}</p>
+                  <p className="text-2xl font-bold text-graphite">{formatHourlyRate(selectedFreelancer.hourly_rate, false)}</p>
                   <p className="text-sm text-coolgray">Per Hour</p>
                 </div>
               </div>

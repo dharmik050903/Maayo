@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { bidService } from '../services/bidService'
 import Button from './Button'
+import { formatBudget } from '../utils/currency'
 import confirmationService from '../services/confirmationService.jsx'
 import messagingService from '../services/messagingService'
 
@@ -233,7 +234,7 @@ const MyBids = () => {
                       </div>
                       <div>
                         <p className="text-sm text-coolgray">Your Bid</p>
-                        <p className="font-semibold text-mint">${bid.bid_amount}</p>
+                        <p className="font-semibold text-mint">{formatBudget(bid.bid_amount)}</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -306,7 +307,7 @@ const MyBids = () => {
                                   <p className="text-sm text-coolgray mt-1">{milestone.description}</p>
                                 )}
                               </div>
-                              <span className="font-bold text-mint text-lg">${milestone.amount}</span>
+                              <span className="font-bold text-mint text-lg">{formatBudget(milestone.amount)}</span>
                             </div>
                           </div>
                         ))}

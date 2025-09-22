@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Header from '../components/Header'
-import { getFreelancers } from '../utils/api'
+import { getFreelancers, isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
+import { formatHourlyRate } from '../utils/currency'
 
 export default function Freelancers() {
   const [searchParams] = useSearchParams()
@@ -10,17 +11,47 @@ export default function Freelancers() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [userData, setUserData] = useState(null)
+  const [authLoading, setAuthLoading] = useState(true)
   const hasFetched = useRef(false)
+  const hasInitialized = useRef(false)
+
+  // Authentication check
+  useEffect(() => {
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      console.log('Freelancers: useEffect running (first time)');
+      
+      // Check if user is authenticated
+      const authStatus = isAuthenticated();
+      console.log('Freelancers: Authentication status:', authStatus);
+      
+      if (authStatus) {
+        // Get user data if authenticated
+        const user = getCurrentUser();
+        console.log('Freelancers: User data:', user);
+        
+        if (user) {
+          setUserData(user);
+        }
+      }
+      
+      // Set auth loading to false after initialization
+      setAuthLoading(false);
+    } else {
+      console.log('Freelancers: Skipping duplicate initialization due to StrictMode');
+    }
+  }, []);
 
   useEffect(() => {
-    if (!hasFetched.current) {
+    if (!hasFetched.current && !authLoading) {
       hasFetched.current = true
       console.log('Freelancers component: Fetching freelancers (first time)')
       fetchFreelancers()
     } else {
       console.log('Freelancers component: Skipping duplicate fetch due to StrictMode')
     }
-  }, [])
+  }, [authLoading])
 
   // Handle search parameters from URL
   useEffect(() => {
@@ -70,10 +101,25 @@ export default function Freelancers() {
     }
   }
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-brand-gradient text-white">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-brand-gradient text-white">
-        <Header />
+        <Header 
+          userType={userData?.user_type || 'client'} 
+          userData={userData} 
+          onLogout={clearAuth}
+        />
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
@@ -87,7 +133,11 @@ export default function Freelancers() {
   if (error) {
     return (
       <div className="min-h-screen bg-brand-gradient text-white">
-        <Header />
+        <Header 
+          userType={userData?.user_type || 'client'} 
+          userData={userData} 
+          onLogout={clearAuth}
+        />
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <p className="text-white/80">{error}</p>
@@ -99,7 +149,11 @@ export default function Freelancers() {
 
   return (
     <div className="min-h-screen bg-brand-gradient text-white page-transition">
-      <Header />
+      <Header 
+        userType={userData?.user_type || 'client'} 
+        userData={userData} 
+        onLogout={clearAuth}
+      />
       
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 pt-28 pb-8">
@@ -185,7 +239,7 @@ export default function Freelancers() {
                     <div className="grid grid-cols-2 gap-4 mb-4">
                       <div>
                         <p className="text-xs text-coolgray uppercase tracking-wide">Hourly Rate</p>
-                        <p className="text-lg font-semibold text-mint">${freelancer.hourly_rate || 0}/hr</p>
+                        <p className="text-lg font-semibold text-mint">{formatHourlyRate(freelancer.hourly_rate || 0)}</p>
                       </div>
                       <div>
                         <p className="text-xs text-coolgray uppercase tracking-wide">Projects</p>

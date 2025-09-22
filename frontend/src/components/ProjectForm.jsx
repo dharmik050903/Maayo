@@ -123,16 +123,19 @@ export default function ProjectForm({ project = null, onSuccess, onCancel }) {
 
       let response
       if (project) {
-        response = await projectService.updateProject(project._id, projectData)
+        response = await projectService.updateProject({ ...projectData, id: project._id })
       } else {
         response = await projectService.createProject(projectData)
       }
       
       if (response.status) {
+        console.log('Project creation/update successful:', response.data)
         setMessage({ type: 'success', text: `Project ${project ? 'updated' : 'created'} successfully! 🎉` })
+        // Redirect immediately after successful creation/update
         setTimeout(() => {
+          console.log('Redirecting to project:', response.data)
           onSuccess && onSuccess(response.data)
-        }, 1500)
+        }, 1000) // Reduced delay for better UX
       } else {
         setMessage({ type: 'error', text: response.message || 'Something went wrong' })
       }
@@ -186,7 +189,7 @@ export default function ProjectForm({ project = null, onSuccess, onCancel }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Input
-                label="Budget ($)"
+                label="Budget (₹)"
                 name="budget"
                 type="number"
                 placeholder="1000"
@@ -213,7 +216,7 @@ export default function ProjectForm({ project = null, onSuccess, onCancel }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <Input
-                label="Min Bid Amount ($)"
+                label="Min Bid Amount (₹)"
                 name="min_bid_amount"
                 type="number"
                 placeholder="500"
@@ -223,7 +226,7 @@ export default function ProjectForm({ project = null, onSuccess, onCancel }) {
             </div>
             <div>
               <Input
-                label="Max Bid Amount ($)"
+                label="Max Bid Amount (₹)"
                 name="max_bid_amount"
                 type="number"
                 placeholder="2000"

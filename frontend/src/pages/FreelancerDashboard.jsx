@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import Button from '../components/Button'
 import { authenticatedFetch, isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
+import { formatHourlyRate } from '../utils/currency'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
 
 export default function FreelancerDashboard() {
@@ -613,7 +614,7 @@ export default function FreelancerDashboard() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-coolgray">Total Earnings</p>
                 <p className="text-2xl font-bold text-graphite">
-                  ${freelancerInfo?.total_earnings || '0'}
+                  {formatBudget(freelancerInfo?.total_earnings || 0)}
                 </p>
               </div>
             </div>

@@ -5,6 +5,7 @@ import Button from '../components/Button'
 import { projectService } from '../services/projectService'
 import { PageShimmer } from '../components/Shimmer'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
+import { formatBudget } from '../utils/currency'
 import confirmationService from '../services/confirmationService.jsx'
 
 export default function ProjectDetail() {
@@ -258,7 +259,7 @@ export default function ProjectDetail() {
               <div className="space-y-4">
                 <div>
                   <label className="text-sm font-medium text-coolgray">Budget</label>
-                  <p className="text-lg font-semibold text-graphite">${project.budget}</p>
+                  <p className="text-lg font-semibold text-graphite">{formatBudget(project.budget)}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-coolgray">Duration</label>
@@ -277,13 +278,13 @@ export default function ProjectDetail() {
                 {project.min_bid_amount && (
                   <div>
                     <label className="text-sm font-medium text-coolgray">Min Bid Amount</label>
-                    <p className="text-lg font-semibold text-graphite">${project.min_bid_amount}</p>
+                    <p className="text-lg font-semibold text-graphite">{formatBudget(project.min_bid_amount)}</p>
                   </div>
                 )}
                 {project.max_bid_amount && (
                   <div>
                     <label className="text-sm font-medium text-coolgray">Max Bid Amount</label>
-                    <p className="text-lg font-semibold text-graphite">${project.max_bid_amount}</p>
+                    <p className="text-lg font-semibold text-graphite">{formatBudget(project.max_bid_amount)}</p>
                   </div>
                 )}
                 <div>

@@ -5,13 +5,16 @@ import Logo from './Logo'
 import Button from './Button'
 import { projectService } from '../services/projectService'
 import { getFreelancers } from '../utils/api'
+import { formatBudget, formatHourlyRate } from '../utils/currency'
 import messagingService from '../services/messagingService.jsx'
 import ConversationsModal from './ConversationsModal'
+import PaymentHistory from './PaymentHistory'
 
 export default function Header({ userType, onLogout, userData }) {
   const location = useLocation()
   const navigate = useNavigate()
   const isAuthenticated = !!userData
+  const actualUserType = userType || 'client' // Default to 'client' if userType is undefined
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -25,6 +28,7 @@ export default function Header({ userType, onLogout, userData }) {
   const [showProjectModal, setShowProjectModal] = useState(false)
   const [showFreelancerModal, setShowFreelancerModal] = useState(false)
   const [showConversationsModal, setShowConversationsModal] = useState(false)
+  const [showPaymentHistory, setShowPaymentHistory] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -146,11 +150,40 @@ export default function Header({ userType, onLogout, userData }) {
   const handleMessagesClick = () => {
     console.log('Header: Messages button clicked')
     console.log('Header: Current user:', userData)
+    if (!isAuthenticated) {
+      // Redirect to login if not authenticated
+      navigate('/login')
+      return
+    }
     setShowConversationsModal(true)
+  }
+
+  const handleProfileClick = (e) => {
+    e.preventDefault()
+    if (!isAuthenticated) {
+      // Redirect to login if not authenticated
+      navigate('/login')
+      return
+    }
+    // If authenticated, navigate to the appropriate dashboard
+    navigate(`/${actualUserType}-dashboard`)
   }
 
   const closeConversationsModal = () => {
     setShowConversationsModal(false)
+  }
+
+  const handlePaymentHistoryClick = () => {
+    if (!isAuthenticated) {
+      // Redirect to login if not authenticated
+      navigate('/login')
+      return
+    }
+    setShowPaymentHistory(true)
+  }
+
+  const closePaymentHistory = () => {
+    setShowPaymentHistory(false)
   }
 
   const handleStartChat = (user, project = null) => {
@@ -201,10 +234,10 @@ export default function Header({ userType, onLogout, userData }) {
 
   const navLinks = isAuthenticated ? (
     <>
-      <Link to={`/${userType}-home`} className={getLinkClasses(`/${userType}-home`)}>
+      <Link to={`/${actualUserType}-home`} className={getLinkClasses(`/${actualUserType}-home`)}>
         Home
       </Link>
-      {userType === 'freelancer' ? (
+      {actualUserType === 'freelancer' ? (
         <Link to="/find-work" className={getLinkClasses('/find-work')}>
           Find Work
         </Link>
@@ -225,9 +258,18 @@ export default function Header({ userType, onLogout, userData }) {
       >
         Messages
       </button>
-      <Link to={`/${userType}-dashboard`} className={getLinkClasses(`/${userType}-dashboard`)}>
+      <button 
+        onClick={handlePaymentHistoryClick}
+        className="hover:text-mint px-3 py-1 rounded-md transition-colors text-graphite"
+      >
+        Payments
+      </button>
+      <button 
+        onClick={handleProfileClick}
+        className="hover:text-mint px-3 py-1 rounded-md transition-colors text-graphite"
+      >
         Profile
-      </Link>
+      </button>
       <Link to="/pricing" className={getLinkClasses('/pricing')}>
         Pricing
       </Link>
@@ -255,10 +297,10 @@ export default function Header({ userType, onLogout, userData }) {
   // Mobile-specific navigation links with proper text colors
   const mobileNavLinks = isAuthenticated ? (
     <>
-      <Link to={`/${userType}-home`} className={getMobileLinkClasses(`/${userType}-home`)}>
+      <Link to={`/${actualUserType}-home`} className={getMobileLinkClasses(`/${actualUserType}-home`)}>
         Home
       </Link>
-      {userType === 'freelancer' ? (
+      {actualUserType === 'freelancer' ? (
         <Link to="/find-work" className={getMobileLinkClasses('/find-work')}>
           Find Work
         </Link>
@@ -279,9 +321,18 @@ export default function Header({ userType, onLogout, userData }) {
       >
         Messages
       </button>
-      <Link to={`/${userType}-dashboard`} className={getMobileLinkClasses(`/${userType}-dashboard`)}>
+      <button 
+        onClick={handlePaymentHistoryClick}
+        className="hover:text-mint px-3 py-1 rounded-md transition-colors text-graphite"
+      >
+        Payments
+      </button>
+      <button 
+        onClick={handleProfileClick}
+        className="hover:text-mint px-3 py-1 rounded-md transition-colors text-graphite"
+      >
         Profile
-      </Link>
+      </button>
       <Link to="/pricing" className={getMobileLinkClasses('/pricing')}>
         Pricing
       </Link>
@@ -312,7 +363,7 @@ export default function Header({ userType, onLogout, userData }) {
       isScrolled ? 'bg-white/95 border-white/30' : 'bg-white/10 border-white/20'
     }`}>
       <div className="max-w-7xl mx-auto flex items-center justify-between p-2 md:p-4">
-        <Link to={isAuthenticated ? `/${userType}-home` : "/"} className="logo-link flex items-center space-x-2 hover:opacity-80 transition-opacity">
+        <Link to={isAuthenticated ? `/${actualUserType}-home` : "/"} className="logo-link flex items-center space-x-2 hover:opacity-80 transition-opacity">
           <Logo theme={isScrolled ? "dark" : "light"} />
         </Link>
 
@@ -389,7 +440,7 @@ export default function Header({ userType, onLogout, userData }) {
                             {project.description}
                           </p>
                           <p className="text-xs text-mint">
-                            ${project.budget?.toLocaleString()} • {project.duration} days
+                            {formatBudget(project.budget)} • {project.duration} days
                           </p>
                         </div>
                       ))}
@@ -422,7 +473,7 @@ export default function Header({ userType, onLogout, userData }) {
                             {freelancer.title && freelancer.title !== freelancer.name ? freelancer.title : 'Professional'} • {freelancer.experience_level || 'Experienced'}
                           </p>
                           <p className="text-xs text-mint">
-                            ${freelancer.hourly_rate || 0}/hr • {freelancer.total_projects || 0} projects
+                            {formatHourlyRate(freelancer.hourly_rate || 0)} • {freelancer.total_projects || 0} projects
                           </p>
                         </div>
                       ))}
@@ -540,7 +591,7 @@ export default function Header({ userType, onLogout, userData }) {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm font-medium text-coolgray">Budget</p>
-                    <p className="text-lg font-semibold text-mint">${selectedProject.budget?.toLocaleString()}</p>
+                    <p className="text-lg font-semibold text-mint">{formatBudget(selectedProject.budget)}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-coolgray">Duration</p>
@@ -678,7 +729,7 @@ export default function Header({ userType, onLogout, userData }) {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm font-medium text-coolgray">Hourly Rate</p>
-                    <p className="text-lg font-semibold text-mint">${selectedFreelancer.hourly_rate || 0}/hr</p>
+                    <p className="text-lg font-semibold text-mint">{formatHourlyRate(selectedFreelancer.hourly_rate || 0)}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-coolgray">Projects Completed</p>
@@ -767,6 +818,12 @@ export default function Header({ userType, onLogout, userData }) {
         isOpen={showConversationsModal}
         onClose={closeConversationsModal}
         currentUser={userData}
+      />
+
+      {/* Payment History Modal */}
+      <PaymentHistory
+        isOpen={showPaymentHistory}
+        onClose={closePaymentHistory}
       />
     </>
   )

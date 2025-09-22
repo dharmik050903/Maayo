@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { bidService } from '../services/bidService'
+import { formatBudget } from '../utils/currency'
 import confirmationService from '../services/confirmationService.jsx'
 
 const BidList = ({ projectId, userRole, onBidAction }) => {
@@ -209,7 +210,7 @@ const BidList = ({ projectId, userRole, onBidAction }) => {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4 text-sm">
                     <div>
                       <span className="text-gray-600">Bid Amount:</span>
-                      <span className="ml-2 font-semibold text-green-600">${bid.bid_amount}</span>
+                      <span className="ml-2 font-semibold text-green-600">{formatBudget(bid.bid_amount)}</span>
                     </div>
                     <div>
                       <span className="text-gray-600">Duration:</span>
@@ -246,7 +247,7 @@ const BidList = ({ projectId, userRole, onBidAction }) => {
                                   <p className="text-sm text-gray-600 mt-1">{milestone.description}</p>
                                 )}
                               </div>
-                              <span className="font-semibold text-green-600">${milestone.amount}</span>
+                              <span className="font-semibold text-green-600">{formatBudget(milestone.amount)}</span>
                             </div>
                             {milestone.due_date && (
                               <p className="text-xs text-gray-500 mt-1">

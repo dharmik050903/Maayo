@@ -32,7 +32,15 @@ export default function ProjectCreate() {
 
   const handleSuccess = (project) => {
     // Redirect to project detail page
-    navigate(`/project/${project._id}`)
+    console.log('ProjectCreate: handleSuccess called with project:', project)
+    if (project && project._id) {
+      console.log('ProjectCreate: Redirecting to project detail page:', `/project/${project._id}`)
+      navigate(`/project/${project._id}`)
+    } else {
+      console.error('ProjectCreate: No project ID found in response:', project)
+      // Fallback: redirect to projects list
+      navigate('/projects')
+    }
   }
 
   const handleCancel = () => {

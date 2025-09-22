@@ -3,23 +3,52 @@ import { Link } from "react-router-dom"
 import Header from "../components/Header"
 import Button from "../components/Button"
 import { projectService } from "../services/projectService"
+import { formatBudget } from "../utils/currency"
+import { isAuthenticated, getCurrentUser, clearAuth } from "../utils/api"
 import hero from "../assets/medium-shot-woman-typing-keyboard.jpg"
 
 export default function Home() {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [userData, setUserData] = useState(null)
+  const [authLoading, setAuthLoading] = useState(true)
   const hasFetched = useRef(false)
+  const hasInitialized = useRef(false)
+
+  // Authentication check
+  useEffect(() => {
+    if (!hasInitialized.current) {
+      hasInitialized.current = true
+      console.log('Home: useEffect running (first time)')
+      
+      const authStatus = isAuthenticated()
+      console.log('Home: Authentication status:', authStatus)
+      
+      if (authStatus) {
+        const user = getCurrentUser()
+        console.log('Home: User data:', user)
+        
+        if (user) {
+          setUserData(user)
+        }
+      }
+      
+      setAuthLoading(false)
+    } else {
+      console.log('Home: Skipping duplicate initialization due to StrictMode')
+    }
+  }, [])
 
   useEffect(() => {
-    if (!hasFetched.current) {
+    if (!hasFetched.current && !authLoading) { // Fetch only after auth status is determined
       hasFetched.current = true
       console.log('Home component: Fetching projects (first time)')
       fetchProjects()
     } else {
       console.log('Home component: Skipping duplicate fetch due to StrictMode')
     }
-  }, [])
+  }, [authLoading])
 
   const fetchProjects = async () => {
     try {
@@ -34,9 +63,42 @@ export default function Home() {
     }
   }
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-brand-gradient text-white">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-brand-gradient text-white">
+        <Header 
+          userType={userData?.user_type || 'client'} 
+          userData={userData} 
+          onLogout={clearAuth}
+        />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+            <p>Loading projects...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-brand-gradient text-white page-transition">
-      <Header />
+      <Header 
+        userType={userData?.user_type || 'client'} 
+        userData={userData} 
+        onLogout={clearAuth}
+      />
 
       {/* Hero Section */}
       <section className="flex flex-col md:flex-row items-center justify-between flex-1 max-w-7xl mx-auto px-6 pt-28">
@@ -137,7 +199,7 @@ export default function Home() {
                       <div className="grid grid-cols-2 gap-4 mb-4">
                         <div>
                           <p className="text-xs text-coolgray uppercase tracking-wide">Budget</p>
-                          <p className="text-lg font-semibold text-mint">{project.budget?.toLocaleString()}</p>
+                          <p className="text-lg font-semibold text-mint">{formatBudget(project.budget)}</p>
                         </div>
                         <div>
                           <p className="text-xs text-coolgray uppercase tracking-wide">Duration</p>
@@ -232,8 +294,6 @@ export default function Home() {
           <Button variant="accent">Create an Account</Button>
         </Link>
       </section>
-
-........
     </div>
   )
 }

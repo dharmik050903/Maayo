@@ -1,11 +1,58 @@
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import Button from '../components/Button'
+import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 
 export default function AboutUs() {
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const hasInitialized = useRef(false);
+
+  useEffect(() => {
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      console.log('AboutUs: useEffect running (first time)');
+      
+      // Check if user is authenticated
+      const authStatus = isAuthenticated();
+      console.log('AboutUs: Authentication status:', authStatus);
+      
+      if (authStatus) {
+        // Get user data if authenticated
+        const user = getCurrentUser();
+        console.log('AboutUs: User data:', user);
+        
+        if (user) {
+          setUserData(user);
+        }
+      }
+      
+      // Set loading to false after initialization
+      setLoading(false);
+    } else {
+      console.log('AboutUs: Skipping duplicate initialization due to StrictMode');
+    }
+  }, []);
+
+  if (loading) {
     return (
+      <div className="min-h-screen flex items-center justify-center bg-base">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-mint mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
     <div className="min-h-screen bg-base">
-      <Header />
+      <Header 
+        userType={userData?.user_type || 'client'} 
+        userData={userData} 
+        onLogout={clearAuth}
+      />
       
       <div className="pt-20">
         {/* Hero Section */}

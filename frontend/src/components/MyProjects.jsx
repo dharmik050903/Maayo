@@ -9,6 +9,7 @@ import { projectService } from '../services/projectService'
 import { skillsService } from '../services/skillsService'
 import { reviewService } from '../services/reviewService'
 import { bidService } from '../services/bidService'
+import { formatBudget } from '../utils/currency'
 import confirmationService from '../services/confirmationService.jsx'
 
 export default function MyProjects() {
@@ -151,7 +152,7 @@ export default function MyProjects() {
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'INR'
     }).format(amount)
   }
 
@@ -1069,7 +1070,7 @@ const handleCloseBidRequest = () => {
                 <h4 className="text-lg font-semibold text-graphite mb-2">{selectedBid.title}</h4>
                 <p className="text-coolgray text-sm mb-3">{selectedBid.description}</p>
                 <div className="flex items-center gap-4 text-sm">
-                  <span className="text-mint font-medium">Budget: ${selectedBid.budget}</span>
+                  <span className="text-mint font-medium">Budget: {formatBudget(selectedBid.budget)}</span>
                   <span className="text-violet font-medium">Duration: {selectedBid.duration} days</span>
                   <span className="text-coral font-medium">Bids: {projectBids.length}</span>
                 </div>
@@ -1140,7 +1141,7 @@ const handleCloseBidRequest = () => {
                               </svg>
                               <div>
                                 <p className="text-sm text-coolgray">Bid Amount</p>
-                                <p className="font-semibold text-mint">${bid.bid_amount}</p>
+                                <p className="font-semibold text-mint">{formatBudget(bid.bid_amount)}</p>
                               </div>
                             </div>
                             <div className="flex items-center">

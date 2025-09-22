@@ -5,6 +5,7 @@ import Button from '../components/Button'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 import { projectService } from '../services/projectService'
 import { skillsService } from '../services/skillsService'
+import { formatBudget, formatHourlyRate } from '../utils/currency'
 import MyBids from '../components/MyBids'
 import BidForm from '../components/BidForm'
 import confirmationService from '../services/confirmationService.jsx'
@@ -402,7 +403,7 @@ export default function FreelancerHome() {
           {profileData && (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-4xl mx-auto mb-12">
               <div className="card p-6 bg-white/95 text-center">
-                <div className="text-2xl font-bold text-mint mb-1">${profileData.hourly_rate || '0'}</div>
+                <div className="text-2xl font-bold text-mint mb-1">{formatHourlyRate(profileData.hourly_rate || 0, false)}</div>
                 <div className="text-sm text-coolgray">Hourly Rate</div>
               </div>
               <div className="card p-6 bg-white/95 text-center">
@@ -427,7 +428,7 @@ export default function FreelancerHome() {
               <div className="text-white/70">Active Projects</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-coral mb-2">$2M+</div>
+              <div className="text-4xl font-bold text-coral mb-2">₹2 Cr+</div>
               <div className="text-white/70">Earned by Freelancers</div>
             </div>
             <div className="text-center">
@@ -602,19 +603,19 @@ export default function FreelancerHome() {
                           onClick={() => setMaxBudget('1000')}
                           className="px-3 py-1 bg-white/20 text-white rounded text-sm hover:bg-white/30"
                         >
-                          Under $1K
+                          Under ₹1K
                         </button>
                         <button
                           onClick={() => setMaxBudget('5000')}
                           className="px-3 py-1 bg-white/20 text-white rounded text-sm hover:bg-white/30"
                         >
-                          Under $5K
+                          Under ₹5K
                         </button>
                         <button
                           onClick={() => setMaxBudget('10000')}
                           className="px-3 py-1 bg-white/20 text-white rounded text-sm hover:bg-white/30"
                         >
-                          Under $10K
+                          Under ₹10K
                         </button>
                       </div>
                     </div>
@@ -681,7 +682,7 @@ export default function FreelancerHome() {
                       <div className="flex items-center gap-2">
                         <span className="text-white/70 text-sm">Max Budget:</span>
                         <span className="px-2 py-1 bg-violet/20 text-violet rounded text-xs">
-                          ${parseFloat(maxBudget).toLocaleString()}
+                          {formatBudget(parseFloat(maxBudget), false)}
                         </span>
                       </div>
                     )}
@@ -735,7 +736,7 @@ export default function FreelancerHome() {
                             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                             </svg>
-                            {project.budget.toLocaleString()}
+                            {formatBudget(project.budget, false)}
                           </span>
                           <span className="flex items-center">
                             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1097,7 +1098,7 @@ export default function FreelancerHome() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <p className="text-sm text-coolgray mb-1">Budget</p>
-                    <p className="text-xl font-bold text-mint">{selectedProjectDetail.budget.toLocaleString()}</p>
+                    <p className="text-xl font-bold text-mint">{formatBudget(selectedProjectDetail.budget)}</p>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <p className="text-sm text-coolgray mb-1">Duration</p>
