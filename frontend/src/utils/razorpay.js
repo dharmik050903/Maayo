@@ -25,6 +25,21 @@ const loadRazorpayScript = () => {
  */
 export const initializeRazorpay = async (options) => {
   try {
+    // Check if Razorpay key is configured
+    const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID
+    console.log('🔍 Razorpay Key Debug:', {
+      envKey: razorpayKey,
+      isDummy: razorpayKey === 'rzp_test_1234567890',
+      isConfigured: !!razorpayKey && razorpayKey !== 'rzp_test_1234567890'
+    })
+    
+    if (!razorpayKey || razorpayKey === 'rzp_test_1234567890') {
+      console.warn('⚠️ Razorpay key not configured properly. Using fallback key.')
+      console.warn('Please check your .env file and restart the development server.')
+    } else {
+      console.log('✅ Razorpay key is properly configured:', razorpayKey.substring(0, 12) + '...')
+    }
+
     const isLoaded = await loadRazorpayScript()
     if (!isLoaded) {
       throw new Error('Failed to load Razorpay script')
@@ -32,7 +47,7 @@ export const initializeRazorpay = async (options) => {
 
     return new Promise((resolve, reject) => {
       const razorpayOptions = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_1234567890', // Replace with your key
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_live_RKtnwAL4ofwknm', // Use your actual key as fallback
         ...options,
         handler: function (response) {
           console.log('Payment successful:', response)

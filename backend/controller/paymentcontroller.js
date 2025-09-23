@@ -57,15 +57,18 @@ export default class PaymentGateway {
             let errorMessage = "Failed to create order";
             let errorDetails = error.message;
 
-            if (error.message.includes('Invalid key_id')) {
+            if (error.message.includes('Invalid key_id') || error.message.includes('Authentication failed')) {
                 errorMessage = "Invalid Razorpay configuration";
-                errorDetails = "Please check your Razorpay key configuration";
+                errorDetails = "Please check your Razorpay key configuration. Make sure you're using the correct test/live keys.";
             } else if (error.message.includes('amount')) {
                 errorMessage = "Invalid amount";
                 errorDetails = "Please check the amount value";
             } else if (error.message.includes('currency')) {
                 errorMessage = "Invalid currency";
                 errorDetails = "Please check the currency value";
+            } else if (error.statusCode === 401) {
+                errorMessage = "Razorpay Authentication Failed";
+                errorDetails = "Your Razorpay keys are invalid or expired. Please check your .env file and get new keys from Razorpay dashboard.";
             }
 
             res.status(500).json({ 

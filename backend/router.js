@@ -78,6 +78,7 @@ router.post("/bid/withdraw", auth, bidController.withdrawBid);
 router.post("/bid/update", auth, bidController.updateBid);
 // AI routes
 router.post("/ai/generate-proposal", auth, aiController.generateProposal);
+router.post("/ai/generate-project-description", auth, aiController.generateProjectDescription);
 
 // Chat routes
 router.post("/chat/send", auth, chatController.sendMessage);
