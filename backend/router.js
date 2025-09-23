@@ -89,6 +89,20 @@ router.post("/payment/create-session", auth, paymentGateway.createOrder);
 router.post("/payment/verify", auth, paymentGateway.verifyPayment);
 router.post("/payment/history", auth, paymentGateway.paymentHistory);
 
+// Test endpoint for Razorpay configuration
+router.get("/payment/test-config", (req, res) => {
+    const config = {
+        keyId: process.env.RAZORPAY_KEY_ID ? 'Set' : 'Not Set',
+        keySecret: process.env.RAZORPAY_KEY_SECRET ? 'Set' : 'Not Set',
+        nodeEnv: process.env.NODE_ENV || 'development'
+    };
+    res.json({ 
+        status: 'OK', 
+        message: 'Razorpay configuration check',
+        config 
+    });
+});
+
 // Health check for chat endpoints
 router.get("/chat/health", (req, res) => {
     res.json({ 
