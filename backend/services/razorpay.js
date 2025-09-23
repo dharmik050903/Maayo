@@ -21,15 +21,19 @@ const razorpay = new Razorpay({
   key_secret: keySecret,
 });
 
-// Test Razorpay connection
-razorpay.orders.create({
-  amount: 100,
-  currency: 'INR',
-  receipt: 'test_receipt'
-}).then(() => {
-  console.log('✅ Razorpay connection test successful');
-}).catch((error) => {
-  console.error('❌ Razorpay connection test failed:', error.message);
-});
+// Test Razorpay connection (async to avoid blocking module load)
+setTimeout(async () => {
+  try {
+    await razorpay.orders.create({
+      amount: 100,
+      currency: 'INR',
+      receipt: 'test_receipt'
+    });
+    console.log('✅ Razorpay connection test successful');
+  } catch (error) {
+    console.error('❌ Razorpay connection test failed:', error.message || error);
+    console.error('Full error:', error);
+  }
+}, 1000);
 
 export default razorpay;

@@ -94,13 +94,46 @@ router.get("/payment/test-config", (req, res) => {
     const config = {
         keyId: process.env.RAZORPAY_KEY_ID ? 'Set' : 'Not Set',
         keySecret: process.env.RAZORPAY_KEY_SECRET ? 'Set' : 'Not Set',
-        nodeEnv: process.env.NODE_ENV || 'development'
+        nodeEnv: process.env.NODE_ENV || 'development',
+        keyType: process.env.RAZORPAY_KEY_ID ? (process.env.RAZORPAY_KEY_ID.startsWith('rzp_test_') ? 'Test' : 'Live') : 'Unknown'
     };
     res.json({ 
         status: 'OK', 
         message: 'Razorpay configuration check',
         config 
     });
+});
+
+// Test endpoint to create a small test order
+router.post("/payment/test-order", async (req, res) => {
+    try {
+        const razorpay = (await import('../services/razorpay.js')).default;
+        
+        const testOrder = await razorpay.orders.create({
+            amount: 100, // 1 INR in paise
+            currency: 'INR',
+            receipt: `test_${Date.now()}`
+        });
+        
+        res.json({
+            status: 'success',
+            message: 'Test order created successfully',
+            order: {
+                id: testOrder.id,
+                amount: testOrder.amount,
+                currency: testOrder.currency,
+                status: testOrder.status
+            }
+        });
+    } catch (error) {
+        console.error('Test order creation failed:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Test order creation failed',
+            error: error.message,
+            details: error.response?.data || error
+        });
+    }
 });
 
 // Health check for chat endpoints
