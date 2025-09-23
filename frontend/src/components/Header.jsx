@@ -46,30 +46,30 @@ export default function Header({ userType, onLogout, userData }) {
       hasFetchedData.current = true
       console.log('Header: Fetching initial data (first time)')
       
-      const fetchInitialData = async () => {
-        try {
-          // Always fetch projects (public endpoint)
-          const projectsResponse = await projectService.getBrowseProjects()
-          setProjects(projectsResponse.data || [])
-          
-          // Only fetch freelancers if user is authenticated
-          if (isAuthenticated) {
-            try {
-              const freelancersResponse = await getFreelancers({})
-              if (freelancersResponse.response.ok && freelancersResponse.data.status) {
-                setFreelancers(freelancersResponse.data.data || [])
-              }
-            } catch (freelancerErr) {
-              console.error('Error fetching freelancers:', freelancerErr)
-              // Don't redirect on freelancer fetch error, just log it
+    const fetchInitialData = async () => {
+      try {
+        // Always fetch projects (public endpoint)
+        const projectsResponse = await projectService.getBrowseProjects()
+        setProjects(projectsResponse.data || [])
+        
+        // Only fetch freelancers if user is authenticated
+        if (isAuthenticated) {
+          try {
+            const freelancersResponse = await getFreelancers({})
+            if (freelancersResponse.response.ok && freelancersResponse.data.status) {
+              setFreelancers(freelancersResponse.data.data || [])
             }
+          } catch (freelancerErr) {
+            console.error('Error fetching freelancers:', freelancerErr)
+            // Don't redirect on freelancer fetch error, just log it
           }
-        } catch (err) {
-          console.error('Error fetching data for search:', err)
         }
+      } catch (err) {
+        console.error('Error fetching data for search:', err)
       }
+    }
 
-      fetchInitialData()
+    fetchInitialData()
     } else {
       console.log('Header: Skipping duplicate data fetch due to StrictMode')
     }
@@ -231,13 +231,29 @@ export default function Header({ userType, onLogout, userData }) {
 
   // Helper function to get mobile-specific link classes
   const getMobileLinkClasses = (path) => {
-    const baseClasses = "px-3 py-1 rounded-md transition-colors mobile-nav-link"
+    const baseClasses = "px-3 py-1 rounded-md transition-colors mobile-nav-link text-center"
     const isActive = isActiveLink(path)
     
     if (isActive) {
-      return `${baseClasses} text-mint font-semibold bg-mint/10 border-b-2 border-mint`
+      return `${baseClasses} text-mint !font-bold bg-mint/10 border-b-2 border-mint`
     }
-    return `${baseClasses} hover:text-mint text-graphite`
+    return `${baseClasses} hover:text-mint text-graphite !font-bold`
+  }
+
+  // Helper function to get mobile button styles
+  const getMobileButtonStyles = () => {
+    return {
+      fontWeight: '700 !important',
+      textAlign: 'center'
+    }
+  }
+
+  // Helper function to get mobile link styles
+  const getMobileLinkStyles = (isActive) => {
+    return {
+      fontWeight: '700 !important',
+      textAlign: 'center'
+    }
   }
 
   const navLinks = isAuthenticated ? (
@@ -305,61 +321,64 @@ export default function Header({ userType, onLogout, userData }) {
   // Mobile-specific navigation links with proper text colors
   const mobileNavLinks = isAuthenticated ? (
     <>
-      <Link to={`/${actualUserType}-home`} className={getMobileLinkClasses(`/${actualUserType}-home`)}>
+      <Link to={`/${actualUserType}-home`} className={getMobileLinkClasses(`/${actualUserType}-home`)} style={getMobileLinkStyles()}>
         Home
       </Link>
       {actualUserType === 'freelancer' ? (
-        <Link to="/find-work" className={getMobileLinkClasses('/find-work')}>
+        <Link to="/find-work" className={getMobileLinkClasses('/find-work')} style={getMobileLinkStyles()}>
           Find Work
         </Link>
       ) : (
-        <Link to="/project/create" className={getMobileLinkClasses('/project/create')}>
+        <Link to="/project/create" className={getMobileLinkClasses('/project/create')} style={getMobileLinkStyles()}>
             Post a Project
           </Link>
       )}
       
       {/* My Projects Link */}
-      <Link to="/my-projects" className={getMobileLinkClasses('/my-projects')}>
+      <Link to="/my-projects" className={getMobileLinkClasses('/my-projects')} style={getMobileLinkStyles()}>
         My Projects
       </Link>
       
       <button 
         onClick={handleMessagesClick}
-        className="hover:text-mint px-3 py-1 rounded-md transition-colors text-graphite"
+        className="hover:text-mint px-3 py-1 rounded-md transition-colors text-center text-graphite !font-bold"
+        style={getMobileButtonStyles()}
       >
         Messages
       </button>
       <button 
         onClick={handlePaymentHistoryClick}
-        className="hover:text-mint px-3 py-1 rounded-md transition-colors text-graphite"
+        className="hover:text-mint px-3 py-1 rounded-md transition-colors text-center text-graphite !font-bold"
+        style={getMobileButtonStyles()}
       >
         Payments
       </button>
       <button 
         onClick={handleProfileClick}
-        className="hover:text-mint px-3 py-1 rounded-md transition-colors text-graphite"
+        className="hover:text-mint px-3 py-1 rounded-md transition-colors text-center text-graphite !font-bold"
+        style={getMobileButtonStyles()}
       >
         Profile
       </button>
-      <Link to="/pricing" className={getMobileLinkClasses('/pricing')}>
+      <Link to="/pricing" className={getMobileLinkClasses('/pricing')} style={getMobileLinkStyles()}>
         Pricing
       </Link>
     </>
   ) : (
     <>
-      <Link to="/" className={getMobileLinkClasses('/')}>
+      <Link to="/" className={getMobileLinkClasses('/')} style={getMobileLinkStyles()}>
         Home
       </Link>
-      <Link to="/browse" className={getMobileLinkClasses('/browse')}>
+      <Link to="/browse" className={getMobileLinkClasses('/browse')} style={getMobileLinkStyles()}>
         Find Work
       </Link>
-      <Link to="/project/create" className={getMobileLinkClasses('/project/create')}>
+      <Link to="/project/create" className={getMobileLinkClasses('/project/create')} style={getMobileLinkStyles()}>
         Post a Project
       </Link>
-      <Link to="/pricing" className={getMobileLinkClasses('/pricing')}>
+      <Link to="/pricing" className={getMobileLinkClasses('/pricing')} style={getMobileLinkStyles()}>
         Pricing
       </Link>
-      <Link to="/about" className={getMobileLinkClasses('/about')}>
+      <Link to="/about" className={getMobileLinkClasses('/about')} style={getMobileLinkStyles()}>
         About
       </Link>
     </>
@@ -548,16 +567,16 @@ export default function Header({ userType, onLogout, userData }) {
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
         <nav className={`md:hidden bg-white/95 border-t border-white/20 shadow-lg transition-all duration-300`}>
-          <div className="flex flex-col gap-2 p-4">
+          <div className="flex flex-col gap-2 p-4 text-center">
             {mobileNavLinks}
             {isAuthenticated ? (
-              <button onClick={onLogout} className="hover:text-mint px-3 py-1 rounded-md transition-colors text-left text-graphite">
+              <button onClick={onLogout} className="hover:text-mint px-3 py-1 rounded-md transition-colors text-center text-graphite !font-bold" style={getMobileButtonStyles()}>
                 Logout
               </button>
             ) : (
               <>
-                <Link to="/login" className="hover:text-mint px-3 py-1 rounded-md transition-colors text-graphite">Login</Link>
-                <Link to="/signup" className="hover:text-mint px-3 py-1 rounded-md transition-colors text-graphite">Sign Up</Link>
+                <Link to="/login" className="hover:text-mint px-3 py-1 rounded-md transition-colors text-center text-graphite !font-bold" style={getMobileButtonStyles()}>Login</Link>
+                <Link to="/signup" className="hover:text-mint px-3 py-1 rounded-md transition-colors text-center text-graphite !font-bold" style={getMobileButtonStyles()}>Sign Up</Link>
               </>
             )}
           </div>
