@@ -102,7 +102,7 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="flex flex-col md:flex-row items-center justify-between flex-1 max-w-7xl mx-auto px-6 pt-28">
-        <div className="max-w-xl space-y-6 slide-in-left">
+        <div className="max-w-xl space-y-6 slide-in-left text-center md:text-left">
           <h1 className="text-4xl md:text-5xl font-bold leading-tight">
             Find the right <span className="text-mint">freelancer</span> for your project
           </h1>
@@ -110,12 +110,12 @@ export default function Home() {
             Maayo connects businesses with talented professionals across the globe. 
             Secure, fast, and easy to use.
           </p>
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center sm:justify-start">
             <Link to="/signup">
-              <Button variant="accent">Get Started</Button>
+              <Button variant="accent" className="w-full sm:w-auto">Get Started</Button>
             </Link>
             <Link to="/browse">
-              <Button variant="primary">Browse Projects</Button>
+              <Button variant="primary" className="w-full sm:w-auto">Browse Projects</Button>
             </Link>
           </div>
         </div>

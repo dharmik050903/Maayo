@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import Button from '../components/Button'
 import { authenticatedFetch, isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
-import { formatHourlyRate } from '../utils/currency'
+import { formatHourlyRate, formatBudget } from '../utils/currency'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
 
 export default function FreelancerDashboard() {

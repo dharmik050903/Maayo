@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import Logo from './Logo'
 import Button from './Button'
@@ -29,6 +29,7 @@ export default function Header({ userType, onLogout, userData }) {
   const [showFreelancerModal, setShowFreelancerModal] = useState(false)
   const [showConversationsModal, setShowConversationsModal] = useState(false)
   const [showPaymentHistory, setShowPaymentHistory] = useState(false)
+  const hasFetchedData = useRef(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,30 +42,37 @@ export default function Header({ userType, onLogout, userData }) {
 
   // Fetch initial data for search
   useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        // Always fetch projects (public endpoint)
-        const projectsResponse = await projectService.getBrowseProjects()
-        setProjects(projectsResponse.data || [])
-        
-        // Only fetch freelancers if user is authenticated
-        if (isAuthenticated) {
-          try {
-            const freelancersResponse = await getFreelancers({})
-            if (freelancersResponse.response.ok && freelancersResponse.data.status) {
-              setFreelancers(freelancersResponse.data.data || [])
+    if (!hasFetchedData.current) {
+      hasFetchedData.current = true
+      console.log('Header: Fetching initial data (first time)')
+      
+      const fetchInitialData = async () => {
+        try {
+          // Always fetch projects (public endpoint)
+          const projectsResponse = await projectService.getBrowseProjects()
+          setProjects(projectsResponse.data || [])
+          
+          // Only fetch freelancers if user is authenticated
+          if (isAuthenticated) {
+            try {
+              const freelancersResponse = await getFreelancers({})
+              if (freelancersResponse.response.ok && freelancersResponse.data.status) {
+                setFreelancers(freelancersResponse.data.data || [])
+              }
+            } catch (freelancerErr) {
+              console.error('Error fetching freelancers:', freelancerErr)
+              // Don't redirect on freelancer fetch error, just log it
             }
-          } catch (freelancerErr) {
-            console.error('Error fetching freelancers:', freelancerErr)
-            // Don't redirect on freelancer fetch error, just log it
           }
+        } catch (err) {
+          console.error('Error fetching data for search:', err)
         }
-      } catch (err) {
-        console.error('Error fetching data for search:', err)
       }
-    }
 
-    fetchInitialData()
+      fetchInitialData()
+    } else {
+      console.log('Header: Skipping duplicate data fetch due to StrictMode')
+    }
   }, [isAuthenticated])
 
   // Set current user for messaging service
