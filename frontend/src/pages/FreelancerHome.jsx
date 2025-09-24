@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import Button from '../components/Button'
 import UpgradeBanner from '../components/UpgradeBanner'
+import AnimatedCounter from '../components/AnimatedCounter'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 import { projectService } from '../services/projectService'
 import { skillsService } from '../services/skillsService'
@@ -372,7 +373,7 @@ export default function FreelancerHome() {
                 Welcome back, <span className="text-mint">{userData.first_name}!</span>
               </h1>
               <p className="text-lg text-white/80 mb-6">
-                {profileData ?` Ready to find your next ${profileData.experience_level?.toLowerCase() || 'exciting'} project?` : 'Ready to find your next exciting project?'}
+                {profileData ?` Ready to find your next exciting project?` : 'Ready to find your next exciting project?'}
               </p>
             </div>
           )}
@@ -433,15 +434,34 @@ export default function FreelancerHome() {
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div className="text-center">
-              <div className="text-4xl font-bold text-mint mb-2">10K+</div>
+              <AnimatedCounter 
+                end={10000} 
+                suffix="+" 
+                className="text-4xl font-bold text-mint mb-2"
+                duration={2500}
+                delay={200}
+              />
               <div className="text-white/70">Active Projects</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-coral mb-2">₹2 Cr+</div>
+              <AnimatedCounter 
+                end={20000000} 
+                prefix="₹" 
+                // suffix=" Cr+" 
+                className="text-4xl font-bold text-coral mb-2"
+                duration={3000}
+                delay={400}
+              />
               <div className="text-white/70">Earned by Freelancers</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-violet mb-2">5K+</div>
+              <AnimatedCounter 
+                end={5000} 
+                suffix="+" 
+                className="text-4xl font-bold text-violet mb-2"
+                duration={2000}
+                delay={600}
+              />
               <div className="text-white/70">Happy Clients</div>
             </div>
           </div>

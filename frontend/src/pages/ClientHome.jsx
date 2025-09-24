@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import Button from '../components/Button'
 import UpgradeBanner from '../components/UpgradeBanner'
+import AnimatedCounter from '../components/AnimatedCounter'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 import { freelancerService } from '../services/freelancerService'
 import { formatHourlyRate } from '../utils/currency'
@@ -408,15 +409,33 @@ export default function ClientHome() {
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div className="text-center">
-              <div className="text-4xl font-bold text-coral mb-2">15K+</div>
+              <AnimatedCounter 
+                end={15000} 
+                suffix="+" 
+                className="text-4xl font-bold text-coral mb-2"
+                duration={2500}
+                delay={200}
+              />
               <div className="text-white/70">Expert Freelancers</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-mint mb-2">50K+</div>
+              <AnimatedCounter 
+                end={50000} 
+                suffix="+" 
+                className="text-4xl font-bold text-mint mb-2"
+                duration={3000}
+                delay={400}
+              />
               <div className="text-white/70">Projects Completed</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-violet mb-2">98%</div>
+              <AnimatedCounter 
+                end={98} 
+                suffix="%" 
+                className="text-4xl font-bold text-violet mb-2"
+                duration={2000}
+                delay={600}
+              />
               <div className="text-white/70">Client Satisfaction</div>
             </div>
           </div>

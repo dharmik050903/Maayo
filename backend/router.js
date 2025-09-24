@@ -1,5 +1,6 @@
 import express from "express";
 import auth from "./middlewares/auth.js";
+import { requireFeatureAccess, canCreateProject, canSubmitBid } from "./middlewares/subscription.js";
 import Signup from "./controller/signup.js";
 import Login from "./controller/login.js";
 import FreelancerInfo from "./controller/freelancerInfo.js";
@@ -12,6 +13,7 @@ import OTP from "./controller/otp.js";
 import AIController from "./controller/aiController.js";
 import ChatController from "./controller/chat.js";
 import PaymentGateway from "./controller/paymentcontroller.js";
+import SubscriptionController from "./controller/subscriptionController.js";
 import AdminAuth from "./controller/adminAuth.js";
 import AdminController from "./controller/admin.js";
 import { adminAuth, checkPermission, superAdminOnly } from "./middlewares/adminAuth.js";
@@ -30,6 +32,9 @@ const otpController = new OTP();
 const aiController = new AIController();
 const chatController = new ChatController();
 const paymentGateway = new PaymentGateway();
+
+const subscriptionController = new SubscriptionController();
+
 const adminAuthController = new AdminAuth();
 const adminController = new AdminController();
 
@@ -57,7 +62,7 @@ router.post("/freelancer/info/update",auth,freelancerinfo.updateFreelancerInfo);
 router.post("/client/info",auth,clientinfo.createClientInfo);
 router.post("/client/info/update",auth,clientinfo.updateClientInfo);
 // Project routes
-router.post("/project/create", auth, projectController.createProject);
+router.post("/project/create", auth, canCreateProject, projectController.createProject);
 router.post("/project/list", auth, projectController.listproject);
 router.post("/project/browse",projectController.listproject);
 router.post("/project/search", auth, projectController.searchProjects);
@@ -74,7 +79,7 @@ router.post("/review/update", auth, reviewController.updateReview);
 router.post("/review/delete", auth, reviewController.deleteReview);
 
 // Bid routes
-router.post("/bid/create", auth, bidController.createBid);
+router.post("/bid/create", auth, canSubmitBid, bidController.createBid);
 router.post("/bid/project", auth, bidController.getProjectBids);
 router.post("/bid/freelancer", auth, bidController.getFreelancerBids);
 router.post("/bid/accept", auth, bidController.acceptBid);
@@ -82,8 +87,8 @@ router.post("/bid/reject", auth, bidController.rejectBid);
 router.post("/bid/withdraw", auth, bidController.withdrawBid);
 router.post("/bid/update", auth, bidController.updateBid);
 // AI routes
-router.post("/ai/generate-proposal", auth, aiController.generateProposal);
-router.post("/ai/generate-project-description", auth, aiController.generateProjectDescription);
+router.post("/ai/generate-proposal", auth, requireFeatureAccess('ai_proposals'), aiController.generateProposal);
+router.post("/ai/generate-project-description", auth, requireFeatureAccess('ai_proposals'), aiController.createProposalPrompt);
 
 // Chat routes
 router.post("/chat/send", auth, chatController.sendMessage);
@@ -94,6 +99,15 @@ router.post("/chat/conversations", auth, chatController.getConversations);
 router.post("/payment/create-session", auth, paymentGateway.createOrder);
 router.post("/payment/verify", auth, paymentGateway.verifyPayment);
 router.post("/payment/history", auth, paymentGateway.paymentHistory);
+
+//Subscription routes
+router.post("/subscription/plans", subscriptionController.getPlans);
+router.post("/subscription/current", auth, subscriptionController.getCurrentSubscription);
+router.post("/subscription/create", auth, subscriptionController.createSubscription);
+router.post("/subscription/verify", auth, subscriptionController.verifySubscription);
+router.post("/subscription/cancel", auth, subscriptionController.cancelSubscription);
+router.post("/subscription/check-feature", auth, subscriptionController.checkFeatureAccess);
+router.post("/subscription/usage", auth, subscriptionController.getUsageStats);
 
 // Test endpoint for Razorpay configuration
 router.get("/payment/test-config", (req, res) => {

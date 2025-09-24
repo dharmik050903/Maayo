@@ -20,6 +20,24 @@ const personMaster = new mongoose.Schema({
     status: { type: Number , default:1},
     email_verified: { type: Number, default:0 },  // 0 for Unverified and 1 for Verified
     phone_verified: { type: Number, default:0 },  // 0 for Unverified and 1 for Verified
+    
+    // Subscription fields
+    subscription: {
+        plan_id: { type: String, default: 'free' },
+        status: { type: String, default: 'active' },
+        current_period_end: { type: Date },
+        features: {
+            max_projects: { type: Number, default: 3 },
+            max_bids_per_month: { type: Number, default: 5 },
+            ai_proposals: { type: Boolean, default: false },
+            priority_support: { type: Boolean, default: false },
+            advanced_analytics: { type: Boolean, default: false },
+            custom_branding: { type: Boolean, default: false },
+            api_access: { type: Boolean, default: false },
+            escrow_protection: { type: Boolean, default: false }
+        }
+    },
+    
     createdAt: { type: String, default: () => new Date().toISOString() },
 })
 

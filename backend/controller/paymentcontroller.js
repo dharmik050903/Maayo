@@ -38,8 +38,27 @@ export default class PaymentGateway {
 
             console.log('Creating Razorpay order with options:', options);
 
-            // Create order in Razorpay
-            const order = await razorpay.orders.create(options);
+            // Create order in Razorpay with retry logic
+            let order;
+            let retryCount = 0;
+            const maxRetries = 3;
+            
+            while (retryCount < maxRetries) {
+                try {
+                    order = await razorpay.orders.create(options);
+                    break; // Success, exit retry loop
+                } catch (retryError) {
+                    retryCount++;
+                    console.log(`Razorpay order creation attempt ${retryCount} failed:`, retryError.message);
+                    
+                    if (retryCount >= maxRetries) {
+                        throw retryError; // Re-throw the last error
+                    }
+                    
+                    // Wait before retrying (exponential backoff)
+                    await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+                }
+            }
 
             console.log('Razorpay order created successfully:', order.id);
 
@@ -69,6 +88,9 @@ export default class PaymentGateway {
             } else if (error.statusCode === 401) {
                 errorMessage = "Razorpay Authentication Failed";
                 errorDetails = "Your Razorpay keys are invalid or expired. Please check your .env file and get new keys from Razorpay dashboard.";
+            } else if (error.statusCode === 500 || error.message.includes('SERVER_ERROR')) {
+                errorMessage = "Razorpay Server Error";
+                errorDetails = "Razorpay is experiencing temporary server issues. Please try again in a few minutes.";
             }
 
             res.status(500).json({ 
