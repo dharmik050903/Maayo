@@ -164,11 +164,12 @@ export default class AdminAuth {
     // Create predefined admin accounts
     async createPredefinedAdmins(req, res) {
         try {
+            // Get admin credentials from environment variables
             const predefinedAdmins = [
                 {
-                    name: 'Master Admin',
-                    email: 'master@maayo.com',
-                    password: 'MasterAdmin@123',
+                    name: process.env.MASTER_ADMIN_NAME || 'Master Admin',
+                    email: process.env.MASTER_ADMIN_EMAIL || 'master@maayo.com',
+                    password: process.env.MASTER_ADMIN_PASSWORD || 'MasterAdmin@123',
                     role: 'super_admin',
                     permissions: {
                         users: { view: true, edit: true, delete: true, suspend: true },
@@ -180,9 +181,9 @@ export default class AdminAuth {
                     }
                 },
                 {
-                    name: 'Content Admin',
-                    email: 'content@maayo.com',
-                    password: 'ContentAdmin@123',
+                    name: process.env.CONTENT_ADMIN_NAME || 'Content Admin',
+                    email: process.env.CONTENT_ADMIN_EMAIL || 'content@maayo.com',
+                    password: process.env.CONTENT_ADMIN_PASSWORD || 'ContentAdmin@123',
                     role: 'admin',
                     permissions: {
                         users: { view: true, edit: true, delete: false, suspend: false },
@@ -194,9 +195,9 @@ export default class AdminAuth {
                     }
                 },
                 {
-                    name: 'Support Admin',
-                    email: 'support@maayo.com',
-                    password: 'SupportAdmin@123',
+                    name: process.env.SUPPORT_ADMIN_NAME || 'Support Admin',
+                    email: process.env.SUPPORT_ADMIN_EMAIL || 'support@maayo.com',
+                    password: process.env.SUPPORT_ADMIN_PASSWORD || 'SupportAdmin@123',
                     role: 'moderator',
                     permissions: {
                         users: { view: true, edit: false, delete: false, suspend: false },

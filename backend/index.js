@@ -6,8 +6,12 @@ import router from "./router.js";
 import http from "http";
 import { initSocketServer } from "./services/socket.js";
 import AdminAuth from "./controller/adminAuth.js";
+import validateEnvironment from "./utils/validateEnvironment.js";
 
 dotenv.config();
+
+// Validate environment variables
+validateEnvironment();
 
 const app = express();
 const httpServer = http.createServer(app);
