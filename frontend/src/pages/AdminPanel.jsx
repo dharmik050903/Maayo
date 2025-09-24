@@ -990,7 +990,7 @@ const AdminProfile = () => {
     <div className="p-3 sm:p-4 lg:p-6 bg-gray-50 min-h-screen">
       <div className="max-w-2xl">
         <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-4 sm:p-6 mb-6 border border-indigo-100 shadow-sm">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">Admin Profile</h1>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6" style={{ color: '#000000', fontWeight: '800' }}>Admin Profile</h1>
         
           {error && (
             <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-3 sm:px-4 py-3 rounded">
@@ -1006,8 +1006,8 @@ const AdminProfile = () => {
                 {adminData?.name?.charAt(0)?.toUpperCase()}
               </div>
               <div className="ml-3 sm:ml-4">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-800">{adminData?.name}</h2>
-                <p className="text-sm sm:text-base text-gray-600 capitalize font-medium">{adminData?.role?.replace('_', ' ')}</p>
+                <h2 className="text-lg sm:text-xl font-bold" style={{ color: '#000000', fontWeight: '800' }}>{adminData?.name}</h2>
+                <p className="text-sm sm:text-base capitalize font-bold" style={{ color: '#1f2937', fontWeight: '700' }}>{adminData?.role?.replace('_', ' ')}</p>
               </div>
             </div>
             <button
@@ -1062,24 +1062,24 @@ const AdminProfile = () => {
           ) : (
             <div className="space-y-4">
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-600 mb-1">Name</label>
-                <p className="text-sm sm:text-base text-gray-800 font-medium">{adminData?.name}</p>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Name</label>
+                <p className="text-sm sm:text-base font-bold" style={{ color: '#000000', fontWeight: '700' }}>{adminData?.name}</p>
               </div>
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-600 mb-1">Email</label>
-                <p className="text-sm sm:text-base text-gray-800 font-medium">{adminData?.email}</p>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Email</label>
+                <p className="text-sm sm:text-base font-bold" style={{ color: '#000000', fontWeight: '700' }}>{adminData?.email}</p>
               </div>
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-600 mb-1">Phone</label>
-                <p className="text-sm sm:text-base text-gray-800 font-medium">{adminData?.phone || 'Not provided'}</p>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <p className="text-sm sm:text-base font-bold" style={{ color: '#000000', fontWeight: '700' }}>{adminData?.phone || 'Not provided'}</p>
               </div>
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-600 mb-1">Role</label>
-                <p className="text-sm sm:text-base text-gray-800 font-medium capitalize">{adminData?.role?.replace('_', ' ')}</p>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Role</label>
+                <p className="text-sm sm:text-base font-bold capitalize" style={{ color: '#000000', fontWeight: '700' }}>{adminData?.role?.replace('_', ' ')}</p>
               </div>
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-600 mb-1">Last Login</label>
-                <p className="text-sm sm:text-base text-gray-800 font-medium">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Last Login</label>
+                <p className="text-sm sm:text-base font-bold" style={{ color: '#000000', fontWeight: '700' }}>
                   {adminData?.last_login ? new Date(adminData.last_login).toLocaleString() : 'Never'}
                 </p>
               </div>

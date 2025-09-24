@@ -257,7 +257,7 @@ const UserManagement = () => {
       {/* Header and Search */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 mb-6 border border-blue-100 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">User Management</h1>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold" style={{ color: '#000000', fontWeight: '800' }}>User Management</h1>
           <button 
             onClick={fetchUsers}
             disabled={loading}
@@ -280,35 +280,39 @@ const UserManagement = () => {
             type="text"
             placeholder="Search users..."
             className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base bg-white shadow-sm transition-all duration-200"
+            style={{ color: '#000000' }}
             value={filters.search}
             onChange={(e) => handleFilterChange('search', e.target.value)}
           />
           <select
             className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base bg-white shadow-sm transition-all duration-200"
+            style={{ color: '#000000' }}
             value={filters.status}
             onChange={(e) => handleFilterChange('status', e.target.value)}
           >
-            <option value="all">All Status</option>
-            <option value="1">Active</option>
-            <option value="0">Inactive</option>
+            <option value="all" style={{ color: '#000000' }}>All Status</option>
+            <option value="1" style={{ color: '#000000' }}>Active</option>
+            <option value="0" style={{ color: '#000000' }}>Inactive</option>
           </select>
           <select
             className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base bg-white shadow-sm transition-all duration-200"
+            style={{ color: '#000000' }}
             value={filters.user_type}
             onChange={(e) => handleFilterChange('user_type', e.target.value)}
           >
-            <option value="all">All Types</option>
-            <option value="freelancer">Freelancers</option>
-            <option value="client">Clients</option>
+            <option value="all" style={{ color: '#000000' }}>All Types</option>
+            <option value="freelancer" style={{ color: '#000000' }}>Freelancers</option>
+            <option value="client" style={{ color: '#000000' }}>Clients</option>
           </select>
           <select
             className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base bg-white shadow-sm transition-all duration-200"
+            style={{ color: '#000000' }}
             value={filters.limit}
             onChange={(e) => handleFilterChange('limit', parseInt(e.target.value))}
           >
-            <option value={10}>10 per page</option>
-            <option value={25}>25 per page</option>
-            <option value={50}>50 per page</option>
+            <option value={10} style={{ color: '#000000' }}>10 per page</option>
+            <option value={25} style={{ color: '#000000' }}>25 per page</option>
+            <option value={50} style={{ color: '#000000' }}>50 per page</option>
           </select>
         </div>
       </div>
@@ -319,19 +323,19 @@ const UserManagement = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gradient-to-r from-gray-50 to-blue-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#000000', fontWeight: '700' }}>
                   User
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#000000', fontWeight: '700' }}>
                   Type
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#000000', fontWeight: '700' }}>
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#000000', fontWeight: '700' }}>
                   Joined
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#000000', fontWeight: '700' }}>
                   Actions
                 </th>
               </tr>
@@ -350,10 +354,10 @@ const UserManagement = () => {
                           </div>
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium" style={{ color: '#000000', fontWeight: '600' }}>
                             {user.fullName || `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'N/A'}
                           </div>
-                          <div className="text-sm text-gray-500">{user.email}</div>
+                          <div className="text-sm" style={{ color: '#374151', fontWeight: '500' }}>{user.email}</div>
                         </div>
                       </div>
                     </td>
@@ -377,7 +381,7 @@ const UserManagement = () => {
                         {(user.is_suspended || user.status === 0) ? 'Suspended' : user.status === 1 || user.is_active ? 'Active' : 'Inactive'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#374151', fontWeight: '500' }}>
                       {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">

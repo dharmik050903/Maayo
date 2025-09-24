@@ -2,9 +2,11 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import Button from '../components/Button'
+import UpgradeBanner from '../components/UpgradeBanner'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 import { freelancerService } from '../services/freelancerService'
 import { formatHourlyRate } from '../utils/currency'
+import { needsUpgrade } from '../utils/subscription'
 import confirmationService from '../services/confirmationService.jsx'
 
 export default function ClientHome() {
@@ -364,6 +366,13 @@ export default function ClientHome() {
         onLogout={handleLogout} 
         userData={userData}
       />
+      
+      {/* Upgrade Banner - Show only if user doesn't have active subscription */}
+      {userData && needsUpgrade(userData) && (
+        <div className="px-6 pt-24">
+          <UpgradeBanner userType="client" />
+        </div>
+      )}
       
       {/* Hero Section */}
       <section className="flex-1 flex items-center justify-center px-6 py-20">
