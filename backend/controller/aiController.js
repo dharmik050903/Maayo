@@ -117,7 +117,7 @@ export default class AIController {
             // More specific error handling for the Google Generative AI SDK
             if (error instanceof GoogleGenerativeAIError) {
                 // This can catch permission denied (bad API key), invalid arguments, etc.
-                return res.status(401).json({
+                return res.status(503).json({
                     status: false,
                     message: "AI service error. Please check your API key or the request payload.",
                     error: error.message
@@ -173,7 +173,7 @@ export default class AIController {
             // More specific error handling for the Google Generative AI SDK
             if (error instanceof GoogleGenerativeAIError) {
                 // This can catch permission denied (bad API key), invalid arguments, etc.
-                return res.status(401).json({
+                return res.status(503).json({
                     status: false,
                     message: "AI service error. Please check your API key or the request payload.",
                     error: error.message
