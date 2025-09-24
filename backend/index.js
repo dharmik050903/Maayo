@@ -5,6 +5,8 @@ import connect from "./connection.js";
 import router from "./router.js";
 import http from "http";
 import { initSocketServer } from "./services/socket.js";
+import AdminAuth from "./controller/adminAuth.js";
+
 dotenv.config();
 
 const app = express();
@@ -55,6 +57,27 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 connect();  
+
+// Initialize predefined admin accounts on server startup
+const initializeAdminAccounts = async () => {
+    try {
+        console.log('🔧 Initializing predefined admin accounts...');
+        const adminAuthController = new AdminAuth();
+        const result = await adminAuthController.createPredefinedAdmins();
+        if (result.created.length > 0) {
+            console.log(`✅ Created ${result.created.length} new admin accounts: ${result.created.join(', ')}`);
+        }
+        if (result.existing.length > 0) {
+            console.log(`ℹ️ ${result.existing.length} admin accounts already exist: ${result.existing.join(', ')}`);
+        }
+        console.log('🎉 Admin account initialization completed');
+    } catch (error) {
+        console.error('❌ Error initializing admin accounts:', error);
+    }
+};
+
+// Call initialization after database connection
+setTimeout(initializeAdminAccounts, 2000); // Wait 2 seconds for DB to fully connect  
 
 // Health check endpoint
 app.get('/health', (req, res) => {

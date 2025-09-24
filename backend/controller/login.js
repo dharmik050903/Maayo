@@ -23,6 +23,15 @@ export default class Login {
                 return res.status(401).json({ message: "Invalid credentials" });
             }
 
+            // Check if user is suspended
+            if (user.status !== 1) {
+                return res.status(403).json({ 
+                    message: "Your account has been suspended. Please contact support.",
+                    suspended: true,
+                    status: user.status
+                });
+            }
+
             const token = generateToken({
                 id: String(user._id),
                 username: user.personName || `${user.first_name} ${user.last_name}`,
@@ -98,6 +107,15 @@ export default class Login {
                     });
                     user = await newUser.save();
                 }
+            }
+
+            // Check if user is suspended
+            if (user.status !== 1) {
+                return res.status(403).json({ 
+                    message: "Your account has been suspended. Please contact support.",
+                    suspended: true,
+                    status: user.status
+                });
             }
 
             // Generate JWT token

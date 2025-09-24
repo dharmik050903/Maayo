@@ -22,6 +22,8 @@ export default function ProjectForm({ project = null, onSuccess, onCancel }) {
   const [availableSkills, setAvailableSkills] = useState([])
   const [selectedSkills, setSelectedSkills] = useState([])
   const [skillSearch, setSkillSearch] = useState('')
+  const [customSkillInput, setCustomSkillInput] = useState('')
+  const [showCustomSkillInput, setShowCustomSkillInput] = useState(false)
   const [aiLoading, setAiLoading] = useState(false)
   const [aiError, setAiError] = useState('')
   const hasInitialized = useRef(false)
@@ -52,12 +54,25 @@ export default function ProjectForm({ project = null, onSuccess, onCancel }) {
 
   const loadSkills = async () => {
     try {
+      console.log('🔄 Loading skills...')
       const response = await skillsService.getSkills()
+      
       if (response.data && Array.isArray(response.data)) {
+        console.log(`✅ Loaded ${response.data.length} skills`)
         setAvailableSkills(response.data)
+        
+        // Show fallback message if using fallback skills
+        if (!response.success) {
+          console.log('⚠️ Using fallback skills due to API error')
+        }
+      } else {
+        console.error('❌ Invalid skills response format:', response)
+        setAvailableSkills([])
       }
     } catch (error) {
-      console.error('Error loading skills:', error)
+      console.error('❌ Error loading skills:', error)
+      // Set empty array to show "Loading skills..." message
+      setAvailableSkills([])
     }
   }
 
@@ -93,6 +108,28 @@ export default function ProjectForm({ project = null, onSuccess, onCancel }) {
         return updated
       }
     })
+  }
+
+  const handleAddCustomSkill = () => {
+    const customSkill = customSkillInput.trim()
+    if (customSkill && !selectedSkills.find(s => s.skill.toLowerCase() === customSkill.toLowerCase())) {
+      const customSkillData = {
+        skill: customSkill,
+        skill_id: `custom_${Date.now()}` // Unique ID for custom skill
+      }
+      
+      const updated = [...selectedSkills, customSkillData]
+      setSelectedSkills(updated)
+      setForm({ ...form, skills_required: updated })
+      setCustomSkillInput('')
+      setShowCustomSkillInput(false)
+    }
+  }
+
+  const handleRemoveSkill = (skillToRemove) => {
+    const updated = selectedSkills.filter(s => s.skill_id !== skillToRemove.skill_id)
+    setSelectedSkills(updated)
+    setForm({ ...form, skills_required: updated })
   }
 
   const getWordCount = (text) => {
@@ -185,9 +222,14 @@ export default function ProjectForm({ project = null, onSuccess, onCancel }) {
         ...form,
         budget: Number(form.budget),
         duration: Number(form.duration),
+        skills_required: selectedSkills, // Use selectedSkills instead of form.skills_required
         min_bid_amount: form.min_bid_amount ? Number(form.min_bid_amount) : undefined,
         max_bid_amount: form.max_bid_amount ? Number(form.max_bid_amount) : undefined
       }
+
+      // Debug logging
+      console.log('🚀 Submitting project data:', projectData)
+      console.log('📋 Selected skills:', selectedSkills)
 
       let response
       if (project) {
@@ -390,19 +432,64 @@ export default function ProjectForm({ project = null, onSuccess, onCancel }) {
             
             <div className="space-y-3">
               {/* Skills Search Input */}
-              <div className="mb-3">
+              <div className="flex gap-2">
                 <input
                   type="text"
                   placeholder="Search skills..."
                   value={skillSearch}
                   onChange={handleSkillSearch}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-graphite bg-white focus:outline-none focus:ring-2 focus:ring-violet/50 focus:border-violet"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-graphite bg-white focus:outline-none focus:ring-2 focus:ring-violet/50 focus:border-violet"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowCustomSkillInput(!showCustomSkillInput)}
+                  className="px-4 py-2 bg-violet text-white rounded-md hover:bg-violet/90 focus:outline-none focus:ring-2 focus:ring-violet/50 transition-colors"
+                  title="Add custom skill"
+                >
+                  + Custom
+                </button>
               </div>
+              
+              {/* Custom Skill Input */}
+              {showCustomSkillInput && (
+                <div className="flex gap-2 p-3 bg-violet/5 border border-violet/20 rounded-md">
+                  <input
+                    type="text"
+                    placeholder="Enter custom skill..."
+                    value={customSkillInput}
+                    onChange={(e) => setCustomSkillInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddCustomSkill()}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-graphite bg-white focus:outline-none focus:ring-2 focus:ring-violet/50 focus:border-violet"
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCustomSkill}
+                    disabled={!customSkillInput.trim()}
+                    className="px-4 py-2 bg-violet text-white rounded-md hover:bg-violet/90 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-violet/50 transition-colors"
+                  >
+                    Add
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowCustomSkillInput(false)
+                      setCustomSkillInput('')
+                    }}
+                    className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500/50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
               
               {availableSkills.length === 0 ? (
                 <div className="p-4 text-center text-coolgray border border-gray-300 rounded-md">
-                  <p>Loading skills...</p>
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="animate-spin h-5 w-5 border-2 border-violet border-t-transparent rounded-full"></div>
+                    <p>Loading skills...</p>
+                    <p className="text-xs text-gray-400">If this takes too long, you can add custom skills using the "+ Custom" button above</p>
+                  </div>
                 </div>
               ) : (
                 <div className="max-h-40 overflow-y-auto border border-gray-300 rounded-md p-2">
@@ -419,6 +506,9 @@ export default function ProjectForm({ project = null, onSuccess, onCancel }) {
                         className="rounded border-gray-300 text-violet focus:ring-violet"
                       />
                       <span className="text-sm text-graphite">{skill.skill}</span>
+                      {skill.category && (
+                        <span className="text-xs text-gray-500 ml-auto">({skill.category})</span>
+                      )}
                     </label>
                   ))}
                   {availableSkills.filter(skill => 
@@ -426,6 +516,7 @@ export default function ProjectForm({ project = null, onSuccess, onCancel }) {
                   ).length === 0 && skillSearch && (
                     <div className="p-4 text-center text-coolgray">
                       <p>No skills found matching "{skillSearch}"</p>
+                      <p className="text-xs text-gray-500 mt-1">Try using the "+ Custom" button to add your own skill</p>
                     </div>
                   )}
                 </div>
@@ -433,7 +524,7 @@ export default function ProjectForm({ project = null, onSuccess, onCancel }) {
 
               {selectedSkills.length > 0 && (
                 <div className="mt-2">
-                  <p className="text-sm text-coolgray mb-2">Selected Skills:</p>
+                  <p className="text-sm text-coolgray mb-2">Selected Skills ({selectedSkills.length}):</p>
                   <div className="flex flex-wrap gap-2">
                     {selectedSkills.map(skill => (
                       <span
@@ -441,10 +532,14 @@ export default function ProjectForm({ project = null, onSuccess, onCancel }) {
                         className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-violet/10 text-violet border border-violet/20"
                       >
                         {skill.skill}
+                        {skill.skill_id.startsWith('custom_') && (
+                          <span className="ml-1 text-xs opacity-75">(custom)</span>
+                        )}
                         <button
                           type="button"
-                          onClick={() => handleSkillToggle({_id: skill.skill_id, skill: skill.skill})}
-                          className="ml-2 text-violet/60 hover:text-violet"
+                          onClick={() => handleRemoveSkill(skill)}
+                          className="ml-2 text-violet/60 hover:text-violet transition-colors"
+                          title="Remove skill"
                         >
                           ×
                         </button>
@@ -454,7 +549,7 @@ export default function ProjectForm({ project = null, onSuccess, onCancel }) {
                 </div>
               )}
             </div>
-            {errors.skills && <p className="text-coral text-sm">{errors.skills}</p>}
+            {errors.skills && <p className="text-coral text-sm mt-2">{errors.skills}</p>}
           </div>
 
           {message && (

@@ -27,6 +27,9 @@ import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsAndConditions from './pages/TermsAndConditions'
 import CancellationRefunds from './pages/CancellationRefunds'
 import ShippingPolicy from './pages/ShippingPolicy'
+import AdminLogin from './pages/AdminLogin'
+import AdminPanel from './pages/AdminPanel'
+import AdminSetup from './pages/AdminSetup'
 
 const router = createBrowserRouter([
   {
@@ -59,6 +62,19 @@ const router = createBrowserRouter([
       { path: '/shipping', element: <ShippingPolicy />}
     ],
   },
+  // Admin Routes
+  {
+    path: '/admin/login',
+    element: <AdminLogin />
+  },
+  {
+    path: '/admin/setup',
+    element: <AdminSetup />
+  },
+  {
+    path: '/admin/*',
+    element: <AdminPanel />
+  }
 ])
 
 createRoot(document.getElementById('root')).render(
