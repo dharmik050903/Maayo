@@ -220,7 +220,7 @@ export default function Header({ userType, onLogout, userData }) {
 
   // Helper function to get link classes with active state
   const getLinkClasses = (path) => {
-    const baseClasses = "px-3 py-1 rounded-md transition-colors"
+    const baseClasses = "px-4 py-2 rounded-md transition-colors whitespace-nowrap flex items-center"
     const isActive = isActiveLink(path)
     
     if (isActive) {
@@ -231,7 +231,7 @@ export default function Header({ userType, onLogout, userData }) {
 
   // Helper function to get mobile-specific link classes
   const getMobileLinkClasses = (path) => {
-    const baseClasses = "px-3 py-1 rounded-md transition-colors mobile-nav-link text-center"
+    const baseClasses = "px-4 py-2 rounded-md transition-colors mobile-nav-link text-center"
     const isActive = isActiveLink(path)
     
     if (isActive) {
@@ -278,19 +278,19 @@ export default function Header({ userType, onLogout, userData }) {
       
       <button 
         onClick={handleMessagesClick}
-        className="hover:text-mint px-3 py-1 rounded-md transition-colors text-graphite"
+        className="hover:text-mint px-4 py-2 rounded-md transition-colors text-graphite whitespace-nowrap flex items-center"
       >
         Messages
       </button>
       <button 
         onClick={handlePaymentHistoryClick}
-        className="hover:text-mint px-3 py-1 rounded-md transition-colors text-graphite"
+        className="hover:text-mint px-4 py-2 rounded-md transition-colors text-graphite whitespace-nowrap flex items-center"
       >
         Payments
       </button>
       <button 
         onClick={handleProfileClick}
-        className="hover:text-mint px-3 py-1 rounded-md transition-colors text-graphite"
+        className="hover:text-mint px-4 py-2 rounded-md transition-colors text-graphite whitespace-nowrap flex items-center"
       >
         Profile
       </button>
@@ -341,21 +341,21 @@ export default function Header({ userType, onLogout, userData }) {
       
       <button 
         onClick={handleMessagesClick}
-        className="hover:text-mint px-3 py-1 rounded-md transition-colors text-center text-graphite !font-bold"
+        className="hover:text-mint px-4 py-2 rounded-md transition-colors text-center text-graphite !font-bold"
         style={getMobileButtonStyles()}
       >
         Messages
       </button>
       <button 
         onClick={handlePaymentHistoryClick}
-        className="hover:text-mint px-3 py-1 rounded-md transition-colors text-center text-graphite !font-bold"
+        className="hover:text-mint px-4 py-2 rounded-md transition-colors text-center text-graphite !font-bold"
         style={getMobileButtonStyles()}
       >
         Payments
       </button>
       <button 
         onClick={handleProfileClick}
-        className="hover:text-mint px-3 py-1 rounded-md transition-colors text-center text-graphite !font-bold"
+        className="hover:text-mint px-4 py-2 rounded-md transition-colors text-center text-graphite !font-bold"
         style={getMobileButtonStyles()}
       >
         Profile
@@ -395,45 +395,55 @@ export default function Header({ userType, onLogout, userData }) {
         </Link>
 
         {/* Global Search Bar */}
-        <div className="flex-1 max-w-md mx-1 md:mx-8 relative search-container">
+        <div className="flex-1 max-w-md mx-4 relative search-container">
           <form onSubmit={handleSearch} className="relative">
-            <div className="flex gap-1 md:gap-2">
+            <div className="flex gap-2">
               <div className="relative flex-1">
                 <input
                   type="text"
-                  placeholder="Search..."
+                  placeholder="Search projects, freelancers..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className={`w-full px-3 md:px-4 py-2 pl-8 md:pl-10 rounded-lg border-0 focus:ring-2 focus:ring-mint focus:border-transparent transition-all duration-300 text-sm md:text-base ${
+                  className={`w-full px-4 py-2 pl-10 pr-4 rounded-lg border transition-colors text-sm ${
                     isScrolled 
-                      ? 'bg-gray-100 text-graphite placeholder-gray-500' 
-                      : 'bg-white/30 text-white placeholder-white/80 backdrop-blur-sm'
-                  }`}
+                      ? 'border-gray-300 bg-white text-gray-900 placeholder-gray-500' 
+                      : 'border-white/30 bg-white/20 text-white placeholder-white/70'
+                  } backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-mint/50`}
                 />
-                <svg className={`absolute left-2 md:left-3 top-1/2 transform -translate-y-1/2 w-3 h-3 md:w-4 md:h-4 ${
-                  isScrolled ? 'text-gray-500' : 'text-white/70'
+                <svg className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+                  isScrolled ? 'text-gray-400' : 'text-white/60'
                 }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={clearSearch}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
               </div>
               <button
                 type="submit"
                 disabled={isSearching}
-                className={`px-2 md:px-4 py-2 rounded-lg font-semibold transition-colors text-xs md:text-sm ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isScrolled 
                     ? 'bg-mint text-white hover:bg-mint/90' 
-                    : 'bg-white/30 text-white hover:bg-white/40'
+                    : 'bg-white/20 text-white hover:bg-white/30'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                {isSearching ? '...' : <span className="hidden md:inline">Search</span>}
-                <span className="md:hidden">🔍</span>
+                {isSearching ? '...' : 'Search'}
               </button>
             </div>
           </form>
 
           {/* Search Results Dropdown */}
           {showSearchResults && (
-            <div className={`absolute top-full left-0 right-0 mt-2 rounded-lg shadow-xl border border-gray-200 z-[60] max-h-96 overflow-y-auto bg-white`}>
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
               <div className="p-4">
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-sm font-medium text-graphite">
@@ -441,9 +451,9 @@ export default function Header({ userType, onLogout, userData }) {
                   </p>
                   <button
                     onClick={clearSearch}
-                    className="text-xs underline hover:no-underline text-gray-500 hover:text-graphite"
+                    className="text-xs text-gray-500 hover:text-graphite px-2 py-1 rounded hover:bg-gray-100 transition-colors"
                   >
-                    Clear
+                    Clear all
                   </button>
                 </div>
 
@@ -457,16 +467,16 @@ export default function Header({ userType, onLogout, userData }) {
                       {searchResults.projects.slice(0, 3).map((project) => (
                         <div 
                           key={project._id} 
-                          className="p-2 rounded hover:bg-gray-100 cursor-pointer transition-colors"
+                          className="p-2 hover:bg-gray-50 cursor-pointer transition-colors"
                           onClick={() => handleProjectClick(project)}
                         >
                           <h5 className="text-sm font-medium line-clamp-1 text-graphite hover:text-mint transition-colors">
                             {project.title}
                           </h5>
-                          <p className="text-xs line-clamp-1 text-gray-600">
+                          <p className="text-xs line-clamp-1 text-gray-600 mt-1">
                             {project.description}
                           </p>
-                          <p className="text-xs text-mint">
+                          <p className="text-xs text-mint font-medium mt-1">
                             {formatBudget(project.budget)} • {project.duration} days
                           </p>
                         </div>
@@ -490,16 +500,16 @@ export default function Header({ userType, onLogout, userData }) {
                       {searchResults.freelancers.slice(0, 3).map((freelancer) => (
                         <div 
                           key={freelancer._id} 
-                          className="p-2 rounded hover:bg-gray-100 cursor-pointer transition-colors"
+                          className="p-2 hover:bg-gray-50 cursor-pointer transition-colors"
                           onClick={() => handleFreelancerClick(freelancer)}
                         >
                           <h5 className="text-sm font-medium line-clamp-1 text-graphite hover:text-mint transition-colors">
                             {freelancer.name || 'Freelancer'}
                           </h5>
-                          <p className="text-xs line-clamp-1 text-gray-600">
+                          <p className="text-xs line-clamp-1 text-gray-600 mt-1">
                             {freelancer.title && freelancer.title !== freelancer.name ? freelancer.title : 'Professional'} • {freelancer.experience_level || 'Experienced'}
                           </p>
-                          <p className="text-xs text-mint">
+                          <p className="text-xs text-mint font-medium mt-1">
                             {formatHourlyRate(freelancer.hourly_rate || 0)} • {freelancer.total_projects || 0} projects
                           </p>
                         </div>
@@ -527,7 +537,7 @@ export default function Header({ userType, onLogout, userData }) {
         </div>
 
         {/* Desktop Navigation */}
-        <nav className={`hidden md:flex gap-6 font-medium transition-colors duration-300 ${
+        <nav className={`hidden md:flex gap-4 font-medium transition-colors duration-300 ${
           isScrolled ? 'text-graphite' : 'text-white/90'
         }`}>
           {navLinks}
@@ -540,10 +550,10 @@ export default function Header({ userType, onLogout, userData }) {
           </button>
         </div>
 
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-4">
           {isAuthenticated ? (
             <button onClick={onLogout} className="group relative px-4 py-2 bg-violet/10 border border-violet/30 text-violet rounded-lg hover:bg-violet/20 hover:border-violet/50 transition-all duration-200">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <svg className="w-4 h-4 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
@@ -569,16 +579,18 @@ export default function Header({ userType, onLogout, userData }) {
         <nav className={`md:hidden bg-white/95 border-t border-white/20 shadow-lg transition-all duration-300`}>
           <div className="flex flex-col gap-2 p-4 text-center">
             {mobileNavLinks}
-            {isAuthenticated ? (
-              <button onClick={onLogout} className="hover:text-mint px-3 py-1 rounded-md transition-colors text-center text-graphite !font-bold" style={getMobileButtonStyles()}>
-                Logout
-              </button>
-            ) : (
-              <>
-                <Link to="/login" className="hover:text-mint px-3 py-1 rounded-md transition-colors text-center text-graphite !font-bold" style={getMobileButtonStyles()}>Login</Link>
-                <Link to="/signup" className="hover:text-mint px-3 py-1 rounded-md transition-colors text-center text-graphite !font-bold" style={getMobileButtonStyles()}>Sign Up</Link>
-              </>
-            )}
+            <div className="border-t border-gray-200 pt-4 mt-2">
+              {isAuthenticated ? (
+                <button onClick={onLogout} className="hover:text-mint px-4 py-2 rounded-md transition-colors text-center text-graphite !font-bold bg-violet/10 border border-violet/30" style={getMobileButtonStyles()}>
+                  Logout
+                </button>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <Link to="/login" className="hover:text-mint px-4 py-2 rounded-md transition-colors text-center text-graphite !font-bold border border-gray-300" style={getMobileButtonStyles()}>Login</Link>
+                  <Link to="/signup" className="hover:text-mint px-4 py-2 rounded-md transition-colors text-center text-graphite !font-bold bg-mint text-white" style={getMobileButtonStyles()}>Sign Up</Link>
+                </div>
+              )}
+            </div>
           </div>
         </nav>
       )}

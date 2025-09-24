@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import Button from '../components/Button'
+import AnimatedCounter from '../components/AnimatedCounter'
 import { authenticatedFetch, isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 import { formatHourlyRate, formatBudget } from '../utils/currency'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
@@ -614,7 +615,13 @@ export default function FreelancerDashboard() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-coolgray">Total Earnings</p>
                 <p className="text-2xl font-bold text-graphite">
-                  {formatBudget(freelancerInfo?.total_earnings || 0)}
+                  <AnimatedCounter 
+                    end={freelancerInfo?.total_earnings || 0} 
+                    prefix="₹"
+                    className="text-2xl font-bold text-graphite"
+                    duration={2500}
+                    delay={200}
+                  />
                 </p>
               </div>
             </div>
@@ -630,7 +637,12 @@ export default function FreelancerDashboard() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-coolgray">Active Projects</p>
                 <p className="text-2xl font-bold text-graphite">
-                  {freelancerInfo?.active_projects || '0'}
+                  <AnimatedCounter 
+                    end={freelancerInfo?.active_projects || 0} 
+                    className="text-2xl font-bold text-graphite"
+                    duration={2000}
+                    delay={400}
+                  />
                 </p>
               </div>
             </div>
@@ -646,7 +658,12 @@ export default function FreelancerDashboard() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-coolgray">Rating</p>
                 <p className="text-2xl font-bold text-graphite">
-                  {freelancerInfo?.rating || '4.8'}
+                  <AnimatedCounter 
+                    end={parseFloat(freelancerInfo?.rating || 4.8)} 
+                    className="text-2xl font-bold text-graphite"
+                    duration={2000}
+                    delay={600}
+                  />
                 </p>
               </div>
             </div>
@@ -662,7 +679,12 @@ export default function FreelancerDashboard() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-coolgray">Hours Worked</p>
                 <p className="text-2xl font-bold text-graphite">
-                  {freelancerInfo?.total_hours || '0'}
+                  <AnimatedCounter 
+                    end={freelancerInfo?.total_hours || 0} 
+                    className="text-2xl font-bold text-graphite"
+                    duration={2000}
+                    delay={800}
+                  />
                 </p>
               </div>
             </div>

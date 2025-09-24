@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Button from '../components/Button'
+import AnimatedCounter from '../components/AnimatedCounter'
 import MyProjects from '../components/MyProjects'
 import { authenticatedFetch, isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 import { projectService } from '../services/projectService'
@@ -354,17 +355,32 @@ export default function ClientDashboard() {
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet"></div>
                           </div>
                         ) : (
-                          totalProjects || '0'
+                          <AnimatedCounter 
+                            end={totalProjects || 0} 
+                            className="text-3xl font-bold text-violet"
+                            duration={2000}
+                            delay={200}
+                          />
                         )}
                       </div>
                       <div className="text-sm text-coolgray">Total Projects</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-3xl font-bold text-mint">{clientInfo?.completed_project || '0'}</div>
+                      <AnimatedCounter 
+                        end={clientInfo?.completed_project || 0} 
+                        className="text-3xl font-bold text-mint"
+                        duration={2000}
+                        delay={400}
+                      />
                       <div className="text-sm text-coolgray">Completed</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-3xl font-bold text-coral">{clientInfo?.pending_reviews || '0'}</div>
+                      <AnimatedCounter 
+                        end={clientInfo?.pending_reviews || 0} 
+                        className="text-3xl font-bold text-coral"
+                        duration={2000}
+                        delay={600}
+                      />
                       <div className="text-sm text-coolgray">Pending Reviews</div>
                     </div>
                   </div>
