@@ -295,8 +295,10 @@ export const projectService = {
         let errorMessage = 'Failed to create project'
         try {
           const errorData = await response.json()
+          console.error('❌ Backend error response:', errorData)
           errorMessage = errorData.message || errorMessage
         } catch (parseError) {
+          console.error('❌ Failed to parse error response:', parseError)
           errorMessage = `Server error: ${response.status} ${response.statusText}`
         }
         throw new Error(errorMessage)

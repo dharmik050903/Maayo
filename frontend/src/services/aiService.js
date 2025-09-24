@@ -20,6 +20,17 @@ class AIService {
       if (!response.ok) {
         console.error('AI Service: Response not ok, status:', response.status)
         
+        // Handle specific error cases
+        if (response.status === 401) {
+          console.error('AI Service: Authentication error - user may be logged out')
+          throw new Error('Authentication failed. Please log in again.')
+        }
+        
+        if (response.status === 503) {
+          console.error('AI Service: AI service unavailable')
+          throw new Error('AI service is currently unavailable. Please try again later.')
+        }
+        
         // Try to get error message from response
         let errorMessage = `HTTP ${response.status}: ${response.statusText}`
         try {
@@ -82,6 +93,17 @@ class AIService {
       // Check if response is ok
       if (!response.ok) {
         console.error('AI Service: Response not ok, status:', response.status)
+        
+        // Handle specific error cases
+        if (response.status === 401) {
+          console.error('AI Service: Authentication error - user may be logged out')
+          throw new Error('Authentication failed. Please log in again.')
+        }
+        
+        if (response.status === 503) {
+          console.error('AI Service: AI service unavailable')
+          throw new Error('AI service is currently unavailable. Please try again later.')
+        }
         
         // Try to get error message from response
         let errorMessage = `HTTP ${response.status}: ${response.statusText}`

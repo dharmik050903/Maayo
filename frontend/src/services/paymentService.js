@@ -111,12 +111,22 @@ export const paymentService = {
     try {
       console.log('Fetching payment history')
       
+      // Get current user data to extract userId
+      const userData = JSON.parse(localStorage.getItem('userData') || '{}')
+      const userId = userData.id || userData._id
+      
+      if (!userId) {
+        throw new Error('User ID not found. Please log in again.')
+      }
+      
       const response = await authenticatedFetch(`${API_BASE_URL}/payment/history`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({})
+        body: JSON.stringify({
+          userId: userId
+        })
       })
 
       if (!response.ok) {

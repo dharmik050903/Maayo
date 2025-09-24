@@ -7,6 +7,15 @@ export function generateToken(userData) {
     role: userData.role,
     email: userData.email,
   };
+  
+  // Add admin-specific fields if this is an admin token
+  if (userData.admin_role) {
+    payload.admin_role = userData.admin_role;
+  }
+  if (userData.permissions) {
+    payload.permissions = userData.permissions;
+  }
+  
   return jwt.sign(payload, process.env.jwt_secret, { expiresIn: '24w' });
 }
 

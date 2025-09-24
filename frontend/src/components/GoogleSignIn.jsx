@@ -85,6 +85,12 @@ const GoogleSignIn = ({ onSuccess, onError, loading, disabled, buttonText = "Con
 
       const data = await res.json()
 
+      if (res.status === 403 && data.suspended) {
+        // Handle user suspension
+        if (onError) onError(`🚫 Account Suspended: ${data.message || 'Your account has been suspended. Please contact support.'}`)
+        return
+      }
+
       if (data.token) {
         // Store authentication data
         localStorage.setItem("authToken", data.token)

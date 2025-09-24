@@ -1,6 +1,7 @@
 import projectinfo from "../schema/projectinfo.js";
 import PersonMaster from "../schema/PersonMaster.js";
 import Bid from "../schema/bid.js";
+import mongoose from "mongoose";
 
 export default class Project {
     async searchProjects(req, res) {
@@ -134,14 +135,51 @@ export default class Project {
                     return res.status(400).json({message: "Missing required fields: title, description, skills_required[], budget"});
                 }
 
-                // Normalize skills_required: accept either [{skill, skill_id}] or array of ids with names
-                const normalizedSkills = skills_required.map((s) => ({
-                    skill: s.skill,
-                    skill_id: s.skill_id
-                })).filter((s)=> s.skill && s.skill_id);
+                // Normalize skills_required: handle both existing skills and custom skills
+                const normalizedSkills = [];
+                
+                for (const skillData of skills_required) {
+                    if (!skillData.skill) {
+                        continue; // Skip if no skill name
+                    }
+                    
+                    // Check if it's a custom skill (starts with 'custom_') or if skill_id is missing/invalid
+                    if (!skillData.skill_id || skillData.skill_id.startsWith('custom_')) {
+                        // For custom skills, try to find existing skill by name or create a reference
+                        const existingSkill = await mongoose.model('tblskills').findOne({ 
+                            skill: { $regex: new RegExp('^' + skillData.skill + '$', 'i') }
+                        });
+                        
+                        if (existingSkill) {
+                            // Use existing skill
+                            normalizedSkills.push({
+                                skill: existingSkill.skill,
+                                skill_id: existingSkill._id
+                            });
+                        } else {
+                            // Create new skill for custom entries
+                            const newSkill = new (mongoose.model('tblskills'))({
+                                skill: skillData.skill,
+                                category: 'Custom'
+                            });
+                            await newSkill.save();
+                            
+                            normalizedSkills.push({
+                                skill: newSkill.skill,
+                                skill_id: newSkill._id
+                            });
+                        }
+                    } else {
+                        // Use existing skill with valid ObjectId
+                        normalizedSkills.push({
+                            skill: skillData.skill,
+                            skill_id: skillData.skill_id
+                        });
+                    }
+                }
 
                 if(normalizedSkills.length === 0){
-                    return res.status(400).json({message: "skills_required must contain objects with skill and skill_id"});
+                    return res.status(400).json({message: "At least one valid skill is required"});
                 }
 
                 const newProject = new projectinfo({

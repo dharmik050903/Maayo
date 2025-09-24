@@ -14,6 +14,9 @@ import AIController from "./controller/aiController.js";
 import ChatController from "./controller/chat.js";
 import PaymentGateway from "./controller/paymentcontroller.js";
 import SubscriptionController from "./controller/subscriptionController.js";
+import AdminAuth from "./controller/adminAuth.js";
+import AdminController from "./controller/admin.js";
+import { adminAuth, checkPermission, superAdminOnly } from "./middlewares/adminAuth.js";
 
 const router = express.Router();
 //Login and Signup Controllers
@@ -29,7 +32,11 @@ const otpController = new OTP();
 const aiController = new AIController();
 const chatController = new ChatController();
 const paymentGateway = new PaymentGateway();
+
 const subscriptionController = new SubscriptionController();
+
+const adminAuthController = new AdminAuth();
+const adminController = new AdminController();
 
 
 
@@ -158,5 +165,53 @@ router.get("/chat/health", (req, res) => {
     });
 });
 
+// Admin Authentication Routes
+router.post("/admin/auth/login", adminAuthController.adminLogin);
+router.post("/admin/auth/setup-super-admin", adminAuthController.createSuperAdmin); // One-time setup
+router.post("/admin/auth/bootstrap", adminAuthController.createPredefinedAdmins); // Bootstrap predefined admins
+router.post("/admin/auth/change-password", adminAuth, adminAuthController.changePassword);
+router.post("/admin/auth/profile", adminAuth, adminAuthController.getAdminProfile);
+router.post("/admin/auth/update-profile", adminAuth, adminAuthController.updateAdminProfile);
+router.post("/admin/auth/logout", adminAuth, adminAuthController.adminLogout);
+
+// Admin Dashboard
+router.post("/admin/dashboard/stats", adminAuth, adminController.getDashboardStats);
+
+// Admin User Management
+router.post("/admin/users/list", adminAuth, checkPermission('users', 'view'), adminController.getUsers);
+router.post("/admin/users/suspend", adminAuth, checkPermission('users', 'suspend'), adminController.suspendUser);
+router.post("/admin/users/activate", adminAuth, checkPermission('users', 'suspend'), adminController.activateUser);
+router.post("/admin/users/delete", adminAuth, checkPermission('users', 'delete'), adminController.deleteUser);
+
+// Admin Freelancer Management
+router.post("/admin/freelancers/list", adminAuth, checkPermission('freelancers', 'view'), adminController.getFreelancers);
+router.post("/admin/freelancers/approve", adminAuth, checkPermission('freelancers', 'approve'), adminController.approveFreelancer);
+
+// Admin Project Management
+router.post("/admin/projects/list", adminAuth, checkPermission('projects', 'view'), adminController.getProjects);
+router.post("/admin/projects/delete", adminAuth, checkPermission('projects', 'delete'), adminController.deleteProject);
+
+// Admin Bid Management
+router.post("/admin/bids/list", adminAuth, checkPermission('bids', 'view'), adminController.getBids);
+router.post("/admin/bids/delete", adminAuth, checkPermission('bids', 'delete'), adminController.deleteBid);
+
+// Admin Payment Management
+router.post("/admin/payments/list", adminAuth, checkPermission('payments', 'view'), adminController.getPayments);
+router.post("/admin/payments/delete", adminAuth, checkPermission('payments', 'delete'), adminController.deletePayment);
+
+// Admin User Update
+router.post("/admin/users/update", adminAuth, checkPermission('users', 'edit'), adminController.updateUser);
+
+// Admin Project Update  
+router.post("/admin/projects/update", adminAuth, checkPermission('projects', 'edit'), adminController.updateProject);
+
+// Admin Management (Super Admin only)
+router.post("/admin/admins/list", adminAuth, superAdminOnly, adminController.getAdmins);
+router.post("/admin/admins/create", adminAuth, superAdminOnly, adminController.createAdmin);
+
+// Permission Request Management
+router.post("/admin/permission-requests/submit", adminAuth, adminController.submitPermissionRequest);
+router.get("/admin/permission-requests/list", adminAuth, superAdminOnly, adminController.getPermissionRequests);
+router.post("/admin/permission-requests/:requestId/handle", adminAuth, superAdminOnly, adminController.handlePermissionRequestAction);
 
 export default router;
