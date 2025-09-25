@@ -145,6 +145,88 @@ a:hover, .link-accent:hover {
   transition: all 0.3s ease-in-out;
 }
 
+/* Ensure header stays fixed */
+header {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 9999 !important;
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+}
+
+/* Additional header positioning fixes */
+header[class*="fixed"] {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 9999 !important;
+}
+
+/* Prevent any transforms from affecting the header */
+header, header * {
+  transform: none !important;
+}
+
+/* Override global transform rules for header */
+header {
+  transform: translateZ(0) !important;
+  transition: none !important;
+}
+
+/* Force header to stay at top - most specific rule */
+html body header {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 99999 !important;
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+  transition: none !important;
+}
+
+/* Additional fallback for header visibility */
+header[class*="fixed"] {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 99999 !important;
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+  transition: none !important;
+}
+
+/* Ensure modals are properly displayed */
+.modal-overlay, [class*="modal"], [class*="fixed"][class*="inset-0"] {
+  z-index: 99999 !important;
+  position: fixed !important;
+}
+
+/* Override all z-50 modals to have higher z-index */
+[class*="z-50"] {
+  z-index: 99999 !important;
+}
+
+/* Specific fixes for chat and messaging modals */
+[class*="MessagingModal"], [class*="ConversationsModal"] {
+  z-index: 99999 !important;
+  position: fixed !important;
+}
+
+/* Ensure chat boxes are fully visible */
+div[class*="fixed"][class*="inset-0"] {
+  z-index: 99999 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+}
+
 /* Smooth page transitions */
 .page-transition {
   transition: all 0.3s ease-in-out;

@@ -2,11 +2,13 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import Button from '../components/Button'
+import UpgradeBanner from '../components/UpgradeBanner'
 import AnimatedCounter from '../components/AnimatedCounter'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 import { projectService } from '../services/projectService'
 import { skillsService } from '../services/skillsService'
 import { formatBudget, formatHourlyRate } from '../utils/currency'
+import { needsUpgrade } from '../utils/subscription'
 import MyBids from '../components/MyBids'
 import BidForm from '../components/BidForm'
 import confirmationService from '../services/confirmationService.jsx'
@@ -353,6 +355,13 @@ export default function FreelancerHome() {
         onLogout={handleLogout} 
         userData={userData}
       />
+      
+      {/* Upgrade Banner - Show only if user doesn't have active subscription */}
+      {userData && needsUpgrade(userData) && (
+        <div className="px-6 pt-24">
+          <UpgradeBanner userType="freelancer" />
+        </div>
+      )}
       
       {/* Hero Section */}
       <section className="flex-1 flex items-center justify-center px-6 py-20">

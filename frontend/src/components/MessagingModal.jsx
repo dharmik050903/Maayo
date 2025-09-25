@@ -232,9 +232,24 @@ export default function MessagingModal({ isOpen, onClose, currentUser, otherUser
     return null
   }
 
-  console.log('MessagingModal: Rendering modal')
+  console.log('MessagingModal: Rendering modal with z-index 99999')
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center p-4 pt-8">
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 z-[99999] flex justify-center p-4 pt-8" 
+      style={{ 
+        zIndex: 99999,
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose()
+        }
+      }}
+    >
       <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-200 rounded-t-xl">

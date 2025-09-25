@@ -7,6 +7,8 @@ import { projectService } from '../services/projectService'
 import { getFreelancers } from '../utils/api'
 import { formatBudget, formatHourlyRate } from '../utils/currency'
 import messagingService from '../services/messagingService.jsx'
+import { messageApiService } from '../services/messageApiService.jsx'
+import { bidService } from '../services/bidService.js'
 import ConversationsModal from './ConversationsModal'
 import PaymentHistory from './PaymentHistory'
 
@@ -29,12 +31,29 @@ export default function Header({ userType, onLogout, userData }) {
   const [showFreelancerModal, setShowFreelancerModal] = useState(false)
   const [showConversationsModal, setShowConversationsModal] = useState(false)
   const [showPaymentHistory, setShowPaymentHistory] = useState(false)
+  const [notificationCounts, setNotificationCounts] = useState({
+    messages: 0,
+    bidRequests: 0,
+    bidResponses: 0,
+    total: 0
+  })
+  const [isLoadingNotifications, setIsLoadingNotifications] = useState(false)
   const hasFetchedData = useRef(false)
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY
       setIsScrolled(scrollTop > 50)
+      
+      // Debug: Check if header is visible
+      const header = document.querySelector('header')
+      if (header) {
+        const rect = header.getBoundingClientRect()
+        console.log('Header position:', rect.top, rect.left, rect.width, rect.height)
+        if (rect.top !== 0) {
+          console.warn('Header is not at top! Current top:', rect.top)
+        }
+      }
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
@@ -81,6 +100,19 @@ export default function Header({ userType, onLogout, userData }) {
       messagingService.setCurrentUser(userData)
     }
   }, [userData])
+
+  // Fetch notification counts on mount and periodically
+  useEffect(() => {
+    if (isAuthenticated) {
+      // Fetch immediately
+      fetchNotificationCounts()
+      
+      // Set up periodic refresh every 30 seconds
+      const interval = setInterval(fetchNotificationCounts, 30000)
+      
+      return () => clearInterval(interval)
+    }
+  }, [isAuthenticated, actualUserType])
 
 
   // Close search results when clicking outside
@@ -163,6 +195,9 @@ export default function Header({ userType, onLogout, userData }) {
       navigate('/login')
       return
     }
+    
+    // Refresh notification counts when opening messages
+    fetchNotificationCounts()
     setShowConversationsModal(true)
   }
 
@@ -179,6 +214,8 @@ export default function Header({ userType, onLogout, userData }) {
 
   const closeConversationsModal = () => {
     setShowConversationsModal(false)
+    // Refresh notification counts when closing messages
+    fetchNotificationCounts()
   }
 
   const handlePaymentHistoryClick = () => {
@@ -192,6 +229,87 @@ export default function Header({ userType, onLogout, userData }) {
 
   const closePaymentHistory = () => {
     setShowPaymentHistory(false)
+  }
+
+  // Fetch notification counts
+  const fetchNotificationCounts = async () => {
+    if (!isAuthenticated || isLoadingNotifications) return
+    
+    setIsLoadingNotifications(true)
+    try {
+      console.log('Header: Fetching notification counts')
+      
+      let messageCount = 0
+      let bidRequestCount = 0
+      let bidResponseCount = 0
+      
+      // Fetch conversations to count unread messages
+      try {
+        const conversationsResult = await messageApiService.getConversations()
+        if (conversationsResult.success && conversationsResult.data) {
+          // Count conversations with unread messages
+          messageCount = conversationsResult.data.filter(conv => 
+            conv.unread_count && conv.unread_count > 0
+          ).reduce((total, conv) => total + (conv.unread_count || 0), 0)
+        }
+      } catch (error) {
+        console.error('Header: Error fetching conversations:', error)
+      }
+      
+      // Fetch bids to count pending requests/responses
+      try {
+        if (actualUserType === 'client') {
+          // For clients: count pending bids on their projects
+          const bidsResult = await bidService.getBidsByClient()
+          if (bidsResult.status && bidsResult.data) {
+            bidRequestCount = bidsResult.data.filter(bid => 
+              bid.status === 'pending'
+            ).length
+          }
+        } else {
+          // For freelancers: count bid responses (accepted/rejected)
+          const bidsResult = await bidService.getBidsByFreelancer()
+          if (bidsResult.status && bidsResult.data) {
+            bidResponseCount = bidsResult.data.filter(bid => 
+              bid.status === 'accepted' || bid.status === 'rejected'
+            ).length
+          }
+        }
+      } catch (error) {
+        console.error('Header: Error fetching bids:', error)
+      }
+      
+      const totalCount = messageCount + bidRequestCount + bidResponseCount
+      
+      setNotificationCounts({
+        messages: messageCount,
+        bidRequests: bidRequestCount,
+        bidResponses: bidResponseCount,
+        total: totalCount
+      })
+      
+      console.log('Header: Notification counts updated:', {
+        messages: messageCount,
+        bidRequests: bidRequestCount,
+        bidResponses: bidResponseCount,
+        total: totalCount
+      })
+      
+      // Show breakdown in console for debugging
+      if (totalCount > 0) {
+        console.log('Header: Notification breakdown:', {
+          'Unread Messages': messageCount,
+          'Bid Requests': bidRequestCount,
+          'Bid Responses': bidResponseCount,
+          'Total Notifications': totalCount
+        })
+      }
+      
+    } catch (error) {
+      console.error('Header: Error fetching notification counts:', error)
+    } finally {
+      setIsLoadingNotifications(false)
+    }
   }
 
   const handleStartChat = (user, project = null) => {
@@ -281,6 +399,15 @@ export default function Header({ userType, onLogout, userData }) {
         className="hover:text-mint px-4 py-2 rounded-md transition-colors text-graphite whitespace-nowrap flex items-center"
       >
         Messages
+        {isLoadingNotifications ? (
+          <span className="absolute -top-1 -right-1 bg-gray-400 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+            ...
+          </span>
+        ) : notificationCounts.total > 0 ? (
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+            {notificationCounts.total > 99 ? '99+' : notificationCounts.total}
+          </span>
+        ) : null}
       </button>
       <button 
         onClick={handlePaymentHistoryClick}
@@ -345,6 +472,15 @@ export default function Header({ userType, onLogout, userData }) {
         style={getMobileButtonStyles()}
       >
         Messages
+        {isLoadingNotifications ? (
+          <span className="absolute -top-1 -right-1 bg-gray-400 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+            ...
+          </span>
+        ) : notificationCounts.total > 0 ? (
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+            {notificationCounts.total > 99 ? '99+' : notificationCounts.total}
+          </span>
+        ) : null}
       </button>
       <button 
         onClick={handlePaymentHistoryClick}
@@ -386,9 +522,20 @@ export default function Header({ userType, onLogout, userData }) {
 
   return (
     <>
-    <header className={`w-full fixed top-0 left-0 z-50 backdrop-blur-md border-b transition-all duration-300 ${
-      isScrolled ? 'bg-white/95 border-white/30' : 'bg-white/10 border-white/20'
-    }`}>
+    <header className={`w-full fixed top-0 left-0 right-0 z-[99999] border-b ${
+      isScrolled ? 'bg-white border-gray-200' : 'bg-white/10 border-white/20'
+    }`} style={{ 
+      position: 'fixed', 
+      top: 0, 
+      left: 0, 
+      right: 0, 
+      zIndex: 99999,
+      transform: 'translateZ(0)', // Force hardware acceleration
+      willChange: 'transform', // Optimize for transforms
+      backgroundColor: isScrolled ? 'white' : 'rgba(255, 255, 255, 0.1)', // Explicit background
+      backdropFilter: 'blur(10px)', // Add backdrop blur
+      WebkitBackdropFilter: 'blur(10px)' // Safari support
+    }}>
       <div className="max-w-7xl mx-auto flex items-center justify-between p-2 md:p-4">
         <Link to={isAuthenticated ? `/${actualUserType}-home` : "/"} className="logo-link flex items-center space-x-2 hover:opacity-80 transition-opacity">
           <Logo theme={isScrolled ? "dark" : "light"} />

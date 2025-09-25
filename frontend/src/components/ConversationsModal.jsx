@@ -30,9 +30,19 @@ export default function ConversationsModal({ isOpen, onClose, currentUser }) {
       if (response.success) {
         console.log('ConversationsModal: Successfully fetched conversations:', response.data)
         setConversations(response.data || [])
+        
+        // If no conversations, try to create mock conversations
+        if (!response.data || response.data.length === 0) {
+          console.log('ConversationsModal: No conversations found, creating mock conversations')
+          await createMockConversations()
+        }
       } else {
         console.error('ConversationsModal: Error fetching conversations:', response.error)
         setConversations([])
+        
+        // Try to create mock conversations as fallback
+        console.log('ConversationsModal: Creating mock conversations as fallback')
+        await createMockConversations()
       }
     } catch (error) {
       console.error('ConversationsModal: Error fetching conversations:', error)
@@ -62,27 +72,23 @@ export default function ConversationsModal({ isOpen, onClose, currentUser }) {
               // Only create conversations for accepted bids
               if (bid.status === 'accepted') {
                 mockConversations.push({
-                  id: `conv_${project._id}_${bid.freelancer_id}`,
-                  project: {
-                    id: project._id,
-                    title: project.title
-                  },
-                  otherUser: {
-                    id: bid.freelancer_id,
-                    name: bid.freelancer_name || 'Freelancer',
-                    avatar: bid.freelancer_avatar || null
-                  },
-                  lastMessage: {
-                    text: 'Bid accepted! Let\'s discuss the project details.',
-                    timestamp: bid.updatedAt || bid.createdAt || new Date().toISOString()
-                  },
-                  unreadCount: 0
+                  bid_id: bid._id || `bid_${project._id}_${bid.freelancer_id}`,
+                  project_id: project._id,
+                  project_title: project.title,
+                  freelancer_id: bid.freelancer_id,
+                  freelancer_name: bid.freelancer_name || 'Freelancer',
+                  client_id: currentUser._id,
+                  client_name: currentUser.name || currentUser.username,
+                  last_message: 'Bid accepted! Let\'s discuss the project details.',
+                  last_message_time: bid.updatedAt || bid.createdAt || new Date().toISOString(),
+                  unread_count: 0
                 })
               }
             }
           }
         }
         
+        console.log('ConversationsModal: Created mock conversations:', mockConversations)
         setConversations(mockConversations)
       }
     } catch (error) {
@@ -92,6 +98,8 @@ export default function ConversationsModal({ isOpen, onClose, currentUser }) {
   }
 
   const handleStartChat = (conversation) => {
+    console.log('ConversationsModal: Starting chat with conversation:', conversation)
+    
     // Create user and project objects for the messaging service
     const otherUser = {
       id: conversation.freelancer_id || conversation.client_id,
@@ -103,6 +111,7 @@ export default function ConversationsModal({ isOpen, onClose, currentUser }) {
       title: conversation.project_title
     }
     
+    console.log('ConversationsModal: Opening messaging service with:', { otherUser, project, bidId: conversation.bid_id })
     messagingService.show(otherUser, project, conversation.bid_id)
     onClose()
   }
@@ -127,9 +136,26 @@ export default function ConversationsModal({ isOpen, onClose, currentUser }) {
 
   if (!isOpen) return null
 
+  console.log('ConversationsModal: Rendering modal with conversations:', conversations.length)
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center p-4 pt-8">
-      <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col">
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 z-[99999] flex justify-center p-4 pt-8" 
+      style={{ 
+        zIndex: 99999,
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose()
+        }
+      }}
+    >
+      <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col" style={{ minHeight: '500px' }}>
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-200 rounded-t-xl">
           <div className="flex items-center justify-between">
@@ -160,7 +186,7 @@ export default function ConversationsModal({ isOpen, onClose, currentUser }) {
         </div>
 
         {/* Conversations List */}
-        <div className="flex-1 overflow-y-auto p-6 min-h-0">
+        <div className="flex-1 overflow-y-auto p-6 min-h-0" style={{ minHeight: '400px' }}>
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-mint"></div>
@@ -172,9 +198,11 @@ export default function ConversationsModal({ isOpen, onClose, currentUser }) {
               </svg>
               <p className="text-lg font-medium mb-2">No conversations yet</p>
               <p className="text-sm">Conversations will appear here after you accept a freelancer's bid or when a client accepts your bid.</p>
+              <p className="text-xs text-gray-400 mt-2">Debug: {conversations.length} conversations loaded</p>
             </div>
           ) : (
             <div className="space-y-3">
+              <p className="text-xs text-gray-400 mb-2">Debug: Showing {conversations.length} conversations</p>
               {conversations.map((conversation) => (
                 <div
                   key={conversation.bid_id}
