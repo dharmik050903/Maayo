@@ -2,7 +2,7 @@
 const validateEnvironment = () => {
     const requiredEnvVars = [
         'MONGODB_URI',
-        'JWT_SECRET',
+        'jwt_secret',
         'MASTER_ADMIN_EMAIL',
         'MASTER_ADMIN_PASSWORD',
         'CONTENT_ADMIN_EMAIL',

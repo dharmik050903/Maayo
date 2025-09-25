@@ -12,7 +12,7 @@ MONGODB_URI=mongodb://localhost:27017/maayo
 PORT=5000
 
 # JWT Configuration
-JWT_SECRET=your_jwt_secret_key_here
+jwt_secret=your_jwt_secret_key_here
 
 # Email Configuration (for OTP functionality)
 EMAIL_SERVICE=gmail
