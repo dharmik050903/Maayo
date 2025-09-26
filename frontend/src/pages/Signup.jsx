@@ -372,6 +372,8 @@ export default function Signup() {
 
       if (res.ok) {
         // Store auth data
+        localStorage.setItem('authToken', data.token)
+        localStorage.setItem('userData', JSON.stringify(data.user))
         localStorage.setItem('authHeaders', JSON.stringify({
           token: data.token,
           _id: data.user._id,
