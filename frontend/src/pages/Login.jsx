@@ -515,15 +515,30 @@ export default function Login() {
         }
       )
 
-      // Hide the fallback button if Google button renders successfully
-      setTimeout(() => {
+      // Check if Google button rendered successfully and hide fallback if needed
+      const checkGoogleButton = () => {
         const googleButton = document.getElementById('google-signin-button')
-        const fallbackButton = googleButton?.nextElementSibling
-        if (googleButton && googleButton.children.length > 0 && fallbackButton) {
-          fallbackButton.style.display = 'none'
-          console.log('✅ Google button rendered, hiding fallback')
+        const fallbackButton = document.getElementById('google-fallback-button')
+        
+        if (googleButton && googleButton.children.length > 0) {
+          // Google button rendered successfully
+          if (fallbackButton) {
+            fallbackButton.classList.add('hidden')
+            console.log('✅ Google button rendered, hiding fallback')
+          }
+        } else {
+          // Google button didn't render, show fallback
+          if (fallbackButton) {
+            fallbackButton.classList.remove('hidden')
+            console.log('⚠️ Google button failed, showing fallback')
+          }
         }
-      }, 1000)
+      }
+
+      // Check immediately and then again after a short delay
+      checkGoogleButton()
+      setTimeout(checkGoogleButton, 500)
+      setTimeout(checkGoogleButton, 1500)
 
     } catch (error) {
       console.error('❌ Google initialization error:', error)
@@ -1141,11 +1156,12 @@ export default function Login() {
               type="button"
               onClick={handleGoogleSignInFallback}
               disabled={!selectedRole || loading || otpLoading}
-              className={`w-full flex items-center justify-center px-4 py-3 border rounded-lg font-medium transition-colors mt-2 ${
+              className={`w-full flex items-center justify-center px-4 py-3 border rounded-lg font-medium transition-colors mt-2 hidden ${
                 selectedRole && !loading && !otpLoading
                   ? 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400'
                   : 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
               }`}
+              id="google-fallback-button"
             >
               <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
