@@ -107,7 +107,7 @@ export default class Signup{
             const savedUser = await newUser.save();
 
             // Generate JWT token
-            const token = generateToken({
+            const newtoken = generateToken({
                 id: String(savedUser._id),
                 username: savedUser.personName,
                 role: savedUser.user_type,
@@ -116,7 +116,7 @@ export default class Signup{
 
             return res.json({
                 message: "User created successfully",
-                token,
+                newtoken,
                 user: {
                     _id: savedUser._id,
                     first_name: savedUser.first_name,
