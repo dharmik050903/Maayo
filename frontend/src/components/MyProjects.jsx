@@ -9,6 +9,7 @@ import { projectService } from '../services/projectService'
 import { skillsService } from '../services/skillsService'
 import { reviewService } from '../services/reviewService'
 import { bidService } from '../services/bidService'
+import { getSafeUrl } from '../utils/urlValidation'
 import { formatBudget } from '../utils/currency'
 import confirmationService from '../services/confirmationService.jsx'
 
@@ -1081,7 +1082,7 @@ const handleCloseBidRequest = () => {
                 <div className="text-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-mint mx-auto mb-4"></div>
                   <p className="text-coolgray">Loading bids...</p>
-                </div>
+                  </div>
               )}
 
               {/* Error State */}
@@ -1128,11 +1129,11 @@ const handleCloseBidRequest = () => {
                             <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                               bid.status === 'accepted' ? 'bg-green-100 text-green-800' :
                               bid.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                              'bg-yellow-100 text-yellow-800'
-                            }`}>
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>
                               {bid.status.charAt(0).toUpperCase() + bid.status.slice(1)}
-                            </span>
-                          </div>
+                      </span>
+                  </div>
 
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                             <div className="flex items-center">
@@ -1142,13 +1143,13 @@ const handleCloseBidRequest = () => {
                               <div>
                                 <p className="text-sm text-coolgray">Bid Amount</p>
                                 <p className="font-semibold text-mint">{formatBudget(bid.bid_amount)}</p>
-                              </div>
-                            </div>
+                </div>
+              </div>
                             <div className="flex items-center">
                               <svg className="w-4 h-4 mr-2 text-violet" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg>
-                              <div>
+                <div>
                                 <p className="text-sm text-coolgray">Duration</p>
                                 <p className="font-semibold text-violet">{bid.proposed_duration} days</p>
                               </div>
@@ -1171,10 +1172,56 @@ const handleCloseBidRequest = () => {
                               </svg>
                               Cover Letter
                             </h6>
-                            <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="bg-gray-50 p-4 rounded-lg">
                               <p className="text-coolgray text-sm leading-relaxed line-clamp-3">{bid.cover_letter}</p>
                             </div>
                           </div>
+
+                          {/* Resume and Portfolio Links */}
+                          {bid.freelancer_info && (bid.freelancer_info.resume_link || bid.freelancer_info.github_link) && (
+                            <div className="mb-4">
+                              <h6 className="font-semibold text-graphite mb-2 flex items-center">
+                                <svg className="w-4 h-4 mr-2 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                </svg>
+                                Documents & Links
+                              </h6>
+                              <div className="bg-gray-50 p-4 rounded-lg">
+                                <div className="space-y-2">
+                                  {bid.freelancer_info.resume_link && (
+                                    <div className="flex items-center">
+                                      <svg className="w-4 h-4 mr-2 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                      </svg>
+                                      <a 
+                                        href={getSafeUrl(bid.freelancer_info.resume_link)} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="text-coral hover:text-coral/80 underline text-sm"
+                                      >
+                                        View Resume
+                                      </a>
+                                    </div>
+                                  )}
+                                  {bid.freelancer_info.github_link && (
+                                    <div className="flex items-center">
+                                      <svg className="w-4 h-4 mr-2 text-gray-800" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                      </svg>
+                                      <a 
+                                        href={getSafeUrl(bid.freelancer_info.github_link)} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="text-gray-800 hover:text-gray-600 underline text-sm"
+                                      >
+                                        View GitHub Profile
+                                      </a>
+                                    </div>
+                                  )}
+                                </div>
+                  </div>
+                </div>
+              )}
 
                           <div className="flex items-center text-xs text-coolgray bg-gray-50 p-3 rounded-lg">
                             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1190,11 +1237,11 @@ const handleCloseBidRequest = () => {
                           </div>
                         </div>
 
-                        {/* Action Buttons */}
+              {/* Action Buttons */}
                         {bid.status === 'pending' && (
                           <div className="flex flex-col gap-2 min-w-[200px]">
-                            <Button 
-                              variant="success" 
+                    <Button 
+                      variant="success" 
                               size="sm" 
                               onClick={async () => {
                                 try {
@@ -1224,11 +1271,11 @@ const handleCloseBidRequest = () => {
                                 }
                               }}
                               className="w-full"
-                            >
-                              Accept Bid
-                            </Button>
-                            <Button 
-                              variant="outline" 
+                    >
+                      Accept Bid
+                    </Button>
+                    <Button 
+                      variant="outline" 
                               size="sm" 
                               onClick={async () => {
                                 try {
@@ -1259,13 +1306,13 @@ const handleCloseBidRequest = () => {
                                 }
                               }}
                               className="w-full border-red-300 text-red-700 hover:bg-red-50"
-                            >
-                              Reject Bid
-                            </Button>
+                    >
+                      Reject Bid
+                    </Button>
                           </div>
-                        )}
-                      </div>
-                    </div>
+                )}
+              </div>
+            </div>
                   ))}
                 </div>
               )}

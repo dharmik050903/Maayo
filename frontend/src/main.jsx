@@ -59,7 +59,7 @@ const router = createBrowserRouter([
       { path: '/privacy', element: <PrivacyPolicy />},
       { path: '/terms', element: <TermsAndConditions />},
       { path: '/cancellation-refunds', element: <CancellationRefunds />},
-      { path: '/shipping', element: <ShippingPolicy />}
+      { path: '/shipping', element: <ShippingPolicy />},
     ],
   },
   // Admin Routes

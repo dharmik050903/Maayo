@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { checkClientProfileExists, checkFreelancerProfileExists, createClientProfile, createFreelancerProfile, getCurrentUser } from '../utils/api'
 
-const RoleSelectionModal = ({ isOpen, onClose, userData }) => {
+const RoleSelectionModal = ({ isOpen, onClose, onRoleSelected, userData }) => {
   const [selectedRole, setSelectedRole] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -15,6 +15,13 @@ const RoleSelectionModal = ({ isOpen, onClose, userData }) => {
     setError('')
     
     try {
+      // If onRoleSelected is provided (for Google sign-in flow), use it
+      if (onRoleSelected) {
+        await onRoleSelected(role)
+        return
+      }
+
+      // Original flow for existing users (when userData is provided)
       const user = getCurrentUser()
       if (!user || !user._id) {
         throw new Error('User data not found. Please try signing in again.')

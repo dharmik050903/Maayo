@@ -44,7 +44,9 @@ const adminController = new AdminController();
 
 //Login and Signup Controllers
 router.post("/signup",signupController.createuser);
-router.post("/signup/google",loginController.googleLogin);
+router.post("/signup/google",signupController.googleSignup);
+router.post("/auth/google/flow", loginController.googleOAuthFlow);
+router.get("/auth/google/callback", loginController.googleOAuthCallback);
 router.post("/login",loginController.authenticate);
 
 // OTP Authentication routes
@@ -120,6 +122,22 @@ router.get("/payment/test-config", (req, res) => {
     res.json({ 
         status: 'OK', 
         message: 'Razorpay configuration check',
+        config 
+    });
+});
+
+// Test endpoint for Google OAuth configuration
+router.get("/auth/test-config", (req, res) => {
+    const config = {
+        clientId: process.env.GOOGLE_CLIENT_ID ? `${process.env.GOOGLE_CLIENT_ID.substring(0, 20)}...` : 'Not Set',
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET ? 'Set' : 'Not Set',
+        frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
+        redirectUri: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/google/callback`,
+        nodeEnv: process.env.NODE_ENV || 'development'
+    };
+    res.json({ 
+        status: 'OK', 
+        message: 'Google OAuth configuration check',
         config 
     });
 });

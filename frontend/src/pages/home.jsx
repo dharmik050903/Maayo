@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import { Link } from "react-router-dom"
+import { Link, useSearchParams } from "react-router-dom"
 import Header from "../components/Header"
 import Button from "../components/Button"
 import { projectService } from "../services/projectService"
@@ -8,6 +8,7 @@ import { isAuthenticated, getCurrentUser, clearAuth } from "../utils/api"
 import hero from "../assets/medium-shot-woman-typing-keyboard.jpg"
 
 export default function Home() {
+  const [searchParams] = useSearchParams()
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)

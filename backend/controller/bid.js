@@ -1,6 +1,7 @@
 import Bid from "../schema/bid.js";
 import projectinfo from "../schema/projectinfo.js";
 import PersonMaster from "../schema/PersonMaster.js";
+import freelancerInfo from "../schema/freelancerInfo.js";
 import { getIO } from "../services/socket.js";
 
 export default class BidController {
@@ -176,10 +177,21 @@ export default class BidController {
                 Bid.countDocuments(filter)
             ]);
 
+            // Fetch freelancer info for each bid
+            const bidsWithFreelancerInfo = await Promise.all(
+                bids.map(async (bid) => {
+                    const freelancerData = await freelancerInfo.findOne({ personId: bid.freelancer_id._id });
+                    return {
+                        ...bid.toObject(),
+                        freelancer_info: freelancerData
+                    };
+                })
+            );
+
             return res.status(200).json({
                 status: true,
                 message: "Bids fetched successfully",
-                data: bids,
+                data: bidsWithFreelancerInfo,
                 pagination: { total, page: pageNum, limit: limitNum }
             });
 
