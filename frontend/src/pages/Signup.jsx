@@ -26,13 +26,47 @@ export default function Signup() {
   const [pageLoading, setPageLoading] = useState(true)
   const [showPasswordRequirements, setShowPasswordRequirements] = useState(false)
 
+  // Google OAuth states
+  const [selectedRole, setSelectedRole] = useState('')
+
   useEffect(() => {
     // Simulate page loading time
     const timer = setTimeout(() => {
       setPageLoading(false)
     }, 1000)
 
-    return () => clearTimeout(timer)
+    // Load Google Identity Services script
+    const loadGoogleScript = () => {
+      if (!window.google) {
+        const script = document.createElement('script')
+        script.src = 'https://accounts.google.com/gsi/client'
+        script.async = true
+        script.defer = true
+        document.head.appendChild(script)
+        
+        script.onload = () => {
+          console.log('✅ Google Identity Services loaded')
+          // Initialize Google Identity Services
+          window.google.accounts.id.initialize({
+            client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+            callback: handleGoogleSignUpCallback,
+            auto_select: false,
+            cancel_on_tap_outside: true
+          })
+        }
+      }
+    }
+
+    loadGoogleScript()
+
+    // Make callback function globally available
+    window.handleGoogleSignUpCallback = handleGoogleSignUpCallback
+
+    return () => {
+      clearTimeout(timer)
+      // Clean up global function
+      delete window.handleGoogleSignUpCallback
+    }
   }, [])
 
   function handleChange(e) {
@@ -181,6 +215,133 @@ export default function Signup() {
     }
   }
 
+  // Handle Google Sign Up
+  const handleGoogleSignUp = async () => {
+    if (!selectedRole) {
+      setMessage({ type: 'error', text: 'Please select your role first' })
+      return
+    }
+
+    setLoading(true)
+    setMessage(null)
+
+    try {
+      console.log('🔄 Starting Google sign-up for role:', selectedRole)
+      
+      // Check if Google Client ID is configured
+      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+      if (!clientId) {
+        setMessage({ type: 'error', text: 'Google Client ID not configured' })
+        setLoading(false)
+        return
+      }
+
+      console.log('🔍 Google Client ID:', clientId.substring(0, 20) + '...')
+
+      // Load Google Identity Services script
+      if (!window.google) {
+        console.log('🔄 Loading Google Identity Services...')
+        const script = document.createElement('script')
+        script.src = 'https://accounts.google.com/gsi/client'
+        script.async = true
+        script.defer = true
+        document.head.appendChild(script)
+        
+        await new Promise((resolve, reject) => {
+          script.onload = () => {
+            console.log('✅ Google Identity Services loaded')
+            resolve()
+          }
+          script.onerror = () => {
+            console.error('❌ Failed to load Google Identity Services')
+            reject(new Error('Failed to load Google Identity Services'))
+          }
+        })
+      }
+
+      // Initialize Google Identity Services
+      console.log('🔄 Initializing Google Identity Services...')
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleGoogleSignUpCallback,
+        auto_select: false,
+        cancel_on_tap_outside: true
+      })
+
+      console.log('🔄 Showing Google sign-in prompt...')
+      // Show the Google sign-in popup
+      window.google.accounts.id.prompt((notification) => {
+        console.log('🔍 Google prompt notification:', notification)
+        if (notification.isNotDisplayed()) {
+          console.log('❌ Google sign-in not displayed')
+          setLoading(false)
+          setMessage({ type: 'error', text: 'Google sign-in popup was blocked. Please allow popups for this site.' })
+        } else if (notification.isSkippedMoment()) {
+          console.log('❌ Google sign-in skipped')
+          setLoading(false)
+          setMessage({ type: 'error', text: 'Google sign-in was skipped. Please try again.' })
+        }
+      })
+
+    } catch (error) {
+      console.error('❌ Google sign-up error:', error)
+      setMessage({ type: 'error', text: 'Failed to initialize Google sign-up: ' + error.message })
+      setLoading(false)
+    }
+  }
+
+  // Handle Google callback
+  const handleGoogleSignUpCallback = async (response) => {
+    try {
+      console.log('🔍 Google callback received:', response.credential)
+      
+      // Send the credential to backend
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
+      const res = await fetch(`${API_BASE_URL}/signup/google`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'userRole': selectedRole
+        },
+        body: JSON.stringify({ 
+          token: response.credential
+        })
+      })
+
+      const data = await res.json()
+      setLoading(false)
+
+      if (res.ok) {
+        // Store auth data
+        localStorage.setItem('authHeaders', JSON.stringify({
+          token: data.token,
+          _id: data.user._id,
+          userRole: data.user.user_type,
+          userEmail: data.user.email
+        }))
+        
+        localStorage.setItem('current_user_id', data.user._id)
+        
+        setMessage({ type: 'success', text: 'Google sign-up successful! Redirecting...' })
+        
+        // Redirect based on user type
+        setTimeout(() => {
+          if (data.user.user_type === 'freelancer') {
+            window.location.href = '/freelancer-dashboard'
+          } else {
+            window.location.href = '/client-dashboard'
+          }
+        }, 1500)
+      } else {
+        setMessage({ type: 'error', text: data.message || 'Google sign-up failed' })
+      }
+    } catch (error) {
+      console.error('❌ Google callback error:', error)
+      setMessage({ type: 'error', text: 'Failed to process Google sign-up' })
+      setLoading(false)
+    }
+  }
+
   if (pageLoading) {
     return <PageShimmer />
   }
@@ -317,18 +478,73 @@ export default function Signup() {
 
             </form>
 
-            {/* Google Sign Up Button */}
+            {/* Google Sign Up with Role Selection */}
             <div className="pt-4">
-              <GoogleSignIn
-                onSuccess={(data) => {
-                  setMessage({ type: "success", text: "Google sign-up successful 🎉" })
-                }}
-                onError={(error) => {
-                  setMessage({ type: "error", text: error })
-                }}
-                loading={loading}
-                buttonText="Sign up with Google"
-              />
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium text-graphite">Select your role *</h3>
+                
+                {/* Role Selection */}
+                <div className="space-y-3">
+                  {/* Client Option */}
+                  <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-300 transition-colors">
+                    <input
+                      type="radio"
+                      name="userRole"
+                      value="client"
+                      className="mr-3 text-blue-600 focus:ring-blue-500"
+                      onChange={(e) => setSelectedRole(e.target.value)}
+                    />
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm3 1h2v2H7V5zm0 4h2v2H7V9zm0 4h2v2H7v-2zm4-8h2v2h-2V5zm0 4h2v2h-2V9zm0 4h2v2h-2v-2z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div className="font-medium text-graphite">Client</div>
+                        <div className="text-sm text-gray-500">I want to hire freelancers</div>
+                      </div>
+                    </div>
+                  </label>
+
+                  {/* Freelancer Option */}
+                  <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-green-300 transition-colors">
+                    <input
+                      type="radio"
+                      name="userRole"
+                      value="freelancer"
+                      className="mr-3 text-green-600 focus:ring-green-500"
+                      onChange={(e) => setSelectedRole(e.target.value)}
+                    />
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div className="font-medium text-graphite">Freelancer</div>
+                        <div className="text-sm text-gray-500">I want to find work</div>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+
+                {/* Google Sign Up Button */}
+                <div id="g_id_onload"
+                     data-client_id={import.meta.env.VITE_GOOGLE_CLIENT_ID}
+                     data-callback="handleGoogleSignUpCallback"
+                     data-auto_prompt="false">
+                </div>
+                <div className="g_id_signin"
+                     data-type="standard"
+                     data-size="large"
+                     data-theme="outline"
+                     data-text="sign_up_with"
+                     data-shape="rectangular"
+                     data-logo_alignment="left">
+                </div>
+              </div>
             </div>
           </div>
         </div>
