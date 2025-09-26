@@ -183,7 +183,7 @@ export default function Login() {
   const [showPasswordReset, setShowPasswordReset] = useState(false)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  
+
   // Google OAuth states
   const [selectedRole, setSelectedRole] = useState('')
 
@@ -837,7 +837,7 @@ export default function Login() {
   //   }
   // }
 
-  async function handleSubmit(e) {
+    async function handleSubmit(e) {
     e.preventDefault();
     setMessage(null);
     
