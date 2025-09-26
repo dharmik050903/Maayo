@@ -48,6 +48,7 @@ router.post("/signup/google",signupController.googleSignup);
 router.post("/auth/google/flow", loginController.googleOAuthFlow);
 router.get("/auth/google/callback", loginController.googleOAuthCallback);
 router.post("/login",loginController.authenticate);
+router.post("/login/google", loginController.googleLogin);
 
 // OTP Authentication routes
 router.post("/otp/send-login", otpController.sendLoginOTP);

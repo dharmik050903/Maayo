@@ -629,9 +629,14 @@ export default function Login() {
         setMessage({ type: 'error', text: 'Please select your role first' })
         return
       }
+
+      setLoading(true)
+      setMessage(null)
       
       // Send the credential to backend
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
+      console.log('🔄 Sending Google token to backend:', API_BASE_URL)
+      
       const res = await fetch(`${API_BASE_URL}/login/google`, {
         method: 'POST',
         headers: {
@@ -643,7 +648,9 @@ export default function Login() {
         })
       })
 
+      console.log('🔍 Backend response status:', res.status)
       const data = await res.json()
+      console.log('🔍 Backend response data:', data)
 
       if (res.ok) {
         // Store auth data
@@ -667,11 +674,14 @@ export default function Login() {
           }
         }, 1500)
       } else {
+        console.error('❌ Backend error:', data)
         setMessage({ type: 'error', text: data.message || 'Google login failed' })
       }
     } catch (error) {
       console.error('❌ Google callback error:', error)
-      setMessage({ type: 'error', text: 'Failed to process Google sign-in' })
+      setMessage({ type: 'error', text: 'Failed to process Google sign-in: ' + error.message })
+    } finally {
+      setLoading(false)
     }
   }
 
