@@ -383,12 +383,19 @@ export default function Signup() {
         
         setMessage({ type: 'success', text: 'Google sign-up successful! Redirecting...' })
         
-        // Redirect based on user type
+        // Redirect based on selected role (not backend response)
         setTimeout(() => {
-          if (data.user.user_type === 'freelancer') {
+          if (selectedRole === 'freelancer') {
             window.location.href = '/freelancer-dashboard'
-          } else {
+          } else if (selectedRole === 'client') {
             window.location.href = '/client-dashboard'
+          } else {
+            // Fallback to backend response if selectedRole is not set
+            if (data.user.user_type === 'freelancer') {
+              window.location.href = '/freelancer-dashboard'
+            } else {
+              window.location.href = '/client-dashboard'
+            }
           }
         }, 1500)
       } else {

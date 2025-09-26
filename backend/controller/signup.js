@@ -56,7 +56,7 @@ export default class Signup{
     async googleSignup(req, res) {
         try {
             const { token } = req.body;
-            const userRole = req.headers.userrole;
+            const userRole = req.headers.user_role || req.headers.userRole || req.headers.userrole;
             
             if (!token) {
                 return res.status(400).json({ message: "Google token is required" });
