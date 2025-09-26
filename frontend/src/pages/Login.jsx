@@ -641,7 +641,7 @@ export default function Login() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'userRole': selectedRole
+          'user_role': selectedRole
         },
         body: JSON.stringify({ 
           token: response.credential
@@ -836,7 +836,8 @@ export default function Login() {
   //     setMessage({ type: "error", text: "Something went wrong. Try again." })
   //   }
   // }
-    async function handleSubmit(e) {
+
+  async function handleSubmit(e) {
     e.preventDefault();
     setMessage(null);
     

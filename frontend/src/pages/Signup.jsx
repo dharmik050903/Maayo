@@ -145,42 +145,6 @@ export default function Signup() {
     return Object.keys(next).length === 0
   }
 
-
-  // async function handleSubmit(e) {
-  //   e.preventDefault()
-  //   setMessage(null)
-  //   if (!validate()) return
-  //   setLoading(true)
-
-  //   try {
-  //     let API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
-  //     if(API_BASE_URL && import.meta.env.VITE_API_BASE_URL ){
-  //       API_BASE_URL = "https://maayo-backend.onrender.com"
-  //       console.log(API_BASE_URL)
-  //     }
-  //     const res = await fetch(`${API_BASE_URL}/signup`, {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify(form),
-  //     })
-
-  //     const data = await res.json()
-  //     setLoading(false)
-
-  //     if (data.message === "User created successfully") {
-  //       setMessage({ type: 'success', text: 'Account created successfully 🎉' })
-  //       // Redirect to login after successful signup
-  //       setTimeout(() => {
-  //         window.location.href = "/login"
-  //       }, 2000)
-  //     } else {
-  //       setMessage({ type: 'error', text: data.message || 'Failed to create account' })
-  //     }
-  //   } catch (err) {
-  //     setLoading(false)
-  //     setMessage({ type: 'error', text: 'Something went wrong. Try again.' })
-  //   }
-  // }
   async function handleSubmit(e) {
     e.preventDefault();
     setMessage(null);
@@ -396,7 +360,7 @@ export default function Signup() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'userRole': selectedRole
+          'user_role': selectedRole
         },
         body: JSON.stringify({ 
           token: response.credential
