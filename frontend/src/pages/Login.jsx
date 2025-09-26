@@ -235,6 +235,33 @@ export default function Login() {
     }
   }
 
+  // Standardized function to store authentication data
+  const storeAuthData = (token, user, userRole = null) => {
+    // Use userRole if provided (from Google sign-in), otherwise use user.user_type (from backend)
+    const finalUserRole = userRole || user.user_type
+    
+    // Store individual items
+    localStorage.setItem('authToken', token)
+    
+    // Update userData to use the final user role
+    const updatedUserData = { ...user, user_type: finalUserRole }
+    localStorage.setItem('userData', JSON.stringify(updatedUserData))
+    
+    // Store auth headers for API calls
+    localStorage.setItem('authHeaders', JSON.stringify({
+      token: token,
+      _id: user._id,
+      userRole: finalUserRole,
+      userEmail: user.email
+    }))
+    
+    localStorage.setItem('current_user_id', user._id)
+    
+    console.log('📝 Stored auth data in localStorage')
+    console.log('👤 User type:', finalUserRole)
+    console.log('🆔 User ID:', user._id)
+  }
+
   // OTP Functions
   const handleSendOTP = async () => {
     if (!form.email) {
@@ -301,19 +328,8 @@ export default function Login() {
       return
     }
     
-    // Store authentication data
-    localStorage.setItem("authToken", token)
-    localStorage.setItem("userData", JSON.stringify(user))
-    localStorage.setItem("authHeaders", JSON.stringify({
-      token: token,
-      _id: user._id,
-      userRole: user.user_type,
-      userEmail: user.email
-    }))
-
-    console.log('📝 Stored auth data in localStorage')
-    console.log('👤 User type:', user.user_type)
-    console.log('🆔 User ID:', user._id)
+    // Store authentication data using standardized function
+    storeAuthData(token, user)
 
     setMessage({ type: "success", text: "Login successful 🎉" })
 
@@ -653,17 +669,8 @@ export default function Login() {
       console.log('🔍 Backend response data:', data)
 
       if (res.ok) {
-        // Store auth data
-        localStorage.setItem('authToken', data.token)
-        localStorage.setItem('userData', JSON.stringify(data.user))
-        localStorage.setItem('authHeaders', JSON.stringify({
-          token: data.token,
-          _id: data.user._id,
-          userRole: data.user.user_type,
-          userEmail: data.user.email
-        }))
-        
-        localStorage.setItem('current_user_id', data.user._id)
+        // Store auth data using standardized function
+        storeAuthData(data.token, data.user, selectedRole)
         
         setMessage({ type: 'success', text: 'Google login successful! Redirecting...' })
         
@@ -882,15 +889,8 @@ export default function Login() {
       }
 
       if (data.token) {
-        localStorage.setItem("authToken", data.token);
-        localStorage.setItem("userData", JSON.stringify(data.user));
-        
-        localStorage.setItem("authHeaders", JSON.stringify({
-          token: data.token,
-          _id: data.user._id,
-          userRole: data.user.user_type,
-          userEmail: data.user.email
-        }));
+        // Store auth data using standardized function
+        storeAuthData(data.token, data.user)
         
         setMessage({ type: "success", text: "Login successful 🎉" });
 

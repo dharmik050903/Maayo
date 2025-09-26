@@ -145,6 +145,33 @@ export default function Signup() {
     return Object.keys(next).length === 0
   }
 
+  // Standardized function to store authentication data
+  const storeAuthData = (token, user, userRole = null) => {
+    // Use userRole if provided (from Google sign-up), otherwise use user.user_type (from backend)
+    const finalUserRole = userRole || user.user_type
+    
+    // Store individual items
+    localStorage.setItem('authToken', token)
+    
+    // Update userData to use the final user role
+    const updatedUserData = { ...user, user_type: finalUserRole }
+    localStorage.setItem('userData', JSON.stringify(updatedUserData))
+    
+    // Store auth headers for API calls
+    localStorage.setItem('authHeaders', JSON.stringify({
+      token: token,
+      _id: user._id,
+      userRole: finalUserRole,
+      userEmail: user.email
+    }))
+    
+    localStorage.setItem('current_user_id', user._id)
+    
+    console.log('📝 Stored auth data in localStorage')
+    console.log('👤 User type:', finalUserRole)
+    console.log('🆔 User ID:', user._id)
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setMessage(null);
@@ -371,17 +398,8 @@ export default function Signup() {
       setLoading(false)
 
       if (res.ok) {
-        // Store auth data
-        localStorage.setItem('authToken', data.token)
-        localStorage.setItem('userData', JSON.stringify(data.user))
-        localStorage.setItem('authHeaders', JSON.stringify({
-          token: data.token,
-          _id: data.user._id,
-          userRole: data.user.user_type,
-          userEmail: data.user.email
-        }))
-        
-        localStorage.setItem('current_user_id', data.user._id)
+        // Store auth data using standardized function
+        storeAuthData(data.token, data.user, selectedRole)
         
         setMessage({ type: 'success', text: 'Google sign-up successful! Redirecting...' })
         
