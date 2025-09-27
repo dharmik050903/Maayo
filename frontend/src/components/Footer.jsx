@@ -4,6 +4,11 @@ import { Link } from 'react-router-dom'
 const Footer = ({ variant = 'default' }) => {
   const isDark = variant === 'dark'
   
+  // Function to scroll to top when footer links are clicked
+  const handleFooterLinkClick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+  
   return (
     <footer className={`py-6 border-t ${isDark ? 'border-white/20' : 'border-gray-200'}`}>
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center px-6 gap-4">
@@ -11,12 +16,12 @@ const Footer = ({ variant = 'default' }) => {
           © {new Date().getFullYear()} Maayo. All rights reserved.
         </p>
         <div className={`flex flex-wrap gap-4 text-sm ${isDark ? 'text-white/85' : 'text-coolgray'}`}>
-          <Link to="/about" className="hover:text-mint transition-colors">About</Link>
-          <Link to="/privacy" className="hover:text-mint transition-colors">Privacy</Link>
-          <Link to="/terms" className="hover:text-mint transition-colors">Terms</Link>
-          <Link to="/cancellation-refunds" className="hover:text-mint transition-colors">Refunds</Link>
-          <Link to="/shipping" className="hover:text-mint transition-colors">Shipping</Link>
-          <Link to="/contact" className="hover:text-mint transition-colors">Contact</Link>
+          <Link to="/about" className="hover:text-mint transition-colors" onClick={handleFooterLinkClick}>About</Link>
+          <Link to="/privacy" className="hover:text-mint transition-colors" onClick={handleFooterLinkClick}>Privacy</Link>
+          <Link to="/terms" className="hover:text-mint transition-colors" onClick={handleFooterLinkClick}>Terms</Link>
+          <Link to="/cancellation-refunds" className="hover:text-mint transition-colors" onClick={handleFooterLinkClick}>Refunds</Link>
+          <Link to="/shipping" className="hover:text-mint transition-colors" onClick={handleFooterLinkClick}>Shipping</Link>
+          <Link to="/contact" className="hover:text-mint transition-colors" onClick={handleFooterLinkClick}>Contact</Link>
         </div>
       </div>
     </footer>
