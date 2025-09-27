@@ -1000,95 +1000,6 @@ const PaymentManagement = () => {
   )
 }
 
-const AdminManagement = () => {
-  // Only show for super_admin role
-  const adminData = adminService.getAdminData()
-  
-  if (adminData?.role !== 'super_admin') {
-    return (
-      <div className="p-3 sm:p-4 lg:p-6">
-        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Access Denied</h1>
-        <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm sm:text-base text-red-800">You don't have permission to access admin management. Only Super Admins can manage other administrators.</p>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="p-3 sm:p-4 lg:p-6">
-      <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Admin Management</h1>
-      <div className="mt-4 space-y-4">
-        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <h3 className="font-semibold text-blue-900 mb-2">Super Admin Features</h3>
-          <p className="text-sm sm:text-base text-blue-800 mb-4">As a Super Admin, you have full control over the system and can manage other administrators.</p>
-          
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="p-4 bg-white rounded-lg border">
-              <h4 className="font-medium text-gray-900 mb-2">Admin Roles</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• <strong>Super Admin:</strong> Full system access</li>
-                <li>• <strong>Admin:</strong> Limited management access</li>
-                <li>• <strong>Moderator:</strong> Content moderation only</li>
-              </ul>
-            </div>
-            
-            <div className="p-4 bg-white rounded-lg border">
-              <h4 className="font-medium text-gray-900 mb-2">Your Permissions</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>✅ Manage all users and freelancers</li>
-                <li>✅ Manage projects and bids</li>
-                <li>✅ Handle payments and transactions</li>
-                <li>✅ Create and manage admin accounts</li>
-                <li>✅ Review permission requests from other admins</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
-          <h3 className="font-semibold text-gray-900 mb-2">Current Admin Status</h3>
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="text-center p-3 bg-white rounded">
-              <div className="text-2xl font-bold text-green-600">1</div>
-              <div className="text-sm text-gray-600">Super Admins</div>
-            </div>
-            <div className="text-center p-3 bg-white rounded">
-              <div className="text-2xl font-bold text-blue-600">0</div>
-              <div className="text-sm text-gray-600">Regular Admins</div>
-            </div>
-            <div className="text-center p-3 bg-white rounded">
-              <div className="text-2xl font-bold text-purple-600">0</div>
-              <div className="text-sm text-gray-600">Moderators</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <h3 className="font-semibold text-yellow-900 mb-2">🚧 Development Note</h3>
-          <p className="text-sm text-yellow-800">
-            Admin management features are currently in development. This includes creating new admin accounts, 
-            managing permissions, and admin activity monitoring. For now, you can manage the system through 
-            the other available management sections.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap gap-3">
-          <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 cursor-not-allowed opacity-50">
-            Create New Admin (Coming Soon)
-          </button>
-          <button className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 cursor-not-allowed opacity-50">
-            Manage Permissions (Coming Soon)
-          </button>
-          <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 cursor-not-allowed opacity-50">
-            Admin Activity Log (Coming Soon)
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 const AdminProfile = () => {
   const [adminData, setAdminData] = useState(null)
   const [isEditing, setIsEditing] = useState(false)
@@ -1320,7 +1231,7 @@ const AdminPanel = () => {
               <Route path="/projects" element={<ProjectManagement />} />
               <Route path="/bids" element={<BidManagement />} />
               <Route path="/permission-requests" element={<PermissionRequests />} />
-              <Route path="/admins" element={<AdminManagement />} />
+
               <Route path="/profile" element={<AdminProfile />} />
             </Routes>
           </div>

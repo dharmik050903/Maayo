@@ -36,8 +36,7 @@ const AdminSidebar = ({ adminData, onLogout, isOpen, onClose }) => {
     { name: 'Projects', href: '/admin/projects', icon: '📋', permission: 'projects.view' },
     { name: 'Bids', href: '/admin/bids', icon: '🤝', permission: 'bids.view' },
     ...(adminData?.role === 'super_admin' ? [
-      { name: 'Permission Requests', href: '/admin/permission-requests', icon: '🔐', permission: null },
-      { name: 'Admins', href: '/admin/admins', icon: '⚙️', permission: null }
+      { name: 'Permission Requests', href: '/admin/permission-requests', icon: '🔐', permission: null }
     ] : [])
   ]
 
