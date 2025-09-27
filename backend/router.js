@@ -89,6 +89,7 @@ router.post("/bid/accept", auth, bidController.acceptBid);
 router.post("/bid/reject", auth, bidController.rejectBid);
 router.post("/bid/withdraw", auth, bidController.withdrawBid);
 router.post("/bid/update", auth, bidController.updateBid);
+router.post("/bid/delete", auth, bidController.deleteBid);
 // AI routes
 router.post("/ai/generate-proposal", auth, requireFeatureAccess('ai_proposals'), aiController.generateProposal);
 router.post("/ai/generate-project-description", auth, requireFeatureAccess('ai_proposals'), aiController.createProposalPrompt);

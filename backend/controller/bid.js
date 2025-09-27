@@ -572,5 +572,60 @@ export default class BidController {
             });
         }
     }
+
+    // Delete a bid (only by the freelancer who created it, and only if pending)
+    async deleteBid(req, res) {
+        try {
+            const userId = req.headers.id;
+            const { bid_id } = req.body;
+
+            if (!bid_id) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "bid_id is required" 
+                });
+            }
+
+            const bid = await Bid.findById(bid_id);
+            if (!bid) {
+                return res.status(404).json({ 
+                    status: false, 
+                    message: "Bid not found" 
+                });
+            }
+
+            // Check if user owns the bid
+            if (bid.freelancer_id.toString() !== userId) {
+                return res.status(403).json({ 
+                    status: false, 
+                    message: "You can only delete your own bids" 
+                });
+            }
+
+            // Check if bid is still pending (can't delete accepted/rejected bids)
+            if (bid.status !== 'pending') {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Cannot delete bid - only pending bids can be deleted" 
+                });
+            }
+
+            // Hard delete the bid
+            await Bid.findByIdAndDelete(bid_id);
+
+            return res.status(200).json({
+                status: true,
+                message: "Bid deleted successfully"
+            });
+
+        } catch (error) {
+            console.error("Error deleting bid:", error);
+            return res.status(500).json({ 
+                status: false, 
+                message: "Failed to delete bid", 
+                error: error.message 
+            });
+        }
+    }
 }
 

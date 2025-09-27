@@ -313,6 +313,7 @@ const ProjectManagement = () => {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [actionLoading, setActionLoading] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedProject, setSelectedProject] = useState(null)
@@ -321,15 +322,37 @@ const ProjectManagement = () => {
     fetchProjects()
   }, [])
 
+  // Clear success message after 5 seconds
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => setSuccess(''), 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [success])
+
+  // Clear error message after 10 seconds
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(''), 10000)
+      return () => clearTimeout(timer)
+    }
+  }, [error])
+
   const fetchProjects = async () => {
     try {
       setLoading(true)
       setError('')
       const response = await adminService.getProjects()
-      setProjects(response.data || [])
+      if (response.status) {
+        setProjects(response.data || [])
+        console.log('✅ Projects fetched successfully:', response.data?.length || 0)
+      } else {
+        throw new Error(response.message || 'Failed to fetch projects')
+      }
     } catch (error) {
       console.error('Error fetching projects:', error)
-      setError(error.message)
+      setError(`Failed to fetch projects: ${error.message}`)
+      setProjects([]) // Clear projects on error
     } finally {
       setLoading(false)
     }
@@ -338,31 +361,87 @@ const ProjectManagement = () => {
   const handleEditProject = async (updatedProjectData) => {
     try {
       setActionLoading(true)
-      await adminService.updateProject(selectedProject._id, updatedProjectData)
-      fetchProjects()
-      setShowEditModal(false)
-      setSelectedProject(null)
+      setError('')
+      setSuccess('')
+      
+      const response = await adminService.updateProject(selectedProject._id, updatedProjectData)
+      
+      if (response.status) {
+        // Update state immediately for real-time UI update
+        setProjects(prevProjects => 
+          prevProjects.map(project => 
+            project._id === selectedProject._id 
+              ? { ...project, ...updatedProjectData, ...response.data }
+              : project
+          )
+        )
+        
+        // Show success message
+        setSuccess('Project updated successfully!')
+        
+        // Close modal
+        setShowEditModal(false)
+        setSelectedProject(null)
+        
+        // Refresh list to ensure consistency with backend
+        await fetchProjects()
+        
+        console.log('✅ Project updated successfully')
+      }
     } catch (error) {
       console.error('Error updating project:', error)
-      setError(error.message)
+      setError(`Failed to update project: ${error.message}`)
     } finally {
       setActionLoading(false)
     }
   }
 
   const handleDeleteProject = async (projectId) => {
+    console.log('🗑️ Delete project requested for ID:', projectId)
+    
     if (window.confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
       try {
         setActionLoading(true)
-        // Note: We don't have a deleteProject endpoint, so we'll use soft delete via updateProject
-        await adminService.updateProject(projectId, { is_deleted: true })
-        fetchProjects()
+        setError('')
+        setSuccess('')
+        
+        console.log('🔄 Calling delete API for project:', projectId)
+        
+        // Use proper delete API call
+        const response = await adminService.deleteProject(projectId, 'Deleted by admin')
+        
+        console.log('📡 Delete API response:', response)
+        
+        if (response && response.status) {
+          console.log('✅ Delete API successful, updating UI')
+          
+          // Update state immediately for real-time UI update
+          setProjects(prevProjects => {
+            const filteredProjects = prevProjects.filter(project => project._id !== projectId)
+            console.log('📊 Projects before filter:', prevProjects.length, 'after filter:', filteredProjects.length)
+            return filteredProjects
+          })
+          
+          // Show success message
+          setSuccess('Project deleted successfully!')
+          
+          // Clear success message after 3 seconds
+          setTimeout(() => setSuccess(''), 3000)
+          
+          console.log('✅ Project deleted and UI updated successfully')
+        } else {
+          console.error('❌ Delete API returned false status:', response)
+          throw new Error(response?.message || 'Delete operation failed')
+        }
       } catch (error) {
-        console.error('Error deleting project:', error)
-        setError(error.message)
+        console.error('❌ Error deleting project:', error)
+        console.error('❌ Error stack:', error.stack)
+        setError(`Failed to delete project: ${error.message}`)
       } finally {
         setActionLoading(false)
       }
+    } else {
+      console.log('❌ User cancelled project deletion')
     }
   }
 
@@ -587,38 +666,94 @@ const BidManagement = () => {
   const [bids, setBids] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [actionLoading, setActionLoading] = useState(false)
 
   useEffect(() => {
     fetchBids()
   }, [])
 
+  // Clear success message after 5 seconds
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => setSuccess(''), 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [success])
+
+  // Clear error message after 10 seconds
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(''), 10000)
+      return () => clearTimeout(timer)
+    }
+  }, [error])
+
   const fetchBids = async () => {
     try {
       setLoading(true)
       setError('')
       const response = await adminService.getBids()
-      setBids(response.data || [])
+      if (response.status) {
+        setBids(response.data || [])
+        console.log('✅ Bids fetched successfully:', response.data?.length || 0)
+      } else {
+        throw new Error(response.message || 'Failed to fetch bids')
+      }
     } catch (error) {
       console.error('Error fetching bids:', error)
-      setError(error.message)
+      setError(`Failed to fetch bids: ${error.message}`)
+      setBids([]) // Clear bids on error
     } finally {
       setLoading(false)
     }
   }
 
   const handleDeleteBid = async (bidId) => {
+    console.log('🗑️ Delete bid requested for ID:', bidId)
+    
     if (window.confirm('Are you sure you want to delete this bid? This action cannot be undone.')) {
       try {
         setActionLoading(true)
-        await adminService.deleteBid(bidId)
-        fetchBids()
+        setError('')
+        setSuccess('')
+        
+        console.log('🔄 Calling delete API for bid:', bidId)
+        
+        const response = await adminService.deleteBid(bidId, 'Deleted by admin')
+        
+        console.log('📡 Delete bid API response:', response)
+        
+        if (response && response.status) {
+          console.log('✅ Delete bid API successful, updating UI')
+          
+          // Update state immediately for real-time UI update
+          setBids(prevBids => {
+            const filteredBids = prevBids.filter(bid => bid._id !== bidId)
+            console.log('📊 Bids before filter:', prevBids.length, 'after filter:', filteredBids.length)
+            return filteredBids
+          })
+          
+          // Show success message
+          setSuccess('Bid deleted successfully!')
+          
+          // Clear success message after 3 seconds
+          setTimeout(() => setSuccess(''), 3000)
+          
+          console.log('✅ Bid deleted and UI updated successfully')
+        } else {
+          console.error('❌ Delete bid API returned false status:', response)
+          throw new Error(response?.message || 'Delete operation failed')
+        }
       } catch (error) {
-        console.error('Error deleting bid:', error)
-        setError(error.message)
+        console.error('❌ Error deleting bid:', error)
+        console.error('❌ Error stack:', error.stack)
+        setError(`Failed to delete bid: ${error.message}`)
       } finally {
         setActionLoading(false)
       }
+    } else {
+      console.log('❌ User cancelled bid deletion')
     }
   }
 

@@ -503,26 +503,32 @@ export default class AdminController {
         try {
             const { page = 1, limit = 10, search = '', status = 'all', category = 'all' } = req.body;
             
-            let query = {};
+            let query = {
+                $and: []
+            };
             
             if (search) {
-                query.$or = [
-                    { project_title: { $regex: search, $options: 'i' } },
-                    { project_description: { $regex: search, $options: 'i' } },
-                    { category: { $regex: search, $options: 'i' } }
-                ];
+                query.$and.push({
+                    $or: [
+                        { project_title: { $regex: search, $options: 'i' } },
+                        { title: { $regex: search, $options: 'i' } },
+                        { project_description: { $regex: search, $options: 'i' } },
+                        { description: { $regex: search, $options: 'i' } },
+                        { category: { $regex: search, $options: 'i' } }
+                    ]
+                });
             }
             
             if (status === 'active') {
-                query.isactive = 1;
+                query.$and.push({ isactive: 1 });
             } else if (status === 'completed') {
-                query.iscompleted = 1;
+                query.$and.push({ iscompleted: 1 });
             } else if (status === 'pending') {
-                query.ispending = 1;
+                query.$and.push({ ispending: 1 });
             }
             
             if (category !== 'all') {
-                query.category = category;
+                query.$and.push({ category: category });
             }
 
             const projects = await ProjectInfo.find(query)
@@ -532,6 +538,8 @@ export default class AdminController {
                 .populate('personid', 'first_name last_name email');
 
             const total = await ProjectInfo.countDocuments(query);
+
+            console.log(`✅ Retrieved ${projects.length} projects (total: ${total})`);
 
             res.json({
                 status: true,
@@ -556,9 +564,14 @@ export default class AdminController {
 
     async deleteProject(req, res) {
         try {
+            console.log('🗑️ Admin deleteProject called')
+            console.log('📋 Request body:', req.body)
+            console.log('👤 User:', req.user?.name, req.user?.id)
+            
             const { projectId, reason } = req.body;
 
             if (!req.user.permissions.projects.delete) {
+                console.log('❌ Permission denied - user lacks delete permissions')
                 return res.status(403).json({ 
                     status: false, 
                     message: 'Insufficient permissions' 
@@ -566,34 +579,44 @@ export default class AdminController {
             }
 
             if (!projectId) {
+                console.log('❌ Missing project ID')
                 return res.status(400).json({ 
                     status: false, 
                     message: "Project ID is required" 
                 });
             }
 
+            console.log('🔍 Looking for project with ID:', projectId)
             const project = await ProjectInfo.findById(projectId);
             if (!project) {
+                console.log('❌ Project not found in database')
                 return res.status(404).json({ 
                     status: false, 
                     message: 'Project not found' 
                 });
             }
 
-            // Soft delete
-            project.isDeleted = true;
-            project.deletedAt = new Date().toISOString();
-            project.deletedBy = req.user.id;
-            project.deletionReason = reason;
+            console.log('📄 Found project:', project.title || project.project_title || 'Untitled')
+            
+            // Hard delete - permanently remove from database
+            const projectTitle = project.title || project.project_title || 'Untitled'
 
-            await project.save();
+            console.log('�️ Permanently deleting project from database...')
+            await ProjectInfo.findByIdAndDelete(projectId);
+
+            console.log(`✅ Project ${projectTitle} permanently deleted by admin ${req.user.name}`);
 
             res.json({ 
                 status: true, 
-                message: 'Project deleted successfully' 
+                message: 'Project permanently deleted successfully',
+                data: {
+                    projectId: projectId,
+                    deletedAt: new Date().toISOString()
+                }
             });
         } catch (error) {
-            console.error("Error deleting project:", error);
+            console.error("❌ Error deleting project:", error);
+            console.error("❌ Error stack:", error.stack);
             return res.status(500).json({ 
                 status: false, 
                 message: "Failed to delete project", 
@@ -737,14 +760,21 @@ export default class AdminController {
         try {
             const { page = 1, limit = 10, search = '', status = 'all' } = req.body;
             
-            let query = {};
+            let query = {
+                $and: []
+            };
             
             if (search) {
-                // Add search logic for bids
+                // Add search logic for bids if needed
+                query.$and.push({
+                    $or: [
+                        // Add searchable fields here when available
+                    ]
+                });
             }
             
             if (status !== 'all') {
-                query.status = status;
+                query.$and.push({ status: status });
             }
 
             const bids = await Bid.find(query)
@@ -752,9 +782,11 @@ export default class AdminController {
                 .limit(limit * 1)
                 .skip((page - 1) * limit)
                 .populate('freelancer_id', 'first_name last_name')
-                .populate('project_id', 'project_title');
+                .populate('project_id', 'project_title title');
 
             const total = await Bid.countDocuments(query);
+
+            console.log(`✅ Retrieved ${bids.length} bids (total: ${total})`);
 
             res.json({
                 status: true,
@@ -823,37 +855,58 @@ export default class AdminController {
     // Bid Management Methods
     async deleteBid(req, res) {
         try {
+            console.log('🗑️ Admin deleteBid called')
+            console.log('📋 Request body:', req.body)
+            console.log('👤 User:', req.user?.name, req.user?.id)
+            
             const { bidId, reason } = req.body;
 
+            if (!req.user.permissions.bids.delete) {
+                console.log('❌ Permission denied - user lacks delete permissions')
+                return res.status(403).json({ 
+                    status: false, 
+                    message: 'Insufficient permissions' 
+                });
+            }
+
             if (!bidId) {
+                console.log('❌ Missing bid ID')
                 return res.status(400).json({ 
                     status: false, 
                     message: "Bid ID is required" 
                 });
             }
 
+            console.log('🔍 Looking for bid with ID:', bidId)
             const bid = await Bid.findById(bidId);
             if (!bid) {
+                console.log('❌ Bid not found in database')
                 return res.status(404).json({ 
                     status: false, 
                     message: 'Bid not found' 
                 });
             }
 
-            // Soft delete
-            bid.isDeleted = true;
-            bid.deletedAt = new Date().toISOString();
-            bid.deletedBy = req.user.id;
-            bid.deletionReason = reason;
+            console.log('📄 Found bid:', bid._id)
+            
+            // Hard delete - permanently remove from database
 
-            await bid.save();
+            console.log('�️ Permanently deleting bid from database...')
+            await Bid.findByIdAndDelete(bidId);
+
+            console.log(`✅ Bid ${bidId} permanently deleted by admin ${req.user.name}`);
 
             res.json({ 
                 status: true, 
-                message: 'Bid deleted successfully' 
+                message: 'Bid permanently deleted successfully',
+                data: {
+                    bidId: bidId,
+                    deletedAt: new Date().toISOString()
+                }
             });
         } catch (error) {
             console.error("❌ Error deleting bid:", error);
+            console.error("❌ Error stack:", error.stack);
             return res.status(500).json({ 
                 status: false, 
                 message: "Failed to delete bid", 
@@ -1134,47 +1187,57 @@ export default class AdminController {
                 });
             }
 
-            const request = await PermissionRequest.findById(requestId);
-            if (!request) {
-                return res.status(404).json({
-                    status: false,
-                    message: 'Permission request not found'
-                });
+            // Use findOneAndUpdate with atomic operation to prevent race conditions
+            const updatedRequest = await PermissionRequest.findOneAndUpdate(
+                { 
+                    _id: requestId, 
+                    status: 'pending' // Only update if still pending
+                },
+                {
+                    status: action === 'approve' ? 'approved' : 'rejected',
+                    reviewedBy: req.user.id,
+                    reviewedAt: new Date(),
+                    reviewNotes: reviewNotes
+                },
+                { 
+                    new: true // Return updated document
+                }
+            );
+
+            if (!updatedRequest) {
+                // Either request not found or already processed
+                const existingRequest = await PermissionRequest.findById(requestId);
+                if (!existingRequest) {
+                    return res.status(404).json({
+                        status: false,
+                        message: 'Permission request not found'
+                    });
+                } else {
+                    return res.status(400).json({
+                        status: false,
+                        message: 'Permission request has already been processed'
+                    });
+                }
             }
-
-            if (request.status !== 'pending') {
-                return res.status(400).json({
-                    status: false,
-                    message: 'Permission request has already been processed'
-                });
-            }
-
-            // Update the request
-            request.status = action === 'approve' ? 'approved' : 'rejected';
-            request.reviewedBy = req.user.id;
-            request.reviewedAt = new Date();
-            request.reviewNotes = reviewNotes;
-
-            await request.save();
 
             // If approved, execute the requested action
             if (action === 'approve') {
                 try {
-                    console.log(`🎯 Executing approved action: ${request.requestType}`);
-                    await this.executePermissionRequestAction(request, req.user);
+                    console.log(`🎯 Executing approved action: ${updatedRequest.requestType}`);
+                    await this.executePermissionRequestAction(updatedRequest, req.user);
                     
                     // Mark execution as completed
-                    request.executionStatus = 'completed';
-                    request.executedAt = new Date();
-                    await request.save();
+                    updatedRequest.executionStatus = 'completed';
+                    updatedRequest.executedAt = new Date();
+                    await updatedRequest.save();
                     
-                    console.log(`✅ Successfully executed action: ${request.requestType}`);
+                    console.log(`✅ Successfully executed action: ${updatedRequest.requestType}`);
                 } catch (executionError) {
-                    console.error(`❌ Failed to execute action: ${request.requestType}`, executionError);
+                    console.error(`❌ Failed to execute action: ${updatedRequest.requestType}`, executionError);
                     // Update request with execution error
-                    request.executionError = executionError.message;
-                    request.executionStatus = 'failed';
-                    await request.save();
+                    updatedRequest.executionError = executionError.message;
+                    updatedRequest.executionStatus = 'failed';
+                    await updatedRequest.save();
                     
                     return res.status(500).json({
                         status: false,
@@ -1191,8 +1254,8 @@ export default class AdminController {
                 message: `Permission request ${action}d successfully${action === 'approve' ? ' and action executed' : ''}`,
                 data: {
                     requestId,
-                    status: request.status,
-                    reviewedAt: request.reviewedAt,
+                    status: updatedRequest.status,
+                    reviewedAt: updatedRequest.reviewedAt,
                     executed: action === 'approve'
                 }
             });
@@ -1334,14 +1397,15 @@ export default class AdminController {
 
         const reason = additionalData?.originalRequest?.reason || 'Deleted via admin approval';
         
-        // Soft delete
-        project.isactive = 0;
-        project.deleted_date = new Date();
-        project.deleted_by = approver.id;
-        project.deletion_reason = reason;
+        // Soft delete with proper fields
+        project.isactive = 0; // Mark as inactive
+        project.isDeleted = true;
+        project.deletedAt = new Date().toISOString();
+        project.deletedBy = approver.id;
+        project.deletionReason = reason;
         
         await project.save();
-        console.log(`✅ Project ${project.title} deleted by ${approver.name}`);
+        console.log(`✅ Project ${project.title || 'Untitled'} deleted by ${approver.name} via permission approval`);
     }
 
     async executeEditProject(projectId, additionalData, approver) {
@@ -1355,17 +1419,19 @@ export default class AdminController {
             throw new Error('No update data provided');
         }
 
-        // Apply the updates
-        Object.keys(updates).forEach(key => {
-            if (updates[key] !== undefined && key !== '_id') {
-                project[key] = updates[key];
+        // Apply the updates with proper field validation
+        const allowedFields = ['title', 'description', 'budget', 'status', 'skills', 'deadline', 'isactive', 'iscompleted', 'project_title', 'project_description'];
+        
+        allowedFields.forEach(field => {
+            if (updates[field] !== undefined) {
+                project[field] = updates[field];
             }
         });
 
-        project.last_modified_by = approver.id;
-        project.last_modified_date = new Date();
+        project.updatedAt = new Date().toISOString();
+        project.updatedBy = approver.id;
         
         await project.save();
-        console.log(`✅ Project ${project.title} updated by ${approver.name}`);
+        console.log(`✅ Project ${project.title || project.project_title || 'Untitled'} updated by ${approver.name} via permission approval`);
     }
 }
