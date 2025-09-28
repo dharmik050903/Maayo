@@ -39,13 +39,16 @@ const RatingComponent = ({ projectId, freelancerId, onRatingSubmitted, isOpen, o
         throw new Error('User not authenticated')
       }
 
-      // Prepare rating data
+      // Prepare rating data to match backend schema
       const ratingData = {
-        projectId,
-        freelancerId,
-        rating,
-        review: review.trim(),
-        clientId: currentUser.userId
+        project_id: projectId,
+        reviewee_id: freelancerId,
+        rating: rating,
+        comment: review.trim(),
+        communication_rating: rating, // Default to same as overall rating
+        quality_rating: rating,
+        timeliness_rating: rating,
+        professionalism_rating: rating
       }
 
       console.log('Submitting rating:', ratingData)
