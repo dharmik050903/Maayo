@@ -39,7 +39,12 @@ const bidSchema = new mongoose.Schema({
         description: { type: String },
         amount: { type: Number, required: true },
         due_date: { type: String },
-        is_completed: { type: Number, default: 0 } // 0 - not completed, 1 - completed
+        is_completed: { type: Number, default: 0 }, // 0 - not completed, 1 - completed
+        completed_at: { type: String }, // When milestone was completed
+        payment_released: { type: Number, default: 0 }, // 0 - not released, 1 - released
+        payment_amount: { type: Number }, // Actual amount released
+        payment_id: { type: String }, // Razorpay payout ID
+        payment_released_at: { type: String } // When payment was released
     }],
     // Timeline and availability
     start_date: { 

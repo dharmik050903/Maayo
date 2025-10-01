@@ -341,7 +341,9 @@ export default class BidController {
                 freelancerid: [{
                     freelancerid: bid.freelancer_id,
                     freelancername: '' // Will be populated when needed
-                }]
+                }],
+                // Set initial final amount as bid amount (can be customized later)
+                final_project_amount: bid.bid_amount
             });
 
             // Notify client and freelancer that chat is enabled for this bid
@@ -573,10 +575,102 @@ export default class BidController {
         }
     }
 
-    // Delete a bid (only by the freelancer who created it, and only if pending)
+    // Update project price after bid acceptance
+    async updateProjectPrice(req, res) {
+        try {
+            const userRole = req.headers.user_role;
+            const userId = req.headers.id;
+
+            // Only clients can update project price
+            if (userRole !== 'client') {
+                return res.status(403).json({ 
+                    status: false, 
+                    message: "Access denied. Only clients can update project price." 
+                });
+            }
+
+            const { project_id, final_amount } = req.body;
+
+            if (!project_id || !final_amount) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "project_id and final_amount are required" 
+                });
+            }
+
+            // Validate final amount
+            if (final_amount <= 0) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Final amount must be greater than 0" 
+                });
+            }
+
+            // Get project and verify ownership
+            const project = await projectinfo.findById(project_id)
+                .populate('accepted_bid_id');
+            
+            if (!project) {
+                return res.status(404).json({ 
+                    status: false, 
+                    message: "Project not found" 
+                });
+            }
+
+            if (project.personid.toString() !== userId) {
+                return res.status(403).json({ 
+                    status: false, 
+                    message: "You can only update price for your own projects" 
+                });
+            }
+
+            // Check if project has accepted bid
+            if (!project.accepted_bid_id) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Project must have an accepted bid to update price" 
+                });
+            }
+
+            // Update project with new final amount
+            await projectinfo.findByIdAndUpdate(project_id, {
+                final_project_amount: final_amount,
+                updatedAt: new Date().toISOString()
+            });
+
+            return res.status(200).json({
+                status: true,
+                message: "Project price updated successfully",
+                data: {
+                    project_id: project_id,
+                    final_amount: final_amount
+                }
+            });
+
+        } catch (error) {
+            console.error("Error updating project price:", error);
+            return res.status(500).json({ 
+                status: false, 
+                message: "Failed to update project price", 
+                error: error.message 
+            });
+        }
+    }
+
+    // Delete a bid (by bid owner)
     async deleteBid(req, res) {
         try {
+            const userRole = req.headers.user_role;
             const userId = req.headers.id;
+
+            // Only freelancers can delete their own bids
+            if (userRole !== 'freelancer') {
+                return res.status(403).json({ 
+                    status: false, 
+                    message: "Access denied. Only freelancers can delete their bids." 
+                });
+            }
+
             const { bid_id } = req.body;
 
             if (!bid_id) {
@@ -586,7 +680,10 @@ export default class BidController {
                 });
             }
 
-            const bid = await Bid.findById(bid_id);
+            // Get bid and verify ownership
+            const bid = await Bid.findById(bid_id)
+                .populate('project_id', 'title personid');
+            
             if (!bid) {
                 return res.status(404).json({ 
                     status: false, 
@@ -594,7 +691,6 @@ export default class BidController {
                 });
             }
 
-            // Check if user owns the bid
             if (bid.freelancer_id.toString() !== userId) {
                 return res.status(403).json({ 
                     status: false, 
@@ -602,15 +698,23 @@ export default class BidController {
                 });
             }
 
-            // Check if bid is still pending (can't delete accepted/rejected bids)
-            if (bid.status !== 'pending') {
+            // Check if bid is already accepted
+            if (bid.status === 'accepted') {
                 return res.status(400).json({ 
                     status: false, 
-                    message: "Cannot delete bid - only pending bids can be deleted" 
+                    message: "Cannot delete accepted bids" 
                 });
             }
 
-            // Hard delete the bid
+            // Check if project is still open
+            if (bid.project_id.status !== 'open') {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Cannot delete bids for closed projects" 
+                });
+            }
+
+            // Delete the bid
             await Bid.findByIdAndDelete(bid_id);
 
             return res.status(200).json({
