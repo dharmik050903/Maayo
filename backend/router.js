@@ -1,5 +1,6 @@
 import express from "express";
 import auth from "./middlewares/auth.js";
+import { adminAuth, checkPermission, superAdminOnly } from "./middlewares/adminAuth.js";
 import { requireFeatureAccess, canCreateProject, canSubmitBid } from "./middlewares/subscription.js";
 import Signup from "./controller/signup.js";
 import Login from "./controller/login.js";
@@ -14,9 +15,11 @@ import AIController from "./controller/aiController.js";
 import ChatController from "./controller/chat.js";
 import PaymentGateway from "./controller/paymentcontroller.js";
 import SubscriptionController from "./controller/subscriptionController.js";
+import EscrowController from "./controller/escrowController.js";
+import MilestoneController from "./controller/milestoneController.js";
+import BankDetailsController from "./controller/bankDetailsController.js";
 import AdminAuth from "./controller/adminAuth.js";
 import AdminController from "./controller/admin.js";
-import { adminAuth, checkPermission, superAdminOnly } from "./middlewares/adminAuth.js";
 
 const router = express.Router();
 //Login and Signup Controllers
@@ -37,6 +40,11 @@ const subscriptionController = new SubscriptionController();
 
 const adminAuthController = new AdminAuth();
 const adminController = new AdminController();
+
+// New Escrow and Milestone Controllers
+const escrowController = new EscrowController();
+const milestoneController = new MilestoneController();
+const bankDetailsController = new BankDetailsController();
 
 
 
@@ -88,6 +96,27 @@ router.post("/bid/accept", auth, bidController.acceptBid);
 router.post("/bid/reject", auth, bidController.rejectBid);
 router.post("/bid/withdraw", auth, bidController.withdrawBid);
 router.post("/bid/update", auth, bidController.updateBid);
+router.post("/bid/update-price", auth, bidController.updateProjectPrice);
+
+// Bank Details routes
+router.post("/bank-details/add", auth, bankDetailsController.addBankDetails);
+router.post("/bank-details/update", auth, bankDetailsController.updateBankDetails);
+router.post("/bank-details/list", auth, bankDetailsController.getBankDetails);
+router.post("/bank-details/set-primary", auth, bankDetailsController.setPrimaryBankDetails);
+router.post("/bank-details/delete", auth, bankDetailsController.deleteBankDetails);
+
+// Escrow Payment routes
+router.post("/escrow/create", auth, escrowController.createEscrowPayment);
+router.post("/escrow/verify", auth, escrowController.verifyEscrowPayment);
+router.post("/escrow/release-milestone", auth, escrowController.releaseMilestonePayment);
+router.post("/escrow/status", auth, escrowController.getEscrowStatus);
+
+// Milestone Management routes
+router.post("/milestone/complete", auth, milestoneController.completeMilestone);
+router.post("/milestone/modify", auth, milestoneController.modifyMilestone);
+router.post("/milestone/add", auth, milestoneController.addMilestone);
+router.post("/milestone/remove", auth, milestoneController.removeMilestone);
+router.post("/milestone/list", auth, milestoneController.getProjectMilestones);
 // AI routes
 router.post("/ai/generate-proposal", auth, requireFeatureAccess('ai_proposals'), aiController.generateProposal);
 router.post("/ai/generate-project-description", auth, requireFeatureAccess('ai_proposals'), aiController.createProposalPrompt);

@@ -49,6 +49,29 @@ const project = new mongoose.Schema({
         type: Number, 
         default: 0 
     }, // 0 - not reviewed, 1 - reviewed
+    
+    // Escrow Payment Fields
+    escrow_amount: { 
+        type: Number 
+    }, // Amount held in escrow
+    escrow_order_id: { 
+        type: String 
+    }, // Razorpay order ID for escrow
+    escrow_payment_id: { 
+        type: String 
+    }, // Razorpay payment ID
+    escrow_status: { 
+        type: String, 
+        enum: ['not_created', 'pending', 'completed', 'failed'], 
+        default: 'not_created' 
+    },
+    escrow_verified_at: { 
+        type: String 
+    },
+    final_project_amount: { 
+        type: Number 
+    }, // Final agreed amount after bid acceptance
+    
     createdAt: { type: String, default: () => new Date().toISOString() },
 })
 

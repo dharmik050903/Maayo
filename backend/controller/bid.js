@@ -341,7 +341,9 @@ export default class BidController {
                 freelancerid: [{
                     freelancerid: bid.freelancer_id,
                     freelancername: '' // Will be populated when needed
-                }]
+                }],
+                // Set initial final amount as bid amount (can be customized later)
+                final_project_amount: bid.bid_amount
             });
 
             // Notify client and freelancer that chat is enabled for this bid
@@ -568,6 +570,101 @@ export default class BidController {
             return res.status(500).json({ 
                 status: false, 
                 message: "Failed to update bid", 
+                error: error.message 
+            });
+        }
+    }
+
+    // Update project price after bid acceptance (by client)
+    async updateProjectPrice(req, res) {
+        try {
+            const userRole = req.headers.user_role;
+            const userId = req.headers.id;
+
+            // Only clients can update project price
+            if (userRole !== 'client') {
+                return res.status(403).json({ 
+                    status: false, 
+                    message: "Access denied. Only clients can update project price." 
+                });
+            }
+
+            const { project_id, final_amount } = req.body;
+
+            if (!project_id || !final_amount) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "project_id and final_amount are required" 
+                });
+            }
+
+            // Validate final amount
+            if (final_amount <= 0) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Final amount must be greater than 0" 
+                });
+            }
+
+            // Get project and verify ownership
+            const project = await projectinfo.findById(project_id)
+                .populate('accepted_bid_id');
+            
+            if (!project) {
+                return res.status(404).json({ 
+                    status: false, 
+                    message: "Project not found" 
+                });
+            }
+
+            if (project.personid.toString() !== userId) {
+                return res.status(403).json({ 
+                    status: false, 
+                    message: "You can only update price for your own projects" 
+                });
+            }
+
+            // Check if project has accepted bid
+            if (!project.accepted_bid_id) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Project must have an accepted bid to update price" 
+                });
+            }
+
+            // Check if escrow is already created
+            if (project.escrow_status && project.escrow_status !== 'not_created') {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Cannot update price after escrow payment is created" 
+                });
+            }
+
+            // Update project final amount
+            const updatedProject = await projectinfo.findByIdAndUpdate(
+                project_id,
+                {
+                    final_project_amount: final_amount,
+                    updatedAt: new Date().toISOString()
+                },
+                { new: true }
+            ).populate('accepted_bid_id');
+
+            return res.status(200).json({
+                status: true,
+                message: "Project price updated successfully",
+                data: {
+                    project_id: updatedProject._id,
+                    final_amount: updatedProject.final_project_amount,
+                    original_bid_amount: updatedProject.accepted_bid_id.bid_amount
+                }
+            });
+
+        } catch (error) {
+            console.error("Error updating project price:", error);
+            return res.status(500).json({ 
+                status: false, 
+                message: "Failed to update project price", 
                 error: error.message 
             });
         }
