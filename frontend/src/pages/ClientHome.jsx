@@ -10,6 +10,12 @@ import { formatHourlyRate } from '../utils/currency'
 import { needsUpgrade } from '../utils/subscription'
 import { getSafeUrl } from '../utils/urlValidation'
 import confirmationService from '../services/confirmationService.jsx'
+// Escrow components
+import BankDetailsList from '../components/BankDetailsList'
+import CreateEscrowPayment from '../components/CreateEscrowPayment'
+import EscrowStatus from '../components/EscrowStatus'
+import MilestoneManagement from '../components/MilestoneManagement'
+import ProjectPriceUpdate from '../components/ProjectPriceUpdate'
 
 export default function ClientHome() {
   const [userData, setUserData] = useState(null)
@@ -19,6 +25,10 @@ export default function ClientHome() {
   const [showFreelancerSearch, setShowFreelancerSearch] = useState(false)
   const [selectedFreelancer, setSelectedFreelancer] = useState(null)
   const [showFreelancerModal, setShowFreelancerModal] = useState(false)
+  // Escrow management state
+  const [activeTab, setActiveTab] = useState('freelancers') // 'freelancers' or 'escrow'
+  const [selectedProject, setSelectedProject] = useState(null)
+  const [showEscrowModal, setShowEscrowModal] = useState(false)
   const [filters, setFilters] = useState({
     experience_level: '',
     years_experience_min: '',
@@ -400,9 +410,17 @@ export default function ClientHome() {
               variant="outline" 
               size="lg" 
               className="px-8 py-4 text-lg border-white text-white hover:bg-white hover:text-graphite"
-              onClick={handleShowFreelancerSearch}
+              onClick={() => setActiveTab('freelancers')}
             >
-              {showFreelancerSearch ? 'Hide Freelancers' : 'Find Freelancers'}
+              Find Freelancers
+            </Button>
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="px-8 py-4 text-lg border-white text-white hover:bg-white hover:text-graphite"
+              onClick={() => setActiveTab('escrow')}
+            >
+              Escrow Management
             </Button>
             <Link to="/create-project">
               <Button variant="outline" size="lg" className="px-8 py-4 text-lg border-white text-white hover:bg-white hover:text-graphite">
@@ -447,8 +465,46 @@ export default function ClientHome() {
         </div>
       </section>
 
+      {/* Tab Navigation */}
+      <section className="py-8 px-6 bg-white/5">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex justify-center space-x-1 bg-white/10 p-1 rounded-lg w-fit mx-auto">
+            <button
+              onClick={() => setActiveTab('freelancers')}
+              className={`px-6 py-3 rounded-md font-medium transition-colors ${
+                activeTab === 'freelancers'
+                  ? 'bg-white text-graphite shadow-sm'
+                  : 'text-white/80 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              <div className="flex items-center space-x-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <span>Find Freelancers</span>
+              </div>
+            </button>
+            <button
+              onClick={() => setActiveTab('escrow')}
+              className={`px-6 py-3 rounded-md font-medium transition-colors ${
+                activeTab === 'escrow'
+                  ? 'bg-white text-graphite shadow-sm'
+                  : 'text-white/80 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              <div className="flex items-center space-x-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                </svg>
+                <span>Escrow Management</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </section>
+
       {/* Freelancer Search Section */}
-      {showFreelancerSearch && (
+      {activeTab === 'freelancers' && (
         <section className="py-16 px-6 bg-white/5">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl font-bold text-center mb-8">
@@ -751,6 +807,128 @@ export default function ClientHome() {
             </div>
           </div>
         </section>
+      )}
+
+      {/* Escrow Management Section */}
+      {activeTab === 'escrow' && (
+        <section className="py-16 px-6 bg-white/5">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl font-bold text-center mb-8">
+              <span className="text-mint">Escrow</span> Management
+            </h2>
+            
+            <div className="space-y-8">
+              {/* Bank Details Management */}
+              <div className="bg-white/95 backdrop-blur-sm rounded-lg p-6">
+                <h3 className="text-xl font-semibold text-graphite mb-4">Bank Details</h3>
+                <BankDetailsList />
+              </div>
+
+              {/* Project Selection for Escrow */}
+              <div className="bg-white/95 backdrop-blur-sm rounded-lg p-6">
+                <h3 className="text-xl font-semibold text-graphite mb-4">Project Escrow Management</h3>
+                <p className="text-coolgray mb-4">Select a project to manage escrow payments and milestones</p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* Sample project cards - in real implementation, these would come from your projects API */}
+                  <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                       onClick={() => {
+                         setSelectedProject({ id: '1', title: 'Website Development', amount: 5000 });
+                         setShowEscrowModal(true);
+                       }}>
+                    <h4 className="font-semibold text-graphite mb-2">Website Development</h4>
+                    <p className="text-sm text-coolgray mb-2">Build a responsive website</p>
+                    <p className="text-mint font-medium">₹5,000</p>
+                  </div>
+                  
+                  <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                       onClick={() => {
+                         setSelectedProject({ id: '2', title: 'Mobile App', amount: 15000 });
+                         setShowEscrowModal(true);
+                       }}>
+                    <h4 className="font-semibold text-graphite mb-2">Mobile App Development</h4>
+                    <p className="text-sm text-coolgray mb-2">iOS and Android app</p>
+                    <p className="text-mint font-medium">₹15,000</p>
+                  </div>
+                  
+                  <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                       onClick={() => {
+                         setSelectedProject({ id: '3', title: 'Logo Design', amount: 2000 });
+                         setShowEscrowModal(true);
+                       }}>
+                    <h4 className="font-semibold text-graphite mb-2">Logo Design</h4>
+                    <p className="text-sm text-coolgray mb-2">Professional logo design</p>
+                    <p className="text-mint font-medium">₹2,000</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Escrow Modal */}
+      {showEscrowModal && selectedProject && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-graphite">Escrow Management - {selectedProject.title}</h3>
+              <button 
+                onClick={() => {
+                  setShowEscrowModal(false);
+                  setSelectedProject(null);
+                }}
+                className="text-coolgray hover:text-graphite transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Project Price Update */}
+              <ProjectPriceUpdate 
+                projectId={selectedProject.id}
+                currentAmount={selectedProject.amount}
+                onSuccess={(data) => {
+                  setSelectedProject(prev => ({ ...prev, amount: data.final_amount }));
+                }}
+              />
+
+              {/* Create Escrow Payment */}
+              <CreateEscrowPayment 
+                projectId={selectedProject.id}
+                onSuccess={() => {
+                  // Refresh escrow status
+                }}
+              />
+
+              {/* Escrow Status */}
+              <EscrowStatus projectId={selectedProject.id} />
+
+              {/* Milestone Management */}
+              <MilestoneManagement 
+                projectId={selectedProject.id}
+                userRole="client"
+              />
+            </div>
+
+            <div className="flex justify-end pt-6 border-t border-gray-200">
+              <Button 
+                type="button"
+                variant="outline" 
+                onClick={() => {
+                  setShowEscrowModal(false);
+                  setSelectedProject(null);
+                }}
+                className="border-gray-300 text-gray-700 hover:bg-gray-50"
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Features Section */}

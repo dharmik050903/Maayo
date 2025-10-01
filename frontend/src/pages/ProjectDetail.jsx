@@ -8,6 +8,11 @@ import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 import { formatBudget } from '../utils/currency'
 import confirmationService from '../services/confirmationService.jsx'
 import { useTranslation } from '../hooks/useTranslation'
+// Escrow components
+import CreateEscrowPayment from '../components/CreateEscrowPayment'
+import EscrowStatus from '../components/EscrowStatus'
+import MilestoneManagement from '../components/MilestoneManagement'
+import ProjectPriceUpdate from '../components/ProjectPriceUpdate'
 
 export default function ProjectDetail() {
   const { id } = useParams()
@@ -251,6 +256,23 @@ export default function ProjectDetail() {
                 </div>
               </div>
             )}
+
+            {/* Escrow Status */}
+            {project.isactive === 1 && (
+              <div className="card p-6 bg-white/95 backdrop-blur-sm">
+                <EscrowStatus projectId={project._id} />
+              </div>
+            )}
+
+            {/* Milestone Management */}
+            {project.isactive === 1 && (
+              <div className="card p-6 bg-white/95 backdrop-blur-sm">
+                <MilestoneManagement 
+                  projectId={project._id}
+                  userRole={userData?.user_type || 'client'}
+                />
+              </div>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -301,6 +323,29 @@ export default function ProjectDetail() {
                 )}
               </div>
             </div>
+
+            {/* Escrow Management */}
+            {project.isactive === 1 && (
+              <div className="card p-6 bg-white/95 backdrop-blur-sm">
+                <h2 className="text-xl font-semibold text-graphite mb-4">Escrow Management</h2>
+                <div className="space-y-4">
+                  <ProjectPriceUpdate 
+                    projectId={project._id}
+                    currentAmount={project.budget}
+                    onSuccess={(data) => {
+                      setProject(prev => ({ ...prev, budget: data.final_amount }));
+                    }}
+                  />
+                  <CreateEscrowPayment 
+                    projectId={project._id}
+                    onSuccess={() => {
+                      // Refresh project data
+                      loadProject();
+                    }}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Quick Actions */}
             <div className="card p-6 bg-white/95 backdrop-blur-sm">

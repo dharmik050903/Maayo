@@ -12,6 +12,10 @@ import { needsUpgrade } from '../utils/subscription'
 import MyBids from '../components/MyBids'
 import BidForm from '../components/BidForm'
 import confirmationService from '../services/confirmationService.jsx'
+// Escrow components
+import BankDetailsList from '../components/BankDetailsList'
+import EscrowStatus from '../components/EscrowStatus'
+import MilestoneManagement from '../components/MilestoneManagement'
 
 export default function FreelancerHome() {
   const [userData, setUserData] = useState(null)
@@ -430,6 +434,15 @@ export default function FreelancerHome() {
               </div>
             </div>
           )}
+
+          {/* Bank Details Section */}
+          <div className="max-w-4xl mx-auto mb-12">
+            <div className="card p-6 bg-white/95 backdrop-blur-sm">
+              <h3 className="text-xl font-semibold text-graphite mb-4">Payment Setup</h3>
+              <p className="text-coolgray mb-4">Manage your bank details to receive payments from completed projects</p>
+              <BankDetailsList />
+            </div>
+          </div>
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
