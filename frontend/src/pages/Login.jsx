@@ -7,6 +7,7 @@ import GoogleSignIn from '../components/GoogleSignIn'
 import { PageShimmer } from '../components/Shimmer'
 import { authenticatedFetch } from '../utils/api'
 import { otpService } from '../services/otpService'
+import { useTranslation } from '../hooks/useTranslation'
 
 // Function to check if freelancer profile exists in database
 const checkFreelancerProfileExists = async (userId) => {
@@ -167,6 +168,7 @@ const checkClientProfileExists = async (userId) => {
 }
 
 export default function Login() {
+  const { t } = useTranslation()
   const [form, setForm] = useState({ email: '', password: '' })
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
@@ -955,8 +957,8 @@ export default function Login() {
           
           <div className="card p-8">
             <div className="mb-8 text-center">
-              <h1 className="text-2xl font-semibold text-graphite">Welcome back</h1>
-              <p className="text-coolgray mt-1">Login to continue to your dashboard</p>
+              <h1 className="text-2xl font-semibold text-graphite">{t('welcomeBack')}</h1>
+              <p className="text-coolgray mt-1">{t('loginToContinue')}</p>
               
               <div className="flex bg-gray-100 rounded-lg p-1 mt-4">
                 <button
@@ -989,14 +991,14 @@ export default function Login() {
                       : 'text-coolgray hover:text-graphite'
                   }`}
                 >
-                  OTP Login
+                  {t('otpLogin')}
                 </button>
               </div>
             </div>
 
       <form className="space-y-4" onSubmit={handleSubmit}>
                <div>
-                 <label className="block text-sm font-medium text-graphite mb-1">Email <span className="text-red-500">*</span></label>
+                 <label className="block text-sm font-medium text-graphite mb-1">{t('email')} <span className="text-red-500">*</span></label>
                  <input
                    type="email"
           name="email"
@@ -1013,7 +1015,7 @@ export default function Login() {
 
                {loginMethod === 'password' ? (
                  <div>
-                   <label className="block text-sm font-medium text-graphite mb-1">Password <span className="text-red-500">*</span></label>
+                   <label className="block text-sm font-medium text-graphite mb-1">{t('password')} <span className="text-red-500">*</span></label>
                    <input
                      type="password"
             name="password"

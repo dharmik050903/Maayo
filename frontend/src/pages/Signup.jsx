@@ -9,8 +9,10 @@ import PasswordRequirements from '../components/PasswordRequirements'
 import { countries } from '../data/countries'
 import { dialCodes } from '../data/dialCodes'
 import CountrySelect from '../components/CountrySelect'
+import { useTranslation } from '../hooks/useTranslation'
 
 export default function Signup() {
+  const { t } = useTranslation()
   const [form, setForm] = useState({
     first_name: '',
     last_name: '',
@@ -555,10 +557,10 @@ export default function Signup() {
 
               <div className="flex items-center justify-between pt-4">
                 <Link to="/login" className="link-accent text-sm">
-                  Have an account? Login
+                  {t('haveAccount')} {t('login')}
                 </Link>
                 <Button type="submit" loading={loading}>
-                  {loading ? 'Creating...' : 'Create account'}
+                  {loading ? t('creating') : t('createAccount')}
                 </Button>
               </div>
 

@@ -7,8 +7,10 @@ import { PageShimmer } from '../components/Shimmer'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 import { formatBudget } from '../utils/currency'
 import confirmationService from '../services/confirmationService.jsx'
+import { useTranslation } from '../hooks/useTranslation'
 
 export default function ProjectList() {
+  const { t } = useTranslation()
   const [userData, setUserData] = useState(null)
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
@@ -211,7 +213,7 @@ export default function ProjectList() {
           </div>
           <div className="mt-4 md:mt-0">
             <Link to="/project/create">
-              <Button>Create New Project</Button>
+              <Button>{t('createNewProject')}</Button>
             </Link>
           </div>
         </div>
@@ -405,7 +407,7 @@ export default function ProjectList() {
               }
             </p>
             <Link to="/project/create">
-              <Button>Create Your First Project</Button>
+              <Button>{t('createFirstProject')}</Button>
             </Link>
           </div>
         )}

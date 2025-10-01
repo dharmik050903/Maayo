@@ -7,10 +7,12 @@ import { PageShimmer } from '../components/Shimmer'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 import { formatBudget } from '../utils/currency'
 import confirmationService from '../services/confirmationService.jsx'
+import { useTranslation } from '../hooks/useTranslation'
 
 export default function ProjectDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [userData, setUserData] = useState(null)
   const [project, setProject] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -153,7 +155,7 @@ export default function ProjectDetail() {
           <h2 className="text-2xl font-semibold text-graphite mb-2">Project Not Found</h2>
           <p className="text-coolgray mb-6">The project you're looking for doesn't exist or has been deleted.</p>
           <Link to="/projects">
-            <Button>Back to Projects</Button>
+            <Button>{t('backToProjects')}</Button>
           </Link>
         </div>
       </div>
@@ -178,7 +180,7 @@ export default function ProjectDetail() {
           </div>
           <div className="flex gap-2 mt-4 md:mt-0">
             <Link to={`/project/edit/${project._id}`}>
-              <Button variant="secondary">Edit Project</Button>
+              <Button variant="secondary">{t('editProject')}</Button>
             </Link>
             {project.isactive === 1 && project.iscompleted === 0 && (
               <Button onClick={handleCompleteProject} variant="accent">
@@ -305,15 +307,15 @@ export default function ProjectDetail() {
               <h2 className="text-xl font-semibold text-graphite mb-4">Quick Actions</h2>
               <div className="space-y-3">
                 <Link to={`/project/edit/${project._id}`} className="block">
-                  <Button variant="secondary" className="w-full">Edit Project</Button>
+                  <Button variant="secondary" className="w-full">{t('editProject')}</Button>
                 </Link>
                 {project.isactive === 1 && project.iscompleted === 0 && (
                   <Button onClick={handleCompleteProject} variant="accent" className="w-full">
-                    Mark Complete
+                    {t('markComplete')}
                   </Button>
                 )}
                 <Button onClick={handleDeleteProject} variant="danger" className="w-full">
-                  Delete Project
+                  {t('deleteProject')}
                 </Button>
               </div>
             </div>

@@ -5,10 +5,12 @@ import Button from "../components/Button"
 import { projectService } from "../services/projectService"
 import { formatBudget } from "../utils/currency"
 import { isAuthenticated, getCurrentUser, clearAuth } from "../utils/api"
+import { useTranslation } from "../hooks/useTranslation"
 import hero from "../assets/medium-shot-woman-typing-keyboard.jpg"
 
 export default function Home() {
   const [searchParams] = useSearchParams()
+  const { t } = useTranslation()
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -69,7 +71,7 @@ export default function Home() {
       <div className="min-h-screen flex items-center justify-center bg-brand-gradient text-white">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p>Loading...</p>
+          <p>{t('loading')}</p>
         </div>
       </div>
     )
@@ -86,7 +88,7 @@ export default function Home() {
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-            <p>Loading projects...</p>
+            <p>{t('loadingProjects')}</p>
           </div>
         </div>
       </div>
@@ -105,18 +107,17 @@ export default function Home() {
       <section className="flex flex-col md:flex-row items-center justify-between flex-1 max-w-7xl mx-auto px-6 pt-20">
         <div className="max-w-xl space-y-6 slide-in-left text-center md:text-left">
           <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-            Find the right <span className="text-mint">freelancer</span> for your project
+            {t('heroTitle')} <span className="text-mint">{t('freelancer')}</span> {t('heroTitleEnd')}
           </h1>
           <p className="text-lg text-white/80">
-            Maayo connects businesses with talented professionals across the globe. 
-            Secure, fast, and easy to use.
+            {t('heroDescription')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center sm:justify-start">
             <Link to="/signup">
-              <Button variant="accent" className="w-full sm:w-auto">Get Started</Button>
+              <Button variant="accent" className="w-full sm:w-auto">{t('getStarted')}</Button>
             </Link>
             <Link to="/browse">
-              <Button variant="primary" className="w-full sm:w-auto">Browse Projects</Button>
+              <Button variant="primary" className="w-full sm:w-auto">{t('browseProjects')}</Button>
             </Link>
           </div>
         </div>
@@ -129,16 +130,16 @@ export default function Home() {
       <section className="py-16">
         <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8 px-6">
           <div className="card p-6 text-center bg-white/95 slide-in-up">
-            <h3 className="text-xl font-semibold text-graphite mb-3">Trusted Talent</h3>
-            <p className="text-coolgray">Verified professionals ready to bring your ideas to life.</p>
+            <h3 className="text-xl font-semibold text-graphite mb-3">{t('trustedTalent')}</h3>
+            <p className="text-coolgray">{t('trustedTalentDesc')}</p>
           </div>
           <div className="card p-6 text-center bg-white/95 slide-in-up" style={{animationDelay: '0.1s'}}>
-            <h3 className="text-xl font-semibold text-graphite mb-3">Secure Payments</h3>
-            <p className="text-coolgray">Escrow protection so your money is safe until work is done.</p>
+            <h3 className="text-xl font-semibold text-graphite mb-3">{t('securePayments')}</h3>
+            <p className="text-coolgray">{t('securePaymentsDesc')}</p>
           </div>
           <div className="card p-6 text-center bg-white/95 slide-in-up" style={{animationDelay: '0.2s'}}>
-            <h3 className="text-xl font-semibold text-graphite mb-3">Fast Hiring</h3>
-            <p className="text-coolgray">Post project and start receiving proposals in minutes.</p>
+            <h3 className="text-xl font-semibold text-graphite mb-3">{t('fastHiring')}</h3>
+            <p className="text-coolgray">{t('fastHiringDesc')}</p>
           </div>
         </div>
       </section>
@@ -148,10 +149,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Featured <span className="text-mint">Projects</span>
+              {t('featuredProjects')} <span className="text-mint">{t('projects')}</span>
             </h2>
             <p className="text-lg text-white/80 max-w-2xl mx-auto">
-              Discover amazing projects from talented professionals around the world
+              {t('featuredProjectsDesc')}
             </p>
           </div>
 
@@ -159,7 +160,7 @@ export default function Home() {
             <div className="flex justify-center items-center py-12">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
-                <p className="mt-4 text-white/80">Loading projects...</p>
+                <p className="mt-4 text-white/80">{t('loadingProjects')}</p>
               </div>
             </div>
           ) : error ? (
@@ -171,7 +172,7 @@ export default function Home() {
               </div>
               <p className="text-white/80 mb-4">{error}</p>
               <Button variant="outline" onClick={fetchProjects} className="px-6 py-2">
-                Try Again
+                {t('tryAgain')}
               </Button>
             </div>
           ) : projects.length === 0 ? (
@@ -181,8 +182,8 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-white mb-2">No Projects Available</h3>
-              <p className="text-white/80">Check back later for new projects!</p>
+              <h3 className="text-xl font-semibold text-white mb-2">{t('noProjectsAvailable')}</h3>
+              <p className="text-white/80">{t('noProjectsDesc')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -292,7 +293,7 @@ export default function Home() {
         <h2 className="text-3xl font-semibold mb-4">Ready to get started?</h2>
         <p className="mb-6 text-white/85">Join Maayo today and unlock your project’s potential.</p>
         <Link to="/signup">
-          <Button variant="accent">Create an Account</Button>
+          <Button variant="accent">{t('createAccount')}</Button>
         </Link>
       </section>
     </div>

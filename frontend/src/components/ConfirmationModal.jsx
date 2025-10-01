@@ -1,18 +1,27 @@
 import React from 'react'
 import Button from './Button'
+import { useTranslation } from '../hooks/useTranslation'
 
 export default function ConfirmationModal({
   isOpen,
   onClose,
   onConfirm,
-  title = "Confirm Action",
-  message = "Are you sure you want to proceed?",
-  confirmText = "Confirm",
-  cancelText = "Cancel",
+  title,
+  message,
+  confirmText,
+  cancelText,
   type = "warning", // "warning", "danger", "success", "info"
   isLoading = false,
   confirmButtonVariant = "primary"
 }) {
+  const { t } = useTranslation()
+  
+  // Use translations as defaults if not provided
+  const finalTitle = title || t('confirmAction')
+  const finalMessage = message || t('confirmMessage')
+  const finalConfirmText = confirmText || t('confirm')
+  const finalCancelText = cancelText || t('cancel')
+  
   if (!isOpen) return null
 
   const getTypeStyles = () => {
@@ -79,7 +88,7 @@ export default function ConfirmationModal({
             </div>
             <div>
               <h3 className="text-lg font-semibold text-graphite">
-                {title}
+                {finalTitle}
               </h3>
             </div>
           </div>
@@ -88,7 +97,7 @@ export default function ConfirmationModal({
         {/* Body */}
         <div className="px-6 py-6">
           <p className="text-coolgray leading-relaxed">
-            {message}
+            {finalMessage}
           </p>
         </div>
 
@@ -100,7 +109,7 @@ export default function ConfirmationModal({
             disabled={isLoading}
             className="border-gray-300 text-gray-700 hover:bg-gray-50 px-6"
           >
-            {cancelText}
+            {finalCancelText}
           </Button>
           <Button
             variant={confirmButtonVariant || typeStyles.confirmVariant}
@@ -111,10 +120,10 @@ export default function ConfirmationModal({
             {isLoading ? (
               <div className="flex items-center">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Processing...
+                {t('processing')}
               </div>
             ) : (
-              confirmText
+              finalConfirmText
             )}
           </Button>
         </div>

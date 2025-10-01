@@ -12,10 +12,12 @@ import { messageApiService } from '../services/messageApiService.jsx'
 import { bidService } from '../services/bidService.js'
 import ConversationsModal from './ConversationsModal'
 import PaymentHistory from './PaymentHistory'
+import { useTranslation } from '../hooks/useTranslation'
 
 export default function Header({ userType, onLogout, userData }) {
   const location = useLocation()
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const isAuthenticated = !!userData
   const actualUserType = userType || 'client' // Default to 'client' if userType is undefined
   const [isScrolled, setIsScrolled] = useState(false)
@@ -378,28 +380,28 @@ export default function Header({ userType, onLogout, userData }) {
   const navLinks = isAuthenticated ? (
     <>
       <Link to={`/${actualUserType}-home`} className={getLinkClasses(`/${actualUserType}-home`)}>
-        Home
+        {t('home')}
       </Link>
       {actualUserType === 'freelancer' ? (
         <Link to="/find-work" className={getLinkClasses('/find-work')}>
-          Find Work
+          {t('findWork')}
         </Link>
       ) : (
         <Link to="/project/create" className={getLinkClasses('/project/create')}>
-            Post a Project
+          {t('postProject')}
           </Link>
       )}
       
       {/* My Projects Link */}
       <Link to="/my-projects" className={getLinkClasses('/my-projects')}>
-        My Projects
+        {t('myProjects')}
       </Link>
       
       <button 
         onClick={handleMessagesClick}
         className="hover:text-mint px-4 py-2 rounded-md transition-colors text-graphite whitespace-nowrap flex items-center"
       >
-        Messages
+        {t('messages')}
         {isLoadingNotifications ? (
           <span className="absolute -top-1 -right-1 bg-gray-400 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
             ...
@@ -414,34 +416,34 @@ export default function Header({ userType, onLogout, userData }) {
         onClick={handlePaymentHistoryClick}
         className="hover:text-mint px-4 py-2 rounded-md transition-colors text-graphite whitespace-nowrap flex items-center"
       >
-        Payments
+        {t('payments')}
       </button>
       <button 
         onClick={handleProfileClick}
         className="hover:text-mint px-4 py-2 rounded-md transition-colors text-graphite whitespace-nowrap flex items-center"
       >
-        Profile
+        {t('profile')}
       </button>
       <Link to="/pricing" className={getLinkClasses('/pricing')}>
-        Pricing
+        {t('pricing')}
       </Link>
     </>
   ) : (
     <>
       <Link to="/" className={getLinkClasses('/')}>
-        Home
+        {t('home')}
       </Link>
       <Link to="/browse" className={getLinkClasses('/browse')}>
-        Find Work
+        {t('findWork')}
       </Link>
       <Link to="/project/create" className={getLinkClasses('/project/create')}>
-        Post a Project
+        {t('postProject')}
       </Link>
       <Link to="/pricing" className={getLinkClasses('/pricing')}>
-        Pricing
+        {t('pricing')}
       </Link>
       <Link to="/about" className={getLinkClasses('/about')}>
-        About
+        {t('about')}
       </Link>
     </>
   )
@@ -450,21 +452,21 @@ export default function Header({ userType, onLogout, userData }) {
   const mobileNavLinks = isAuthenticated ? (
     <>
       <Link to={`/${actualUserType}-home`} className={getMobileLinkClasses(`/${actualUserType}-home`)} style={getMobileLinkStyles()}>
-        Home
+        {t('home')}
       </Link>
       {actualUserType === 'freelancer' ? (
         <Link to="/find-work" className={getMobileLinkClasses('/find-work')} style={getMobileLinkStyles()}>
-          Find Work
+          {t('findWork')}
         </Link>
       ) : (
         <Link to="/project/create" className={getMobileLinkClasses('/project/create')} style={getMobileLinkStyles()}>
-            Post a Project
+          {t('postProject')}
           </Link>
       )}
       
       {/* My Projects Link */}
       <Link to="/my-projects" className={getMobileLinkClasses('/my-projects')} style={getMobileLinkStyles()}>
-        My Projects
+        {t('myProjects')}
       </Link>
       
       <button 
@@ -472,7 +474,7 @@ export default function Header({ userType, onLogout, userData }) {
         className="hover:text-mint px-4 py-2 rounded-md transition-colors text-center text-graphite !font-bold"
         style={getMobileButtonStyles()}
       >
-        Messages
+        {t('messages')}
         {isLoadingNotifications ? (
           <span className="absolute -top-1 -right-1 bg-gray-400 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
             ...
@@ -488,35 +490,35 @@ export default function Header({ userType, onLogout, userData }) {
         className="hover:text-mint px-4 py-2 rounded-md transition-colors text-center text-graphite !font-bold"
         style={getMobileButtonStyles()}
       >
-        Payments
+        {t('payments')}
       </button>
       <button 
         onClick={handleProfileClick}
         className="hover:text-mint px-4 py-2 rounded-md transition-colors text-center text-graphite !font-bold"
         style={getMobileButtonStyles()}
       >
-        Profile
+        {t('profile')}
       </button>
       <Link to="/pricing" className={getMobileLinkClasses('/pricing')} style={getMobileLinkStyles()}>
-        Pricing
+        {t('pricing')}
       </Link>
     </>
   ) : (
     <>
       <Link to="/" className={getMobileLinkClasses('/')} style={getMobileLinkStyles()}>
-        Home
+        {t('home')}
       </Link>
       <Link to="/browse" className={getMobileLinkClasses('/browse')} style={getMobileLinkStyles()}>
-        Find Work
+        {t('findWork')}
       </Link>
       <Link to="/project/create" className={getMobileLinkClasses('/project/create')} style={getMobileLinkStyles()}>
-        Post a Project
+        {t('postProject')}
       </Link>
       <Link to="/pricing" className={getMobileLinkClasses('/pricing')} style={getMobileLinkStyles()}>
-        Pricing
+        {t('pricing')}
       </Link>
       <Link to="/about" className={getMobileLinkClasses('/about')} style={getMobileLinkStyles()}>
-        About
+        {t('about')}
       </Link>
     </>
   )
@@ -549,7 +551,7 @@ export default function Header({ userType, onLogout, userData }) {
               <div className="relative flex-1">
                 <input
                   type="text"
-                  placeholder="Search projects, freelancers..."
+                  placeholder={t('searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className={`w-full px-4 py-2 pl-10 pr-4 rounded-lg border transition-colors text-sm ${
@@ -586,7 +588,7 @@ export default function Header({ userType, onLogout, userData }) {
                     : 'bg-white/20 text-white hover:bg-white/30'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                {isSearching ? '...' : 'Search'}
+                {isSearching ? '...' : t('search')}
               </button>
             </div>
           </form>
@@ -715,10 +717,10 @@ export default function Header({ userType, onLogout, userData }) {
             <>
               <Link to="/login">
                 <Button variant="outline" className="border-white text-white hover:bg-white hover:text-graphite font-semibold px-6 py-2 shadow-lg">
-                  Login
+                  {t('login')}
                 </Button>
               </Link>
-              <Link to="/signup"><Button variant="accent">Sign Up</Button></Link>
+              <Link to="/signup"><Button variant="accent">{t('signup')}</Button></Link>
             </>
           )}
         </div>
@@ -732,12 +734,12 @@ export default function Header({ userType, onLogout, userData }) {
             <div className="border-t border-gray-200 pt-4 mt-2">
               {isAuthenticated ? (
                 <button onClick={onLogout} className="hover:text-mint px-4 py-2 rounded-md transition-colors text-center text-graphite !font-bold bg-violet/10 border border-violet/30" style={getMobileButtonStyles()}>
-                  Logout
+                  {t('logout')}
                 </button>
               ) : (
                 <div className="flex flex-col gap-3">
-                  <Link to="/login" className="hover:text-mint px-4 py-2 rounded-md transition-colors text-center text-graphite !font-bold border border-gray-300" style={getMobileButtonStyles()}>Login</Link>
-                  <Link to="/signup" className="hover:text-mint px-4 py-2 rounded-md transition-colors text-center text-graphite !font-bold bg-mint text-white" style={getMobileButtonStyles()}>Sign Up</Link>
+                  <Link to="/login" className="hover:text-mint px-4 py-2 rounded-md transition-colors text-center text-graphite !font-bold border border-gray-300" style={getMobileButtonStyles()}>{t('login')}</Link>
+                  <Link to="/signup" className="hover:text-mint px-4 py-2 rounded-md transition-colors text-center text-graphite !font-bold bg-mint text-white" style={getMobileButtonStyles()}>{t('signup')}</Link>
                 </div>
               )}
             </div>

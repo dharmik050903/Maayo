@@ -12,9 +12,11 @@ import { bidService } from '../services/bidService'
 import { getSafeUrl } from '../utils/urlValidation'
 import { formatBudget } from '../utils/currency'
 import confirmationService from '../services/confirmationService.jsx'
+import { useTranslation } from '../hooks/useTranslation'
 
 export default function MyProjects() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -743,29 +745,29 @@ const handleCloseBidRequest = () => {
                   
                   {/* Always show Edit button for all projects */}
                   <Button variant="accent" size="sm" onClick={() => handleEditProject(project)} className="flex-1 min-w-[120px]">
-                    Edit Project
+                    {t('editProject')}
                   </Button>
                   
                   {getProjectStatus(project) === 'open' && (
                     <>
                       <Button variant="outline" size="sm" onClick={() => handleViewBidRequests(project)} className="flex-1 min-w-[120px] border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white">
-                        View Bids ({project.bid_count || 0})
+                        {t('viewBids')} ({project.bid_count || 0})
                       </Button>
                       <Button variant="success" size="sm" onClick={() => handleActivateProject(project._id)} className="flex-1 min-w-[120px]">
-                        Activate Project
+                        {t('activateProject')}
                       </Button>
                       <Button variant="outline" size="sm" onClick={() => handleDeleteProject(project._id)} className="flex-1 min-w-[120px] border-coral text-coral hover:bg-coral hover:text-white">
-                        Delete Project
+                        {t('deleteProject')}
                       </Button>
                     </>
                   )}
                   {getProjectStatus(project) === 'in_progress' && (
                     <>
                       <Button variant="accent" size="sm" onClick={() => handleCompleteProject(project._id)} className="flex-1 min-w-[120px]">
-                        Mark Complete
+                        {t('markComplete')}
                       </Button>
                       <Button variant="outline" size="sm" onClick={() => handleDeactivateProject(project._id)} className="flex-1 min-w-[120px] border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white">
-                        Deactivate Project
+                        {t('deactivateProject')}
                       </Button>
                     </>
                   )}

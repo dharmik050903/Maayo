@@ -20,6 +20,7 @@ import FindWork from './pages/FindWork'
 import BrowseProjects from './pages/BrowseProjects'
 import Freelancers from './pages/Freelancers'
 import SessionManager from './components/SessionManager'
+import { LanguageProvider } from './contexts/LanguageContext'
 import Aboutus from './pages/Aboutus'
 import ContactUs from './pages/ContactUs'
 import SubscriptionPage from './pages/subscritionPage'
@@ -78,9 +79,11 @@ const router = createBrowserRouter([
 ])
 
 createRoot(document.getElementById('root')).render(
-  <SessionManager>
-    <RouterProvider router={router} />
-  </SessionManager>
+  <LanguageProvider>
+    <SessionManager>
+      <RouterProvider router={router} />
+    </SessionManager>
+  </LanguageProvider>
 )
 
 
