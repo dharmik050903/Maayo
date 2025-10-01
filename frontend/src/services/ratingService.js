@@ -8,7 +8,7 @@ export const ratingService = {
     try {
       console.log('Submitting rating:', ratingData)
       
-      const response = await authenticatedFetch(`${API_BASE_URL}/rating/create`, {
+      const response = await authenticatedFetch(`${API_BASE_URL}/review/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

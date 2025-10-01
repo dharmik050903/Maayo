@@ -156,7 +156,7 @@ export default function Freelancers() {
       />
       
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 pt-28 pb-8">
+      <main className="max-w-7xl mx-auto px-6 pt-20 pb-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">

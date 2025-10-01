@@ -28,7 +28,8 @@ const defaultOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
   'https://maayo-frontend.vercel.app',
-  'https://maayo.vercel.app'
+  'https://maayo.vercel.app',
+  'https://maayo-alpha.vercel.app'
 ]
 
 const finalOrigins = allowedOrigins.length > 0 ? allowedOrigins : defaultOrigins
@@ -41,6 +42,11 @@ app.use(cors({
   
     // Allow localhost and 127.0.0.1 for development
     if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return callback(null, true)
+    }
+    
+    // Allow Vercel domains
+    if (origin.includes('vercel.app')) {
       return callback(null, true)
     }
     

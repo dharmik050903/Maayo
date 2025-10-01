@@ -533,7 +533,15 @@ export const adminService = {
 
   async deleteProject(projectId, reason) {
     try {
+      console.log('🔄 AdminService: Starting delete project request')
+      console.log('📋 Project ID:', projectId)
+      console.log('📝 Reason:', reason)
+      
       const token = this.getAdminToken()
+      console.log('🔑 Token present:', !!token)
+      
+      const requestBody = { projectId, reason }
+      console.log('📦 Request body:', requestBody)
       
       const response = await fetch(`${API_BASE_URL}/admin/projects/delete`, {
         method: 'POST',
@@ -541,27 +549,34 @@ export const adminService = {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ projectId, reason })
+        body: JSON.stringify(requestBody)
       })
+      
+      console.log('📡 Response status:', response.status)
+      console.log('📡 Response ok:', response.ok)
       
       if (!response.ok) {
         let errorMessage = 'Failed to delete project'
         try {
           const errorData = await response.json()
+          console.log('❌ Error response data:', errorData)
           errorMessage = errorData.message || errorMessage
         } catch (parseError) {
+          console.log('❌ Failed to parse error response:', parseError)
           errorMessage = `Server error: ${response.status} ${response.statusText}`
         }
         throw new Error(errorMessage)
       }
       
       const data = await response.json()
+      console.log('✅ Success response data:', data)
+      
       return {
         status: true,
         message: data.message
       }
     } catch (error) {
-      console.error('Error deleting project:', error)
+      console.error('❌ AdminService deleteProject error:', error)
       throw error
     }
   },
@@ -726,7 +741,15 @@ export const adminService = {
   // Additional CRUD Methods
   async deleteBid(bidId, reason) {
     try {
+      console.log('🔄 AdminService: Starting delete bid request')
+      console.log('📋 Bid ID:', bidId)
+      console.log('📝 Reason:', reason)
+      
       const token = this.getAdminToken()
+      console.log('🔑 Token present:', !!token)
+      
+      const requestBody = { bidId, reason }
+      console.log('📦 Request body:', requestBody)
       
       const response = await fetch(`${API_BASE_URL}/admin/bids/delete`, {
         method: 'POST',
@@ -734,27 +757,35 @@ export const adminService = {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ bidId, reason })
+        body: JSON.stringify(requestBody)
       })
+      
+      console.log('📡 Response status:', response.status)
+      console.log('📡 Response ok:', response.ok)
       
       if (!response.ok) {
         let errorMessage = 'Failed to delete bid'
         try {
           const errorData = await response.json()
+          console.log('❌ Error response data:', errorData)
           errorMessage = errorData.message || errorMessage
         } catch (parseError) {
+          console.log('❌ Could not parse error response:', parseError)
           errorMessage = `Server error: ${response.status} ${response.statusText}`
         }
         throw new Error(errorMessage)
       }
       
       const data = await response.json()
+      console.log('✅ Delete bid API success response:', data)
+      
       return {
         status: true,
-        message: data.message
+        message: data.message,
+        data: data.data
       }
     } catch (error) {
-      console.error('Error deleting bid:', error)
+      console.error('❌ AdminService deleteBid error:', error)
       throw error
     }
   },

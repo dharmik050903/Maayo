@@ -56,6 +56,7 @@ router.post("/signup/google",signupController.googleSignup);
 router.post("/auth/google/flow", loginController.googleOAuthFlow);
 router.get("/auth/google/callback", loginController.googleOAuthCallback);
 router.post("/login",loginController.authenticate);
+router.post("/login/google", loginController.googleLogin);
 
 // OTP Authentication routes
 router.post("/otp/send-login", otpController.sendLoginOTP);
@@ -117,6 +118,7 @@ router.post("/milestone/modify", auth, milestoneController.modifyMilestone);
 router.post("/milestone/add", auth, milestoneController.addMilestone);
 router.post("/milestone/remove", auth, milestoneController.removeMilestone);
 router.post("/milestone/list", auth, milestoneController.getProjectMilestones);
+router.post("/bid/delete", auth, bidController.deleteBid);
 // AI routes
 router.post("/ai/generate-proposal", auth, requireFeatureAccess('ai_proposals'), aiController.generateProposal);
 router.post("/ai/generate-project-description", auth, requireFeatureAccess('ai_proposals'), aiController.createProposalPrompt);

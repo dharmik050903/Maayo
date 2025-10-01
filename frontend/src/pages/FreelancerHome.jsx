@@ -358,7 +358,7 @@ export default function FreelancerHome() {
       
       {/* Upgrade Banner - Show only if user doesn't have active subscription */}
       {userData && needsUpgrade(userData) && (
-        <div className="px-6 pt-24">
+        <div className="px-6 pt-20">
           <UpgradeBanner userType="freelancer" />
         </div>
       )}

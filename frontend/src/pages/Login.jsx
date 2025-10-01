@@ -183,7 +183,7 @@ export default function Login() {
   const [showPasswordReset, setShowPasswordReset] = useState(false)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  
+
   // Google OAuth states
   const [selectedRole, setSelectedRole] = useState('')
 
@@ -233,6 +233,33 @@ export default function Login() {
     if (fieldErrors[name]) {
       setFieldErrors({ ...fieldErrors, [name]: false })
     }
+  }
+
+  // Standardized function to store authentication data
+  const storeAuthData = (token, user, userRole = null) => {
+    // Use userRole if provided (from Google sign-in), otherwise use user.user_type (from backend)
+    const finalUserRole = userRole || user.user_type
+    
+    // Store individual items
+    localStorage.setItem('authToken', token)
+    
+    // Update userData to use the final user role
+    const updatedUserData = { ...user, user_type: finalUserRole }
+    localStorage.setItem('userData', JSON.stringify(updatedUserData))
+    
+    // Store auth headers for API calls
+    localStorage.setItem('authHeaders', JSON.stringify({
+      token: token,
+      _id: user._id,
+      userRole: finalUserRole,
+      userEmail: user.email
+    }))
+    
+    localStorage.setItem('current_user_id', user._id)
+    
+    console.log('📝 Stored auth data in localStorage')
+    console.log('👤 User type:', finalUserRole)
+    console.log('🆔 User ID:', user._id)
   }
 
   // OTP Functions
@@ -301,19 +328,8 @@ export default function Login() {
       return
     }
     
-    // Store authentication data
-    localStorage.setItem("authToken", token)
-    localStorage.setItem("userData", JSON.stringify(user))
-    localStorage.setItem("authHeaders", JSON.stringify({
-      token: token,
-      _id: user._id,
-      userRole: user.user_type,
-      userEmail: user.email
-    }))
-
-    console.log('📝 Stored auth data in localStorage')
-    console.log('👤 User type:', user.user_type)
-    console.log('🆔 User ID:', user._id)
+    // Store authentication data using standardized function
+    storeAuthData(token, user)
 
     setMessage({ type: "success", text: "Login successful 🎉" })
 
@@ -450,6 +466,176 @@ export default function Login() {
     }
   }
 
+  // Initialize Google Sign-In script when role is selected (but don't trigger sign-in)
+  useEffect(() => {
+    if (selectedRole && !loading && !otpLoading) {
+      initializeGoogleSignIn()
+    }
+  }, [selectedRole, loading, otpLoading])
+
+  // Initialize Google Sign-In (load script and prepare button, but don't trigger sign-in)
+  const initializeGoogleSignIn = async () => {
+    try {
+      console.log('🔄 Initializing Google Sign-In for role:', selectedRole)
+      
+      // Check if Google Client ID is configured
+      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+      if (!clientId) {
+        console.log('❌ Google Client ID not configured')
+        return
+      }
+
+      console.log('🔍 Google Client ID:', clientId.substring(0, 20) + '...')
+
+      // Load Google Identity Services script if not already loaded
+      if (!window.google) {
+        console.log('🔄 Loading Google Identity Services...')
+        const script = document.createElement('script')
+        script.src = 'https://accounts.google.com/gsi/client'
+        script.async = true
+        script.defer = true
+        document.head.appendChild(script)
+        
+        await new Promise((resolve, reject) => {
+          script.onload = () => {
+            console.log('✅ Google Identity Services loaded')
+            resolve()
+          }
+          script.onerror = () => {
+            console.error('❌ Failed to load Google Identity Services')
+            reject(new Error('Failed to load Google Identity Services'))
+          }
+        })
+      }
+
+      // Initialize Google Identity Services
+      console.log('🔄 Initializing Google Identity Services...')
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleGoogleSignInCallback,
+        auto_select: false,
+        cancel_on_tap_outside: true
+      })
+
+      console.log('🔄 Rendering Google button...')
+      // Render Google's official button
+      window.google.accounts.id.renderButton(
+        document.getElementById('google-signin-button'),
+        {
+          theme: 'outline',
+          size: 'large',
+          text: 'signin_with',
+          shape: 'rectangular',
+          logo_alignment: 'left',
+          width: '100%'
+        }
+      )
+
+      // Check if Google button rendered successfully and hide fallback if needed
+      const checkGoogleButton = () => {
+        const googleButton = document.getElementById('google-signin-button')
+        const fallbackButton = document.getElementById('google-fallback-button')
+        
+        if (googleButton && googleButton.children.length > 0) {
+          // Google button rendered successfully
+          if (fallbackButton) {
+            fallbackButton.classList.add('hidden')
+            console.log('✅ Google button rendered, hiding fallback')
+          }
+        } else {
+          // Google button didn't render, show fallback
+          if (fallbackButton) {
+            fallbackButton.classList.remove('hidden')
+            console.log('⚠️ Google button failed, showing fallback')
+          }
+        }
+      }
+
+      // Check immediately and then again after a short delay
+      checkGoogleButton()
+      setTimeout(checkGoogleButton, 500)
+      setTimeout(checkGoogleButton, 1500)
+
+    } catch (error) {
+      console.error('❌ Google initialization error:', error)
+    }
+  }
+
+  // Handle Google Sign In Fallback (custom button)
+  const handleGoogleSignInFallback = async () => {
+    if (!selectedRole) {
+      setMessage({ type: 'error', text: 'Please select your role first' })
+      return
+    }
+
+    setLoading(true)
+    setMessage(null)
+
+    try {
+      console.log('🔄 Starting Google sign-in fallback for role:', selectedRole)
+      
+      // Check if Google Client ID is configured
+      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+      if (!clientId) {
+        setMessage({ type: 'error', text: 'Google Client ID not configured' })
+        setLoading(false)
+        return
+      }
+
+      console.log('🔍 Google Client ID:', clientId.substring(0, 20) + '...')
+
+      // Load Google Identity Services script if not already loaded
+      if (!window.google) {
+        console.log('🔄 Loading Google Identity Services...')
+        const script = document.createElement('script')
+        script.src = 'https://accounts.google.com/gsi/client'
+        script.async = true
+        script.defer = true
+        document.head.appendChild(script)
+        
+        await new Promise((resolve, reject) => {
+          script.onload = () => {
+            console.log('✅ Google Identity Services loaded')
+            resolve()
+          }
+          script.onerror = () => {
+            console.error('❌ Failed to load Google Identity Services')
+            reject(new Error('Failed to load Google Identity Services'))
+          }
+        })
+      }
+
+      // Initialize Google Identity Services
+      console.log('🔄 Initializing Google Identity Services...')
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleGoogleSignInCallback,
+        auto_select: false,
+        cancel_on_tap_outside: true
+      })
+
+      console.log('🔄 Showing Google sign-in popup...')
+      // Show the Google sign-in popup
+      window.google.accounts.id.prompt((notification) => {
+        console.log('🔍 Google prompt notification:', notification)
+        if (notification.isNotDisplayed()) {
+          console.log('❌ Google sign-in not displayed')
+          setLoading(false)
+          setMessage({ type: 'error', text: 'Google sign-in popup was blocked. Please allow popups for this site.' })
+        } else if (notification.isSkippedMoment()) {
+          console.log('❌ Google sign-in skipped')
+          setLoading(false)
+          setMessage({ type: 'error', text: 'Google sign-in was skipped. Please try again.' })
+        }
+      })
+
+    } catch (error) {
+      console.error('❌ Google sign-in error:', error)
+      setMessage({ type: 'error', text: 'Failed to initialize Google sign-in: ' + error.message })
+      setLoading(false)
+    }
+  }
+
   // Handle Google callback
   const handleGoogleSignInCallback = async (response) => {
     try {
@@ -459,49 +645,59 @@ export default function Login() {
         setMessage({ type: 'error', text: 'Please select your role first' })
         return
       }
+
+      setLoading(true)
+      setMessage(null)
       
       // Send the credential to backend
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
+      console.log('🔄 Sending Google token to backend:', API_BASE_URL)
+      
       const res = await fetch(`${API_BASE_URL}/login/google`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'userRole': selectedRole
+          'user_role': selectedRole
         },
         body: JSON.stringify({ 
           token: response.credential
         })
       })
 
+      console.log('🔍 Backend response status:', res.status)
       const data = await res.json()
+      console.log('🔍 Backend response data:', data)
 
       if (res.ok) {
-        // Store auth data
-        localStorage.setItem('authHeaders', JSON.stringify({
-          token: data.token,
-          _id: data.user._id,
-          userRole: data.user.user_type,
-          userEmail: data.user.email
-        }))
-        
-        localStorage.setItem('current_user_id', data.user._id)
+        // Store auth data using standardized function
+        storeAuthData(data.token, data.user, selectedRole)
         
         setMessage({ type: 'success', text: 'Google login successful! Redirecting...' })
         
-        // Redirect based on user type
+        // Redirect based on selected role (not backend response)
         setTimeout(() => {
-          if (data.user.user_type === 'freelancer') {
+          if (selectedRole === 'freelancer') {
             window.location.href = '/freelancer-dashboard'
-          } else {
+          } else if (selectedRole === 'client') {
             window.location.href = '/client-dashboard'
+          } else {
+            // Fallback to backend response if selectedRole is not set
+            if (data.user.user_type === 'freelancer') {
+              window.location.href = '/freelancer-dashboard'
+            } else {
+              window.location.href = '/client-dashboard'
+            }
           }
         }, 1500)
       } else {
+        console.error('❌ Backend error:', data)
         setMessage({ type: 'error', text: data.message || 'Google login failed' })
       }
     } catch (error) {
       console.error('❌ Google callback error:', error)
-      setMessage({ type: 'error', text: 'Failed to process Google sign-in' })
+      setMessage({ type: 'error', text: 'Failed to process Google sign-in: ' + error.message })
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -656,6 +852,7 @@ export default function Login() {
   //     setMessage({ type: "error", text: "Something went wrong. Try again." })
   //   }
   // }
+
     async function handleSubmit(e) {
     e.preventDefault();
     setMessage(null);
@@ -692,15 +889,8 @@ export default function Login() {
       }
 
       if (data.token) {
-        localStorage.setItem("authToken", data.token);
-        localStorage.setItem("userData", JSON.stringify(data.user));
-        
-        localStorage.setItem("authHeaders", JSON.stringify({
-          token: data.token,
-          _id: data.user._id,
-          userRole: data.user.user_type,
-          userEmail: data.user.email
-        }));
+        // Store auth data using standardized function
+        storeAuthData(data.token, data.user)
         
         setMessage({ type: "success", text: "Login successful 🎉" });
 
@@ -974,18 +1164,33 @@ export default function Login() {
           </div>
 
           {/* Google Sign In Button */}
-          <div id="g_id_onload"
-               data-client_id={import.meta.env.VITE_GOOGLE_CLIENT_ID}
-               data-callback="handleGoogleSignInCallback"
-               data-auto_prompt="false">
-          </div>
-          <div className="g_id_signin"
-               data-type="standard"
-               data-size="large"
-               data-theme="outline"
-               data-text="sign_in_with"
-               data-shape="rectangular"
-               data-logo_alignment="left">
+          <div className="w-full">
+            {/* Google's official button container */}
+            <div 
+              id="google-signin-button"
+              className={`w-full ${!selectedRole || loading || otpLoading ? 'opacity-50 pointer-events-none' : ''}`}
+            ></div>
+            
+            {/* Fallback custom button if Google button doesn't render */}
+            <button
+              type="button"
+              onClick={handleGoogleSignInFallback}
+              disabled={!selectedRole || loading || otpLoading}
+              className={`w-full flex items-center justify-center px-4 py-3 border rounded-lg font-medium transition-colors mt-2 hidden ${
+                selectedRole && !loading && !otpLoading
+                  ? 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400'
+                  : 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
+              }`}
+              id="google-fallback-button"
+            >
+              <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              Continue with Google
+            </button>
           </div>
         </div>
       </div>

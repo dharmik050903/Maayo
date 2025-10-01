@@ -6,7 +6,7 @@ const TermsAndConditions = () => {
     <div className="min-h-screen bg-brand-gradient">
       <Header />
       
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 pt-20">
         <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8">
           <h1 className="text-3xl font-bold text-graphite mb-8">Terms and Conditions</h1>
           

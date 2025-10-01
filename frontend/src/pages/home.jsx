@@ -102,7 +102,7 @@ export default function Home() {
       />
 
       {/* Hero Section */}
-      <section className="flex flex-col md:flex-row items-center justify-between flex-1 max-w-7xl mx-auto px-6 pt-28">
+      <section className="flex flex-col md:flex-row items-center justify-between flex-1 max-w-7xl mx-auto px-6 pt-20">
         <div className="max-w-xl space-y-6 slide-in-left text-center md:text-left">
           <h1 className="text-4xl md:text-5xl font-bold leading-tight">
             Find the right <span className="text-mint">freelancer</span> for your project

@@ -200,7 +200,7 @@ export default function ProjectList() {
   return (
     <div className="min-h-screen flex flex-col bg-brand-gradient text-white">
       <Header userType={userData?.user_type} userData={userData} onLogout={clearAuth} />
-      <div className="max-w-7xl mx-auto px-4 py-8 pt-24">
+      <div className="max-w-7xl mx-auto px-4 py-8 pt-20">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div>
