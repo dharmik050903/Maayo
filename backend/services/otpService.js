@@ -17,10 +17,24 @@ class OTPService {
 
         this.emailTransporter = nodemailer.createTransport({
             service: emailService,
+            host: 'smtp.gmail.com',
+            port: 587,
+            secure: false, // true for 465, false for other ports
             auth: {
                 user: emailUser,
                 pass: emailPass
-            }
+            },
+            // Add timeout configurations
+            pool: true,
+            maxConnections: 5,
+            maxMessages: 100,
+            rateLimit: 14, // Limit to 14 messages per second
+            connectionTimeout: 30000, // 30 seconds
+            greetingTimeout: 30000, // 30 seconds
+            socketTimeout: 30000, // 30 seconds
+            // Add retry configuration
+            retryDelay: 5000, // 5 seconds
+            logger: false
         });
     }
 
@@ -42,20 +56,50 @@ class OTPService {
     // Send OTP via email
     async sendOTPEmail(email, otp, purpose, userData = {}) {
         try {
+            // Verify transporter is ready
+            await this.emailTransporter.verify();
+            
             const subject = this.getEmailSubject(purpose);
             const htmlContent = this.getEmailTemplate(otp, purpose, userData);
             const mailOptions = {
                 from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
                 to: email,
                 subject: subject,
-                html: htmlContent
+                html: htmlContent,
+                // Add timeout and retry options
+                headers: {
+                    'X-Mailer': 'Maayo OTP Service'
+                }
             };
 
-            const result = await this.emailTransporter.sendMail(mailOptions);
+            console.log(`Sending OTP email to: ${email}`);
+            
+            // Send with timeout
+            const result = await Promise.race([
+                this.emailTransporter.sendMail(mailOptions),
+                new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Email timeout')), 25000)
+                )
+            ]);
+            
+            console.log(`Email sent successfully: ${result.messageId}`);
             return { success: true, messageId: result.messageId };
         } catch (error) {
             console.error('Error sending email:', error);
-            return { success: false, error: error.message };
+            
+            // Provide more specific error messages
+            let errorMessage = error.message;
+            if (error.code === 'EAUTH') {
+                errorMessage = 'Email authentication failed. Check your email credentials.';
+            } else if (error.code === 'ETIMEDOUT') {
+                errorMessage = 'Email service timeout. Please try again.';
+            } else if (error.code === 'ECONNECTION') {
+                errorMessage = 'Email connection failed. Check your network settings.';
+            } else if (errorMessage.includes('timeout')) {
+                errorMessage = 'Email service timeout. The service might be temporarily unavailable.';
+            }
+            
+            return { success: false, error: errorMessage };
         }
     }
 

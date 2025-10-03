@@ -157,6 +157,66 @@ router.get("/payment/test-config", (req, res) => {
     });
 });
 
+// Test endpoint for Email configuration
+router.get("/email/test-config", (req, res) => {
+    const config = {
+        emailService: process.env.EMAIL_SERVICE || 'Not Set',
+        emailUser: process.env.EMAIL_USER ? 'Set' : 'Not Set',
+        emailPass: process.env.EMAIL_PASS ? 'Set' : 'Not Set',
+        emailFrom: process.env.EMAIL_FROM || 'Not Set',
+        nodeEnv: process.env.NODE_ENV || 'development',
+        render: process.env.RENDER ? 'Yes' : 'No'
+    };
+    res.json({ 
+        status: 'OK', 
+        message: 'Email configuration check',
+        config 
+    });
+});
+
+// Test endpoint for Email sending
+router.post("/email/test-send", async (req, res) => {
+    try {
+        const { email } = req.body;
+        
+        if (!email) {
+            return res.status(400).json({
+                status: false,
+                message: "Email is required for testing"
+            });
+        }
+        
+        // Import OTP service
+        const { default: otpService } = await import('../services/otpService.js');
+        
+        // Test email transporter connection
+        await otpService.emailTransporter.verify();
+        
+        // Send test OTP
+        const result = await otpService.sendOTPEmail(
+            email, 
+            "123456", 
+            "login", 
+            { first_name: "Test User" }
+        );
+        
+        res.json({ 
+            status: result.success,
+            message: result.success ? 'Test email sent successfully' : 'Failed to send test email',
+            error: result.error,
+            messageId: result.messageId
+        });
+        
+    } catch (error) {
+        console.error('Email test error:', error);
+        res.status(500).json({
+            status: false,
+            message: 'Email test failed',
+            error: error.message
+        });
+    }
+});
+
 // Test endpoint for Google OAuth configuration
 router.get("/auth/test-config", (req, res) => {
     const config = {

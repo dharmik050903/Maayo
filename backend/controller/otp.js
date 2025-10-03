@@ -68,7 +68,8 @@ export default class OTPController {
 
             await otpRecord.save();
 
-            // Send OTP via email
+            // Send OTP via email with timeout handling
+            console.log(`Attempting to send OTP to: ${email}`);
             const sendResult = await otpService.sendOTPEmail(
                 email,
                 otpCode,
@@ -77,11 +78,22 @@ export default class OTPController {
             );
 
             if (!sendResult.success) {
+                // Clean up the OTP record if sending failed
                 await OTP.findByIdAndDelete(otpRecord._id);
+                console.error(`Failed to send OTP to ${email}:`, sendResult.error);
+                
                 return res.status(500).json({
                     status: false,
-                    message: "Failed to send OTP. Please try again.",
-                    error: sendResult.error
+                    message: sendResult.error || "Failed to send OTP. Please try again.",
+                    error: sendResult.error,
+                    // Add debugging info for development
+                    ...(process.env.NODE_ENV === 'development' && { 
+                        debug_info: {
+                            email_service: process.env.EMAIL_SERVICE,
+                            email_user: process.env.EMAIL_USER ? 'Set' : 'Not Set',
+                            has_email_pass: !!process.env.EMAIL_PASS
+                        }
+                    })
                 });
             }
 
