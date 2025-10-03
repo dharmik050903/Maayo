@@ -69,9 +69,9 @@ router.post("/otp/resend", originalOTPController.resendOTP);
 // OTP Authentication routes (improved with cloud-optimized email service and fallback)
 router.post("/otp/v2/send-login", otpController.sendLoginOTP);
 router.post("/otp/v2/send-password-reset", otpController.sendPasswordResetOTP);
-router.post("/otp/v2/verify", otpController.verifyLoginOTP);
-// router.post("/otp/v2/login", otpController.loginWithOTP);
-// router.post("/otp/v2/status", otpController.checkOTPStatus);
+router.post("/otp/v2/verify", otpController.verifyOTP);
+router.post("/otp/v2/login", otpController.loginWithOTP);
+router.post("/otp/v2/status", otpController.checkOTPStatus);
 //Skills Controller
 router.post("/skills",skillsController.listskills);
 //Freelancer and Client Info Controllers
