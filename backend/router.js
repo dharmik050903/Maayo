@@ -32,7 +32,7 @@ const skillsController = new skills();
 const projectController = new Project();
 const reviewController = new Review();
 const bidController = new Bid();
-const otpController = new OTP();
+const originalOTPController = new OTP();
 const aiController = new AIController();
 const chatController = new ChatController();
 const paymentGateway = new PaymentGateway();
@@ -60,11 +60,11 @@ router.post("/login",loginController.authenticate);
 router.post("/login/google", loginController.googleLogin);
 
 // OTP Authentication routes (original)
-router.post("/otp/send-login", otpController.sendLoginOTP);
-router.post("/otp/verify-login", otpController.verifyLoginOTP);
-router.post("/otp/send-password-reset", otpController.sendPasswordResetOTP);
-router.post("/otp/verify-password-reset", otpController.verifyPasswordResetOTP);
-router.post("/otp/resend", otpController.resendOTP);
+router.post("/otp/send-login", originalOTPController.sendLoginOTP);
+router.post("/otp/verify-login", originalOTPController.verifyLoginOTP);
+router.post("/otp/send-password-reset", originalOTPController.sendPasswordResetOTP);
+router.post("/otp/verify-password-reset", originalOTPController.verifyPasswordResetOTP);
+router.post("/otp/resend", originalOTPController.resendOTP);
 
 // OTP Authentication routes (improved with cloud-optimized email service and fallback)
 router.post("/otp/v2/send-login", otpController.sendLoginOTP);
