@@ -2,8 +2,10 @@ import { useState, useEffect, useRef } from 'react'
 import Header from '../components/Header'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 import { formatBudget } from '../utils/currency'
+import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 
 export default function BrowseProjects() {
+  const { t } = useComprehensiveTranslation()
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)

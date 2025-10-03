@@ -482,12 +482,14 @@ export async function getProjects(filters = {}) {
  * @returns {Promise} Freelancers response
  */
 export async function getFreelancers(filters = {}) {
+  console.log('🔄 API: Fetching freelancers with filters:', filters)
   const response = await authenticatedFetch(`${API_BASE_URL}/freelancer/list`, {
     method: 'POST',
     body: JSON.stringify(filters)
   })
   
   const data = await response.json()
+  console.log('📊 API: Freelancers response:', { status: response.status, data })
   return { response, data }
 }
 

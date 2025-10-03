@@ -2,6 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Header completely separate from page - aggressive fix */
+html body header {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100vw !important;
+    z-index: 99999 !important;
+    transform: translateZ(0) !important;
+    will-change: transform !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Override any parent container styles */
+header {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100vw !important;
+    z-index: 99999 !important;
+    transform: translateZ(0) !important;
+    will-change: transform !important;
+}
+
+/* Main content areas need top padding */
+main, .main-content, [class*="main"] {
+    padding-top: 80px !important;
+}
+
+@media (max-width: 768px) {
+    main, .main-content, [class*="main"] {
+        padding-top: 70px !important;
+    }
+}
+
 :root {
   --color-primary: #173257;
   --color-violet: #7635FF;

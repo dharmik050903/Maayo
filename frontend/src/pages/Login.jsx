@@ -7,7 +7,7 @@ import GoogleSignIn from '../components/GoogleSignIn'
 import { PageShimmer } from '../components/Shimmer'
 import { authenticatedFetch } from '../utils/api'
 import { otpService } from '../services/otpService'
-import { useTranslation } from '../hooks/useTranslation'
+import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 
 // Function to check if freelancer profile exists in database
 const checkFreelancerProfileExists = async (userId) => {
@@ -168,7 +168,7 @@ const checkClientProfileExists = async (userId) => {
 }
 
 export default function Login() {
-  const { t } = useTranslation()
+  const { t } = useComprehensiveTranslation()
   const [form, setForm] = useState({ email: '', password: '' })
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)

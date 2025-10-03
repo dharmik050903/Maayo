@@ -12,12 +12,14 @@ import { needsUpgrade } from '../utils/subscription'
 import MyBids from '../components/MyBids'
 import BidForm from '../components/BidForm'
 import confirmationService from '../services/confirmationService.jsx'
+import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 // Escrow components
 import BankDetailsList from '../components/BankDetailsList'
 import EscrowStatus from '../components/EscrowStatus'
 import MilestoneManagement from '../components/MilestoneManagement'
 
 export default function FreelancerHome() {
+  const { t } = useComprehensiveTranslation()
   const [userData, setUserData] = useState(null)
   const [profileData, setProfileData] = useState(null)
   const [projects, setProjects] = useState([])
@@ -88,7 +90,7 @@ export default function FreelancerHome() {
   const loadUserBids = async () => {
     try {
       const { bidService } = await import('../services/bidService')
-      const response = await bidService.getMyBids()
+      const response = await bidService.getFreelancerBids()
       
       if (response.status && response.data) {
         const bidProjectIds = response.data.map(bid => bid.project_id)
@@ -102,13 +104,15 @@ export default function FreelancerHome() {
 
   const fetchAvailableProjects = async () => {
     try {
-      console.log('Fetching active projects from tblprojects...')
+      console.log('🔄 FreelancerHome: Fetching active projects from tblprojects...')
       setLoading(true)
       setError(null)
       
       const response = await projectService.getAllProjects()
+      console.log('📊 FreelancerHome: API Response:', response)
       
       if (response.status && response.data) {
+        console.log('✅ FreelancerHome: Raw projects data:', response.data.length)
         const transformedProjects = response.data.map(project => {
           const clientData = project.personid || {}
           const skills = project.skills_required ? project.skills_required.map(s => s.skill || s.skill_id?.skill || 'Unknown') : []
@@ -228,7 +232,7 @@ export default function FreelancerHome() {
     loadUserBids()
     
     await confirmationService.alert(
-      'Bid submitted successfully! You can view it in "My Bids" section.',
+      t('bidSubmittedSuccess'),
       'Success'
     )
   }
@@ -374,25 +378,25 @@ export default function FreelancerHome() {
           {userData && (
             <div className="mb-8">
               <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-4">
-                Welcome back, <span className="text-mint">{userData.first_name}!</span>
+                {t('welcomeBack')}, <span className="text-mint">{userData.first_name}!</span>
               </h1>
               <p className="text-lg text-white/80 mb-6">
-                {profileData ?` Ready to find your next exciting project?` : 'Ready to find your next exciting project?'}
+                {t('readyToFind')}
               </p>
             </div>
           )}
           
           <h2 className="text-3xl md:text-5xl font-bold leading-tight mb-6">
-            Find Your Next <span className="text-mint">Project</span>
+            {t('findYourNext')} <span className="text-mint">{t('project')}</span>
           </h2>
           <p className="text-xl md:text-2xl text-white/80 mb-8 max-w-3xl mx-auto">
-            Connect with clients worldwide and build your freelance career with Maayo
+            {t('connectWithClients')}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Link to="/freelancer-dashboard">
               <Button variant="accent" size="lg" className="px-8 py-4 text-lg">
-                Manage Profile
+                {t('manageProfile')}
               </Button>
             </Link>
             <Button 
@@ -401,7 +405,7 @@ export default function FreelancerHome() {
               className="px-8 py-4 text-lg border-white text-white hover:bg-white hover:text-graphite"
               onClick={() => setActiveView(activeView === 'projects' ? null : 'projects')}
             >
-              {activeView === 'projects' ? 'Hide Projects' : 'Browse Projects'}
+              {activeView === 'projects' ? t('hideProjects') : t('browseProjects')}
             </Button>
             <Button 
               variant="outline" 
@@ -409,7 +413,7 @@ export default function FreelancerHome() {
               className="px-8 py-4 text-lg border-white text-white hover:bg-white hover:text-graphite"
               onClick={() => setActiveView(activeView === 'bids' ? null : 'bids')}
             >
-              {activeView === 'bids' ? 'Hide My Bids' : 'My Bids'}
+              {activeView === 'bids' ? t('hideMyBids') : t('myBids')}
             </Button>
           </div>
 
@@ -743,14 +747,25 @@ export default function FreelancerHome() {
             {!loading && (
             <div id="projects-section" className="space-y-6">
               {getPaginatedProjects().map((project, index) => (
-                <div key={project._id} className="card p-6 bg-white/95 hover:bg-white transition-colors slide-in-up" style={{animationDelay: `{index * 0.1}s`}}>
+                <div 
+                  key={project._id} 
+                  className="card p-6 bg-white/95 hover:bg-white hover:shadow-lg transition-all duration-200 slide-in-up cursor-pointer group" 
+                  style={{animationDelay: `{index * 0.1}s`}}
+                  onClick={(e) => {
+                    // Only open project details if not clicking on bid button or its container
+                    if (!e.target.closest('.bid-action-container')) {
+                      handleProjectTitleClick(project)
+                    }
+                  }}
+                >
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">
-                      <h3 
-                        className="text-xl font-semibold text-graphite mb-2 cursor-pointer hover:text-violet transition-colors"
-                        onClick={() => handleProjectTitleClick(project)}
-                      >
+                      <h3 className="text-xl font-semibold text-graphite mb-2 hover:text-violet transition-colors flex items-center gap-2">
                         {project.title}
+                        <svg className="w-4 h-4 text-coolgray group-hover:text-violet transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
                       </h3>
                       <p className="text-coolgray mb-3 project-description">
                         {project.description.length > 100 
@@ -796,7 +811,7 @@ export default function FreelancerHome() {
                       </div>
                     </div>
                     
-                    <div className="ml-6 text-right">
+                    <div className="ml-6 text-right bid-action-container">
                       <div className="mb-2">
                         <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
                           {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
@@ -807,14 +822,17 @@ export default function FreelancerHome() {
                       </div>
                       {hasUserSubmittedBid(project._id) ? (
                         <div className="px-6 py-2 bg-green-100 text-green-800 rounded-lg text-sm font-medium text-center">
-                          ✓ Submitted
+                          ✓ Bid Submitted
                         </div>
                       ) : (
                         <Button 
                           variant="accent" 
                           size="sm" 
                           className="px-6 py-2"
-                          onClick={() => handleSubmitBid(project)}
+                          onClick={(e) => {
+                            e.stopPropagation() // Prevent card click
+                            handleSubmitBid(project)
+                          }}
                         >
                           Submit Bid
                         </Button>
@@ -822,6 +840,17 @@ export default function FreelancerHome() {
                       <div className="text-xs text-coolgray mt-2">
                         Posted: {new Date(project.createdAt).toLocaleDateString()}
                       </div>
+                    </div>
+                  </div>
+                  
+                  {/* Click indicator */}
+                  <div className="mt-4 pt-3 border-t border-gray-100">
+                    <div className="flex items-center justify-center text-xs text-coolgray group-hover:text-violet transition-colors">
+                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      Click anywhere to view project details
                     </div>
                   </div>
                 </div>
@@ -1024,7 +1053,7 @@ export default function FreelancerHome() {
       <section className="py-20 px-6 bg-white/5">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-16">
-            How It <span className="text-mint">Works</span>
+            {t('howItWorks').split(' ')[0]} {t('howItWorks').split(' ')[1]} <span className="text-mint">{t('howItWorks').split(' ')[2] || 'Works'}</span>
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -1032,32 +1061,32 @@ export default function FreelancerHome() {
               <div className="w-12 h-12 bg-mint rounded-full mx-auto mb-4 flex items-center justify-center text-white font-bold text-xl">
                 1
               </div>
-              <h3 className="text-lg font-semibold mb-2">Create Profile</h3>
-              <p className="text-white/70 text-sm">Set up your profile with skills, portfolio, and rates</p>
+              <h3 className="text-lg font-semibold mb-2">{t('createProfile')}</h3>
+              <p className="text-white/70 text-sm">{t('createProfileDesc')}</p>
             </div>
             
             <div className="text-center">
               <div className="w-12 h-12 bg-coral rounded-full mx-auto mb-4 flex items-center justify-center text-white font-bold text-xl">
                 2
               </div>
-              <h3 className="text-lg font-semibold mb-2">Find Projects</h3>
-              <p className="text-white/70 text-sm">Browse and apply to projects that match your expertise</p>
+              <h3 className="text-lg font-semibold mb-2">{t('findProjects')}</h3>
+              <p className="text-white/70 text-sm">{t('findProjectsDesc')}</p>
             </div>
             
             <div className="text-center">
               <div className="w-12 h-12 bg-violet rounded-full mx-auto mb-4 flex items-center justify-center text-white font-bold text-xl">
                 3
               </div>
-              <h3 className="text-lg font-semibold mb-2">Get Hired</h3>
-              <p className="text-white/70 text-sm">Submit proposals and get selected by clients</p>
+              <h3 className="text-lg font-semibold mb-2">{t('getHired')}</h3>
+              <p className="text-white/70 text-sm">{t('getHiredDesc')}</p>
             </div>
             
             <div className="text-center">
               <div className="w-12 h-12 bg-mint rounded-full mx-auto mb-4 flex items-center justify-center text-white font-bold text-xl">
                 4
               </div>
-              <h3 className="text-lg font-semibold mb-2">Get Paid</h3>
-              <p className="text-white/70 text-sm">Complete work and receive secure milestone payments</p>
+              <h3 className="text-lg font-semibold mb-2">{t('getPaid')}</h3>
+              <p className="text-white/70 text-sm">{t('completeWork')}</p>
             </div>
           </div>
         </div>
@@ -1067,14 +1096,14 @@ export default function FreelancerHome() {
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-6">
-            Ready to Start Your <span className="text-mint">Freelance Journey</span>?
+            {t('readyToStartJourney')} <span className="text-mint">{t('freelanceJourney')}</span>?
           </h2>
           <p className="text-xl text-white/80 mb-8">
-            Join thousands of successful freelancers on Maayo and take control of your career.
+            {t('joinThousandsFreelancers')}
           </p>
           <Link to="/freelancer-dashboard">
             <Button variant="accent" size="lg" className="px-12 py-4 text-xl">
-              Get Started Now
+              {t('getStartedNow')}
             </Button>
           </Link>
         </div>
@@ -1206,7 +1235,6 @@ export default function FreelancerHome() {
           </div>
         </div>
       )}
-
     </div>
   )
 }

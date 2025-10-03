@@ -7,7 +7,7 @@ import { PageShimmer } from '../components/Shimmer'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 import { formatBudget } from '../utils/currency'
 import confirmationService from '../services/confirmationService.jsx'
-import { useTranslation } from '../hooks/useTranslation'
+import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 // Escrow components
 import CreateEscrowPayment from '../components/CreateEscrowPayment'
 import EscrowStatus from '../components/EscrowStatus'
@@ -17,7 +17,7 @@ import ProjectPriceUpdate from '../components/ProjectPriceUpdate'
 export default function ProjectDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { t } = useTranslation()
+  const { t } = useComprehensiveTranslation()
   const [userData, setUserData] = useState(null)
   const [project, setProject] = useState(null)
   const [loading, setLoading] = useState(true)

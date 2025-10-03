@@ -7,10 +7,10 @@ import { PageShimmer } from '../components/Shimmer'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 import { formatBudget } from '../utils/currency'
 import confirmationService from '../services/confirmationService.jsx'
-import { useTranslation } from '../hooks/useTranslation'
+import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 
 export default function ProjectList() {
-  const { t } = useTranslation()
+  const { t } = useComprehensiveTranslation()
   const [userData, setUserData] = useState(null)
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)

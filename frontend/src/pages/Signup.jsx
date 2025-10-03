@@ -9,10 +9,10 @@ import PasswordRequirements from '../components/PasswordRequirements'
 import { countries } from '../data/countries'
 import { dialCodes } from '../data/dialCodes'
 import CountrySelect from '../components/CountrySelect'
-import { useTranslation } from '../hooks/useTranslation'
+import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 
 export default function Signup() {
-  const { t } = useTranslation()
+  const { t } = useComprehensiveTranslation()
   const [form, setForm] = useState({
     first_name: '',
     last_name: '',

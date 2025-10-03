@@ -3,8 +3,10 @@ import { useSearchParams } from 'react-router-dom'
 import Header from '../components/Header'
 import { getFreelancers, isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 import { formatHourlyRate } from '../utils/currency'
+import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 
 export default function Freelancers() {
+  const { t } = useComprehensiveTranslation()
   const [searchParams] = useSearchParams()
   const [freelancers, setFreelancers] = useState([])
   const [filteredFreelancers, setFilteredFreelancers] = useState([])
@@ -81,20 +83,21 @@ export default function Freelancers() {
   const fetchFreelancers = async () => {
     try {
       setLoading(true)
-      console.log('Fetching freelancers from database...')
+      console.log('🔄 Freelancers: Starting to fetch freelancers from database...')
       
       const { response, data } = await getFreelancers({})
+      console.log('📊 Freelancers: API Response:', { response: response.status, data })
       
       if (response.ok && data.status) {
-        console.log('Freelancers fetched successfully:', data.data)
+        console.log('✅ Freelancers: Freelancers fetched successfully:', data.data?.length || 0)
         setFreelancers(data.data || [])
         setFilteredFreelancers(data.data || [])
       } else {
-        console.error('Failed to fetch freelancers:', data.message)
+        console.error('❌ Freelancers: Failed to fetch freelancers:', data.message)
         setError(data.message || 'Failed to fetch freelancers')
       }
     } catch (err) {
-      console.error('Error fetching freelancers:', err)
+      console.error('❌ Freelancers: Error fetching freelancers:', err)
       setError('Error fetching freelancers')
     } finally {
       setLoading(false)

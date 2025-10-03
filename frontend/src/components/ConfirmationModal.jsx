@@ -1,6 +1,6 @@
 import React from 'react'
 import Button from './Button'
-import { useTranslation } from '../hooks/useTranslation'
+import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 
 export default function ConfirmationModal({
   isOpen,
@@ -14,7 +14,7 @@ export default function ConfirmationModal({
   isLoading = false,
   confirmButtonVariant = "primary"
 }) {
-  const { t } = useTranslation()
+  const { t } = useComprehensiveTranslation()
   
   // Use translations as defaults if not provided
   const finalTitle = title || t('confirmAction')

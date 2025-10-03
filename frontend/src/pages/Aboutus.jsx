@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import Button from '../components/Button'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
+import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 
 export default function AboutUs() {
+  const { t } = useComprehensiveTranslation()
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const hasInitialized = useRef(false);
@@ -333,10 +335,10 @@ export default function AboutUs() {
           {/* Closing CTA */}
           <section className="bg-brand-gradient text-white rounded-xl p-12 text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Maayo – Where Talent Meets Opportunity</h2>
-            <p className="text-xl text-white/90 mb-8">Join thousands of freelancers and businesses building success together.</p>
+            <p className="text-xl text-white/90 mb-8">{t('joinThousandsTogether')}</p>
             <Link to="/signup">
               <Button variant="accent" className="text-lg px-8 py-4">
-            Sign Up Free →
+            {t('signUpFree')} →
               </Button>
             </Link>
           </section>

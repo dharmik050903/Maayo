@@ -8,8 +8,10 @@ import { getCurrentUser } from '../utils/api'
 import { formatBudget } from '../utils/currency'
 import BidForm from '../components/BidForm'
 import confirmationService from '../services/confirmationService.jsx'
+import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 
 export default function FindWork() {
+  const { t } = useComprehensiveTranslation()
   const userData = getCurrentUser()
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)

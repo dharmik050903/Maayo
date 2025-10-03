@@ -10,6 +10,7 @@ import { formatHourlyRate } from '../utils/currency'
 import { needsUpgrade } from '../utils/subscription'
 import { getSafeUrl } from '../utils/urlValidation'
 import confirmationService from '../services/confirmationService.jsx'
+import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 // Escrow components
 import BankDetailsList from '../components/BankDetailsList'
 import CreateEscrowPayment from '../components/CreateEscrowPayment'
@@ -18,6 +19,7 @@ import MilestoneManagement from '../components/MilestoneManagement'
 import ProjectPriceUpdate from '../components/ProjectPriceUpdate'
 
 export default function ClientHome() {
+  const { t } = useComprehensiveTranslation()
   const [userData, setUserData] = useState(null)
   const [profileData, setProfileData] = useState(null)
   const [freelancers, setFreelancers] = useState([])
@@ -397,7 +399,7 @@ export default function ClientHome() {
             Find the Perfect <span className="text-coral">Freelancer</span>
           </h1>
           <p className="text-xl md:text-2xl text-white/80 mb-8 max-w-3xl mx-auto">
-            Connect with top talent worldwide and bring your projects to life with Maayo
+            {t('connectWithTalent')}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -420,11 +422,11 @@ export default function ClientHome() {
               className="px-8 py-4 text-lg border-white text-white hover:bg-white hover:text-graphite"
               onClick={() => setActiveTab('escrow')}
             >
-              Escrow Management
+                {t('escrowManagement')}
             </Button>
             <Link to="/create-project">
               <Button variant="outline" size="lg" className="px-8 py-4 text-lg border-white text-white hover:bg-white hover:text-graphite">
-                Post a Project
+                {t('postAProject')}
               </Button>
             </Link>
           </div>
@@ -496,7 +498,7 @@ export default function ClientHome() {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                 </svg>
-                <span>Escrow Management</span>
+                <span>{t('escrowManagement')}</span>
               </div>
             </button>
           </div>
@@ -576,10 +578,10 @@ export default function ClientHome() {
                         onChange={(e) => handleFilterChange('experience_level', e.target.value)}
                         className="w-full px-3 py-2 border border-white/20 rounded-lg text-graphite bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50"
                       >
-                        <option value="">All Levels</option>
-                        <option value="Beginner">Beginner</option>
-                        <option value="Intermediate">Intermediate</option>
-                        <option value="Expert">Expert</option>
+                        <option value="">{t('allLevels')}</option>
+                        <option value="Beginner">{t('beginner')}</option>
+                        <option value="Intermediate">{t('intermediate')}</option>
+                        <option value="Expert">{t('expert')}</option>
                       </select>
                     </div>
                     
@@ -741,7 +743,7 @@ export default function ClientHome() {
                           handleFreelancerClick(freelancer)
                         }}
                       >
-                        View Profile
+                        {t('viewProfile')}
                       </Button>
                       <Button 
                         variant="accent" 
@@ -814,7 +816,7 @@ export default function ClientHome() {
         <section className="py-16 px-6 bg-white/5">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl font-bold text-center mb-8">
-              <span className="text-mint">Escrow</span> Management
+              <span className="text-mint">{t('escrowManagement')}</span>
             </h2>
             
             <div className="space-y-8">
@@ -826,7 +828,7 @@ export default function ClientHome() {
 
               {/* Project Selection for Escrow */}
               <div className="bg-white/95 backdrop-blur-sm rounded-lg p-6">
-                <h3 className="text-xl font-semibold text-graphite mb-4">Project Escrow Management</h3>
+                <h3 className="text-xl font-semibold text-graphite mb-4">{t('projectEscrowManagement')}</h3>
                 <p className="text-coolgray mb-4">Select a project to manage escrow payments and milestones</p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -872,7 +874,7 @@ export default function ClientHome() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 max-w-6xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-graphite">Escrow Management - {selectedProject.title}</h3>
+              <h3 className="text-2xl font-bold text-graphite">{t('escrowManagement')} - {selectedProject.title}</h3>
               <button 
                 onClick={() => {
                   setShowEscrowModal(false);
@@ -1028,10 +1030,10 @@ export default function ClientHome() {
       <section className="py-20 px-6 bg-white/5">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-6">
-            Ready to Start Your <span className="text-coral">Next Project</span>?
+            {t('readyToStartProject')} <span className="text-coral">{t('nextProject')}</span>?
           </h2>
           <p className="text-xl text-white/80 mb-8">
-            Join thousands of satisfied clients who trust Maayo for their project needs.
+            {t('joinThousandsClients')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/create-project">

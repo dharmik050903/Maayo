@@ -12,11 +12,11 @@ import { bidService } from '../services/bidService'
 import { getSafeUrl } from '../utils/urlValidation'
 import { formatBudget } from '../utils/currency'
 import confirmationService from '../services/confirmationService.jsx'
-import { useTranslation } from '../hooks/useTranslation'
+import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 
 export default function MyProjects() {
   const navigate = useNavigate()
-  const { t } = useTranslation()
+  const { t } = useComprehensiveTranslation()
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -85,18 +85,21 @@ export default function MyProjects() {
     try {
       setLoading(true)
       setError(null)
-      
+      console.log('🔄 MyProjects: Starting to fetch client projects...')
       
       // Get projects for the current client
       const response = await projectService.getClientProjects()
+      console.log('📊 MyProjects: API Response:', response)
       
       if (response.status && response.data) {
+        console.log('✅ MyProjects: Projects fetched successfully:', response.data.length)
         setProjects(response.data)
       } else {
+        console.log('⚠️ MyProjects: No projects found or invalid response')
         setProjects([])
       }
     } catch (error) {
-      console.error('Error fetching client projects:', error)
+      console.error('❌ MyProjects: Error fetching client projects:', error)
       setError(error.message)
       setProjects([])
     } finally {

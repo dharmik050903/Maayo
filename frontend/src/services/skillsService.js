@@ -1,4 +1,5 @@
 import { authenticatedFetch } from '../utils/api'
+import { apiCache } from '../utils/apiCache'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
 
@@ -7,10 +8,19 @@ export const skillsService = {
   async getSkills() {
     try {
       console.log('🔄 Fetching skills from API...')
-      const response = await authenticatedFetch(`${API_BASE_URL}/skills`, {
+      
+      const requestOptions = {
         method: 'POST',
         body: JSON.stringify({})
-      })
+      }
+
+      // Check cache first
+      const cachedData = apiCache.get(`${API_BASE_URL}/skills`, requestOptions)
+      if (cachedData) {
+        return cachedData
+      }
+
+      const response = await authenticatedFetch(`${API_BASE_URL}/skills`, requestOptions)
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ message: 'Failed to fetch skills' }))
@@ -22,11 +32,16 @@ export const skillsService = {
       console.log('✅ Skills fetched successfully:', data)
       
       // Return in consistent format
-      return {
+      const result = {
         success: true,
         message: data.message || 'Skills fetched successfully',
         data: data.data || []
       }
+
+      // Cache the result
+      apiCache.set(`${API_BASE_URL}/skills`, requestOptions, result)
+      
+      return result
     } catch (error) {
       console.error('❌ Error fetching skills:', error)
       
