@@ -12,12 +12,12 @@ import { messageApiService } from '../services/messageApiService.jsx'
 import { bidService } from '../services/bidService.js'
 import ConversationsModal from './ConversationsModal'
 import PaymentHistory from './PaymentHistory'
-import { useTranslation } from '../hooks/useTranslation'
+import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 
 export default function Header({ userType, onLogout, userData }) {
   const location = useLocation()
   const navigate = useNavigate()
-  const { t } = useTranslation()
+  const { t } = useComprehensiveTranslation()
   const isAuthenticated = !!userData
   const actualUserType = userType || 'client' // Default to 'client' if userType is undefined
   const [isScrolled, setIsScrolled] = useState(false)
@@ -48,16 +48,27 @@ export default function Header({ userType, onLogout, userData }) {
       const scrollTop = window.scrollY
       setIsScrolled(scrollTop > 50)
       
-      // Debug: Check if header is visible
+      // Force header to stay fixed
       const header = document.querySelector('header')
       if (header) {
-        const rect = header.getBoundingClientRect()
-        console.log('Header position:', rect.top, rect.left, rect.width, rect.height)
-        if (rect.top !== 0) {
-          console.warn('Header is not at top! Current top:', rect.top)
-        }
+        header.style.position = 'fixed'
+        header.style.top = '0px'
+        header.style.left = '0px'
+        header.style.right = '0px'
+        header.style.zIndex = '1000'
       }
     }
+    
+    // Set initial position
+    const header = document.querySelector('header')
+    if (header) {
+      header.style.position = 'fixed'
+      header.style.top = '0px'
+      header.style.left = '0px'
+      header.style.right = '0px'
+      header.style.zIndex = '1000'
+    }
+    
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
@@ -70,11 +81,7 @@ export default function Header({ userType, onLogout, userData }) {
       
     const fetchInitialData = async () => {
       try {
-        // Always fetch projects (public endpoint)
-        const projectsResponse = await projectService.getBrowseProjects()
-        setProjects(projectsResponse.data || [])
-        
-        // Only fetch freelancers if user is authenticated
+        // Only fetch freelancers if user is authenticated (for search functionality)
         if (isAuthenticated) {
           try {
             const freelancersResponse = await getFreelancers({})
@@ -86,6 +93,7 @@ export default function Header({ userType, onLogout, userData }) {
             // Don't redirect on freelancer fetch error, just log it
           }
         }
+        // Don't fetch projects automatically - only fetch when user searches
       } catch (err) {
         console.error('Error fetching data for search:', err)
       }
@@ -95,7 +103,7 @@ export default function Header({ userType, onLogout, userData }) {
     } else {
       console.log('Header: Skipping duplicate data fetch due to StrictMode')
     }
-  }, [isAuthenticated])
+  }, [])
 
   // Set current user for messaging service
   useEffect(() => {
@@ -110,12 +118,12 @@ export default function Header({ userType, onLogout, userData }) {
       // Fetch immediately
       fetchNotificationCounts()
       
-      // Set up periodic refresh every 30 seconds
-      const interval = setInterval(fetchNotificationCounts, 30000)
+      // Set up periodic refresh every 5 minutes (reduced frequency)
+      const interval = setInterval(fetchNotificationCounts, 300000)
       
       return () => clearInterval(interval)
     }
-  }, [isAuthenticated, actualUserType])
+  }, []) // Remove dependencies to prevent re-creation of intervals
 
 
   // Close search results when clicking outside
@@ -140,14 +148,24 @@ export default function Header({ userType, onLogout, userData }) {
       setIsSearching(true)
       setShowSearchResults(true)
       
-      // Filter projects
-      const filteredProjects = projects.filter(project =>
-        project.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (project.skills_required && project.skills_required.some(skill =>
-          skill.skill?.toLowerCase().includes(searchQuery.toLowerCase())
-        ))
-      )
+      // Fetch projects only when user searches
+      let filteredProjects = []
+      try {
+        const projectsResponse = await projectService.getBrowseProjects()
+        const allProjects = projectsResponse.data || []
+        
+        // Filter projects
+        filteredProjects = allProjects.filter(project =>
+          project.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          project.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (project.skills_required && project.skills_required.some(skill =>
+            skill.skill?.toLowerCase().includes(searchQuery.toLowerCase())
+          ))
+        )
+      } catch (error) {
+        console.error('Error fetching projects for search:', error)
+        filteredProjects = []
+      }
       
       // Filter freelancers
       const filteredFreelancers = freelancers.filter(freelancer =>
@@ -199,8 +217,6 @@ export default function Header({ userType, onLogout, userData }) {
       return
     }
     
-    // Refresh notification counts when opening messages
-    fetchNotificationCounts()
     setShowConversationsModal(true)
   }
 
@@ -217,8 +233,6 @@ export default function Header({ userType, onLogout, userData }) {
 
   const closeConversationsModal = () => {
     setShowConversationsModal(false)
-    // Refresh notification counts when closing messages
-    fetchNotificationCounts()
   }
 
   const handlePaymentHistoryClick = () => {
@@ -246,17 +260,36 @@ export default function Header({ userType, onLogout, userData }) {
       let bidRequestCount = 0
       let bidResponseCount = 0
       
-      // Fetch conversations to count unread messages
-      try {
-        const conversationsResult = await messageApiService.getConversations()
-        if (conversationsResult.success && conversationsResult.data) {
-          // Count conversations with unread messages
-          messageCount = conversationsResult.data.filter(conv => 
-            conv.unread_count && conv.unread_count > 0
-          ).reduce((total, conv) => total + (conv.unread_count || 0), 0)
+      // Check if we have cached conversations data (cache for 2 minutes)
+      const cachedConversations = localStorage.getItem('cached_conversations')
+      const cacheTime = localStorage.getItem('cached_conversations_time')
+      const now = Date.now()
+      const cacheValid = cacheTime && (now - parseInt(cacheTime)) < 120000 // 2 minutes
+      
+      if (cacheValid && cachedConversations) {
+        // Use cached data
+        const conversations = JSON.parse(cachedConversations)
+        messageCount = conversations.filter(conv => 
+          conv.unread_count && conv.unread_count > 0
+        ).reduce((total, conv) => total + (conv.unread_count || 0), 0)
+        console.log('Header: Using cached conversations data')
+      } else {
+        // Fetch conversations to count unread messages
+        try {
+          const conversationsResult = await messageApiService.getConversations()
+          if (conversationsResult.success && conversationsResult.data) {
+            // Cache the conversations data
+            localStorage.setItem('cached_conversations', JSON.stringify(conversationsResult.data))
+            localStorage.setItem('cached_conversations_time', now.toString())
+            
+            // Count conversations with unread messages
+            messageCount = conversationsResult.data.filter(conv => 
+              conv.unread_count && conv.unread_count > 0
+            ).reduce((total, conv) => total + (conv.unread_count || 0), 0)
+          }
+        } catch (error) {
+          console.error('Header: Error fetching conversations:', error)
         }
-      } catch (error) {
-        console.error('Header: Error fetching conversations:', error)
       }
       
       // Fetch bids to count pending requests/responses
@@ -525,20 +558,19 @@ export default function Header({ userType, onLogout, userData }) {
 
   return (
     <>
-    <header className={`w-full fixed top-0 left-0 right-0 z-[99999] border-b ${
-      isScrolled ? 'bg-white border-gray-200' : 'bg-white/10 border-white/20'
-    }`} style={{ 
-      position: 'fixed', 
-      top: 0, 
-      left: 0, 
-      right: 0, 
-      zIndex: 99999,
-      transform: 'translateZ(0)', // Force hardware acceleration
-      willChange: 'transform', // Optimize for transforms
-      backgroundColor: isScrolled ? 'white' : 'rgba(255, 255, 255, 0.1)', // Explicit background
-      backdropFilter: 'blur(10px)', // Add backdrop blur
-      WebkitBackdropFilter: 'blur(10px)' // Safari support
-    }}>
+    {createPortal(
+      <header className={`w-full border-b ${
+        isScrolled ? 'bg-white/95 border-gray-200 shadow-lg' : 'bg-white/10 border-white/20'
+      }`} style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 99999,
+        width: '100vw',
+        transform: 'translateZ(0)',
+        willChange: 'transform'
+      }}>
       <div className="max-w-7xl mx-auto flex items-center justify-between p-2 md:p-4">
         <Link to={isAuthenticated ? `/${actualUserType}-home` : "/"} className="logo-link flex items-center space-x-2 hover:opacity-80 transition-opacity">
           <Logo theme={isScrolled ? "dark" : "light"} />
@@ -709,7 +741,7 @@ export default function Header({ userType, onLogout, userData }) {
                 <svg className="w-4 h-4 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-                <span className={`font-medium transition-colors duration-300 ${isScrolled ? 'text-graphite' : 'text-white'}`}>Logout</span>
+                <span className={`font-medium transition-colors duration-300 ${isScrolled ? 'text-graphite' : 'text-white'}`}>{t('logout')}</span>
               </div>
               <div className="absolute inset-0 bg-gradient-to-r from-coral/20 to-mint/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
             </button>
@@ -746,7 +778,9 @@ export default function Header({ userType, onLogout, userData }) {
           </div>
         </nav>
       )}
-    </header>
+    </header>,
+    document.body
+    )}
 
       {/* Project Detail Modal */}
       {showProjectModal && selectedProject && createPortal(

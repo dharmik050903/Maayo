@@ -5,12 +5,12 @@ import Button from "../components/Button"
 import { projectService } from "../services/projectService"
 import { formatBudget } from "../utils/currency"
 import { isAuthenticated, getCurrentUser, clearAuth } from "../utils/api"
-import { useTranslation } from "../hooks/useTranslation"
+import { useComprehensiveTranslation } from "../hooks/useComprehensiveTranslation"
 import hero from "../assets/medium-shot-woman-typing-keyboard.jpg"
 
 export default function Home() {
   const [searchParams] = useSearchParams()
-  const { t } = useTranslation()
+  const { t } = useComprehensiveTranslation()
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)

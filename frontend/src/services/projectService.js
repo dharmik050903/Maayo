@@ -1,4 +1,5 @@
 import { authenticatedFetch, getCurrentUser, isAuthenticated } from '../utils/api'
+import { apiCache } from '../utils/apiCache'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
 
@@ -63,7 +64,7 @@ export const projectService = {
     try {
       console.log('Fetching active projects from tblprojects...')
       
-      const response = await authenticatedFetch(`${API_BASE_URL}/project/list`, {
+      const requestOptions = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,7 +77,15 @@ export const projectService = {
           page: 1,
           limit: 50 // Get more projects for better browsing
         })
-      })
+      }
+
+      // Check cache first
+      const cachedData = apiCache.get(`${API_BASE_URL}/project/list`, requestOptions)
+      if (cachedData) {
+        return cachedData
+      }
+      
+      const response = await authenticatedFetch(`${API_BASE_URL}/project/list`, requestOptions)
       
       if (!response.ok) {
         let errorMessage = 'Failed to fetch projects'
@@ -90,15 +99,22 @@ export const projectService = {
       }
       
       const data = await response.json()
-      console.log('Active projects fetched successfully:', data.data?.length || 0)
-      console.log('Raw project data:', data.data)
+
+      console.log('📊 ProjectService: Active projects API response:', data)
+      console.log('✅ ProjectService: Active projects fetched successfully:', data.data?.length || 0)
+      console.log('📋 ProjectService: Raw project data:', data.data)
       
-      return {
+      const result = {
         status: true,
         message: "Active projects retrieved successfully",
         data: data.data || [],
         pagination: data.pagination
       }
+
+      // Cache the result
+      apiCache.set(`${API_BASE_URL}/project/list`, requestOptions, result)
+      
+      return result
     } catch (error) {
       console.error('Error fetching active projects:', error)
       if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
@@ -166,7 +182,8 @@ export const projectService = {
       }
       
       const data = await response.json()
-      console.log('Client projects fetched successfully:', data.data?.length || 0)
+      console.log('📊 ProjectService: Client projects API response:', data)
+      console.log('✅ ProjectService: Client projects fetched successfully:', data.data?.length || 0)
       
       return {
         status: true,

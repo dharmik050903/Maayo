@@ -21,6 +21,7 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
   const [milestoneAmount, setMilestoneAmount] = useState('')
   const [milestoneDescription, setMilestoneDescription] = useState('')
   const [milestoneDueDate, setMilestoneDueDate] = useState('')
+  const [milestoneError, setMilestoneError] = useState('')
   
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -114,8 +115,30 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
   }
 
   const addMilestone = () => {
-    if (!milestoneTitle.trim() || !milestoneAmount) {
-      setError('Milestone title and amount are required')
+    setMilestoneError('')
+    
+    if (!milestoneTitle.trim()) {
+      setMilestoneError('Milestone title is required')
+      return
+    }
+    if (!milestoneAmount || parseFloat(milestoneAmount) <= 0) {
+      setMilestoneError('Valid milestone amount is required')
+      return
+    }
+    if (!milestoneDescription.trim()) {
+      setMilestoneError('Milestone description is required')
+      return
+    }
+    if (!milestoneDueDate) {
+      setMilestoneError('Milestone due date is required')
+      return
+    }
+
+    // Check if milestone amount exceeds remaining budget
+    const totalMilestoneAmount = formData.milestones.reduce((sum, m) => sum + m.amount, 0)
+    const newTotal = totalMilestoneAmount + parseFloat(milestoneAmount)
+    if (newTotal > parseFloat(formData.bid_amount)) {
+      setMilestoneError(`Total milestone amount ($${newTotal.toFixed(2)}) cannot exceed bid amount ($${formData.bid_amount})`)
       return
     }
 
@@ -157,6 +180,16 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
 
       if (formData.bid_amount <= 0) {
         throw new Error('Bid amount must be greater than 0')
+      }
+
+      if (formData.milestones.length === 0) {
+        throw new Error('At least one milestone is required for escrow payment')
+      }
+
+      // Validate milestone amounts match bid amount
+      const totalMilestoneAmount = formData.milestones.reduce((sum, m) => sum + m.amount, 0)
+      if (Math.abs(totalMilestoneAmount - parseFloat(formData.bid_amount)) > 0.01) {
+        throw new Error(`Total milestone amount ($${totalMilestoneAmount.toFixed(2)}) must equal bid amount ($${formData.bid_amount})`)
       }
 
       if (formData.proposed_duration <= 0) {
@@ -457,6 +490,10 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
               </div>
             </div>
             
+            {milestoneError && (
+              <div className="text-red-500 text-sm mt-2">{milestoneError}</div>
+            )}
+            
             <button
               type="button"
               onClick={addMilestone}
@@ -469,7 +506,12 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
           {/* Milestones List */}
           {formData.milestones.length > 0 && (
             <div className="space-y-4">
-              <h4 className="font-semibold text-graphite text-lg">Added Milestones:</h4>
+              <div className="flex items-center justify-between">
+                <h4 className="font-semibold text-graphite text-lg">Added Milestones:</h4>
+                <div className="text-sm text-coolgray">
+                  Total: ${formData.milestones.reduce((sum, m) => sum + m.amount, 0).toFixed(2)} / ${formData.bid_amount}
+                </div>
+              </div>
               {formData.milestones.map((milestone, index) => (
                 <div key={index} className="bg-white border border-gray-200 rounded-2xl p-6 flex justify-between items-start shadow-sm hover:shadow-md transition-shadow duration-200">
                   <div className="flex-1">

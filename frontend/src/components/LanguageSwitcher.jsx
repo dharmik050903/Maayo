@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useLanguage } from '../contexts/LanguageContext'
-import { useTranslation } from '../hooks/useTranslation'
-import { availableLanguages } from '../data/translations'
+import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
+import comprehensiveTranslationService from '../services/comprehensiveTranslationService'
 
 const LanguageSwitcher = ({ variant = 'default' }) => {
   const { language, changeLanguage, isLoading } = useLanguage()
-  const { t } = useTranslation()
+  const { t, availableLanguages, isComplete } = useComprehensiveTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)
   const isDark = variant === 'dark'
@@ -82,37 +82,47 @@ const LanguageSwitcher = ({ variant = 'default' }) => {
             `}>
               {t('footer.language')}
             </div>
-            {availableLanguages.map((lang) => (
-              <button
-                key={lang.code}
-                onClick={() => handleLanguageChange(lang.code)}
-                className={`
-                  w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left
-                  transition-all duration-200 hover:scale-[1.02]
-                  ${language === lang.code
-                    ? isDark 
-                      ? 'bg-mint/20 text-mint border border-mint/30' 
-                      : 'bg-mint/10 text-mint border border-mint/20'
-                    : isDark
-                      ? 'hover:bg-white/10 text-white/90'
-                      : 'hover:bg-gray-100 text-gray-700'
-                  }
-                `}
-              >
-                <span className="text-xl">{lang.flag}</span>
-                <div className="flex-1">
-                  <div className="font-medium">{lang.name}</div>
-                  <div className={`text-xs ${isDark ? 'text-white/60' : 'text-gray-500'}`}>
-                    {lang.code.toUpperCase()}
+            {availableLanguages.map((lang) => {
+              const isComplete = comprehensiveTranslationService.isLanguageComplete(lang.code)
+              return (
+                <button
+                  key={lang.code}
+                  onClick={() => handleLanguageChange(lang.code)}
+                  className={`
+                    w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left
+                    transition-all duration-200 hover:scale-[1.02]
+                    ${language === lang.code
+                      ? isDark 
+                        ? 'bg-mint/20 text-mint border border-mint/30' 
+                        : 'bg-mint/10 text-mint border border-mint/20'
+                      : isDark
+                        ? 'hover:bg-white/10 text-white/90'
+                        : 'hover:bg-gray-100 text-gray-700'
+                    }
+                  `}
+                >
+                  <span className="text-xl">{lang.flag}</span>
+                  <div className="flex-1">
+                    <div className="font-medium flex items-center gap-2">
+                      {lang.name}
+                      {isComplete && (
+                        <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full">
+                          ✓
+                        </span>
+                      )}
+                    </div>
+                    <div className={`text-xs ${isDark ? 'text-white/60' : 'text-gray-500'}`}>
+                      {lang.code.toUpperCase()}
+                    </div>
                   </div>
-                </div>
-                {language === lang.code && (
-                  <svg className="w-4 h-4 text-mint" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                )}
-              </button>
-            ))}
+                  {language === lang.code && (
+                    <svg className="w-4 h-4 text-mint" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                </button>
+              )
+            })}
           </div>
         </div>
       )}

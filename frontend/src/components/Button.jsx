@@ -1,7 +1,7 @@
-import { useTranslation } from '../hooks/useTranslation'
+import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 
 export default function Button({ children, variant = 'primary', loading = false, className = '', ...props }) {
-  const { t } = useTranslation()
+  const { t } = useComprehensiveTranslation()
   
   const getVariantClasses = () => {
     switch (variant) {

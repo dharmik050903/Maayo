@@ -15,6 +15,8 @@ export default function ClientDashboard() {
   const [loading, setLoading] = useState(true)
   const [totalProjects, setTotalProjects] = useState(0)
   const [projectsLoading, setProjectsLoading] = useState(true)
+  const [recentProjects, setRecentProjects] = useState([])
+  const [recentProjectsLoading, setRecentProjectsLoading] = useState(true)
   const [activeSection, setActiveSection] = useState('overview') // 'overview' or 'projects'
   const hasInitialized = useRef(false)
 
@@ -45,6 +47,7 @@ export default function ClientDashboard() {
         setUserData(user)
         fetchClientInfo()
         fetchTotalProjects()
+        fetchRecentProjects()
       } else {
         console.log('ClientDashboard: No user data found')
         setLoading(false)
@@ -127,6 +130,33 @@ export default function ClientDashboard() {
     }
   }
 
+  const fetchRecentProjects = async () => {
+    try {
+      console.log('🔄 ClientDashboard: Fetching recent projects...')
+      setRecentProjectsLoading(true)
+      
+      // Fetch client's projects and get the last 3
+      const response = await projectService.getClientProjects()
+      
+      if (response.status && response.data) {
+        // Sort by creation date (newest first) and take last 3
+        const sortedProjects = response.data
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .slice(0, 3)
+        
+        console.log('✅ ClientDashboard: Recent projects fetched:', sortedProjects.length)
+        setRecentProjects(sortedProjects)
+      } else {
+        console.log('⚠️ ClientDashboard: No recent projects found')
+        setRecentProjects([])
+      }
+    } catch (error) {
+      console.error('❌ ClientDashboard: Error fetching recent projects:', error)
+      setRecentProjects([])
+    } finally {
+      setRecentProjectsLoading(false)
+    }
+  }
 
   const handleLogout = () => {
     clearAuth()
@@ -389,26 +419,48 @@ export default function ClientDashboard() {
                 {/* Recent Projects */}
                 <div className="card p-6 bg-white/95">
                   <h3 className="text-lg font-semibold text-graphite mb-4">Recent Projects</h3>
-                  <div className="space-y-4">
-                    <div className="border-l-4 border-violet pl-4">
-                      <h4 className="font-medium text-graphite">Website Development</h4>
-                      <p className="text-sm text-coolgray">Freelancer: John Doe</p>
-                      <p className="text-sm text-coolgray">Status: In Progress</p>
-                      <p className="text-sm text-coolgray">Budget: {formatBudget(2500)}</p>
+                  {recentProjectsLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet"></div>
+                      <span className="ml-3 text-coolgray">Loading projects...</span>
                     </div>
-                    <div className="border-l-4 border-mint pl-4">
-                      <h4 className="font-medium text-graphite">Logo Design</h4>
-                      <p className="text-sm text-coolgray">Freelancer: Jane Smith</p>
-                      <p className="text-sm text-coolgray">Status: Completed</p>
-                      <p className="text-sm text-coolgray">Budget: {formatBudget(500)}</p>
+                  ) : recentProjects.length > 0 ? (
+                    <div className="space-y-4">
+                      {recentProjects.map((project, index) => {
+                        // Determine status and color based on project state
+                        const getProjectStatus = (project) => {
+                          if (project.iscompleted === 1) return { status: 'Completed', color: 'border-mint' }
+                          if (project.isactive === 1) return { status: 'In Progress', color: 'border-violet' }
+                          if (project.ispending === 1) return { status: 'Pending Review', color: 'border-coral' }
+                          return { status: 'Open', color: 'border-gray-400' }
+                        }
+                        
+                        const { status, color } = getProjectStatus(project)
+                        
+                        return (
+                          <div key={project._id} className={`border-l-4 ${color} pl-4`}>
+                            <h4 className="font-medium text-graphite">{project.title}</h4>
+                            <p className="text-sm text-coolgray">
+                              Created: {new Date(project.createdAt).toLocaleDateString()}
+                            </p>
+                            <p className="text-sm text-coolgray">Status: {status}</p>
+                            <p className="text-sm text-coolgray">Budget: {formatBudget(project.budget)}</p>
+                            {project.duration && (
+                              <p className="text-sm text-coolgray">Duration: {project.duration} days</p>
+                            )}
+                          </div>
+                        )
+                      })}
                     </div>
-                    <div className="border-l-4 border-coral pl-4">
-                      <h4 className="font-medium text-graphite">Mobile App</h4>
-                      <p className="text-sm text-coolgray">Freelancer: Mike Johnson</p>
-                      <p className="text-sm text-coolgray">Status: Pending Review</p>
-                      <p className="text-sm text-coolgray">Budget: {formatBudget(5000)}</p>
+                  ) : (
+                    <div className="text-center py-8 text-coolgray">
+                      <svg className="w-12 h-12 mx-auto mb-3 text-coolgray/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <p className="text-sm">No projects yet</p>
+                      <p className="text-xs text-coolgray/70 mt-1">Create your first project to get started!</p>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>

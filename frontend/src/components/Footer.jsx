@@ -1,10 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { useTranslation } from '../hooks/useTranslation'
+import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 import LanguageSwitcher from './LanguageSwitcher'
 
 const Footer = ({ variant = 'default' }) => {
-  const { t } = useTranslation()
+  const { t } = useComprehensiveTranslation()
   const isDark = variant === 'dark'
   
   // Function to scroll to top when footer links are clicked

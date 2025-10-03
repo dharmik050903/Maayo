@@ -7,7 +7,7 @@ import GoogleSignIn from '../components/GoogleSignIn'
 import { PageShimmer } from '../components/Shimmer'
 import { authenticatedFetch } from '../utils/api'
 import { otpService } from '../services/otpService'
-import { useTranslation } from '../hooks/useTranslation'
+import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 
 // Function to check if freelancer profile exists in database
 const checkFreelancerProfileExists = async (userId) => {
@@ -168,7 +168,7 @@ const checkClientProfileExists = async (userId) => {
 }
 
 export default function Login() {
-  const { t } = useTranslation()
+  const { t } = useComprehensiveTranslation()
   const [form, setForm] = useState({ email: '', password: '' })
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
@@ -185,6 +185,8 @@ export default function Login() {
   const [showPasswordReset, setShowPasswordReset] = useState(false)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [retryCount, setRetryCount] = useState(0)
+  const [isWakingUpBackend, setIsWakingUpBackend] = useState(false)
 
   // Google OAuth states
   const [selectedRole, setSelectedRole] = useState('')
@@ -412,7 +414,12 @@ export default function Login() {
 
   const handlePasswordReset = async () => {
     if (!form.email) {
-      setMessage({ type: 'error', text: 'Please enter your email address' })
+      setMessage({ type: 'error', text: 'Please enter your email address first' })
+      // Focus on email input
+      const emailInput = document.querySelector('input[type="email"]')
+      if (emailInput) {
+        emailInput.focus()
+      }
       return
     }
 
@@ -420,16 +427,71 @@ export default function Login() {
     setMessage(null)
 
     try {
-      const response = await otpService.sendPasswordResetOTP(form.email)
+      console.log('🔄 Sending password reset OTP to:', form.email)
+      
+      // Check backend health first (with timeout)
+      console.log('🔍 Checking backend health...')
+      try {
+        const healthCheckPromise = otpService.checkBackendHealth()
+        const healthCheckTimeout = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Health check timeout')), 10000) // 10 second timeout for health check
+        })
+        
+        const healthCheck = await Promise.race([healthCheckPromise, healthCheckTimeout])
+        if (!healthCheck.healthy) {
+          console.log('⚠️ Backend health check failed, proceeding with wake-up attempts')
+        } else {
+          console.log('✅ Backend is healthy at:', healthCheck.url)
+        }
+      } catch (healthError) {
+        console.log('⚠️ Health check failed or timed out, proceeding anyway:', healthError.message)
+        // Continue with the request even if health check fails
+      }
+      
+      // Add timeout to prevent hanging (longer for Render cold start)
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Request timeout - please try again')), 60000) // 60 second timeout for Render
+      })
+      
+      const responsePromise = otpService.sendPasswordResetOTP(form.email)
+      const response = await Promise.race([responsePromise, timeoutPromise])
+      
+      console.log('📧 Password reset OTP response:', response)
+      
       if (response.status) {
         setShowPasswordReset(true)
         setMessage({ type: 'success', text: 'Password reset OTP sent to your email' })
         startResendTimer()
+        setRetryCount(0) // Reset retry count on success
       } else {
         setMessage({ type: 'error', text: response.message || 'Failed to send password reset OTP' })
       }
     } catch (error) {
-      setMessage({ type: 'error', text: error.message || 'Failed to send password reset OTP' })
+      console.error('❌ Error sending password reset OTP:', error)
+      
+      // Provide more specific error messages
+      let errorMessage = 'Failed to send password reset OTP'
+      if (error.message.includes('timeout')) {
+        errorMessage = 'Request timed out due to server cold start. Render free tier servers sleep after inactivity and take 30-60 seconds to wake up. Please wait 30 seconds and try again - the second attempt should work much faster.'
+      } else if (error.message.includes('Failed to fetch')) {
+        errorMessage = 'Unable to connect to server. Please check if the backend is running.'
+      } else if (error.message.includes('NetworkError')) {
+        errorMessage = 'Network error. Please check your internet connection.'
+      } else if (error.message.includes('All backend servers are unavailable')) {
+        errorMessage = 'Backend server is currently unavailable. Please try again in a few moments.'
+      } else {
+        errorMessage = error.message || 'Failed to send password reset OTP'
+      }
+      
+      // Increment retry count
+      setRetryCount(prev => prev + 1)
+      
+      // Add retry suggestion if retry count is low
+      if (retryCount < 2) {
+        errorMessage += ' Click "Forgot password?" again to retry.'
+      }
+      
+      setMessage({ type: 'error', text: errorMessage })
     } finally {
       setOtpLoading(false)
     }
@@ -1095,13 +1157,50 @@ export default function Login() {
           <div className="flex flex-col items-end gap-2">
             {/* Forgot Password Link - Exactly Above Login Button */}
             {loginMethod === 'password' && (
-              <button
-                type="button"
-                onClick={handlePasswordReset}
-                className="text-sm text-coral hover:text-coral/80 transition-colors"
-              >
-                Forgot password?
-              </button>
+              <div className="text-right">
+                <button
+                  type="button"
+                  onClick={handlePasswordReset}
+                  disabled={otpLoading}
+                  title="Enter your email first, then click here to reset password"
+                  className="text-sm text-coral hover:text-coral/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed underline hover:no-underline"
+                >
+                  {otpLoading ? 'Sending... (may take up to 60s)' : 'Forgot password?'}
+                </button>
+                {retryCount > 0 && (
+                  <div className="text-xs text-coolgray mt-1">
+                    Retry attempts: {retryCount}
+                    {retryCount >= 2 && (
+                      <div className="text-xs text-coral mt-1">
+                        Server may be cold. Try waiting 30 seconds then retry.
+                        <br />
+                        <button 
+                          type="button"
+                          onClick={async () => {
+                            console.log('🚀 Manual wake-up attempt...')
+                            try {
+                              const response = await fetch('https://maayo-backend.onrender.com/health', {
+                                method: 'GET',
+                                timeout: 15000
+                              })
+                              if (response.ok) {
+                                setMessage({ type: 'success', text: 'Server warmed up! Try forgot password again.' })
+                              } else {
+                                setMessage({ type: 'error', text: 'Wake-up failed. Please try again later.' })
+                              }
+                            } catch (error) {
+                              setMessage({ type: 'error', text: 'Wake-up failed. Please try again later.' })
+                            }
+                          }}
+                          className="text-xs text-violet hover:text-violet/80 underline mt-1"
+                        >
+                          Warm up server
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             )}
             {loginMethod === 'password' && (
               <Button type="submit" variant="accent" loading={loading}>
