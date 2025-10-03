@@ -425,11 +425,12 @@ export const escrowService = {
    * @param {string} projectId - Project ID
    * @param {number} milestoneIndex - Milestone index
    * @param {string} completionNotes - Completion notes
+   * @param {string} evidence - Evidence/proof of completion
    * @returns {Promise<Object>} Completion response
    */
-  async completeMilestone(projectId, milestoneIndex, completionNotes = '') {
+  async completeMilestone(projectId, milestoneIndex, completionNotes = '', evidence = '') {
     try {
-      console.log('Completing milestone:', { projectId, milestoneIndex, completionNotes })
+      console.log('Completing milestone:', { projectId, milestoneIndex, completionNotes, evidence })
       
       const response = await authenticatedFetch(`${API_BASE_URL}/milestone/complete`, {
         method: 'POST',
@@ -439,7 +440,8 @@ export const escrowService = {
         body: JSON.stringify({
           project_id: projectId,
           milestone_index: milestoneIndex,
-          completion_notes: completionNotes
+          completion_notes: completionNotes,
+          evidence: evidence
         })
       })
 

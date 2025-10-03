@@ -5,7 +5,7 @@ import Button from '../components/Button'
 import UpgradeBanner from '../components/UpgradeBanner'
 import AnimatedCounter from '../components/AnimatedCounter'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
-import { freelancerService } from '../services/freelancerService'
+import { getFreelancers } from '../utils/api'
 import { formatHourlyRate } from '../utils/currency'
 import { needsUpgrade } from '../utils/subscription'
 import { getSafeUrl } from '../utils/urlValidation'
@@ -86,18 +86,29 @@ export default function ClientHome() {
 
   const fetchAvailableFreelancers = async () => {
     try {
-      console.log('Fetching freelancers from backend API...')
-      console.log('User authenticated:', isAuthenticated())
-      console.log('Current user:', getCurrentUser())
+      console.log('🔄 ClientHome: Fetching freelancers from backend API...')
+      console.log('🔍 ClientHome: User authenticated:', isAuthenticated())
+      console.log('🔍 ClientHome: Current user:', getCurrentUser())
       setLoading(true)
       
-      const response = await freelancerService.getAllFreelancers()
+      const { response, data } = await getFreelancers({})
+      console.log('📊 ClientHome: Freelancer API response:', { status: response.status, data })
+      console.log('🔍 ClientHome: Data structure check:', {
+        dataExists: !!data,
+        dataStatus: data?.status,
+        dataDataExists: !!data?.data,
+        dataDataLength: data?.data?.length,
+        dataDataType: typeof data?.data,
+        dataDataSample: data?.data?.[0]
+      })
       
-      if (response.status && response.data && response.data.length > 0) {
-        console.log('Found freelancers from backend:', response.data.length)
+      if (response.ok && data && data.status && data.data && Array.isArray(data.data) && data.data.length > 0) {
+        console.log('✅ ClientHome: Found freelancers from backend:', data.data.length)
         
         // Transform the data from backend API to match the expected format
-        const transformedFreelancers = response.data.map(freelancer => {
+        console.log('🔍 ClientHome: Sample freelancer data:', data.data[0])
+        const transformedFreelancers = data.data.map(freelancer => {
+          console.log('🔍 ClientHome: Processing freelancer:', freelancer._id, freelancer)
           const personData = freelancer.personId || {}
           const skills = freelancer.skills ? freelancer.skills.map(s => s.skill || s) : []
           
@@ -144,18 +155,35 @@ export default function ClientHome() {
         })
         
         setFreelancers(transformedFreelancers)
-        console.log('Successfully loaded freelancers from backend API')
+        console.log('✅ ClientHome: Successfully loaded freelancers from backend API')
+        console.log('✅ ClientHome: Transformed freelancers count:', transformedFreelancers.length)
+        console.log('✅ ClientHome: Sample transformed freelancer:', transformedFreelancers[0])
       } else {
-        console.log('No freelancers found in database')
+        console.log('⚠️ ClientHome: No freelancers found or invalid response format')
+        console.log('🔍 ClientHome: Response details:', {
+          responseOk: response.ok,
+          dataStatus: data?.status,
+          dataDataLength: data?.data?.length,
+          dataMessage: data?.message
+        })
         setFreelancers([])
         // Set a helpful error message for the user
-        if (response.message) {
-          setError(response.message)
+        if (data && data.message) {
+          setError(data.message)
+        } else if (data && data.data && data.data.length === 0) {
+          setError('No freelancers found in the database')
+        } else {
+          setError('Failed to load freelancers')
         }
       }
       
     } catch (error) {
-      console.error('Error fetching freelancers from backend:', error)
+      console.error('❌ ClientHome: Error fetching freelancers from backend:', error)
+      console.error('❌ ClientHome: Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      })
       setError(error.message)
       setFreelancers([])
     } finally {
@@ -206,9 +234,11 @@ export default function ClientHome() {
   }
 
   const getFilteredAndSortedFreelancers = () => {
-    console.log('Filtering freelancers with search term:', freelancerSearchTerm)
-    console.log('Current filters:', filters)
-    console.log('Sort by:', sortBy)
+    console.log('🔍 ClientHome: Filtering freelancers with search term:', freelancerSearchTerm)
+    console.log('🔍 ClientHome: Current filters:', filters)
+    console.log('🔍 ClientHome: Sort by:', sortBy)
+    console.log('🔍 ClientHome: Total freelancers before filtering:', freelancers.length)
+    console.log('🔍 ClientHome: Sample freelancer for filtering:', freelancers[0])
     
     let filtered = freelancers.filter(freelancer => {
       // Search filter - matches name, title, overview, location, or skills
@@ -282,11 +312,11 @@ export default function ClientHome() {
       setLoading(true)
       console.log('Searching freelancers with term:', freelancerSearchTerm)
       
-      const response = await freelancerService.searchFreelancers(freelancerSearchTerm)
+      const { response, data } = await getFreelancers({ search: freelancerSearchTerm })
       
-      if (response.status && response.data && Array.isArray(response.data)) {
+      if (response.ok && data && data.data && Array.isArray(data.data)) {
         // Transform the data from backend API to match the expected format
-        const transformedFreelancers = response.data.map(freelancer => {
+        const transformedFreelancers = data.data.map(freelancer => {
           const personData = freelancer.personId || {}
           const skills = freelancer.skills ? freelancer.skills.map(s => s.skill || s) : []
           

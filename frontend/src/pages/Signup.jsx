@@ -184,6 +184,9 @@ export default function Signup() {
       // This will correctly use your VITE_API_BASE_URL.
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
       
+      console.log('📤 Signup: Sending form data:', form)
+      console.log('📤 Signup: API endpoint:', `${API_BASE_URL}/signup`)
+      
       const res = await fetch(`${API_BASE_URL}/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -191,6 +194,8 @@ export default function Signup() {
       });
 
       const data = await res.json();
+      console.log('📨 Signup: Response data:', data)
+      console.log('📨 Signup: Response status:', res.status)
       setLoading(false);
 
       if (data.message === "User created successfully") {
@@ -200,7 +205,18 @@ export default function Signup() {
           window.location.href = "/login";
         }, 2000);
       } else {
-        setMessage({ type: 'error', text: data.message || 'Failed to create account' });
+        let errorMessage = data.message || 'Failed to create account'
+        
+        // Provide better user guidance for common errors
+        if (data.message === "User already exists") {
+          errorMessage = "An account with this email already exists. Please use a different email or try logging in instead."
+        } else if (data.message === "Please fill required fields") {
+          errorMessage = "Please fill in all required fields."
+        } else if (res.status === 409) {
+          errorMessage = "This email is already registered. Please use a different email or try logging in."
+        }
+        
+        setMessage({ type: 'error', text: errorMessage });
       }
     } catch (err) {
       setLoading(false);

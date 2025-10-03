@@ -12,6 +12,7 @@ import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslatio
 import CreateEscrowPayment from '../components/CreateEscrowPayment'
 import EscrowStatus from '../components/EscrowStatus'
 import MilestoneManagement from '../components/MilestoneManagement'
+import FreelancerMilestoneTracker from '../components/FreelancerMilestoneTracker'
 import ProjectPriceUpdate from '../components/ProjectPriceUpdate'
 
 export default function ProjectDetail() {
@@ -267,10 +268,17 @@ export default function ProjectDetail() {
             {/* Milestone Management */}
             {project.isactive === 1 && (
               <div className="card p-6 bg-white/95 backdrop-blur-sm">
-                <MilestoneManagement 
-                  projectId={project._id}
-                  userRole={userData?.user_type || 'client'}
-                />
+                {userData?.user_type === 'freelancer' ? (
+                  <FreelancerMilestoneTracker 
+                    projectId={project._id}
+                    projectTitle={project.title}
+                  />
+                ) : (
+                  <MilestoneManagement 
+                    projectId={project._id}
+                    userRole={userData?.user_type || 'client'}
+                  />
+                )}
               </div>
             )}
           </div>

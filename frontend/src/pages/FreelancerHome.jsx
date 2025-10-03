@@ -11,6 +11,7 @@ import { formatBudget, formatHourlyRate } from '../utils/currency'
 import { needsUpgrade } from '../utils/subscription'
 import MyBids from '../components/MyBids'
 import BidForm from '../components/BidForm'
+import FreelancerMilestoneTracker from '../components/FreelancerMilestoneTracker'
 import confirmationService from '../services/confirmationService.jsx'
 import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 // Escrow components
@@ -447,6 +448,29 @@ export default function FreelancerHome() {
               <BankDetailsList />
             </div>
           </div>
+
+          {/* Active Projects with Milestones */}
+          {activeProjects.length > 0 && (
+            <div className="max-w-4xl mx-auto mb-12">
+              <h3 className="text-xl font-semibold text-graphite mb-6 text-center">📋 Active Project Milestones</h3>
+              <div className="space-y-6">
+                {activeProjects.map((project) => (
+                  <div key={project._id} className="card p-6 bg-white/95 backdrop-blur-sm">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-lg font-semibold text-graphite">{project.title}</h4>
+                      <div className="text-sm text-coolgray">
+                        Budget: {formatBudget(project.budget)}
+                      </div>
+                    </div>
+                    <FreelancerMilestoneTracker 
+                      projectId={project._id} 
+                      projectTitle={project.title}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
