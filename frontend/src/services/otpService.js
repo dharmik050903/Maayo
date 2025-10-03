@@ -1,28 +1,39 @@
 // Determine API base URL based on environment
 const getApiBaseUrl = () => {
   // Check if we're in production (not localhost)
-  const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'
+  const isProduction = window.location.hostname !== 'localhost' && 
+                      window.location.hostname !== '127.0.0.1' &&
+                      !window.location.hostname.includes('localhost') &&
+                      window.location.hostname !== ''
+  
+  console.log('🔧 Environment check:', {
+    hostname: window.location.hostname,
+    href: window.location.href,
+    isProduction,
+    viteApiUrl: import.meta.env.VITE_API_BASE_URL,
+    viteMode: import.meta.env.MODE,
+    viteDev: import.meta.env.DEV,
+    viteProd: import.meta.env.PROD
+  })
   
   if (import.meta.env.VITE_API_BASE_URL) {
+    console.log('✅ Using VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL)
     return import.meta.env.VITE_API_BASE_URL
   }
   
   if (isProduction) {
-    // For production, try multiple possible backend URLs
-    const possibleUrls = [
-      `${window.location.protocol}//${window.location.hostname}/api`,
-      `${window.location.protocol}//api.${window.location.hostname}`,
-      `${window.location.protocol}//backend.${window.location.hostname}`,
-      'https://api.maayo.com/api', // Replace with your actual backend domain
-      'https://backend.maayo.com/api' // Replace with your actual backend domain
-    ]
-    
-    // For now, return the first option (same domain)
-    return possibleUrls[0]
+    // For production, use the Render backend directly
+    const renderBackend = 'https://maayo-backend.onrender.com/api'
+    console.log('✅ Using Render backend for production:', renderBackend)
+    console.log('🌐 Current domain:', window.location.hostname)
+    console.log('🔗 Full URL:', window.location.href)
+    return renderBackend
   }
   
   // For development, use localhost
-  return 'http://localhost:5000/api'
+  const localhostBackend = 'http://localhost:5000/api'
+  console.log('✅ Using localhost backend for development:', localhostBackend)
+  return localhostBackend
 }
 
 const API_BASE_URL = getApiBaseUrl()
@@ -40,17 +51,45 @@ window.testBackendHealth = async () => {
   return result
 }
 
+// Make API URL test available globally for debugging
+window.testApiConnection = async () => {
+  const testUrl = 'https://maayo-backend.onrender.com/api/otp/send-password-reset'
+  console.log('🔍 Testing direct API connection to:', testUrl)
+  
+  try {
+    const response = await fetch(testUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'test@test.com' })
+    })
+    
+    console.log('📊 Direct API test response:', {
+      status: response.status,
+      statusText: response.statusText,
+      ok: response.ok
+    })
+    
+    return { success: true, status: response.status }
+  } catch (error) {
+    console.error('❌ Direct API test failed:', error)
+    return { success: false, error: error.message }
+  }
+}
+
 export const otpService = {
   // Get all possible API URLs to try
   getPossibleApiUrls() {
     const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'
     
+    console.log('🔧 Getting possible API URLs:', { isProduction, hostname: window.location.hostname })
+    
     if (import.meta.env.VITE_API_BASE_URL) {
+      console.log('✅ Using VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL)
       return [import.meta.env.VITE_API_BASE_URL]
     }
     
     if (isProduction) {
-      return [
+      const urls = [
         'https://maayo-backend.onrender.com/api', // Your actual Render backend
         `${window.location.protocol}//${window.location.hostname}/api`,
         `${window.location.protocol}//api.${window.location.hostname}`,
@@ -58,9 +97,13 @@ export const otpService = {
         'https://api.maayo.com/api',
         'https://backend.maayo.com/api'
       ]
+      console.log('✅ Production URLs:', urls)
+      return urls
     }
     
-    return ['http://localhost:5000/api']
+    const localhostUrl = 'http://localhost:5000/api'
+    console.log('✅ Development URL:', localhostUrl)
+    return [localhostUrl]
   },
 
   // Check if backend is available
@@ -191,44 +234,105 @@ export const otpService = {
     if (apiUrl.includes('onrender.com')) {
       try {
         console.log('🌅 Waking up Render backend...')
-        await fetch(`${apiUrl.replace('/api', '')}/health`, {
-          method: 'GET',
-          timeout: 5000
-        })
-        console.log('✅ Render backend is awake')
+        
+        // Try multiple wake-up attempts with increasing delays
+        const wakeUpAttempts = [
+          { url: `${apiUrl.replace('/api', '')}/health`, delay: 0 },
+          { url: `${apiUrl}/health`, delay: 2000 },
+          { url: `${apiUrl.replace('/api', '')}/status`, delay: 4000 }
+        ]
+        
+        for (const attempt of wakeUpAttempts) {
+          try {
+            if (attempt.delay > 0) {
+              console.log(`⏳ Waiting ${attempt.delay}ms before next wake-up attempt...`)
+              await new Promise(resolve => setTimeout(resolve, attempt.delay))
+            }
+            
+            const response = await fetch(attempt.url, {
+              method: 'GET',
+              timeout: 10000
+            })
+            
+            if (response.ok) {
+              console.log('✅ Render backend is awake at:', attempt.url)
+              return true
+            }
+          } catch (error) {
+            console.log(`⚠️ Wake-up attempt failed for ${attempt.url}:`, error.message)
+          }
+        }
+        
+        console.log('⚠️ All wake-up attempts failed, proceeding anyway')
+        return false
       } catch (error) {
         console.log('⚠️ Render wake-up failed, proceeding anyway:', error.message)
+        return false
       }
     }
+    return true
   },
 
   // Send OTP for password reset
   async sendPasswordResetOTP(email) {
     const possibleUrls = this.getPossibleApiUrls()
     
-    for (const apiUrl of possibleUrls) {
+    for (let i = 0; i < possibleUrls.length; i++) {
+      const apiUrl = possibleUrls[i]
       try {
-        console.log('🔄 OTP Service: Trying API URL:', apiUrl)
+        console.log(`🔄 OTP Service: Attempt ${i + 1}/${possibleUrls.length} - Trying API URL:`, apiUrl)
         console.log('🔄 OTP Service: Sending password reset OTP to:', email)
         
         // Wake up Render backend if needed
-        await this.wakeUpRenderBackend(apiUrl)
+        const wakeUpSuccess = await this.wakeUpRenderBackend(apiUrl)
+        
+        // If wake-up failed and this is a Render URL, add extra delay
+        if (!wakeUpSuccess && apiUrl.includes('onrender.com')) {
+          console.log('⏳ Adding extra delay for Render cold start...')
+          await new Promise(resolve => setTimeout(resolve, 5000)) // 5 second delay
+        }
         
         // Create AbortController for timeout (longer timeout for Render cold start)
         const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout for Render
+        const timeoutId = setTimeout(() => controller.abort(), 45000) // 45 second timeout for Render
         
-        const response = await fetch(`${apiUrl}/otp/send-password-reset`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ email }),
-          signal: controller.signal
-        })
+        // Try the request with retries
+        let response
+        let lastError
+        
+        for (let retry = 0; retry < 3; retry++) {
+          try {
+            console.log(`📧 OTP Service: Attempt ${retry + 1}/3 for password reset`)
+            
+            response = await fetch(`${apiUrl}/otp/send-password-reset`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ email }),
+              signal: controller.signal
+            })
+            
+            console.log('📧 OTP Service: Response status:', response.status, 'from URL:', apiUrl)
+            break // Success, exit retry loop
+            
+          } catch (error) {
+            lastError = error
+            console.log(`❌ OTP Service: Attempt ${retry + 1} failed:`, error.message)
+            
+            if (retry < 2) { // Don't delay on last attempt
+              const delay = (retry + 1) * 3000 // 3s, 6s delays
+              console.log(`⏳ Waiting ${delay}ms before retry...`)
+              await new Promise(resolve => setTimeout(resolve, delay))
+            }
+          }
+        }
         
         clearTimeout(timeoutId)
-        console.log('📧 OTP Service: Response status:', response.status, 'from URL:', apiUrl)
+        
+        if (!response) {
+          throw lastError || new Error('All retry attempts failed')
+        }
         
         if (!response.ok) {
           let errorMessage = 'Failed to send password reset OTP'

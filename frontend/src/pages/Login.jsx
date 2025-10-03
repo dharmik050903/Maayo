@@ -186,6 +186,7 @@ export default function Login() {
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [retryCount, setRetryCount] = useState(0)
+  const [isWakingUpBackend, setIsWakingUpBackend] = useState(false)
 
   // Google OAuth states
   const [selectedRole, setSelectedRole] = useState('')
@@ -448,7 +449,7 @@ export default function Login() {
       
       // Add timeout to prevent hanging (longer for Render cold start)
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Request timeout - please try again')), 35000) // 35 second timeout for Render
+        setTimeout(() => reject(new Error('Request timeout - please try again')), 60000) // 60 second timeout for Render
       })
       
       const responsePromise = otpService.sendPasswordResetOTP(form.email)
@@ -1163,7 +1164,7 @@ export default function Login() {
                   title="Enter your email first, then click here to reset password"
                   className="text-sm text-coral hover:text-coral/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed underline hover:no-underline"
                 >
-                  {otpLoading ? 'Sending... (may take up to 30s)' : 'Forgot password?'}
+                  {otpLoading ? 'Sending... (may take up to 60s)' : 'Forgot password?'}
                 </button>
                 {retryCount > 0 && (
                   <div className="text-xs text-coolgray mt-1">
