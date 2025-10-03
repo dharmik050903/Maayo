@@ -446,9 +446,9 @@ export default function Login() {
         // Continue with the request even if health check fails
       }
       
-      // Add timeout to prevent hanging
+      // Add timeout to prevent hanging (longer for Render cold start)
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Request timeout - please try again')), 10000) // 10 second timeout
+        setTimeout(() => reject(new Error('Request timeout - please try again')), 35000) // 35 second timeout for Render
       })
       
       const responsePromise = otpService.sendPasswordResetOTP(form.email)
@@ -470,11 +470,13 @@ export default function Login() {
       // Provide more specific error messages
       let errorMessage = 'Failed to send password reset OTP'
       if (error.message.includes('timeout')) {
-        errorMessage = 'Request timed out. Please check your internet connection and try again.'
+        errorMessage = 'Request timed out. This may be due to server cold start. Please try again - it should work on the second attempt.'
       } else if (error.message.includes('Failed to fetch')) {
         errorMessage = 'Unable to connect to server. Please check if the backend is running.'
       } else if (error.message.includes('NetworkError')) {
         errorMessage = 'Network error. Please check your internet connection.'
+      } else if (error.message.includes('All backend servers are unavailable')) {
+        errorMessage = 'Backend server is currently unavailable. Please try again in a few moments.'
       } else {
         errorMessage = error.message || 'Failed to send password reset OTP'
       }
@@ -1161,7 +1163,7 @@ export default function Login() {
                   title="Enter your email first, then click here to reset password"
                   className="text-sm text-coral hover:text-coral/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed underline hover:no-underline"
                 >
-                  {otpLoading ? 'Sending...' : 'Forgot password?'}
+                  {otpLoading ? 'Sending... (may take up to 30s)' : 'Forgot password?'}
                 </button>
                 {retryCount > 0 && (
                   <div className="text-xs text-coolgray mt-1">

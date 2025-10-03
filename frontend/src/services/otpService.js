@@ -32,6 +32,14 @@ console.log('🔧 OTP Service: Using API URL:', API_BASE_URL)
 console.log('🔧 OTP Service: Current hostname:', window.location.hostname)
 console.log('🔧 OTP Service: Environment:', import.meta.env.MODE)
 
+// Make health check available globally for debugging
+window.testBackendHealth = async () => {
+  const otpService = (await import('./otpService.js')).otpService
+  const result = await otpService.checkBackendHealth()
+  console.log('🔍 Backend Health Check Result:', result)
+  return result
+}
+
 export const otpService = {
   // Get all possible API URLs to try
   getPossibleApiUrls() {
@@ -43,11 +51,12 @@ export const otpService = {
     
     if (isProduction) {
       return [
+        'https://maayo-backend.onrender.com/api', // Your actual Render backend
         `${window.location.protocol}//${window.location.hostname}/api`,
         `${window.location.protocol}//api.${window.location.hostname}`,
         `${window.location.protocol}//backend.${window.location.hostname}`,
-        'https://api.maayo.com/api', // Replace with your actual backend domain
-        'https://backend.maayo.com/api' // Replace with your actual backend domain
+        'https://api.maayo.com/api',
+        'https://backend.maayo.com/api'
       ]
     }
     
@@ -177,6 +186,22 @@ export const otpService = {
     }
   },
 
+  // Wake up Render backend (ping to prevent cold start)
+  async wakeUpRenderBackend(apiUrl) {
+    if (apiUrl.includes('onrender.com')) {
+      try {
+        console.log('🌅 Waking up Render backend...')
+        await fetch(`${apiUrl.replace('/api', '')}/health`, {
+          method: 'GET',
+          timeout: 5000
+        })
+        console.log('✅ Render backend is awake')
+      } catch (error) {
+        console.log('⚠️ Render wake-up failed, proceeding anyway:', error.message)
+      }
+    }
+  },
+
   // Send OTP for password reset
   async sendPasswordResetOTP(email) {
     const possibleUrls = this.getPossibleApiUrls()
@@ -186,9 +211,12 @@ export const otpService = {
         console.log('🔄 OTP Service: Trying API URL:', apiUrl)
         console.log('🔄 OTP Service: Sending password reset OTP to:', email)
         
-        // Create AbortController for timeout
+        // Wake up Render backend if needed
+        await this.wakeUpRenderBackend(apiUrl)
+        
+        // Create AbortController for timeout (longer timeout for Render cold start)
         const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 8000) // 8 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout for Render
         
         const response = await fetch(`${apiUrl}/otp/send-password-reset`, {
           method: 'POST',
