@@ -434,14 +434,15 @@ export default function Login() {
       try {
         const healthCheckPromise = otpService.checkBackendHealth()
         const healthCheckTimeout = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Health check timeout')), 5000) // 5 second timeout for health check
+          setTimeout(() => reject(new Error('Health check timeout')), 10000) // 10 second timeout for health check
         })
         
         const healthCheck = await Promise.race([healthCheckPromise, healthCheckTimeout])
         if (!healthCheck.healthy) {
-          throw new Error('Backend server is not available. Please try again later.')
+          console.log('⚠️ Backend health check failed, proceeding with wake-up attempts')
+        } else {
+          console.log('✅ Backend is healthy at:', healthCheck.url)
         }
-        console.log('✅ Backend is healthy at:', healthCheck.url)
       } catch (healthError) {
         console.log('⚠️ Health check failed or timed out, proceeding anyway:', healthError.message)
         // Continue with the request even if health check fails
@@ -471,7 +472,7 @@ export default function Login() {
       // Provide more specific error messages
       let errorMessage = 'Failed to send password reset OTP'
       if (error.message.includes('timeout')) {
-        errorMessage = 'Request timed out. This may be due to server cold start. Please try again - it should work on the second attempt.'
+        errorMessage = 'Request timed out due to server cold start. Render free tier servers sleep after inactivity and take 30-60 seconds to wake up. Please wait 30 seconds and try again - the second attempt should work much faster.'
       } else if (error.message.includes('Failed to fetch')) {
         errorMessage = 'Unable to connect to server. Please check if the backend is running.'
       } else if (error.message.includes('NetworkError')) {
@@ -1169,6 +1170,34 @@ export default function Login() {
                 {retryCount > 0 && (
                   <div className="text-xs text-coolgray mt-1">
                     Retry attempts: {retryCount}
+                    {retryCount >= 2 && (
+                      <div className="text-xs text-coral mt-1">
+                        Server may be cold. Try waiting 30 seconds then retry.
+                        <br />
+                        <button 
+                          type="button"
+                          onClick={async () => {
+                            console.log('🚀 Manual wake-up attempt...')
+                            try {
+                              const response = await fetch('https://maayo-backend.onrender.com/health', {
+                                method: 'GET',
+                                timeout: 15000
+                              })
+                              if (response.ok) {
+                                setMessage({ type: 'success', text: 'Server warmed up! Try forgot password again.' })
+                              } else {
+                                setMessage({ type: 'error', text: 'Wake-up failed. Please try again later.' })
+                              }
+                            } catch (error) {
+                              setMessage({ type: 'error', text: 'Wake-up failed. Please try again later.' })
+                            }
+                          }}
+                          className="text-xs text-violet hover:text-violet/80 underline mt-1"
+                        >
+                          Warm up server
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

@@ -76,6 +76,59 @@ window.testApiConnection = async () => {
   }
 }
 
+// Pre-wakeup Render backend when page loads (for production)
+if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+  console.log('🌅 Pre-waking up Render backend on page load...')
+  
+  // Run wake-up in background without blocking page load
+  setTimeout(async () => {
+    try {
+      const wakeUpUrl = 'https://maayo-backend.onrender.com/health'
+      console.log('🔍 Pre-wakeup: Testing', wakeUpUrl)
+      
+      const response = await fetch(wakeUpUrl, {
+        method: 'GET',
+        timeout: 10000
+      })
+      
+      if (response.ok) {
+        console.log('✅ Pre-wakeup successful: Render backend is warm')
+        window.renderBackendWarm = true
+      } else {
+        console.log('⚠️ Pre-wakeup failed, backend may still be cold')
+        window.renderBackendWarm = false
+      }
+    } catch (error) {
+      console.log('⚠️ Pre-wakeup error:', error.message)
+      window.renderBackendWarm = false
+    }
+  }, 2000) // Wait 2 seconds after page load
+}
+
+// Pre-wake Render backend when page loads (for production)
+const preWakeRenderBackend = async () => {
+  const isProduction = window.location.hostname !== 'localhost' && 
+                      window.location.hostname !== '127.0.0.1' &&
+                      !window.location.hostname.includes('localhost')
+  
+  if (isProduction) {
+    console.log('🌅 Pre-waking Render backend on page load...')
+    try {
+      // Silent wake-up attempt
+      await fetch('https://maayo-backend.onrender.com/health', {
+        method: 'GET',
+        timeout: 10000
+      })
+      console.log('✅ Render backend pre-warmed')
+    } catch (error) {
+      console.log('⚠️ Pre-wake failed (this is normal):', error.message)
+    }
+  }
+}
+
+// Run pre-wake after a short delay
+setTimeout(preWakeRenderBackend, 2000)
+
 export const otpService = {
   // Get all possible API URLs to try
   getPossibleApiUrls() {
@@ -233,13 +286,14 @@ export const otpService = {
   async wakeUpRenderBackend(apiUrl) {
     if (apiUrl.includes('onrender.com')) {
       try {
-        console.log('🌅 Waking up Render backend...')
+        console.log('🌅 Waking up Render backend with aggressive approach...')
         
-        // Try multiple wake-up attempts with increasing delays
+        // More aggressive wake-up strategy for Render
         const wakeUpAttempts = [
-          { url: `${apiUrl.replace('/api', '')}/health`, delay: 0 },
-          { url: `${apiUrl}/health`, delay: 2000 },
-          { url: `${apiUrl.replace('/api', '')}/status`, delay: 4000 }
+          { url: `${apiUrl.replace('/api', '')}/health`, delay: 0, timeout: 15000 },
+          { url: `${apiUrl}/health`, delay: 3000, timeout: 15000 },
+          { url: `${apiUrl.replace('/api', '')}/status`, delay: 6000, timeout: 15000 },
+          { url: `${apiUrl}/otp/send-login`, delay: 9000, timeout: 20000, method: 'POST', body: JSON.stringify({ email: 'wakeup@test.com' }) }
         ]
         
         for (const attempt of wakeUpAttempts) {
@@ -249,13 +303,22 @@ export const otpService = {
               await new Promise(resolve => setTimeout(resolve, attempt.delay))
             }
             
-            const response = await fetch(attempt.url, {
-              method: 'GET',
-              timeout: 10000
-            })
+            const fetchOptions = {
+              method: attempt.method || 'GET',
+              timeout: attempt.timeout
+            }
             
-            if (response.ok) {
-              console.log('✅ Render backend is awake at:', attempt.url)
+            if (attempt.body) {
+              fetchOptions.headers = { 'Content-Type': 'application/json' }
+              fetchOptions.body = attempt.body
+            }
+            
+            console.log(`🔍 Wake-up attempt: ${attempt.method || 'GET'} ${attempt.url}`)
+            const response = await fetch(attempt.url, fetchOptions)
+            
+            // For POST requests, even 400/422 means server is awake
+            if (response.ok || (attempt.method === 'POST' && response.status < 500)) {
+              console.log('✅ Render backend is awake at:', attempt.url, 'Status:', response.status)
               return true
             }
           } catch (error) {
@@ -289,7 +352,13 @@ export const otpService = {
         // If wake-up failed and this is a Render URL, add extra delay
         if (!wakeUpSuccess && apiUrl.includes('onrender.com')) {
           console.log('⏳ Adding extra delay for Render cold start...')
-          await new Promise(resolve => setTimeout(resolve, 5000)) // 5 second delay
+          await new Promise(resolve => setTimeout(resolve, 10000)) // 10 second delay for cold start
+        }
+        
+        // Check if backend was pre-warmed
+        if (apiUrl.includes('onrender.com') && window.renderBackendWarm === false) {
+          console.log('❄️ Backend appears to be cold, adding additional delay...')
+          await new Promise(resolve => setTimeout(resolve, 15000)) // Additional 15 second delay
         }
         
         // Create AbortController for timeout (longer timeout for Render cold start)
