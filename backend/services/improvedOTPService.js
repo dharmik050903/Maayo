@@ -5,7 +5,7 @@ import { getEmailConfig, ALTERNATIVE_CONFIGS } from './emailConfig.js';
 
 dotenv.config();
 
-class OTPService {
+class ImprovedOTPService {
     constructor() {
         this.emailTransporter = null;
         this.initializeTransporter();
@@ -80,85 +80,108 @@ class OTPService {
         return crypto.randomBytes(length).toString('hex');
     }
 
-    // Send OTP via email with retry logic
+    // Send OTP via email with retry logic and fallback services
     async sendOTPEmail(email, otp, purpose, userData = {}) {
-        const maxRetries = 3;
-        const retryDelay = 2000; // 2 seconds
+        const maxRetries = 2; // Reduced retries per service
+        const retryDelay = 1500;
         
-        for (let attempt = 1; attempt <= maxRetries; attempt++) {
-            try {
-                console.log(`Email attempt ${attempt}/${maxRetries} to: ${email}`);
-                
-                // Skip verification on retry attempts for speed
-                if (attempt === 1) {
-                    await this.emailTransporter.verify();
+        // List of services to try in order
+        const servicesToTry = ['primary'];
+        
+        // Add alternative services if they have credentials
+        if (process.env.SENDGRID_API_KEY) servicesToTry.push('sendgrid');
+        if (process.env.MAILGUN_USERNAME && process.env.MAILGUN_PASSWORD) servicesToTry.push('mailgun');
+        if (process.env.SMTP2GO_USERNAME && process.env.SMTP2GO_PASSWORD) servicesToTry.push('smtp2go');
+        
+        // Try each service
+        for (const service of servicesToTry) {
+            console.log(`Trying email service: ${service}`);
+            
+            // Switch to alternative service if needed
+            if (service !== 'primary') {
+                const switched = await this.switchToAlternative(service);
+                if (!switched) {
+                    console.log(`Skipping ${service} - switch failed`);
+                    continue;
                 }
-                
-                const subject = this.getEmailSubject(purpose);
-                const htmlContent = this.getEmailTemplate(otp, purpose, userData);
-                const mailOptions = {
-                    from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
-                    to: email,
-                    subject: subject,
-                    html: htmlContent,
-                    headers: {
-                        'X-Mailer': 'Maayo OTP Service',
-                        'X-Attempt': attempt.toString()
+            } else if (service === 'primary') {
+                // Reinitialize primary service
+                this.initializeTransporter();
+            }
+            
+            // Try sending with current service
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                try {
+                    console.log(`Email attempt ${attempt}/${maxRetries} via ${service} to: ${email}`);
+                    
+                    // Verify connection on first attempt per service
+                    if (attempt === 1) {
+                        await this.emailTransporter.verify();
                     }
-                };
+                    
+                    const subject = this.getEmailSubject(purpose);
+                    const htmlContent = this.getEmailTemplate(otp, purpose, userData);
+                    const mailOptions = {
+                        from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+                        to: email,
+                        subject: subject,
+                        html: htmlContent,
+                        headers: {
+                            'X-Mailer': `Maayo OTP Service (${service})`,
+                            'X-Attempt': attempt.toString(),
+                            'X-Service': service
+                        }
+                    };
 
-                // Shorter timeout for production environments
-                const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER;
-                const timeoutDuration = isProduction ? 15000 : 25000; // 15s for prod, 25s for dev
-                
-                const result = await Promise.race([
-                    this.emailTransporter.sendMail(mailOptions),
-                    new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error(`Email timeout after ${timeoutDuration}ms`)), timeoutDuration)
-                    )
-                ]);
-                
-                console.log(`Email sent successfully on attempt ${attempt}: ${result.messageId}`);
-                return { success: true, messageId: result.messageId };
-                
-            } catch (error) {
-                console.error(`Email attempt ${attempt} failed:`, error.message);
-                
-                // Don't retry for certain errors
-                if (error.code === 'EAUTH' || error.message.includes('Invalid login')) {
-                    return { success: false, error: 'Email authentication failed. Check your email credentials.' };
-                }
-                
-                if (error.code === 'EMESSAGE' || error.message.includes('invalid email')) {
-                    return { success: false, error: 'Invalid email address provided.' };
-                }
-                
-                // If this was the last attempt, return error
-                if (attempt === maxRetries) {
-                    let errorMessage = error.message;
+                    // Shorter timeout for cloud environments
+                    const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER;
+                    const timeoutDuration = isProduction ? 10000 : 20000; // 10s for prod, 20s for dev
                     
-                    if (error.code === 'ETIMEDOUT' || error.message.includes('timeout')) {
-                        errorMessage = 'Email service timeout. Please try again later.';
-                    } else if (error.code === 'ECONNECTION') {
-                        errorMessage = 'Cannot connect to email service. Please check your network or try again.';
-                    } else if (error.code === 'EDNS') {
-                        errorMessage = 'Email service DNS resolution failed.';
-                    } else {
-                        errorMessage = `Email service error: ${error.message}`;
+                    const result = await Promise.race([
+                        this.emailTransporter.sendMail(mailOptions),
+                        new Promise((_, reject) => 
+                            setTimeout(() => reject(new Error(`Email timeout after ${timeoutDuration}ms`)), timeoutDuration)
+                        )
+                    ]);
+                    
+                    console.log(`Email sent successfully via ${service} on attempt ${attempt}: ${result.messageId}`);
+                    return { 
+                        success: true, 
+                        messageId: result.messageId,
+                        service: service 
+                    };
+                    
+                } catch (error) {
+                    console.error(`Email attempt ${attempt} via ${service} failed:`, error.message);
+                    
+                    // Don't retry for certain errors
+                    if (error.code === 'EAUTH' || error.message.includes('Invalid login')) {
+                        console.log(`Authentication failed with ${service}, trying next service...`);
+                        break; // Try next service
                     }
                     
-                    return { success: false, error: errorMessage };
-                }
-                
-                // Wait before retrying
-                if (attempt < maxRetries) {
-                    console.log(`Waiting ${retryDelay}ms before retry...`);
+                    if (error.code === 'EMESSAGE' || error.message.includes('invalid email')) {
+                        return { success: false, error: 'Invalid email address provided.' };
+                    }
+                    
+                    // If this was the last attempt for this service, try next service
+                    if (attempt === maxRetries) {
+                        console.log(`All attempts failed for ${service}, trying next service...`);
+                        break;
+                    }
+                    
+                    // Wait before retrying with same service
                     await new Promise(resolve => setTimeout(resolve, retryDelay));
                 }
             }
         }
         
-        return { success: false, error: 'Maximum retry attempts exceeded' };
+        // All services failed
+        return { 
+            success: false, 
+            error: 'All email services failed. Please check your email configuration or try again later.',
+            services_tried: servicesToTry.length 
+        };
     }
 
     // Get email subject based on purpose
@@ -198,7 +221,7 @@ class OTPService {
                     <p>This OTP is valid for 10 minutes. Do not share this code with anyone.</p>
                     <p>If you didn't request a password reset, please ignore this email.</p>
                     <hr style="margin: 20px 0;">
-                    <p style="color: #666; font-size: 12px;">This is an automated message from Maayo.</p>
+                    <p style="color: #666, font-size: 12px;">This is an automated message from Maayo.</p>
                 </div>
             `
         };
@@ -223,4 +246,4 @@ class OTPService {
     }
 }
 
-export default new OTPService();
+export default new ImprovedOTPService();

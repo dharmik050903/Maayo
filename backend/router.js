@@ -11,6 +11,7 @@ import Project from "./controller/project.js";
 import Review from "./controller/review.js";
 import Bid from "./controller/bid.js";
 import OTP from "./controller/otp.js";
+import { otpController } from "./controller/improvedOTPController.js";
 import AIController from "./controller/aiController.js";
 import ChatController from "./controller/chat.js";
 import PaymentGateway from "./controller/paymentcontroller.js";
@@ -58,12 +59,19 @@ router.get("/auth/google/callback", loginController.googleOAuthCallback);
 router.post("/login",loginController.authenticate);
 router.post("/login/google", loginController.googleLogin);
 
-// OTP Authentication routes
+// OTP Authentication routes (original)
 router.post("/otp/send-login", otpController.sendLoginOTP);
 router.post("/otp/verify-login", otpController.verifyLoginOTP);
 router.post("/otp/send-password-reset", otpController.sendPasswordResetOTP);
 router.post("/otp/verify-password-reset", otpController.verifyPasswordResetOTP);
 router.post("/otp/resend", otpController.resendOTP);
+
+// OTP Authentication routes (improved with cloud-optimized email service and fallback)
+router.post("/otp/v2/send-login", otpController.sendLoginOTP);
+router.post("/otp/v2/send-password-reset", otpController.sendPasswordResetOTP);
+router.post("/otp/v2/verify", otpController.verifyLoginOTP);
+// router.post("/otp/v2/login", otpController.loginWithOTP);
+// router.post("/otp/v2/status", otpController.checkOTPStatus);
 //Skills Controller
 router.post("/skills",skillsController.listskills);
 //Freelancer and Client Info Controllers
