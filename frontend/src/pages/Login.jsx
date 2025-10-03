@@ -412,7 +412,12 @@ export default function Login() {
 
   const handlePasswordReset = async () => {
     if (!form.email) {
-      setMessage({ type: 'error', text: 'Please enter your email address' })
+      setMessage({ type: 'error', text: 'Please enter your email address first' })
+      // Focus on email input
+      const emailInput = document.querySelector('input[type="email"]')
+      if (emailInput) {
+        emailInput.focus()
+      }
       return
     }
 
@@ -420,7 +425,10 @@ export default function Login() {
     setMessage(null)
 
     try {
+      console.log('🔄 Sending password reset OTP to:', form.email)
       const response = await otpService.sendPasswordResetOTP(form.email)
+      console.log('📧 Password reset OTP response:', response)
+      
       if (response.status) {
         setShowPasswordReset(true)
         setMessage({ type: 'success', text: 'Password reset OTP sent to your email' })
@@ -429,6 +437,7 @@ export default function Login() {
         setMessage({ type: 'error', text: response.message || 'Failed to send password reset OTP' })
       }
     } catch (error) {
+      console.error('❌ Error sending password reset OTP:', error)
       setMessage({ type: 'error', text: error.message || 'Failed to send password reset OTP' })
     } finally {
       setOtpLoading(false)
@@ -1098,9 +1107,11 @@ export default function Login() {
               <button
                 type="button"
                 onClick={handlePasswordReset}
-                className="text-sm text-coral hover:text-coral/80 transition-colors"
+                disabled={otpLoading}
+                title="Enter your email first, then click here to reset password"
+                className="text-sm text-coral hover:text-coral/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed underline hover:no-underline"
               >
-                Forgot password?
+                {otpLoading ? 'Sending...' : 'Forgot password?'}
               </button>
             )}
             {loginMethod === 'password' && (
