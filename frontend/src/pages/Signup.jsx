@@ -181,21 +181,49 @@ export default function Signup() {
     setLoading(true);
 
     try {
-      // This will correctly use your VITE_API_BASE_URL.
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      // Force localhost for testing - comment out this line when deploying
+      const API_BASE_URL = 'http://localhost:5000/api';
+      // const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
       
       console.log('📤 Signup: Sending form data:', form)
+      console.log('📤 Signup: Form data validation:', {
+        hasFirstName: !!form.first_name,
+        hasLastName: !!form.last_name,
+        hasEmail: !!form.email,
+        hasPassword: !!form.password,
+        hasContact: !!form.contact_number,
+        hasCountry: !!form.country,
+        hasUserType: !!form.user_type,
+        emailValue: form.email,
+        emailLength: form.email?.length || 0
+      })
       console.log('📤 Signup: API endpoint:', `${API_BASE_URL}/signup`)
+      console.log('📤 Signup: Environment variables:', {
+        VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
+        MODE: import.meta.env.MODE,
+        DEV: import.meta.env.DEV,
+        PROD: import.meta.env.PROD
+      })
+      
+      console.log('📤 Signup: Sending data at:', new Date().toISOString())
+      const requestId = Math.random().toString(36).substr(2, 9)
+      console.log('📤 Signup: Request ID:', requestId)
       
       const res = await fetch(`${API_BASE_URL}/signup`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "X-Request-ID": requestId
+        },
         body: JSON.stringify(form),
       });
 
       const data = await res.json();
       console.log('📨 Signup: Response data:', data)
       console.log('📨 Signup: Response status:', res.status)
+      console.log('📨 Signup: Response statusText:', res.statusText)
+      console.log('📨 Signup: Response ok:', res.ok)
+      console.log('📨 Signup: Response headers:', res.headers)
       setLoading(false);
 
       if (data.message === "User created successfully") {
@@ -219,8 +247,24 @@ export default function Signup() {
         setMessage({ type: 'error', text: errorMessage });
       }
     } catch (err) {
+      console.error('❌ Signup: Network/Syntax error:', err)
+      console.error('❌ Signup: Error details:', {
+        name: err.name,
+        message: err.message,
+        stack: err.stack
+      })
       setLoading(false);
-      setMessage({ type: 'error', text: 'Something went wrong. Try again.' });
+      
+      let errorMessage = 'Something went wrong. Try again.'
+      if (err.name === 'SyntaxError') {
+        errorMessage = 'Server returned invalid response. Please try again.'
+      } else if (err.name === 'TypeError' && err.message.includes('fetch')) {
+        errorMessage = 'Unable to connect to server. Please check your internet connection.'
+      } else if (err.message) {
+        errorMessage = err.message
+      }
+      
+      setMessage({ type: 'error', text: errorMessage });
     }
   }
 

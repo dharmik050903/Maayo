@@ -47,6 +47,9 @@ export default function FreelancerHome() {
   
   // Track submitted bids
   const [submittedBids, setSubmittedBids] = useState(new Set())
+  
+  // Active projects for milestone tracking
+  const activeProjects = projects.filter(project => project.isactive === 1)
 
   useEffect(() => {
     if (!hasInitialized.current) {
