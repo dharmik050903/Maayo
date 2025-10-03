@@ -185,6 +185,7 @@ export default function Login() {
   const [showPasswordReset, setShowPasswordReset] = useState(false)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [retryCount, setRetryCount] = useState(0)
 
   // Google OAuth states
   const [selectedRole, setSelectedRole] = useState('')
@@ -426,19 +427,56 @@ export default function Login() {
 
     try {
       console.log('🔄 Sending password reset OTP to:', form.email)
-      const response = await otpService.sendPasswordResetOTP(form.email)
+      
+      // Check backend health first
+      console.log('🔍 Checking backend health...')
+      const isBackendHealthy = await otpService.checkBackendHealth()
+      if (!isBackendHealthy) {
+        throw new Error('Backend server is not available. Please try again later.')
+      }
+      
+      // Add timeout to prevent hanging
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Request timeout - please try again')), 10000) // 10 second timeout
+      })
+      
+      const responsePromise = otpService.sendPasswordResetOTP(form.email)
+      const response = await Promise.race([responsePromise, timeoutPromise])
+      
       console.log('📧 Password reset OTP response:', response)
       
       if (response.status) {
         setShowPasswordReset(true)
         setMessage({ type: 'success', text: 'Password reset OTP sent to your email' })
         startResendTimer()
+        setRetryCount(0) // Reset retry count on success
       } else {
         setMessage({ type: 'error', text: response.message || 'Failed to send password reset OTP' })
       }
     } catch (error) {
       console.error('❌ Error sending password reset OTP:', error)
-      setMessage({ type: 'error', text: error.message || 'Failed to send password reset OTP' })
+      
+      // Provide more specific error messages
+      let errorMessage = 'Failed to send password reset OTP'
+      if (error.message.includes('timeout')) {
+        errorMessage = 'Request timed out. Please check your internet connection and try again.'
+      } else if (error.message.includes('Failed to fetch')) {
+        errorMessage = 'Unable to connect to server. Please check if the backend is running.'
+      } else if (error.message.includes('NetworkError')) {
+        errorMessage = 'Network error. Please check your internet connection.'
+      } else {
+        errorMessage = error.message || 'Failed to send password reset OTP'
+      }
+      
+      // Increment retry count
+      setRetryCount(prev => prev + 1)
+      
+      // Add retry suggestion if retry count is low
+      if (retryCount < 2) {
+        errorMessage += ' Click "Forgot password?" again to retry.'
+      }
+      
+      setMessage({ type: 'error', text: errorMessage })
     } finally {
       setOtpLoading(false)
     }
@@ -1104,15 +1142,22 @@ export default function Login() {
           <div className="flex flex-col items-end gap-2">
             {/* Forgot Password Link - Exactly Above Login Button */}
             {loginMethod === 'password' && (
-              <button
-                type="button"
-                onClick={handlePasswordReset}
-                disabled={otpLoading}
-                title="Enter your email first, then click here to reset password"
-                className="text-sm text-coral hover:text-coral/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed underline hover:no-underline"
-              >
-                {otpLoading ? 'Sending...' : 'Forgot password?'}
-              </button>
+              <div className="text-right">
+                <button
+                  type="button"
+                  onClick={handlePasswordReset}
+                  disabled={otpLoading}
+                  title="Enter your email first, then click here to reset password"
+                  className="text-sm text-coral hover:text-coral/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed underline hover:no-underline"
+                >
+                  {otpLoading ? 'Sending...' : 'Forgot password?'}
+                </button>
+                {retryCount > 0 && (
+                  <div className="text-xs text-coolgray mt-1">
+                    Retry attempts: {retryCount}
+                  </div>
+                )}
+              </div>
             )}
             {loginMethod === 'password' && (
               <Button type="submit" variant="accent" loading={loading}>
