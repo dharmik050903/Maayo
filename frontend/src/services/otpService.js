@@ -8,8 +8,17 @@ const getApiBaseUrl = () => {
   }
   
   if (isProduction) {
-    // For production, use the same domain but with /api path
-    return `${window.location.protocol}//${window.location.hostname}/api`
+    // For production, try multiple possible backend URLs
+    const possibleUrls = [
+      `${window.location.protocol}//${window.location.hostname}/api`,
+      `${window.location.protocol}//api.${window.location.hostname}`,
+      `${window.location.protocol}//backend.${window.location.hostname}`,
+      'https://api.maayo.com/api', // Replace with your actual backend domain
+      'https://backend.maayo.com/api' // Replace with your actual backend domain
+    ]
+    
+    // For now, return the first option (same domain)
+    return possibleUrls[0]
   }
   
   // For development, use localhost
@@ -24,18 +33,82 @@ console.log('🔧 OTP Service: Current hostname:', window.location.hostname)
 console.log('🔧 OTP Service: Environment:', import.meta.env.MODE)
 
 export const otpService = {
+  // Get all possible API URLs to try
+  getPossibleApiUrls() {
+    const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'
+    
+    if (import.meta.env.VITE_API_BASE_URL) {
+      return [import.meta.env.VITE_API_BASE_URL]
+    }
+    
+    if (isProduction) {
+      return [
+        `${window.location.protocol}//${window.location.hostname}/api`,
+        `${window.location.protocol}//api.${window.location.hostname}`,
+        `${window.location.protocol}//backend.${window.location.hostname}`,
+        'https://api.maayo.com/api', // Replace with your actual backend domain
+        'https://backend.maayo.com/api' // Replace with your actual backend domain
+      ]
+    }
+    
+    return ['http://localhost:5000/api']
+  },
+
   // Check if backend is available
   async checkBackendHealth() {
-    try {
-      const response = await fetch(`${API_BASE_URL.replace('/api', '')}/health`, {
-        method: 'GET',
-        timeout: 3000
-      })
-      return response.ok
-    } catch (error) {
-      console.log('🔍 Backend health check failed:', error)
-      return false
+    const possibleUrls = this.getPossibleApiUrls()
+    
+    for (const url of possibleUrls) {
+      try {
+        console.log('🔍 Checking backend health at:', url)
+        
+        // Try multiple health check endpoints
+        const healthEndpoints = [
+          `${url.replace('/api', '')}/health`,
+          `${url}/health`,
+          `${url}/status`,
+          `${url.replace('/api', '')}/status`
+        ]
+        
+        for (const endpoint of healthEndpoints) {
+          try {
+            const response = await fetch(endpoint, {
+              method: 'GET',
+              timeout: 3000
+            })
+            if (response.ok) {
+              console.log('✅ Backend is healthy at:', url, 'endpoint:', endpoint)
+              return { healthy: true, url }
+            }
+          } catch (endpointError) {
+            console.log('❌ Health endpoint failed:', endpoint, endpointError.message)
+          }
+        }
+        
+        // If no health endpoint works, try a simple API call
+        try {
+          const response = await fetch(`${url}/otp/send-login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: 'test@test.com' }),
+            timeout: 3000
+          })
+          // Even if it fails with 400/422, it means the server is responding
+          if (response.status !== 500 && response.status !== 0) {
+            console.log('✅ Backend is responding at:', url, 'status:', response.status)
+            return { healthy: true, url }
+          }
+        } catch (apiError) {
+          console.log('❌ API test failed at:', url, apiError.message)
+        }
+        
+      } catch (error) {
+        console.log('❌ Backend health check failed at:', url, error.message)
+      }
     }
+    
+    console.log('❌ All backend health checks failed')
+    return { healthy: false, url: null }
   },
 
   // Send OTP for login
@@ -106,48 +179,64 @@ export const otpService = {
 
   // Send OTP for password reset
   async sendPasswordResetOTP(email) {
-    try {
-      console.log('🔄 OTP Service: Sending password reset OTP to:', email)
-      console.log('🔄 OTP Service: API URL:', `${API_BASE_URL}/otp/send-password-reset`)
-      
-      // Create AbortController for timeout
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 8000) // 8 second timeout
-      
-      const response = await fetch(`${API_BASE_URL}/otp/send-password-reset`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email }),
-        signal: controller.signal
-      })
-      
-      clearTimeout(timeoutId)
-      console.log('📧 OTP Service: Response status:', response.status)
-      
-      if (!response.ok) {
-        let errorMessage = 'Failed to send password reset OTP'
-        try {
-          const errorData = await response.json()
-          errorMessage = errorData.message || errorMessage
-        } catch (parseError) {
-          errorMessage = `Server error: ${response.status} ${response.statusText}`
+    const possibleUrls = this.getPossibleApiUrls()
+    
+    for (const apiUrl of possibleUrls) {
+      try {
+        console.log('🔄 OTP Service: Trying API URL:', apiUrl)
+        console.log('🔄 OTP Service: Sending password reset OTP to:', email)
+        
+        // Create AbortController for timeout
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 8000) // 8 second timeout
+        
+        const response = await fetch(`${apiUrl}/otp/send-password-reset`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email }),
+          signal: controller.signal
+        })
+        
+        clearTimeout(timeoutId)
+        console.log('📧 OTP Service: Response status:', response.status, 'from URL:', apiUrl)
+        
+        if (!response.ok) {
+          let errorMessage = 'Failed to send password reset OTP'
+          try {
+            const errorData = await response.json()
+            errorMessage = errorData.message || errorMessage
+          } catch (parseError) {
+            errorMessage = `Server error: ${response.status} ${response.statusText}`
+          }
+          throw new Error(errorMessage)
         }
-        throw new Error(errorMessage)
+        
+        console.log('✅ OTP Service: Successfully sent password reset OTP from:', apiUrl)
+        return await response.json()
+        
+      } catch (error) {
+        console.error('❌ OTP Service: Error with URL', apiUrl, ':', error.message)
+        
+        // If this is the last URL, throw the error
+        if (apiUrl === possibleUrls[possibleUrls.length - 1]) {
+          if (error.name === 'AbortError') {
+            throw new Error('Request timeout - please try again')
+          } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+            throw new Error('Unable to connect to server. Please check if the backend is running.')
+          }
+          throw error
+        }
+        
+        // Otherwise, continue to next URL
+        console.log('🔄 OTP Service: Trying next API URL...')
+        continue
       }
-      
-      return await response.json()
-    } catch (error) {
-      console.error('❌ OTP Service: Error sending password reset OTP:', error)
-      
-      if (error.name === 'AbortError') {
-        throw new Error('Request timeout - please try again')
-      } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-        throw new Error('Unable to connect to server. Please check if the backend is running.')
-      }
-      throw error
     }
+    
+    // If we get here, all URLs failed
+    throw new Error('All backend servers are unavailable. Please try again later.')
   },
 
   // Verify OTP for password reset

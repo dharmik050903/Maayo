@@ -428,11 +428,22 @@ export default function Login() {
     try {
       console.log('🔄 Sending password reset OTP to:', form.email)
       
-      // Check backend health first
+      // Check backend health first (with timeout)
       console.log('🔍 Checking backend health...')
-      const isBackendHealthy = await otpService.checkBackendHealth()
-      if (!isBackendHealthy) {
-        throw new Error('Backend server is not available. Please try again later.')
+      try {
+        const healthCheckPromise = otpService.checkBackendHealth()
+        const healthCheckTimeout = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Health check timeout')), 5000) // 5 second timeout for health check
+        })
+        
+        const healthCheck = await Promise.race([healthCheckPromise, healthCheckTimeout])
+        if (!healthCheck.healthy) {
+          throw new Error('Backend server is not available. Please try again later.')
+        }
+        console.log('✅ Backend is healthy at:', healthCheck.url)
+      } catch (healthError) {
+        console.log('⚠️ Health check failed or timed out, proceeding anyway:', healthError.message)
+        // Continue with the request even if health check fails
       }
       
       // Add timeout to prevent hanging
