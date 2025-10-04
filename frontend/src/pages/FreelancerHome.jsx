@@ -49,8 +49,8 @@ export default function FreelancerHome() {
   // Track submitted bids
   const [submittedBids, setSubmittedBids] = useState(new Set())
   
-  // Active projects for milestone tracking
-  const activeProjects = projects.filter(project => project.isactive === 1)
+  // Active projects for milestone tracking - computed separately
+  const [activeProjects, setActiveProjects] = useState([])
 
   useEffect(() => {
     if (!hasInitialized.current) {
@@ -73,9 +73,17 @@ export default function FreelancerHome() {
         setProfileData(JSON.parse(savedProfile))
       }
       
+
+      // Fetch active projects for milestone tracking separately
+      const fetchAndSetActiveProjects = async () => {
+        const activeProjs = await fetchActiveProjects()
+        setActiveProjects(activeProjs)
+      }
+      
       fetchAvailableProjects()
       loadSkills()
       loadUserBids()
+      fetchAndSetActiveProjects()
     } else {
       console.log('FreelancerHome: Skipping duplicate initialization due to StrictMode')
     }
@@ -109,27 +117,19 @@ export default function FreelancerHome() {
 
   const fetchAvailableProjects = async () => {
     try {
-      console.log('🔄 FreelancerHome: Fetching active projects from tblprojects...')
+      console.log('🔄 FreelancerHome: Fetching all available projects for browsing...')
       setLoading(true)
       setError(null)
       
-      // First get freelancer bids to see which projects they have access to
-      const bidsResponse = await bidService.getFreelancerBids()
-      console.log('📊 FreelancerHome: Bids Response:', bidsResponse)
+      // Fetch all projects (not restricted to freelancer bids for browsing)
+      const response = await projectService.getAllProjects()
+      console.log('📊 FreelancerHome: Projects Response:', response)
       
-      if (bidsResponse.status && bidsResponse.data) {
-        console.log('✅ FreelancerHome: Raw bids data:', bidsResponse.data.length)
+      if (response.status && response.data) {
+        console.log('✅ FreelancerHome: Raw projects data:', response.data.length)
         
-        // Filter only accepted bids (projects the freelancer is working on)
-        const acceptedBids = bidsResponse.data.filter(bid => 
-          bid.type === 'acceptedbid' && 
-          bid.project?.isactive === 1
-        )
-        console.log('✅ FreelancerHome: Accepted active bids:', acceptedBids.length)
-        
-        const transformedProjects = acceptedBids.map(bid => {
-          const project = bid.project
-          const clientData = project.personid || bid.client || {}
+        const transformedProjects = response.data.map(project => {
+          const clientData = project.personid || {}
           const skills = project.skills_required ? project.skills_required.map(s => s.skill || s.skill_id?.skill || 'Unknown') : []
           
           return {
@@ -177,6 +177,41 @@ export default function FreelancerHome() {
     }
   }
 
+  // Separate function to fetch active projects for milestone tracking
+  const fetchActiveProjects = async () => {
+    try {
+      console.log('🔄 FreelancerHome: Fetching active projects for milestone tracking...')
+      
+      const bidsResponse = await bidService.getFreelancerBids()
+      
+      if (bidsResponse.status && bidsResponse.data) {
+        // Filter only accepted bids (projects the freelancer is working on)
+        const acceptedBids = bidsResponse.data.filter(bid => 
+          bid.type === 'acceptedbid' && 
+          bid.project?.isactive === 1
+        )
+        
+        const activeProjects = acceptedBids.map(bid => ({
+          _id: bid.project._id,
+          title: bid.project.title,
+          budget: bid.project.budget,
+          // Add other needed fields for milestone tracking
+          isactive: bid.project.isactive,
+          status: 'active'
+        }))
+        
+        console.log('✅ FreelancerHome: Active projects for milestones:', activeProjects.length)
+        
+        // Update the activeProjects variable or state here
+        return activeProjects
+      }
+      
+      return []
+    } catch (error) {
+      console.error('Error fetching active projects:', error)
+      return []
+    }
+  }
 
   const handleProjectSearch = async () => {
     resetPagination() // Reset to first page when searching
