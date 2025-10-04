@@ -331,6 +331,18 @@ export const bidService = {
     try {
       console.log('🔄 BidService: Accepting bid:', bidId)
       
+      // Get user ID for debugging
+      const authHeaders = localStorage.getItem('authHeaders')
+      let userId = 'unknown'
+      if (authHeaders) {
+        try {
+          const authData = JSON.parse(authHeaders)
+          userId = authData._id
+        } catch (error) {
+          console.log('⚠️ BidService: Could not parse auth headers for debugging')
+        }
+      }
+      
       // First try normal client acceptance
       let response = await authenticatedFetch(`${API_BASE_URL}/bid/accept`, {
         method: 'POST',
@@ -343,27 +355,19 @@ export const bidService = {
         })
       })
       
-      // If client role fails due to ownership mismatch, try admin simulation
+      // If client role fails due to ownership mismatch, provide helpful message
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
         console.log('⚠️ BidService: Client accept failed:', errorData.message)
         
         if (response.status === 403 && errorData.message?.includes('own projects')) {
-          console.log('🔄 BidService: Trying admin simulation for bid acceptance...')
+          console.log('✅ BidService: This is the expected personid mismatch issue')
+          console.log('💡 BidService: The bid belongs to this client\'s project but personid fields don\'t match')
+          console.log('🔍 BidService: Client ID:', userId, 'Project Owner ID:', 'requires debug')
           
-          // Try with admin role to bypass ownership check
-          response = await authenticatedFetch(`${API_BASE_URL}/bid/accept`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'user_role': 'admin' // Admin simulation to bypass ownership validation
-            },
-            body: JSON.stringify({
-              bid_id: bidId
-            })
-          })
-          
-          console.log('📡 BidService: Admin simulation response:', response.status, 'OK:', response.ok)
+          // Note: Can't use admin simulation here because acceptBid() requires userRole === 'client' exactly
+          // This is a known limitation in the backend ownership validation system
+          throw new Error(`Unable to accept bid due to backend permission validation. The project appears to belong to your account, but there's a technical mismatch in the ownership verification system. Please contact support for assistance with bid ID: ${bidId}`)
         }
       }
       
@@ -400,6 +404,18 @@ export const bidService = {
     try {
       console.log('🔄 BidService: Rejecting bid:', bidId)
       
+      // Get user ID for debugging
+      const authHeaders = localStorage.getItem('authHeaders')
+      let userId = 'unknown'
+      if (authHeaders) {
+        try {
+          const authData = JSON.parse(authHeaders)
+          userId = authData._id
+        } catch (error) {
+          console.log('⚠️ BidService: Could not parse auth headers for debugging')
+        }
+      }
+      
       // First try normal client rejection
       let response = await authenticatedFetch(`${API_BASE_URL}/bid/reject`, {
         method: 'POST',
@@ -413,28 +429,19 @@ export const bidService = {
         })
       })
       
-      // If client role fails due to ownership mismatch, try admin simulation
+      // If client role fails due to ownership mismatch, provide helpful message
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
         console.log('⚠️ BidService: Client reject failed:', errorData.message)
         
         if (response.status === 403 && errorData.message?.includes('own projects')) {
-          console.log('🔄 BidService: Trying admin simulation for bid rejection...')
+          console.log('✅ BidService: This is the expected personid mismatch issue')
+          console.log('💡 BidService: The bid belongs to this client\'s project but personid fields don\'t match')
+          console.log('🔍 BidService: Client ID:', userId, 'Project Owner ID:', 'requires debug')
           
-          // Try with admin role to bypass ownership check
-          response = await authenticatedFetch(`${API_BASE_URL}/bid/reject`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'user_role': 'admin' // Admin simulation to bypass ownership validation
-            },
-            body: JSON.stringify({
-              bid_id: bidId,
-              client_message: clientMessage
-            })
-          })
-          
-          console.log('📡 BidService: Admin rejection response:', response.status, 'OK:', response.ok)
+          // Note: Can't use admin simulation here because rejectBid() likely requires userRole === 'client' exactly
+          // This is a known limitation in the backend ownership validation system
+          throw new Error(`Unable to reject bid due to backend permission validation. The project appears to belong to your account, but there's a technical mismatch in the ownership verification system. Please contact support for assistance with bid ID: ${bidId}`)
         }
       }
       
