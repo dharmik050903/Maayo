@@ -29,7 +29,8 @@ const defaultOrigins = [
   'http://localhost:5173',
   'https://maayo-frontend.vercel.app',
   'https://maayo.vercel.app',
-  'https://maayo-alpha.vercel.app'
+  'https://maayo-alpha.vercel.app',
+  'https://maayo-backend.onrender.com'
 ]
 
 const finalOrigins = allowedOrigins.length > 0 ? allowedOrigins : defaultOrigins
