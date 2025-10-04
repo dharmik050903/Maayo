@@ -181,9 +181,22 @@ export default function Signup() {
     setLoading(true);
 
     try {
-      // Force localhost for testing - comment out this line when deploying
-      const API_BASE_URL = 'http://localhost:5000/api';
-      // const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      // Use production URL for main domain deployment
+      console.log('🔧 Environment check:', {
+        VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
+        MODE: import.meta.env.MODE,
+        PROD: import.meta.env.PROD,
+        DEV: import.meta.env.DEV,
+        hostname: window.location.hostname
+      })
+      
+      // Force production URL for main domain (maayo-alpha.vercel.app)
+      const isProduction = window.location.hostname === 'maayo-alpha.vercel.app'
+      const API_BASE_URL = isProduction 
+        ? 'https://maayo-backend.onrender.com/api' 
+        : 'http://localhost:5000/api'
+      
+      console.log('🎯 Selected API URL:', API_BASE_URL, '| Production:', isProduction)
       
       console.log('📤 Signup: Sending form data:', form)
       console.log('📤 Signup: Form data validation:', {
@@ -443,8 +456,11 @@ export default function Signup() {
     try {
       console.log('🔍 Google callback received:', response.credential)
       
-      // Send the credential to backend
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
+      // Send the credential to backend (use same URL logic as regular signup)
+      const isProduction = window.location.hostname === 'maayo-alpha.vercel.app'
+      const API_BASE_URL = isProduction 
+        ? 'https://maayo-backend.onrender.com/api' 
+        : 'http://localhost:5000/api'
       const res = await fetch(`${API_BASE_URL}/signup/google`, {
         method: 'POST',
         headers: {
