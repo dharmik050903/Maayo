@@ -138,7 +138,7 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
     const totalMilestoneAmount = formData.milestones.reduce((sum, m) => sum + m.amount, 0)
     const newTotal = totalMilestoneAmount + parseFloat(milestoneAmount)
     if (newTotal > parseFloat(formData.bid_amount)) {
-      setMilestoneError(`Total milestone amount ($${newTotal.toFixed(2)}) cannot exceed bid amount ($${formData.bid_amount})`)
+      setMilestoneError(`Total milestone amount (₹${newTotal.toFixed(2)}) cannot exceed bid amount (₹${formData.bid_amount})`)
       return
     }
 
@@ -189,7 +189,7 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
       // Validate milestone amounts match bid amount
       const totalMilestoneAmount = formData.milestones.reduce((sum, m) => sum + m.amount, 0)
       if (Math.abs(totalMilestoneAmount - parseFloat(formData.bid_amount)) > 0.01) {
-        throw new Error(`Total milestone amount ($${totalMilestoneAmount.toFixed(2)}) must equal bid amount ($${formData.bid_amount})`)
+        throw new Error(`Total milestone amount (₹${totalMilestoneAmount.toFixed(2)}) must equal bid amount (₹${formData.bid_amount})`)
       }
 
       if (formData.proposed_duration <= 0) {
@@ -509,7 +509,7 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
               <div className="flex items-center justify-between">
                 <h4 className="font-semibold text-graphite text-lg">Added Milestones:</h4>
                 <div className="text-sm text-coolgray">
-                  Total: ${formData.milestones.reduce((sum, m) => sum + m.amount, 0).toFixed(2)} / ${formData.bid_amount}
+                  Total: ₹{formData.milestones.reduce((sum, m) => sum + m.amount, 0).toFixed(2)} / ₹{formData.bid_amount}
                 </div>
               </div>
               {formData.milestones.map((milestone, index) => (

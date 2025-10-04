@@ -6,7 +6,25 @@ export const bidService = {
   // Create a new bid
   async createBid(bidData) {
     try {
-      console.log('Creating bid:', bidData)
+      console.log('🔄 BidService: Creating bid with data:', bidData)
+      console.log('🔍 BidService: API endpoint:', `${API_BASE_URL}/bid/create`)
+      
+      // Check authentication before making request
+      const authHeaders = localStorage.getItem('authHeaders')
+      if (!authHeaders) {
+        throw new Error('No authentication found. Please log in again.')
+      }
+      
+      const authData = JSON.parse(authHeaders)
+      console.log('🔍 BidService: Auth data:', {
+        userId: authData._id,
+        userRole: authData.userRole,
+        userEmail: authData.userEmail,
+        tokenLength: authData.token?.length
+      })
+      
+      // Create debug version of authenticatedFetch call to see what's being sent
+      console.log('🔐 BidService: Call authenticatedFetch with debug headers...')
       
       const response = await authenticatedFetch(`${API_BASE_URL}/bid/create`, {
         method: 'POST',
@@ -17,14 +35,29 @@ export const bidService = {
         body: JSON.stringify(bidData)
       })
       
+      console.log('📡 BidService: AuthenticatedFetch completed, response status:', response.status)
+      
+      console.log('📡 BidService: Response status:', response.status, 'OK:', response.ok)
+      
       if (!response.ok) {
         let errorMessage = 'Failed to create bid'
+        let errorData = null
+        
         try {
-          const errorData = await response.json()
+          errorData = await response.json()
           errorMessage = errorData.message || errorMessage
+          console.log('📡 BidService: Error response data:', errorData)
         } catch (parseError) {
           errorMessage = `Server error: ${response.status} ${response.statusText}`
+          console.log('📡 BidService: Could not parse error response')
         }
+        
+        // Special handling for 403 Forbidden
+        if (response.status === 403) {
+          errorMessage = 'Access denied. Only freelancers can submit bids. Please check your account permissions.'
+          console.log('🚫 BidService: 403 Forbidden - Check user role and authentication')
+        }
+        
         throw new Error(errorMessage)
       }
       
@@ -59,29 +92,63 @@ export const bidService = {
   // Get bids for a specific project
   async getProjectBids(projectId, status = null, page = 1, limit = 20) {
     try {
-      console.log('Fetching bids for project:', projectId)
+      console.log('🔄 BidService: Fetching bids for project:', projectId)
+      console.log('🔍 BidService: API endpoint:', `${API_BASE_URL}/bid/project`)
+      
+      // Check authentication before making request
+      const authHeaders = localStorage.getItem('authHeaders')
+      if (!authHeaders) {
+        throw new Error('No authentication found. Please log in again.')
+      }
+      
+      const authData = JSON.parse(authHeaders)
+      console.log('🔍 BidService: Auth data for getProjectBids:', {
+        userId: authData._id,
+        userRole: authData.userRole,
+        userEmail: authData.userEmail,
+        tokenLength: authData.token?.length
+      })
+      
+      const requestBody = {
+        project_id: projectId,
+        status: status,
+        page: page,
+        limit: limit
+      }
+      
+      console.log('🔍 BidService: Request body:', requestBody)
       
       const response = await authenticatedFetch(`${API_BASE_URL}/bid/project`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'user_role': authData.userRole || 'client' // Add user role to headers
         },
-        body: JSON.stringify({
-          project_id: projectId,
-          status: status,
-          page: page,
-          limit: limit
-        })
+        body: JSON.stringify(requestBody)
       })
+      
+      console.log('📡 BidService: Response status:', response.status, 'OK:', response.ok)
       
       if (!response.ok) {
         let errorMessage = 'Failed to fetch project bids'
+        let errorData = null
+        
         try {
-          const errorData = await response.json()
+          errorData = await response.json()
           errorMessage = errorData.message || errorMessage
+          console.log('📡 BidService: Error response data:', errorData)
         } catch (parseError) {
           errorMessage = `Server error: ${response.status} ${response.statusText}`
+          console.log('📡 BidService: Could not parse error response')
         }
+        
+        // Special handling for access denied errors
+        if (response.status === 403 || errorMessage.includes('Access denied')) {
+          console.log('🚫 BidService: Access denied - Check project ownership and user role')
+          console.log('🔍 BidService: Debug info - Project ID:', projectId, 'User Role:', authData.userRole)
+          errorMessage = 'Access denied. Please ensure you are logged in as the project owner.'
+        }
+        
         throw new Error(errorMessage)
       }
       
