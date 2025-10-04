@@ -14,6 +14,14 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
   useEffect(() => {
     if (projectId) {
       fetchMilestones()
+      
+      // Set up periodic refresh every 30 seconds to catch milestone updates
+      const refreshInterval = setInterval(() => {
+        console.log('🔄 ClientMilestoneReview: Auto-refreshing milestones...')
+        fetchMilestones()
+      }, 30000) // 30 seconds
+      
+      return () => clearInterval(refreshInterval)
     }
   }, [projectId])
 

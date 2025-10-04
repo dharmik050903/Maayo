@@ -77,6 +77,7 @@ export default function FreelancerHome() {
       // Fetch active projects for milestone tracking separately
       const fetchAndSetActiveProjects = async () => {
         const activeProjs = await fetchActiveProjects()
+        console.log('🔄 FreelancerHome: Setting active projects:', activeProjs.length)
         setActiveProjects(activeProjs)
       }
       
@@ -185,9 +186,23 @@ export default function FreelancerHome() {
       const bidsResponse = await bidService.getFreelancerBids()
       
       if (bidsResponse.status && bidsResponse.data) {
+        console.log('📊 FreelancerHome: All freelancer bids:', bidsResponse.data.length)
+        
+        // Debug each bid to understand structure
+        bidsResponse.data.forEach((bid, index) => {
+          console.log(`📋 Bid ${index + 1}:`, {
+            id: bid._id,
+            status: bid.status,
+            type: bid.type,
+            projectId: bid.project_id,
+            projectActive: bid.project?.isactive,
+            projectTitle: bid.project?.title
+          })
+        })
+        
         // Filter only accepted bids (projects the freelancer is working on)
         const acceptedBids = bidsResponse.data.filter(bid => 
-          bid.type === 'acceptedbid' && 
+          (bid.status === 'accepted' || bid.status === 'acceptedbid') && 
           bid.project?.isactive === 1
         )
         

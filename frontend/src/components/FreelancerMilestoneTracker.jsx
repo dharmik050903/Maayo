@@ -12,6 +12,10 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
   const [selectedMilestone, setSelectedMilestone] = useState(null)
   const [completionNotes, setCompletionNotes] = useState('')
   const [completionEvidence, setCompletionEvidence] = useState('')
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [showErrorModal, setShowErrorModal] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
     if (projectId) {
@@ -85,15 +89,18 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
       )
       
       if (result.status) {
-        alert('Milestone completion submitted successfully! Waiting for client approval.')
+        setSuccessMessage('Milestone completion submitted successfully! Waiting for client approval.')
+        setShowSuccessModal(true)
         setShowCompletionModal(false)
         fetchMilestones() // Refresh milestones
       } else {
-        alert(result.message || 'Failed to complete milestone')
+        setErrorMessage(result.message || 'Failed to complete milestone')
+        setShowErrorModal(true)
       }
     } catch (error) {
       console.error('Error completing milestone:', error)
-      alert(error.message || 'Failed to complete milestone')
+      setErrorMessage(error.message || 'Failed to complete milestone')
+      setShowErrorModal(true)
     } finally {
       setCompletingMilestone(null)
     }
@@ -319,6 +326,44 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
                 className="flex-1 px-4 py-2 bg-violet text-white rounded-lg hover:bg-violet/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {completingMilestone ? 'Submitting...' : 'Submit Completion'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+            <div className="text-center">
+              <div className="text-green-500 text-6xl mb-4">✅</div>
+              <h3 className="text-xl font-semibold text-graphite mb-4">Success!</h3>
+              <p className="text-coolgray mb-6">{successMessage}</p>
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+              >
+                Got it!
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Error Modal */}
+      {showErrorModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+            <div className="text-center">
+              <div className="text-red-500 text-6xl mb-4">❌</div>
+              <h3 className="text-xl font-semibold text-graphite mb-4">Error</h3>
+              <p className="text-coolgray mb-6">{errorMessage}</p>
+              <button
+                onClick={() => setShowErrorModal(false)}
+                className="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+              >
+                Try Again
               </button>
             </div>
           </div>
