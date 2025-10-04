@@ -118,6 +118,17 @@ export const bidService = {
       
       console.log('🔍 BidService: Request body:', requestBody)
       
+      // Add detailed debugging for the authenticatedFetch call
+      console.log('🔐 BidService: About to call authenticatedFetch with:')
+      console.log('   - URL:', `${API_BASE_URL}/bid/project`)
+      console.log('   - Method: POST')
+      console.log('   - Headers:', {
+        'Content-Type': 'application/json',
+        'user_role': authData.userRole || 'client'
+      })
+      console.log('   - Auth Token Available:', !!authData.token)
+      console.log('   - User ID:', authData._id)
+      
       const response = await authenticatedFetch(`${API_BASE_URL}/bid/project`, {
         method: 'POST',
         headers: {
@@ -126,6 +137,8 @@ export const bidService = {
         },
         body: JSON.stringify(requestBody)
       })
+      
+      console.log('📡 BidService: authenticatedFetch completed')
       
       console.log('📡 BidService: Response status:', response.status, 'OK:', response.ok)
       
@@ -146,7 +159,12 @@ export const bidService = {
         if (response.status === 403 || errorMessage.includes('Access denied')) {
           console.log('🚫 BidService: Access denied - Check project ownership and user role')
           console.log('🔍 BidService: Debug info - Project ID:', projectId, 'User Role:', authData.userRole)
-          errorMessage = 'Access denied. Please ensure you are logged in as the project owner.'
+          
+          // This is likely the same personid mismatch issue as client projects
+          // For now, provide more helpful error message
+          errorMessage = `Access denied for project ${projectId}. This might be a project ownership mismatch - the project may have been created with a different user ID than your current authentication.`
+          
+          console.log('💡 BidService: Likely cause - PersonId mismatch similar to client projects issue')
         }
         
         throw new Error(errorMessage)
