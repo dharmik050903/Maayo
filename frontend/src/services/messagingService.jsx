@@ -25,8 +25,9 @@ class MessagingService {
   }
 
   show(otherUser, project = null, bidId = null) {
-    console.log('🚀 MessagingService: Opening modal with:', { otherUser, project, bidId })
+    console.log('🚀 MessagingService V2 (CACHE-BUSTED): Opening modal with:', { otherUser, project, bidId })
     console.log('✅ LanguageProvider fix applied - MessagingModal should have context now!')
+    console.log('📅 Build timestamp:', new Date().toISOString())
     
     if (!this.container) {
       this.init()
