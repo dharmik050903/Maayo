@@ -194,22 +194,22 @@ export const projectService = {
       console.log('📊 ProjectService: Client projects API response:', data)
       console.log('🔍 ProjectService: Raw projects data:', data.data)
       
-      // Filter projects by client name (from freelancer home, we know projects have client names)
+      // Filter projects using EXACT same validation as backend bid acceptance
+      console.log('🔍 ProjectService: Using STRICT personid validation (same as backend)...')
       const clientProjects = (data.data || []).filter(project => {
-        const clientData = project.personid || {}
-        const projectClientName = `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim().toLowerCase()
-        const clientPersonName = `${user.first_name || ''} ${user.last_name || ''}`.trim().toLowerCase()
-        const emailMatch = clientData.email === user.email
+        const projectPersonId = project.personid?._id || project.personid
+        const personIdMatch = projectPersonId && projectPersonId.toString() === userId
         
-        console.log('🔍 ProjectService: Checking project:', project.title, {
-          projectClientName,
-          clientPersonName,
-          emailMatch,
-          projectPersonid: project.personid?._id,
-          userId
+        console.log('🔍 ProjectService: STRICT validation for project:', project.title, {
+          projectPersonId,
+          userId,
+          personIdMatch,
+          projectPersonIdType: typeof projectPersonId,
+          userIdType: typeof userId
         })
         
-        return projectClientName === clientPersonName || emailMatch || project.personid?._id === userId
+        // ONLY show if exact personid match (same validation as backend bid acceptance)
+        return personIdMatch
       })
       
       console.log('✅ ProjectService: Client projects filtered successfully:', clientProjects.length)
