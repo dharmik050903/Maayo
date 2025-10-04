@@ -181,23 +181,9 @@ export default function Signup() {
     setLoading(true);
 
     try {
-      // Use production URL for main domain deployment
-      console.log('🔧 Environment check:', {
-        VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
-        MODE: import.meta.env.MODE,
-        PROD: import.meta.env.PROD,
-        DEV: import.meta.env.DEV,
-        hostname: window.location.hostname
-      })
-      
-      // Force production URL for main domain
-      const hostname = window.location.hostname
-      const isProduction = hostname.includes('vercel.app') || hostname.includes('maayo-alpha') || hostname !== 'localhost'
-      const API_BASE_URL = isProduction 
-        ? 'https://maayo-alpha.vercel.app/api' 
-        : 'http://localhost:5000/api'
-      
-      console.log('🎯 Selected API URL:', API_BASE_URL, '| Production:', isProduction)
+      // This line will now automatically use your production URL when deployed
+      // and your localhost URL during development (same logic as login page)
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
       
       console.log('📤 Signup: Sending form data:', form)
       console.log('📤 Signup: Form data validation:', {
@@ -456,12 +442,8 @@ export default function Signup() {
     try {
       console.log('🔍 Google callback received:', response.credential)
       
-      // Send the credential to backend (use same URL logic as regular signup)
-      const hostname = window.location.hostname
-      const isProduction = hostname.includes('vercel.app') || hostname.includes('maayo-alpha') || hostname !== 'localhost'
-      const API_BASE_URL = isProduction 
-        ? 'https://maayo-alpha.vercel.app/api' 
-        : 'http://localhost:5000/api'
+      // Send the credential to backend (same logic as login and regular signup)
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
       const res = await fetch(`${API_BASE_URL}/signup/google`, {
         method: 'POST',
         headers: {
