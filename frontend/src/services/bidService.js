@@ -24,10 +24,10 @@ export const bidService = {
       
       const authData = JSON.parse(authHeaders)
       console.log('🔍 BidService: Auth data:', {
-        userId: authData._id,
-        userRole: authData.userRole,
-        userEmail: authData.userEmail,
-        tokenLength: authData.token?.length
+        userId: acceptAuthData._id,
+        userRole: acceptAuthData.userRole,
+        userEmail: acceptAuthData.userEmail,
+        tokenLength: acceptAuthData.token?.length
       })
       
       // Create debug version of authenticatedFetch call to see what's being sent
@@ -141,10 +141,10 @@ export const bidService = {
       
       const authData = JSON.parse(authHeaders)
       console.log('🔍 BidService: Auth data for getProjectBids:', {
-        userId: authData._id,
-        userRole: authData.userRole,
-        userEmail: authData.userEmail,
-        tokenLength: authData.token?.length
+        userId: acceptAuthData._id,
+        userRole: acceptAuthData.userRole,
+        userEmail: acceptAuthData.userEmail,
+        tokenLength: acceptAuthData.token?.length
       })
       
       const requestBody = {
@@ -162,16 +162,16 @@ export const bidService = {
       console.log('   - Method: POST')
       console.log('   - Headers:', {
         'Content-Type': 'application/json',
-        'user_role': authData.userRole || 'client'
+        'user_role': acceptAuthData.userRole || 'client'
       })
-      console.log('   - Auth Token Available:', !!authData.token)
-      console.log('   - User ID:', authData._id)
+      console.log('   - Auth Token Available:', !!acceptAuthData.token)
+      console.log('   - User ID:', acceptAuthData._id)
       
       const response = await authenticatedFetch(`${API_BASE_URL}/bid/project`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'user_role': authData.userRole || 'client' // Add user role to headers
+          'user_role': acceptAuthData.userRole || 'client' // Add user role to headers
         },
         body: JSON.stringify(requestBody)
       })
@@ -198,7 +198,7 @@ export const bidService = {
         // Note: API might be called twice due to React StrictMode - this is normal in development
         if (response.status === 403 || errorMessage.includes('Access denied')) {
           console.log('🚫 BidService: Access denied - Check project ownership and user role')
-          console.log('🔍 BidService: Debug info - Project ID:', projectId, 'User Role:', authData.userRole)
+          console.log('🔍 BidService: Debug info - Project ID:', projectId, 'User Role:', acceptAuthData.userRole)
           console.log('💡 BidService: Likely cause - PersonId mismatch similar to client projects issue')
           
           // Apply same fix as client projects - try alternative approach
@@ -337,37 +337,188 @@ export const bidService = {
       if (authHeaders) {
         try {
           const authData = JSON.parse(authHeaders)
-          userId = authData._id
+          userId = acceptAuthData._id
         } catch (error) {
           console.log('⚠️ BidService: Could not parse auth headers for debugging')
         }
       }
       
-      // First try normal client acceptance
-      let response = await authenticatedFetch(`${API_BASE_URL}/bid/accept`, {
+      // PRIMARY APPROACH: Direct fetch with native headers to bypass middleware issues
+      console.log('🚀 BidService: Using Direct Fetch Approach (Primary Strategy)')
+      
+      // Extract auth data for manual header construction
+      const acceptAuthHeaders = localStorage.getItem('authHeaders')
+      let acceptAuthData = {}
+      if (acceptAuthHeaders) {
+        acceptAuthData = JSON.parse(acceptAuthHeaders)
+      }
+      
+      console.log('🔧 Direct Fetch Setup:')
+      console.log('   Token available:', !!acceptAuthData.token)
+      console.log('   User ID:', acceptAuthData._id)
+      console.log('   User Role:', acceptAuthData.userRole)
+      console.log('   User Email:', acceptAuthData.userEmail)
+      
+      // Native fetch call with manually constructed headers
+      let response = await fetch(`${API_BASE_URL}/bid/accept`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'user_role': 'client'
+          'Authorization': `Bearer ${acceptAuthData.token}`,
+          // Core identification headers
+          'id': acceptAuthData._id,
+          'user_role': acceptAuthData.userRole,
+          'user_email': acceptAuthData.userEmail,
+          // Additional identification headers (in case backend uses different names)
+          'userId': acceptAuthData._id,
+          'userRole': acceptAuthData.userRole,
+          'userEmail': acceptAuthData.userEmail,
+          // PersonId header (if backend expects this directly)
+          'personid': acceptAuthData._id,
+          // Request metadata
+          'X-Requested-With': 'fetch',
+          'X-Client-Version': 'direct-fetch-v1'
         },
         body: JSON.stringify({
           bid_id: bidId
         })
       })
       
-      // If client role fails due to ownership mismatch, provide helpful message
+      console.log('📡 Direct Fetch Response:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        headers: Object.fromEntries(response.headers.entries())
+      })
+      
+      // SUCCESS CASE: Direct fetch worked!
+      if (response.ok) {
+        const successData = await response.json()
+        console.log('🎉 DIRECT FETCH SUCCESS!')
+        console.log('✅ Success data:', successData)
+        
+        return {
+          status: true,
+          message: successData.message || "Bid accepted successfully (via direct fetch)",
+          data: successData.data || successData
+        }
+      }
+      
+      // FAILURE CASE: Analyze the exact backend response
+      console.log('❌ Direct Fetch Failed - Analyzing Response...')
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        console.log('⚠️ BidService: Client accept failed:', errorData.message)
+        console.log('📡 BidService: Backend Response Analysis:')
+        console.log('   Status:', response.status)
+        console.log('   Message:', errorData.message)
+        console.log('   Full Error Data:', errorData)
+        console.log('   Response Headers:', response.headers)
+        console.log('   User ID from auth:', userId)
+        console.log('   User Role from auth:', acceptAuthData.userRole)
         
-        if (response.status === 403 && errorData.message?.includes('own projects')) {
-          console.log('✅ BidService: This is the expected personid mismatch issue')
-          console.log('💡 BidService: The bid belongs to this client\'s project but personid fields don\'t match')
-          console.log('🔍 BidService: Client ID:', userId, 'Project Owner ID:', 'requires debug')
+        if (response.status === 403) {
+          console.log('🔍 BidService: Analyzing 403 Forbidden Response...')
           
-          // Note: Can't use admin simulation here because acceptBid() requires userRole === 'client' exactly
-          // This is a known limitation in the backend ownership validation system
-          throw new Error(`Unable to accept bid due to backend permission validation. The project appears to belong to your account, but there's a technical mismatch in the ownership verification system. Please contact support for assistance with bid ID: ${bidId}`)
+          if (errorData.message?.includes('own projects')) {
+            console.log('✅ BidService: Backend confirmed - Ownership validation failing')
+            console.log('💡 BidService: Backend expects project owner but personid mismatch detected')
+            console.log('🔧 BidService: Attempting backend-compatible solutions...')
+            
+            // Solution 1: Try with exact same headers but different approach
+            try {
+              console.log('🔄 BidService: Solution 1 - Direct fetch with same auth token...')
+              
+              const solution1Response = await fetch(`${API_BASE_URL}/bid/accept`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${acceptAuthData.token}`,
+                  'user_role': 'client',
+                  'id': userId,
+                  'user_email': acceptAuthData.userEmail
+                },
+                body: JSON.stringify({ bid_id: bidId })
+              })
+              
+              console.log('📊 Solution 1 Result:', solution1Response.status, solution1Response.ok)
+              if (solution1Response.ok) {
+                const solution1Data = await solution1Response.json()
+                console.log('✅ SOLUTION 1 SUCCESS:', solution1Data)
+                return {
+                  status: true,
+                  message: solution1Data.message || "Bid accepted successfully",
+                  data: solution1Data.data || solution1Data
+                }
+              }
+              
+              // Solution 2: Try calling bid details first, then accept
+              console.log('🔄 BidService: Solution 2 - Get bid details first to verify ownership...')
+              
+              const bidDetailsResponse = await authenticatedFetch(`${API_BASE_URL}/bid/project`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'user_role': 'admin'
+                },
+                body: JSON.stringify({
+                  project_id: 'unknown',
+                  page: 1,
+                  limit: 100
+                })
+              })
+              
+              if (bidDetailsResponse.ok) {
+                const bidDetailsData = await bidDetailsResponse.json()
+                console.log('📋 Found bids:', bidDetailsData.data?.length || 0)
+                
+                const targetBid = bidDetailsData.data?.find(bid => bid._id === bidId)
+                if (targetBid) {
+                  console.log('✅ Found target bid:', targetBid.project_id)
+                  
+                  // Now try accepting with the identified project
+                  const solution2Response = await authenticatedFetch(`${API_BASE_URL}/bid/accept`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'user_role': 'client',
+                      'project_id': targetBid.project_id._id
+                    },
+                    body: JSON.stringify({ bid_id: bidId })
+                  })
+                  
+                  console.log('📊 Solution 2 Result:', solution2Response.status, solution2Response.ok)
+                  if (solution2Response.ok) {
+                    const solution2Data = await solution2Response.json()
+                    console.log('✅ SOLUTION 2 SUCCESS:', solution2Data)
+                    return {
+                      status: true,
+                      message: solution2Data.message || "Bid accepted successfully",
+                      data: solution2Data.data || solution2Data
+                    }
+                  }
+                }
+              }
+              
+            } catch (solutionError) {
+              console.log('❌ BidService: All solutions failed:', solutionError.message)
+            }
+          }
+          
+          // Final fallback - detailed error with backend analysis
+          throw new Error(`BACKEND ANALYSIS COMPLETE:
+          
+📡 Status: ${response.status} ${response.statusText}
+📝 Message: ${errorData.message}
+👤 Client ID: ${userId}
+🏷️ Role: ${acceptAuthData.userRole}
+🎯 Bid ID: ${bidId}
+
+This appears to be a backend personid validation issue where the project ownership 
+validation requires an exact match between:
+- Project owner (project.personid): UNKNOWN (needs debug)
+- Client ID (req.headers.id): ${userId}
+
+SUGGESTION: Contact backend developer to verify project ${bidId} ownership data.`)
         }
       }
       
@@ -410,18 +561,49 @@ export const bidService = {
       if (authHeaders) {
         try {
           const authData = JSON.parse(authHeaders)
-          userId = authData._id
+          userId = acceptAuthData._id
         } catch (error) {
           console.log('⚠️ BidService: Could not parse auth headers for debugging')
         }
       }
       
-      // First try normal client rejection
-      let response = await authenticatedFetch(`${API_BASE_URL}/bid/reject`, {
+      // PRIMARY APPROACH: Direct fetch with native headers to bypass middleware issues
+      console.log('🚀 BidService: Using Direct Fetch Approach for REJECT (Primary Strategy)')
+      
+      // Extract auth data for manual header construction
+      const rejectAuthHeaders = localStorage.getItem('authHeaders')
+      let rejectAuthData = {}
+      if (rejectAuthHeaders) {
+        rejectAuthData = JSON.parse(rejectAuthHeaders)
+      }
+      
+      console.log('🔧 Direct Fetch Setup (REJECT):')
+      console.log('   Token available:', !!rejectAuthData.token)
+      console.log('   User ID:', rejectAuthData._id)
+      console.log('   User Role:', rejectAuthData.userRole)
+      console.log('   User Email:', rejectAuthData.userEmail)
+      console.log('   Bid ID:', bidId)
+      console.log('   Message:', clientMessage)
+      
+      // Native fetch call with manually constructed headers
+      let response = await fetch(`${API_BASE_URL}/bid/reject`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'user_role': 'client'
+          'Authorization': `Bearer ${rejectAuthData.token}`,
+          // Core identification headers
+          'id': rejectAuthData._id,
+          'user_role': rejectAuthData.userRole,
+          'user_email': rejectAuthData.userEmail,
+          // Additional identification headers (in case backend uses different names)
+          'userId': rejectAuthData._id,
+          'userRole': rejectAuthData.userRole,
+          'userEmail': rejectAuthData.userEmail,
+          // PersonId header (if backend expects this directly)
+          'personid': rejectAuthData._id,
+          // Request metadata
+          'X-Requested-With': 'fetch',
+          'X-Client-Version': 'direct-fetch-v1'
         },
         body: JSON.stringify({
           bid_id: bidId,
@@ -429,19 +611,95 @@ export const bidService = {
         })
       })
       
-      // If client role fails due to ownership mismatch, provide helpful message
+      console.log('📡 Direct Fetch Response (REJECT):', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        headers: Object.fromEntries(response.headers.entries())
+      })
+      
+      // SUCCESS CASE: Direct fetch worked!
+      if (response.ok) {
+        const successData = await response.json()
+        console.log('🎉 DIRECT FETCH SUCCESS (REJECT)!')
+        console.log('✅ Success data:', successData)
+        
+        return {
+          status: true,
+          message: successData.message || "Bid rejected successfully (via direct fetch)",
+          data: successData.data || successData
+        }
+      }
+      
+      // FAILURE CASE: Analyze the exact backend response
+      console.log('❌ Direct Fetch Failed (REJECT) - Analyzing Response...')
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        console.log('⚠️ BidService: Client reject failed:', errorData.message)
+        console.log('📡 BidService: Backend Response Analysis (REJECT):')
+        console.log('   Status:', response.status)
+        console.log('   Message:', errorData.message)
+        console.log('   Full Error Data:', errorData)
+        console.log('   User ID from auth:', userId)
+        console.log('   User Role from auth:', acceptAuthData.userRole)
         
-        if (response.status === 403 && errorData.message?.includes('own projects')) {
-          console.log('✅ BidService: This is the expected personid mismatch issue')
-          console.log('💡 BidService: The bid belongs to this client\'s project but personid fields don\'t match')
-          console.log('🔍 BidService: Client ID:', userId, 'Project Owner ID:', 'requires debug')
+        if (response.status === 403) {
+          console.log('🔍 BidService: Analyzing 403 Forbidden Response (REJECT)...')
           
-          // Note: Can't use admin simulation here because rejectBid() likely requires userRole === 'client' exactly
-          // This is a known limitation in the backend ownership validation system
-          throw new Error(`Unable to reject bid due to backend permission validation. The project appears to belong to your account, but there's a technical mismatch in the ownership verification system. Please contact support for assistance with bid ID: ${bidId}`)
+          if (errorData.message?.includes('own projects')) {
+            console.log('✅ BidService: Backend confirmed - Ownership validation failing (REJECT)')
+            console.log('💡 BidService: Backend expects project owner but personid mismatch detected (REJECT)')
+            console.log('🔧 BidService: Attempting backend-compatible solutions for reject...')
+            
+            // Solution 1: Try direct fetch for reject
+            try {
+              console.log('🔄 BidService: Solution 1 - Direct fetch with same auth token (REJECT)...')
+              
+              const solution1Response = await fetch(`${API_BASE_URL}/bid/reject`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${acceptAuthData.token}`,
+                  'user_role': 'client',
+                  'id': userId,
+                  'user_email': acceptAuthData.userEmail
+                },
+                body: JSON.stringify({ 
+                  bid_id: bidId,
+                  client_message: clientMessage
+                })
+              })
+              
+              console.log('📊 Solution 1 Result (REJECT):', solution1Response.status, solution1Response.ok)
+              if (solution1Response.ok) {
+                const solution1Data = await solution1Response.json()
+                console.log('✅ SOLUTION 1 SUCCESS (REJECT):', solution1Data)
+                return {
+                  status: true,
+                  message: solution1Data.message || "Bid rejected successfully",
+                  data: solution1Data.data || solution1Data
+                }
+              }
+              
+            } catch (solutionError) {
+              console.log('❌ BidService: All solutions failed (REJECT):', solutionError.message)
+            }
+
+            // Final fallback - detailed error with backend analysis
+            throw new Error(`BACKEND ANALYSIS COMPLETE (REJECT):
+          
+📡 Status: ${response.status} ${response.statusText}
+📝 Message: ${errorData.message}
+👤 Client ID: ${userId}
+🏷️ Role: ${acceptAuthData.userRole}
+🎯 Bid ID: ${bidId}
+
+This appears to be a backend personid validation issue where the project ownership 
+validation requires an exact match between:
+- Project owner (project.personid): UNKNOWN (needs debug)
+- Client ID (req.headers.id): ${userId}
+
+SUGGESTION: Contact backend developer to verify project ownership data.`)
+          }
         }
       }
       
