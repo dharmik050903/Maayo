@@ -365,19 +365,12 @@ export const bidService = {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${acceptAuthData.token}`,
-          // Core identification headers
+          // Core identification headers (CORS-safe)
           'id': acceptAuthData._id,
           'user_role': acceptAuthData.userRole,
           'user_email': acceptAuthData.userEmail,
-          // Additional identification headers (in case backend uses different names)
-          'userId': acceptAuthData._id,
-          'userRole': acceptAuthData.userRole,
-          'userEmail': acceptAuthData.userEmail,
-          // PersonId header (if backend expects this directly)
-          'personid': acceptAuthData._id,
-          // Request metadata
-          'X-Requested-With': 'fetch',
-          'X-Client-Version': 'direct-fetch-v1'
+          // Request metadata (CORS-safe)
+          'X-Requested-With': 'XMLHttpRequest'
         },
         body: JSON.stringify({
           bid_id: bidId
@@ -433,9 +426,9 @@ export const bidService = {
                 headers: {
                   'Content-Type': 'application/json',
                   'Authorization': `Bearer ${acceptAuthData.token}`,
-                  'user_role': 'client',
                   'id': userId,
                   'user_email': acceptAuthData.userEmail
+                  // Removed 'user_role': 'client' to avoid CORS issues
                 },
                 body: JSON.stringify({ bid_id: bidId })
               })
@@ -591,19 +584,12 @@ SUGGESTION: Contact backend developer to verify project ${bidId} ownership data.
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${rejectAuthData.token}`,
-          // Core identification headers
+          // Core identification headers (CORS-safe)
           'id': rejectAuthData._id,
           'user_role': rejectAuthData.userRole,
           'user_email': rejectAuthData.userEmail,
-          // Additional identification headers (in case backend uses different names)
-          'userId': rejectAuthData._id,
-          'userRole': rejectAuthData.userRole,
-          'userEmail': rejectAuthData.userEmail,
-          // PersonId header (if backend expects this directly)
-          'personid': rejectAuthData._id,
-          // Request metadata
-          'X-Requested-With': 'fetch',
-          'X-Client-Version': 'direct-fetch-v1'
+          // Request metadata (CORS-safe)
+          'X-Requested-With': 'XMLHttpRequest'
         },
         body: JSON.stringify({
           bid_id: bidId,
@@ -658,10 +644,10 @@ SUGGESTION: Contact backend developer to verify project ${bidId} ownership data.
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${acceptAuthData.token}`,
-                  'user_role': 'client',
+                  'Authorization': `Bearer ${rejectAuthData.token}`,
                   'id': userId,
-                  'user_email': acceptAuthData.userEmail
+                  'user_email': rejectAuthData.userEmail
+                  // Removed 'user_role': 'client' to avoid CORS issues
                 },
                 body: JSON.stringify({ 
                   bid_id: bidId,
