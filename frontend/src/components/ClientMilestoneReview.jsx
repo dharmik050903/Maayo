@@ -224,6 +224,13 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
         const statusColor = getStatusColor(status)
         const statusIcon = getStatusIcon(status)
         
+        console.log(`🔍 Client Milestone ${index + 1} Debug:`, {
+          title: milestone.title,
+          status: milestone.status,
+          computedStatus: status,
+          index: milestone.index
+        })
+        
         return (
           <div key={`milestone-${milestone.index || index}`} className="border border-gray-200 rounded-lg p-4 bg-white">
             <div className="flex justify-between items-start mb-3">

@@ -35,6 +35,11 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
       if (result.status) {
         const milestonesData = result.data.milestones || []
         console.log('✅ FreelancerMilestoneTracker: Milestones found:', milestonesData.length)
+        console.log('📊 FreelancerMilestoneTracker: Milestone details:', milestonesData.map(m => ({
+          title: m.title,
+          status: m.status,
+          index: m.index
+        })))
         setMilestones(milestonesData)
         
         if (milestonesData.length === 0) {
@@ -80,6 +85,14 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
     if (!selectedMilestone) return
 
     try {
+      console.log('🚀 Submitting milestone completion:', {
+        projectId,
+        milestoneIndex: selectedMilestone.index,
+        milestoneStatus: selectedMilestone.status,
+        completionNotes,
+        completionEvidence
+      })
+      
       setCompletingMilestone(selectedMilestone.index)
       const result = await escrowService.completeMilestone(
         projectId, 
@@ -188,6 +201,13 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
         {milestones.map((milestone, index) => {
           const status = getMilestoneStatus(milestone)
           const overdue = isOverdue(milestone.due_date)
+          
+          console.log(`🔍 Milestone ${index + 1} Debug:`, {
+            title: milestone.title,
+            status: milestone.status,
+            computedStatus: status,
+            index: milestone.index
+          })
           
           return (
             <div 
