@@ -157,17 +157,22 @@ export const projectService = {
         throw new Error('User ID not found. Please log in again.')
       }
       
+      const requestPayload = {
+        personid: userId, // Filter projects by the current client's ID
+        page: 1,
+        limit: 50 // Get more projects for better browsing
+      }
+      
+      console.log('🔍 ProjectService: Request payload for client projects:', requestPayload)
+      console.log('🔍 ProjectService: API endpoint:', `${API_BASE_URL}/project/list`)
+      
       const response = await authenticatedFetch(`${API_BASE_URL}/project/list`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'user_role': 'client'
         },
-        body: JSON.stringify({
-          personid: userId, // Filter projects by the current client's ID
-          page: 1,
-          limit: 50 // Get more projects for better browsing
-        })
+        body: JSON.stringify(requestPayload)
       })
       
       if (!response.ok) {
