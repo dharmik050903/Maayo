@@ -190,10 +190,11 @@ export default function Signup() {
         hostname: window.location.hostname
       })
       
-      // Force production URL for main domain (maayo-alpha.vercel.app)
-      const isProduction = window.location.hostname === 'maayo-alpha.vercel.app'
+      // Force production URL for main domain
+      const hostname = window.location.hostname
+      const isProduction = hostname.includes('vercel.app') || hostname.includes('maayo-alpha') || hostname !== 'localhost'
       const API_BASE_URL = isProduction 
-        ? 'https://maayo-backend.onrender.com/api' 
+        ? 'https://maayo-alpha.vercel.app/api' 
         : 'http://localhost:5000/api'
       
       console.log('🎯 Selected API URL:', API_BASE_URL, '| Production:', isProduction)
@@ -225,8 +226,7 @@ export default function Signup() {
       const res = await fetch(`${API_BASE_URL}/signup`, {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
-          "X-Request-ID": requestId
+          "Content-Type": "application/json"
         },
         body: JSON.stringify(form),
       });
@@ -457,9 +457,10 @@ export default function Signup() {
       console.log('🔍 Google callback received:', response.credential)
       
       // Send the credential to backend (use same URL logic as regular signup)
-      const isProduction = window.location.hostname === 'maayo-alpha.vercel.app'
+      const hostname = window.location.hostname
+      const isProduction = hostname.includes('vercel.app') || hostname.includes('maayo-alpha') || hostname !== 'localhost'
       const API_BASE_URL = isProduction 
-        ? 'https://maayo-backend.onrender.com/api' 
+        ? 'https://maayo-alpha.vercel.app/api' 
         : 'http://localhost:5000/api'
       const res = await fetch(`${API_BASE_URL}/signup/google`, {
         method: 'POST',
