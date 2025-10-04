@@ -24,10 +24,10 @@ export const bidService = {
       
       const authData = JSON.parse(authHeaders)
       console.log('🔍 BidService: Auth data:', {
-        userId: acceptAuthData._id,
-        userRole: acceptAuthData.userRole,
-        userEmail: acceptAuthData.userEmail,
-        tokenLength: acceptAuthData.token?.length
+        userId: authData._id,
+        userRole: authData.userRole,
+        userEmail: authData.userEmail,
+        tokenLength: authData.token?.length
       })
       
       // Create debug version of authenticatedFetch call to see what's being sent
@@ -141,10 +141,10 @@ export const bidService = {
       
       const authData = JSON.parse(authHeaders)
       console.log('🔍 BidService: Auth data for getProjectBids:', {
-        userId: acceptAuthData._id,
-        userRole: acceptAuthData.userRole,
-        userEmail: acceptAuthData.userEmail,
-        tokenLength: acceptAuthData.token?.length
+        userId: authData._id,
+        userRole: authData.userRole,
+        userEmail: authData.userEmail,
+        tokenLength: authData.token?.length
       })
       
       const requestBody = {
@@ -162,16 +162,16 @@ export const bidService = {
       console.log('   - Method: POST')
       console.log('   - Headers:', {
         'Content-Type': 'application/json',
-        'user_role': acceptAuthData.userRole || 'client'
+        'user_role': authData.userRole || 'client'
       })
-      console.log('   - Auth Token Available:', !!acceptAuthData.token)
-      console.log('   - User ID:', acceptAuthData._id)
+      console.log('   - Auth Token Available:', !!authData.token)
+      console.log('   - User ID:', authData._id)
       
       const response = await authenticatedFetch(`${API_BASE_URL}/bid/project`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'user_role': acceptAuthData.userRole || 'client' // Add user role to headers
+          'user_role': authData.userRole || 'client' // Add user role to headers
         },
         body: JSON.stringify(requestBody)
       })
@@ -198,7 +198,7 @@ export const bidService = {
         // Note: API might be called twice due to React StrictMode - this is normal in development
         if (response.status === 403 || errorMessage.includes('Access denied')) {
           console.log('🚫 BidService: Access denied - Check project ownership and user role')
-          console.log('🔍 BidService: Debug info - Project ID:', projectId, 'User Role:', acceptAuthData.userRole)
+          console.log('🔍 BidService: Debug info - Project ID:', projectId, 'User Role:', authData.userRole)
           console.log('💡 BidService: Likely cause - PersonId mismatch similar to client projects issue')
           
           // Apply same fix as client projects - try alternative approach
@@ -337,7 +337,7 @@ export const bidService = {
       if (authHeaders) {
         try {
           const authData = JSON.parse(authHeaders)
-          userId = acceptAuthData._id
+          userId = authData._id
         } catch (error) {
           console.log('⚠️ BidService: Could not parse auth headers for debugging')
         }
@@ -561,7 +561,7 @@ SUGGESTION: Contact backend developer to verify project ${bidId} ownership data.
       if (authHeaders) {
         try {
           const authData = JSON.parse(authHeaders)
-          userId = acceptAuthData._id
+          userId = authData._id
         } catch (error) {
           console.log('⚠️ BidService: Could not parse auth headers for debugging')
         }
