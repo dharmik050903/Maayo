@@ -3,14 +3,20 @@ import Button from './Button'
 import { authenticatedFetch, getCurrentUser } from '../utils/api'
 import messageApiService from '../services/messageApiService'
 import socketService from '../services/socketService'
+import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 
 export default function MessagingModal({ isOpen, onClose, currentUser, otherUser, project, bidId }) {
+  // Test language context availability
+  const { t } = useComprehensiveTranslation()
+  
   const [messages, setMessages] = useState([])
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
   const messagesEndRef = useRef(null)
+  
+  console.log('🎯 MessagingModal: Language context test passed! Translation function available:', !!t)
 
   useEffect(() => {
     console.log('MessagingModal: useEffect triggered with isOpen:', isOpen, 'bidId:', bidId)

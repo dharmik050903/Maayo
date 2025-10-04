@@ -25,7 +25,8 @@ class MessagingService {
   }
 
   show(otherUser, project = null, bidId = null) {
-    console.log('MessagingService: Opening modal with:', { otherUser, project, bidId })
+    console.log('🚀 MessagingService: Opening modal with:', { otherUser, project, bidId })
+    console.log('✅ LanguageProvider fix applied - MessagingModal should have context now!')
     
     if (!this.container) {
       this.init()
