@@ -295,16 +295,13 @@ export default function Header({ userType, onLogout, userData }) {
       // Fetch bids to count pending requests/responses
       try {
         if (actualUserType === 'client') {
-          // For clients: count pending bids on their projects
-          const bidsResult = await bidService.getBidsByClient()
-          if (bidsResult.status && bidsResult.data) {
-            bidRequestCount = bidsResult.data.filter(bid => 
-              bid.status === 'pending'
-            ).length
-          }
+          // For clients: we'll skip bid counting for now since getBidsByClient doesn't exist
+          // TODO: Implement client bid counting when the backend endpoint is available
+          console.log('⚠️ Skipping client bid counting - getBidsByClient not implemented')
+          bidRequestCount = 0
         } else {
-          // For freelancers: count bid responses (accepted/rejected)
-          const bidsResult = await bidService.getBidsByFreelancer()
+          // For freelancers: use getFreelancerBids instead
+          const bidsResult = await bidService.getFreelancerBids()
           if (bidsResult.status && bidsResult.data) {
             bidResponseCount = bidsResult.data.filter(bid => 
               bid.status === 'accepted' || bid.status === 'rejected'

@@ -157,13 +157,17 @@ export const projectService = {
         throw new Error('User ID not found. Please log in again.')
       }
       
+      // TEMPORARY FIX: Use same query as freelancer getAllProjects() 
+      // to get ALL projects, then filter on frontend to find client's projects
+      console.log('⚠️ Using temporary fix: fetching all projects and filtering by personName')
+      
       const requestPayload = {
-        personid: userId, // Filter projects by the current client's ID
+        // Remove personid filter temporarily to get all projects
         page: 1,
-        limit: 50 // Get more projects for better browsing
+        limit: 100 // Get more projects for filtering
       }
       
-      console.log('🔍 ProjectService: Request payload for client projects:', requestPayload)
+      console.log('🔍 ProjectService: Request payload for client projects (temp fix):', requestPayload)
       console.log('🔍 ProjectService: API endpoint:', `${API_BASE_URL}/project/list`)
       
       const response = await authenticatedFetch(`${API_BASE_URL}/project/list`, {
@@ -188,12 +192,33 @@ export const projectService = {
       
       const data = await response.json()
       console.log('📊 ProjectService: Client projects API response:', data)
-      console.log('✅ ProjectService: Client projects fetched successfully:', data.data?.length || 0)
+      console.log('🔍 ProjectService: Raw projects data:', data.data)
+      
+      // Filter projects by client name (from freelancer home, we know projects have client names)
+      const clientProjects = (data.data || []).filter(project => {
+        const clientData = project.personid || {}
+        const projectClientName = `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim().toLowerCase()
+        const clientPersonName = `${user.first_name || ''} ${user.last_name || ''}`.trim().toLowerCase()
+        const emailMatch = clientData.email === user.email
+        
+        console.log('🔍 ProjectService: Checking project:', project.title, {
+          projectClientName,
+          clientPersonName,
+          emailMatch,
+          projectPersonid: project.personid?._id,
+          userId
+        })
+        
+        return projectClientName === clientPersonName || emailMatch || project.personid?._id === userId
+      })
+      
+      console.log('✅ ProjectService: Client projects filtered successfully:', clientProjects.length)
+      console.log('📋 ProjectService: Filtered projects:', clientProjects.map(p => ({ title: p.title, client: `${p.personid?.first_name} ${p.personid?.last_name}` })))
       
       return {
         status: true,
         message: "Client projects retrieved successfully",
-        data: data.data || [],
+        data: clientProjects,
         pagination: data.pagination
       }
     } catch (error) {
