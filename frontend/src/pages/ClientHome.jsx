@@ -17,6 +17,8 @@ import CreateEscrowPayment from '../components/CreateEscrowPayment'
 import EscrowStatus from '../components/EscrowStatus'
 import MilestoneManagement from '../components/MilestoneManagement'
 import ProjectPriceUpdate from '../components/ProjectPriceUpdate'
+import ClientMilestoneReview from '../components/ClientMilestoneReview'
+import ActiveEscrowProjects from '../components/ActiveEscrowProjects'
 
 export default function ClientHome() {
   const { t } = useComprehensiveTranslation()
@@ -861,38 +863,8 @@ export default function ClientHome() {
                 <h3 className="text-xl font-semibold text-graphite mb-4">{t('projectEscrowManagement')}</h3>
                 <p className="text-coolgray mb-4">Select a project to manage escrow payments and milestones</p>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {/* Sample project cards - in real implementation, these would come from your projects API */}
-                  <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                       onClick={() => {
-                         setSelectedProject({ id: '1', title: 'Website Development', amount: 5000 });
-                         setShowEscrowModal(true);
-                       }}>
-                    <h4 className="font-semibold text-graphite mb-2">Website Development</h4>
-                    <p className="text-sm text-coolgray mb-2">Build a responsive website</p>
-                    <p className="text-mint font-medium">₹5,000</p>
-                  </div>
-                  
-                  <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                       onClick={() => {
-                         setSelectedProject({ id: '2', title: 'Mobile App', amount: 15000 });
-                         setShowEscrowModal(true);
-                       }}>
-                    <h4 className="font-semibold text-graphite mb-2">Mobile App Development</h4>
-                    <p className="text-sm text-coolgray mb-2">iOS and Android app</p>
-                    <p className="text-mint font-medium">₹15,000</p>
-                  </div>
-                  
-                  <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                       onClick={() => {
-                         setSelectedProject({ id: '3', title: 'Logo Design', amount: 2000 });
-                         setShowEscrowModal(true);
-                       }}>
-                    <h4 className="font-semibold text-graphite mb-2">Logo Design</h4>
-                    <p className="text-sm text-coolgray mb-2">Professional logo design</p>
-                    <p className="text-mint font-medium">₹2,000</p>
-                  </div>
-                </div>
+                {/* Active Projects with Milestones for Payment */}
+                <ActiveEscrowProjects />
               </div>
             </div>
           </div>
