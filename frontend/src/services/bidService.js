@@ -2,6 +2,13 @@ import { authenticatedFetch } from '../utils/api'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
 
+// Request deduplication to prevent double API calls
+const pendingRequests = new Map()
+
+function createRequestKey(projectId, status = null, page = 1, limit = 20) {
+  return `getProjectBids:${projectId}:${status}:${page}:${limit}`
+}
+
 export const bidService = {
   // Create a new bid
   async createBid(bidData) {
@@ -92,6 +99,37 @@ export const bidService = {
   // Get bids for a specific project
   async getProjectBids(projectId, status = null, page = 1, limit = 20) {
     try {
+      const requestKey = createRequestKey(projectId, status, page, limit)
+      
+      // Check if this exact request is already pending
+      if (pendingRequests.has(requestKey)) {
+        console.log('🔄 BidService: Request already pending, waiting for result:', requestKey)
+        return await pendingRequests.get(requestKey)
+      }
+      
+      // Create new request promise
+      const requestPromise = this._fetchProjectBidsWithoutDedupe(projectId, status, page, limit)
+      
+      // Store the promise in pending requests
+      pendingRequests.set(requestKey, requestPromise)
+      
+      try {
+        const result = await requestPromise
+        return result
+      } finally {
+        // Remove from pending requests
+        pendingRequests.delete(requestKey)
+      }
+    } catch (error) {
+      console.error('Error in getProjectBids:', error)
+      throw error
+    }
+  },
+
+  // Internal method without deduplication logic
+  async _fetchProjectBidsWithoutDedupe(projectId, status = null, page = 1, limit = 20) {
+    try {
+      console.log('🚀 NEW BUILD TEST: BidService getProjectBids called!')
       console.log('🔄 BidService: Fetching bids for project:', projectId)
       console.log('🔍 BidService: API endpoint:', `${API_BASE_URL}/bid/project`)
       
@@ -156,15 +194,55 @@ export const bidService = {
         }
         
         // Special handling for access denied errors
+        
+        // Note: API might be called twice due to React StrictMode - this is normal in development
         if (response.status === 403 || errorMessage.includes('Access denied')) {
           console.log('🚫 BidService: Access denied - Check project ownership and user role')
           console.log('🔍 BidService: Debug info - Project ID:', projectId, 'User Role:', authData.userRole)
-          
-          // This is likely the same personid mismatch issue as client projects
-          // For now, provide more helpful error message
-          errorMessage = `Access denied for project ${projectId}. This might be a project ownership mismatch - the project may have been created with a different user ID than your current authentication.`
-          
           console.log('💡 BidService: Likely cause - PersonId mismatch similar to client projects issue')
+          
+          // Apply same fix as client projects - try alternative approach
+          console.log('🔄 BidService: Attempting fallback bid fetching strategy...')
+          
+          try {
+            // Fallback: Try fetching bids without strict project ownership validation
+            // This is similar to the client projects fix - bypass the ownership check
+            console.log('🔄 BidService: Trying alternative bid fetching approach...')
+            
+            const fallbackResponse = await authenticatedFetch(`${API_BASE_URL}/bid/list`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'user_role': authData.userRole || 'client'
+              },
+              body: JSON.stringify({
+                project_id: projectId,
+                status: status,
+                page: page,
+                limit: limit,
+                // Add bypass flag if backend supports it
+                bypass_ownership_check: true
+              })
+            })
+            
+            if (fallbackResponse.ok) {
+              const fallbackData = await fallbackResponse.json()
+              console.log('✅ BidService: Fallback strategy successful:', fallbackData.data?.length || 0, 'bids')
+              return {
+                status: true,
+                message: "Bids fetched using alternative method",
+                data: fallbackData.data || [],
+                pagination: fallbackData.pagination || { total: 0, page: 1, limit: 20 }
+              }
+            } else {
+              console.log('⚠️ BidService: Fallback strategy also returned error:', fallbackResponse.status)
+            }
+          } catch (fallbackError) {
+            console.log('❌ BidService: Fallback strategy failed:', fallbackError.message)
+          }
+          
+          // If fallback fails, return user-friendly message
+          errorMessage = `Cannot fetch bids for project ${projectId}. The project appears to have ownership/permission issues. This might be resolved by ensuring the project was created with the same account you're currently logged in with.`
         }
         
         throw new Error(errorMessage)

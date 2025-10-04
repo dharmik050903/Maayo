@@ -76,16 +76,26 @@ export default function ClientMyBids() {
         const projectIds = projectsData.map(project => project._id)
         const allBids = []
         
+        console.log('🔄 ClientMyBids: Fetching bids for projects:', projectIds.length, 'projects')
+        console.log('📋 ClientMyBids: Project IDs:', projectIds)
+        
         for (const projectId of projectIds) {
           try {
+            console.log(`🔄 ClientMyBids: Fetching bids for project: ${projectId}`)
             const bidsResponse = await bidService.getProjectBids(projectId)
             if (bidsResponse.status && bidsResponse.data) {
+              console.log(`✅ ClientMyBids: Successfully fetched ${bidsResponse.data.length} bids for project ${projectId}`)
               allBids.push(...bidsResponse.data)
+            } else {
+              console.log(`⚠️ ClientMyBids: No bids data for project ${projectId}:`, bidsResponse)
             }
           } catch (err) {
-            console.error(`ClientMyBids: Error fetching bids for project ${projectId}:`, err)
+            console.error(`❌ ClientMyBids: Error fetching bids for project ${projectId}:`, err)
+            console.log(`💡 ClientMyBids: Check if this is the same ownership mismatch issue`)
           }
         }
+        
+        console.log('📊 ClientMyBids: Total bids fetched:', allBids.length)
         
         setBids(allBids)
       } else {
