@@ -86,6 +86,10 @@ export default function MyProjects() {
       setLoading(true)
       setError(null)
       console.log('🔄 MyProjects: Starting to fetch client projects...')
+      console.log('🔄 MyProjects: User authentication check:', {
+        isAuthenticated: localStorage.getItem('authHeaders') !== null,
+        authHeaders: localStorage.getItem('authHeaders')?.substring(0, 50) + '...' // Truncate for security
+      })
       
       // Get projects for the current client
       const response = await projectService.getClientProjects()
@@ -93,9 +97,15 @@ export default function MyProjects() {
       
       if (response.status && response.data) {
         console.log('✅ MyProjects: Projects fetched successfully:', response.data.length)
+        console.log('📋 MyProjects: Sample project:', response.data[0])
         setProjects(response.data)
       } else {
         console.log('⚠️ MyProjects: No projects found or invalid response')
+        console.log('⚠️ MyProjects: Response details:', {
+          status: response.status,
+          message: response.message,
+          dataLength: response.data?.length
+        })
         setProjects([])
       }
     } catch (error) {
