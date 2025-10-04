@@ -363,14 +363,13 @@ export const bidService = {
       let response = await fetch(`${API_BASE_URL}/bid/accept`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${acceptAuthData.token}`,
-          // Core identification headers (CORS-safe)
+          'Content-Type': 'application/json',
           'id': acceptAuthData._id,
           'user_role': acceptAuthData.userRole,
           'user_email': acceptAuthData.userEmail,
-          // Request metadata (CORS-safe)
-          'X-Requested-With': 'XMLHttpRequest'
+          'first_name': acceptAuthData.first_name || '',
+          'last_name': acceptAuthData.last_name || ''
         },
         body: JSON.stringify({
           bid_id: bidId
@@ -424,11 +423,13 @@ export const bidService = {
               const solution1Response = await fetch(`${API_BASE_URL}/bid/accept`, {
                 method: 'POST',
                 headers: {
-                  'Content-Type': 'application/json',
                   'Authorization': `Bearer ${acceptAuthData.token}`,
+                  'Content-Type': 'application/json',
                   'id': userId,
-                  'user_email': acceptAuthData.userEmail
-                  // Removed 'user_role': 'client' to avoid CORS issues
+                  'user_role': acceptAuthData.userRole,
+                  'user_email': acceptAuthData.userEmail,
+                  'first_name': acceptAuthData.first_name || '',
+                  'last_name': acceptAuthData.last_name || ''
                 },
                 body: JSON.stringify({ bid_id: bidId })
               })
@@ -582,14 +583,13 @@ SUGGESTION: Contact backend developer to verify project ${bidId} ownership data.
       let response = await fetch(`${API_BASE_URL}/bid/reject`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${rejectAuthData.token}`,
-          // Core identification headers (CORS-safe)
+          'Content-Type': 'application/json',
           'id': rejectAuthData._id,
           'user_role': rejectAuthData.userRole,
           'user_email': rejectAuthData.userEmail,
-          // Request metadata (CORS-safe)
-          'X-Requested-With': 'XMLHttpRequest'
+          'first_name': rejectAuthData.first_name || '',
+          'last_name': rejectAuthData.last_name || ''
         },
         body: JSON.stringify({
           bid_id: bidId,
@@ -643,11 +643,13 @@ SUGGESTION: Contact backend developer to verify project ${bidId} ownership data.
               const solution1Response = await fetch(`${API_BASE_URL}/bid/reject`, {
                 method: 'POST',
                 headers: {
-                  'Content-Type': 'application/json',
                   'Authorization': `Bearer ${rejectAuthData.token}`,
+                  'Content-Type': 'application/json',
                   'id': userId,
-                  'user_email': rejectAuthData.userEmail
-                  // Removed 'user_role': 'client' to avoid CORS issues
+                  'user_role': rejectAuthData.userRole,
+                  'user_email': rejectAuthData.userEmail,
+                  'first_name': rejectAuthData.first_name || '',
+                  'last_name': rejectAuthData.last_name || ''
                 },
                 body: JSON.stringify({ 
                   bid_id: bidId,
