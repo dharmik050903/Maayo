@@ -6,6 +6,7 @@ import UpgradeBanner from '../components/UpgradeBanner'
 import AnimatedCounter from '../components/AnimatedCounter'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 import { projectService } from '../services/projectService'
+import { bidService } from '../services/bidService'
 import { skillsService } from '../services/skillsService'
 import { formatBudget, formatHourlyRate } from '../utils/currency'
 import { needsUpgrade } from '../utils/subscription'
@@ -112,13 +113,23 @@ export default function FreelancerHome() {
       setLoading(true)
       setError(null)
       
-      const response = await projectService.getAllProjects()
-      console.log('📊 FreelancerHome: API Response:', response)
+      // First get freelancer bids to see which projects they have access to
+      const bidsResponse = await bidService.getFreelancerBids()
+      console.log('📊 FreelancerHome: Bids Response:', bidsResponse)
       
-      if (response.status && response.data) {
-        console.log('✅ FreelancerHome: Raw projects data:', response.data.length)
-        const transformedProjects = response.data.map(project => {
-          const clientData = project.personid || {}
+      if (bidsResponse.status && bidsResponse.data) {
+        console.log('✅ FreelancerHome: Raw bids data:', bidsResponse.data.length)
+        
+        // Filter only accepted bids (projects the freelancer is working on)
+        const acceptedBids = bidsResponse.data.filter(bid => 
+          bid.type === 'acceptedbid' && 
+          bid.project?.isactive === 1
+        )
+        console.log('✅ FreelancerHome: Accepted active bids:', acceptedBids.length)
+        
+        const transformedProjects = acceptedBids.map(bid => {
+          const project = bid.project
+          const clientData = project.personid || bid.client || {}
           const skills = project.skills_required ? project.skills_required.map(s => s.skill || s.skill_id?.skill || 'Unknown') : []
           
           return {
@@ -154,11 +165,11 @@ export default function FreelancerHome() {
           status: p.status
         })))
       } else {
-        console.log('No active projects found in database')
-      setProjects([])
+        console.log('No accepted bids found for freelancer')
+        setProjects([])
       }
     } catch (error) {
-      console.error('Error fetching active projects:', error)
+      console.error('Error fetching freelancer bids:', error)
       setError(error.message)
       setProjects([])
     } finally {
@@ -453,7 +464,7 @@ export default function FreelancerHome() {
           </div>
 
           {/* Active Projects with Milestones */}
-          {activeProjects.length > 0 && (
+          {activeProjects.length > 0 ? (
             <div className="max-w-4xl mx-auto mb-12">
               <h3 className="text-xl font-semibold text-graphite mb-6 text-center">📋 Active Project Milestones</h3>
               <div className="space-y-6">
@@ -471,6 +482,21 @@ export default function FreelancerHome() {
                     />
                   </div>
                 ))}
+              </div>
+            </div>
+          ) : (
+            <div className="max-w-4xl mx-auto mb-12">
+              <div className="card p-8 bg-white/95 backdrop-blur-sm text-center">
+                <div className="text-6xl mb-4">📋</div>
+                <h3 className="text-xl font-semibold text-graphite mb-4">No Active Projects</h3>
+                <p className="text-coolgray mb-6">
+                  You don't have any active projects with milestones yet. When clients accept your bids, they will appear here for milestone tracking.
+                </p>
+                <Link to="/find-work">
+                  <Button variant="primary" className="px-6 py-3">
+                    Browse Available Projects
+                  </Button>
+                </Link>
               </div>
             </div>
           )}

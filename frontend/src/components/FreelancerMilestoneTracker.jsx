@@ -21,18 +21,45 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
 
   const fetchMilestones = async () => {
     try {
+      console.log('🔄 FreelancerMilestoneTracker: Fetching milestones for project:', projectId)
       setLoading(true)
       setError(null)
+      
       const result = await escrowService.getMilestones(projectId)
+      console.log('📊 FreelancerMilestoneTracker: Milestone fetch result:', result)
       
       if (result.status) {
-        setMilestones(result.data.milestones || [])
+        const milestonesData = result.data.milestones || []
+        console.log('✅ FreelancerMilestoneTracker: Milestones found:', milestonesData.length)
+        setMilestones(milestonesData)
+        
+        if (milestonesData.length === 0) {
+          setError('No milestones found for this project')
+        }
       } else {
+        console.log('❌ FreelancerMilestoneTracker: API returned error:', result.message)
         setError(result.message || 'Failed to fetch milestones')
       }
     } catch (error) {
-      console.error('Error fetching milestones:', error)
-      setError(error.message || 'Failed to fetch milestones')
+      console.error('❌ FreelancerMilestoneTracker: Error fetching milestones:', error)
+      console.error('❌ FreelancerMilestoneTracker: Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      })
+      
+      let errorMessage = error.message || 'Failed to fetch milestones'
+      
+      // Provide more specific error messages
+      if (error.message.includes('Access denied') || error.message.includes('Unauthorized')) {
+        errorMessage = 'You do not have access to this project\'s milestones. You may not be assigned to this project.'
+      } else if (error.message.includes('Not found')) {
+        errorMessage = 'Project milestones not found. This project may not have milestones set up.'
+      } else if (error.message.includes('Failed to fetch')) {
+        errorMessage = 'Unable to connect to server. Please check your internet connection.'
+      }
+      
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -127,30 +154,15 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
     )
   }
 
-  if (error) {
-    return (
-      <div className="card p-6 bg-white/95">
-        <div className="text-center py-8">
-          <div className="text-red-500 mb-4">❌ {error}</div>
-          <button 
-            onClick={fetchMilestones}
-            className="px-4 py-2 bg-violet text-white rounded-lg hover:bg-violet/80 transition-colors"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    )
-  }
 
   if (milestones.length === 0) {
     return (
       <div className="card p-6 bg-white/95">
         <h3 className="text-lg font-semibold text-graphite mb-4">📋 Project Milestones</h3>
-        <div className="text-center py-8 text-coolgray">
+        <div className="text-center py-8 text-yellow-700">
           <div className="text-4xl mb-4">📝</div>
-          <p className="text-lg mb-2">No milestones defined yet</p>
-          <p className="text-sm">Milestones will appear here once the project starts</p>
+          <p className="text-lg mb-2">No Milestones Defined Yet</p>
+          <p className="text-sm">Milestones will appear here once set up by the client</p>
         </div>
       </div>
     )
