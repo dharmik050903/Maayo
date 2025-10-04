@@ -1,6 +1,7 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import MessagingModal from '../components/MessagingModal'
+import { LanguageProvider } from '../contexts/LanguageContext'
 
 class MessagingService {
   constructor() {
@@ -40,14 +41,16 @@ class MessagingService {
 
     this.isOpen = true
     this.root.render(
-      <MessagingModal
-        isOpen={true}
-        onClose={handleClose}
-        currentUser={this.currentUser}
-        otherUser={otherUser}
-        project={project}
-        bidId={bidId}
-      />
+      <LanguageProvider>
+        <MessagingModal
+          isOpen={true}
+          onClose={handleClose}
+          currentUser={this.currentUser}
+          otherUser={otherUser}
+          project={project}
+          bidId={bidId}
+        />
+      </LanguageProvider>
     )
   }
 
