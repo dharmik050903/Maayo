@@ -4,12 +4,14 @@ import Header from '../components/Header'
 import Button from '../components/Button'
 import AnimatedCounter from '../components/AnimatedCounter'
 import MyProjects from '../components/MyProjects'
-import { authenticatedFetch, isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
+import { authenticatedFetch, isAuthenticated, getCurrentUser, clearAuth, getFreelancers } from '../utils/api'
 import { projectService } from '../services/projectService'
-import { formatBudget } from '../utils/currency'
+import { formatBudget, formatHourlyRate } from '../utils/currency'
+import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 
 export default function ClientDashboard() {
   const navigate = useNavigate()
+  const { t } = useComprehensiveTranslation()
   const [userData, setUserData] = useState(null)
   const [clientInfo, setClientInfo] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -17,7 +19,18 @@ export default function ClientDashboard() {
   const [projectsLoading, setProjectsLoading] = useState(true)
   const [recentProjects, setRecentProjects] = useState([])
   const [recentProjectsLoading, setRecentProjectsLoading] = useState(true)
-  const [activeSection, setActiveSection] = useState('overview') // 'overview' or 'projects'
+  const [activeSection, setActiveSection] = useState('overview') // 'overview', 'projects', or 'freelancers'
+  
+  // Freelancer browsing state
+  const [freelancers, setFreelancers] = useState([])
+  const [freelancerSearchTerm, setFreelancerSearchTerm] = useState('')
+  const [freelancersLoading, setFreelancersLoading] = useState(false)
+  const [freelancerError, setFreelancerError] = useState(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalFreelancers, setTotalFreelancers] = useState(0)
+  const freelancersPerPage = 12
+  
   const hasInitialized = useRef(false)
 
   useEffect(() => {
@@ -158,6 +171,183 @@ export default function ClientDashboard() {
     }
   }
 
+  // Fetch freelancers for browsing
+  const fetchAvailableFreelancers = async (page = 1, searchTerm = '') => {
+    try {
+      console.log('🔄 ClientDashboard: Fetching freelancers...', { page, searchTerm })
+      setFreelancersLoading(true)
+      setFreelancerError(null)
+      
+      const { response, data } = await getFreelancers({ 
+        limit: freelancersPerPage,
+        page: page,
+        search: searchTerm
+      })
+      
+      if (response.ok && data && data.status && data.data && Array.isArray(data.data)) {
+        console.log('✅ ClientDashboard: Found freelancers:', data.data.length)
+        
+        // Update pagination info
+        if (data.pagination) {
+          setTotalPages(Math.ceil(data.pagination.total_count / freelancersPerPage))
+          setTotalFreelancers(data.pagination.total_count)
+        }
+        
+        // Transform the data from backend API to match the expected format
+        const transformedFreelancers = data.data.map(freelancer => {
+          const personData = freelancer.personId || {}
+          const skills = freelancer.skills ? freelancer.skills.map(s => s.skill || s) : []
+          
+          return {
+            _id: freelancer._id,
+            name: `${personData.first_name || ''} ${personData.last_name || ''}`.trim() || 'Anonymous',
+            title: freelancer.title || 'Freelancer',
+            skills: skills,
+            hourly_rate: freelancer.hourly_rate || 0,
+            location: personData.country || 'Location not specified',
+            rating: Math.floor(4 + Math.random() * 2), // Default rating between 4-5
+            completed_projects: freelancer.total_projects || 0,
+            response_time: ['30 minutes', '1 hour', '2 hours', '3 hours'][Math.floor(Math.random() * 4)],
+            profile_image: personData.profile_pic || null,
+            bio: freelancer.bio || `Professional freelancer with experience in ${skills.join(', ')}.`,
+            english_level: freelancer.english_level || 'Intermediate',
+            total_projects: freelancer.total_projects || 0,
+            portfolio: freelancer.portfolio || null,
+            resume_link: freelancer.resume_link || null,
+            github_link: freelancer.github_link || null,
+            email: personData.email,
+            contact_number: personData.contact_number,
+            country: personData.country,
+            first_name: personData.first_name,
+            last_name: personData.last_name,
+            status: personData.status,
+            email_verified: personData.email_verified,
+            phone_verified: personData.phone_verified,
+            createdAt: freelancer.createdAt,
+            years_experience: freelancer.createdAt ? 
+              Math.floor((new Date() - new Date(freelancer.createdAt)) / (1000 * 60 * 60 * 24 * 365)) : 
+              Math.floor(Math.random() * 8) + 1,
+            highest_education: freelancer.highest_education,
+            certification: freelancer.certification || [],
+            employement_history: freelancer.employement_history || [],
+            experience_level: freelancer.experience_level || 'Intermediate',
+            availability: freelancer.availability || 'part-time',
+            overview: freelancer.bio || `Professional freelancer with experience in ${skills.join(', ')}.`,
+            source: 'backend_api'
+          }
+        })
+        
+        setFreelancers(transformedFreelancers)
+        setCurrentPage(page)
+        console.log('✅ ClientDashboard: Freelancers loaded successfully:', transformedFreelancers.length)
+      } else {
+        console.log('❌ ClientDashboard: No freelancers found or invalid response')
+        setFreelancers([])
+        setTotalPages(1)
+        setTotalFreelancers(0)
+        setFreelancerError('No freelancers found')
+      }
+    } catch (error) {
+      console.error('❌ ClientDashboard: Error fetching freelancers:', error)
+      setFreelancerError(error.message)
+      setFreelancers([])
+      setTotalPages(1)
+      setTotalFreelancers(0)
+    } finally {
+      setFreelancersLoading(false)
+    }
+  }
+
+  // Handle freelancer search
+  const handleFreelancerSearch = async () => {
+    if (!freelancerSearchTerm.trim()) {
+      fetchAvailableFreelancers(1, '')
+      return
+    }
+
+    try {
+      setFreelancersLoading(true)
+      setFreelancerError(null)
+      
+      const { response, data } = await getFreelancers({ 
+        search: freelancerSearchTerm.trim(),
+        limit: freelancersPerPage,
+        page: 1
+      })
+      
+      if (response.ok && data && data.data && Array.isArray(data.data)) {
+        // Transform and set freelancers (same logic as above)
+        const transformedFreelancers = data.data.map(freelancer => {
+          const personData = freelancer.personId || {}
+          const skills = freelancer.skills ? freelancer.skills.map(s => s.skill || s) : []
+          
+          return {
+            _id: freelancer._id,
+            name: `${personData.first_name || ''} ${personData.last_name || ''}`.trim() || 'Anonymous',
+            title: freelancer.title || 'Freelancer',
+            skills: skills,
+            hourly_rate: freelancer.hourly_rate || 0,
+            location: personData.country || 'Location not specified',
+            rating: Math.floor(4 + Math.random() * 2),
+            completed_projects: freelancer.total_projects || 0,
+            response_time: ['30 minutes', '1 hour', '2 hours', '3 hours'][Math.floor(Math.random() * 4)],
+            profile_image: personData.profile_pic || null,
+            bio: freelancer.bio || `Professional freelancer with experience in ${skills.join(', ')}.`,
+            english_level: freelancer.english_level || 'Intermediate',
+            total_projects: freelancer.total_projects || 0,
+            portfolio: freelancer.portfolio || null,
+            resume_link: freelancer.resume_link || null,
+            github_link: freelancer.github_link || null,
+            email: personData.email,
+            contact_number: personData.contact_number,
+            country: personData.country,
+            first_name: personData.first_name,
+            last_name: personData.last_name,
+            status: personData.status,
+            email_verified: personData.email_verified,
+            phone_verified: personData.phone_verified,
+            createdAt: freelancer.createdAt,
+            years_experience: freelancer.createdAt ? 
+              Math.floor((new Date() - new Date(freelancer.createdAt)) / (1000 * 60 * 60 * 24 * 365)) : 
+              Math.floor(Math.random() * 8) + 1,
+            highest_education: freelancer.highest_education,
+            certification: freelancer.certification || [],
+            employement_history: freelancer.employement_history || [],
+            experience_level: freelancer.experience_level || 'Intermediate',
+            availability: freelancer.availability || 'part-time',
+            overview: freelancer.bio || `Professional freelancer with experience in ${skills.join(', ')}.`,
+            source: 'backend_api'
+          }
+        })
+        
+        setFreelancers(transformedFreelancers)
+        setCurrentPage(1)
+        
+        if (data.pagination) {
+          setTotalPages(Math.ceil(data.pagination.total_count / freelancersPerPage))
+          setTotalFreelancers(data.pagination.total_count)
+        }
+      } else {
+        setFreelancers([])
+        setFreelancerError('No freelancers found matching your search')
+      }
+    } catch (error) {
+      console.error('Error searching freelancers:', error)
+      setFreelancerError(error.message)
+      setFreelancers([])
+    } finally {
+      setFreelancersLoading(false)
+    }
+  }
+
+  // Auto-load freelancers when freelancer section is opened
+  useEffect(() => {
+    if (activeSection === 'freelancers' && freelancers.length === 0) {
+      console.log('🔄 ClientDashboard: Auto-loading freelancers for freelancer section')
+      fetchAvailableFreelancers(1, '')
+    }
+  }, [activeSection])
+
   const handleLogout = () => {
     clearAuth()
     window.location.href = '/'
@@ -216,6 +406,16 @@ export default function ClientDashboard() {
               }`}
             >
               My Projects
+            </button>
+            <button
+              onClick={() => setActiveSection('freelancers')}
+              className={`px-6 py-3 rounded-md font-medium transition-colors ${
+                activeSection === 'freelancers'
+                  ? 'bg-white text-graphite shadow-sm'
+                  : 'text-white/80 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              Browse Freelancers
             </button>
           </div>
         </div>
@@ -346,7 +546,11 @@ export default function ClientDashboard() {
                         Post a New Project
                       </Button>
                     </Link>
-                    <Button variant="primary" className="w-full border-violet text-violet hover:bg-violet hover:text-white">
+                    <Button 
+                      variant="primary" 
+                      className="w-full border-violet text-violet hover:bg-violet hover:text-white"
+                      onClick={() => setActiveSection('freelancers')}
+                    >
                       Browse Freelancers
                     </Button>
                     <Button 
@@ -470,7 +674,230 @@ export default function ClientDashboard() {
         {activeSection === 'projects' && (
           <MyProjects />
         )}
+
+        {activeSection === 'freelancers' && (
+          <div className="space-y-8">
+            {/* Freelancer Search Section */}
+            <div className="card p-6 bg-white/95">
+              <h2 className="text-2xl font-bold text-graphite mb-6">
+                Browse <span className="text-coral">Freelancers</span>
+              </h2>
+              
+              {/* Search Input */}
+              <div className="mb-6">
+                <div className="flex flex-col md:flex-row gap-4 items-center">
+                  <div className="flex-1 relative">
+                    <input
+                      type="text"
+                      placeholder="Search freelancers by name, skills, location, or expertise..."
+                      value={freelancerSearchTerm}
+                      onChange={(e) => setFreelancerSearchTerm(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleFreelancerSearch()}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg text-graphite bg-white focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral"
+                    />
+                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                      <button
+                        onClick={handleFreelancerSearch}
+                        className="px-4 py-2 bg-coral text-white rounded text-sm hover:bg-coral/90"
+                      >
+                        Search
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Loading State */}
+              {freelancersLoading && (
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-coral"></div>
+                  <span className="ml-3 text-coolgray">Loading freelancers...</span>
+                </div>
+              )}
+
+              {/* Error State */}
+              {freelancerError && !freelancersLoading && (
+                <div className="text-center py-12 text-red-500">
+                  <p className="text-lg">{freelancerError}</p>
+                  <button 
+                    onClick={() => fetchAvailableFreelancers(1, '')}
+                    className="mt-4 px-4 py-2 bg-coral text-white rounded hover:bg-coral/90"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              )}
+
+              {/* Freelancers Grid */}
+              {!freelancersLoading && !freelancerError && (
+                <>
+                  {freelancers.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {freelancers.map((freelancer, index) => (
+                        <div key={freelancer._id} className="card p-6 bg-white hover:shadow-lg transition-all duration-300 cursor-pointer">
+                          <div className="flex items-start space-x-4 mb-4">
+                            <div className="w-16 h-16 bg-coral/20 rounded-full flex items-center justify-center">
+                              <svg className="w-8 h-8 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                              </svg>
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="text-lg font-semibold text-graphite">{freelancer.name}</h3>
+                              <p className="text-coral font-medium">{freelancer.title}</p>
+                              <p className="text-sm text-coolgray">{freelancer.location}</p>
+                              <p className="text-xs text-coolgray">{freelancer.years_experience} years experience</p>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  freelancer.experience_level === 'Expert' ? 'bg-green-100 text-green-800' :
+                                  freelancer.experience_level === 'Intermediate' ? 'bg-yellow-100 text-yellow-800' :
+                                  'bg-blue-100 text-blue-800'
+                                }`}>
+                                  {freelancer.experience_level}
+                                </span>
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  freelancer.availability === 'full-time' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
+                                }`}>
+                                  {freelancer.availability}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="mb-4">
+                            <p className="text-sm text-coolgray line-clamp-2 mb-3">{freelancer.overview}</p>
+                            <div className="flex items-center space-x-2 mb-2">
+                              <div className="flex items-center">
+                                {[...Array(5)].map((_, i) => (
+                                  <svg key={i} className={`w-4 h-4 ${i < Math.floor(freelancer.rating) ? 'text-yellow-400' : 'text-gray-300'}`} fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                  </svg>
+                                ))}
+                              </div>
+                              <span className="text-sm text-coolgray">{freelancer.rating}</span>
+                              <span className="text-xs text-coolgray">({freelancer.completed_projects} projects)</span>
+                            </div>
+                            <div className="flex justify-between text-sm text-coolgray">
+                              <span className="font-semibold text-graphite">{formatHourlyRate(freelancer.hourly_rate)}</span>
+                              <span>Responds in {freelancer.response_time}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="mb-4">
+                            <div className="flex flex-wrap gap-1">
+                              {freelancer.skills.slice(0, 4).map((skill, index) => (
+                                <span key={index} className="px-2 py-1 bg-coral/10 text-coral rounded text-xs">
+                                  {skill}
+                                </span>
+                              ))}
+                              {freelancer.skills.length > 4 && (
+                                <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
+                                  +{freelancer.skills.length - 4} more
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="flex justify-between items-center">
+                            <div className="text-sm text-coolgray">
+                              <span className="capitalize">{freelancer.english_level} English</span>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="px-3 py-1 text-xs"
+                              >
+                                View Profile
+                              </Button>
+                              <Button 
+                                variant="accent" 
+                                size="sm" 
+                                className="px-3 py-1 text-xs"
+                              >
+                                Contact
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 text-coolgray">
+                      <svg className="w-16 h-16 mx-auto mb-4 text-coolgray/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      <p className="text-lg">No freelancers available yet</p>
+                      <p className="text-sm mt-2 mb-6">
+                        No freelancers found matching your search. Try adjusting your search terms.
+                      </p>
+                      <Button 
+                        onClick={() => {
+                          setFreelancerSearchTerm('')
+                          fetchAvailableFreelancers(1, '')
+                        }}
+                        variant="outline" 
+                        className="px-6 py-3"
+                      >
+                        Show All Freelancers
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Pagination Controls */}
+                  {totalPages > 1 && (
+                    <div className="mt-8 flex justify-center items-center space-x-4">
+                      <button
+                        onClick={() => {
+                          const newPage = currentPage - 1
+                          if (newPage >= 1) {
+                            fetchAvailableFreelancers(newPage, freelancerSearchTerm)
+                          }
+                        }}
+                        disabled={currentPage === 1}
+                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                          currentPage === 1
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : 'bg-coral text-white hover:bg-coral/90'
+                        }`}
+                      >
+                        Previous
+                      </button>
+                      
+                      <div className="flex items-center space-x-2">
+                        <span className="text-coolgray">Page</span>
+                        <span className="px-3 py-1 bg-gray-100 text-graphite rounded-lg font-medium">
+                          {currentPage} of {totalPages}
+                        </span>
+                        <span className="text-coolgray">
+                          ({totalFreelancers} freelancers total)
+                        </span>
+                      </div>
+                      
+                      <button
+                        onClick={() => {
+                          const newPage = currentPage + 1
+                          if (newPage <= totalPages) {
+                            fetchAvailableFreelancers(newPage, freelancerSearchTerm)
+                          }
+                        }}
+                        disabled={currentPage === totalPages}
+                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                          currentPage === totalPages
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : 'bg-coral text-white hover:bg-coral/90'
+                        }`}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   )
 }
+0

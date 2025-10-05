@@ -29,6 +29,11 @@ export default function ClientHome() {
   const [showFreelancerSearch, setShowFreelancerSearch] = useState(false)
   const [selectedFreelancer, setSelectedFreelancer] = useState(null)
   const [showFreelancerModal, setShowFreelancerModal] = useState(false)
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalFreelancers, setTotalFreelancers] = useState(0)
+  const freelancersPerPage = 12
   // Escrow management state
   const [activeTab, setActiveTab] = useState('freelancers') // 'freelancers' or 'escrow'
   const [selectedProject, setSelectedProject] = useState(null)
@@ -86,17 +91,18 @@ export default function ClientHome() {
     }
   }, [])
 
-  const fetchAvailableFreelancers = async () => {
+  const fetchAvailableFreelancers = async (page = 1, searchTerm = '') => {
     try {
-      console.log('🔄 ClientHome: Fetching freelancers from backend API...')
+      console.log('🔄 ClientHome: Fetching freelancers from backend API...', { page, searchTerm })
       console.log('🔍 ClientHome: User authenticated:', isAuthenticated())
       console.log('🔍 ClientHome: Current user:', getCurrentUser())
       console.log('🔍 ClientHome: API Base URL:', import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api')
       setLoading(true)
       
       const { response, data } = await getFreelancers({ 
-        limit: 50,  // Request more freelancers per page
-        page: 1     // Start from first page
+        limit: freelancersPerPage,
+        page: page,
+        search: searchTerm
       })
       console.log('📊 ClientHome: Freelancer API response:', { status: response.status, data })
       console.log('🔍 ClientHome: Data structure check:', {
@@ -110,12 +116,24 @@ export default function ClientHome() {
         totalCount: data?.pagination?.total_count
       })
       
-      if (response.ok && data && data.status && data.data && Array.isArray(data.data) && data.data.length > 0) {
-        console.log('✅ ClientHome: Found freelancers from backend:', data.data.length)
-        
-        // Transform the data from backend API to match the expected format
-        console.log('🔍 ClientHome: Sample freelancer data:', data.data[0])
-        const transformedFreelancers = data.data.map(freelancer => {
+        if (response.ok && data && data.status && data.data && Array.isArray(data.data)) {
+          console.log('✅ ClientHome: Found freelancers from backend:', data.data.length)
+          
+          // Update pagination info
+          if (data.pagination) {
+            setTotalPages(Math.ceil(data.pagination.total_count / freelancersPerPage))
+            setTotalFreelancers(data.pagination.total_count)
+            console.log('📊 ClientHome: Pagination info:', {
+              currentPage: page,
+              totalPages: Math.ceil(data.pagination.total_count / freelancersPerPage),
+              totalCount: data.pagination.total_count,
+              freelancersPerPage
+            })
+          }
+          
+          // Transform the data from backend API to match the expected format
+          console.log('🔍 ClientHome: Sample freelancer data:', data.data[0])
+          const transformedFreelancers = data.data.map(freelancer => {
           console.log('🔍 ClientHome: Processing freelancer:', freelancer._id, freelancer)
           const personData = freelancer.personId || {}
           const skills = freelancer.skills ? freelancer.skills.map(s => s.skill || s) : []
@@ -163,6 +181,7 @@ export default function ClientHome() {
         })
         
         setFreelancers(transformedFreelancers)
+        setCurrentPage(page)
         console.log('✅ ClientHome: Successfully loaded freelancers from backend API')
         console.log('✅ ClientHome: Transformed freelancers count:', transformedFreelancers.length)
         console.log('✅ ClientHome: Sample transformed freelancer:', transformedFreelancers[0])
@@ -175,6 +194,8 @@ export default function ClientHome() {
           dataMessage: data?.message
         })
         setFreelancers([])
+        setTotalPages(1)
+        setTotalFreelancers(0)
         // Set a helpful error message for the user
         if (data && data.message) {
           setError(data.message)
@@ -194,6 +215,8 @@ export default function ClientHome() {
       })
       setError(error.message)
       setFreelancers([])
+      setTotalPages(1)
+      setTotalFreelancers(0)
     } finally {
       setLoading(false)
     }
@@ -312,7 +335,7 @@ export default function ClientHome() {
   const handleSearch = async () => {
     if (!freelancerSearchTerm.trim()) {
       // If search is empty, show all freelancers
-      fetchAvailableFreelancers()
+      fetchAvailableFreelancers(1, '')
       return
     }
 
@@ -322,8 +345,8 @@ export default function ClientHome() {
       
       const { response, data } = await getFreelancers({ 
         search: freelancerSearchTerm,
-        limit: 50,  // Request more freelancers per page
-        page: 1     // Start from first page
+        limit: freelancersPerPage,
+        page: 1
       })
       
       if (response.ok && data && data.data && Array.isArray(data.data)) {
@@ -382,11 +405,19 @@ export default function ClientHome() {
     }
   }
 
+  // Auto-load freelancers when freelancer tab is opened
+  useEffect(() => {
+    if (activeTab === 'freelancers' && freelancers.length === 0) {
+      console.log('🔄 ClientHome: Auto-loading freelancers for freelancer tab')
+      fetchAvailableFreelancers(1, '')
+    }
+  }, [activeTab])
+
   // Load freelancers when search section is opened
   const handleShowFreelancerSearch = () => {
     setShowFreelancerSearch(!showFreelancerSearch)
     if (!showFreelancerSearch && freelancers.length === 0) {
-      fetchAvailableFreelancers()
+      fetchAvailableFreelancers(1, '')
     }
   }
 
@@ -575,15 +606,6 @@ export default function ClientHome() {
                       className="px-3 py-1 bg-coral text-white rounded text-sm hover:bg-coral/90"
                     >
                       Search
-                    </button>
-                    <button
-                      onClick={() => {
-                        setFreelancerSearchTerm('')
-                        fetchAvailableFreelancers()
-                      }}
-                      className="px-3 py-1 bg-mint text-white rounded text-sm hover:bg-mint/90"
-                    >
-                      Show All
                     </button>
                   </div>
                 </div>
@@ -827,10 +849,10 @@ export default function ClientHome() {
                       {error && (
                     <Button 
                       variant="outline" 
-                          onClick={() => {
-                            setError(null)
-                            fetchAvailableFreelancers()
-                          }}
+                      onClick={() => {
+                        setError(null)
+                        fetchAvailableFreelancers(1, '')
+                      }}
                       className="px-6 py-3 border-white text-white hover:bg-white hover:text-graphite"
                     >
                           Try Again
@@ -849,6 +871,55 @@ export default function ClientHome() {
                 </div>
               )}
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="mt-8 flex justify-center items-center space-x-4">
+                <button
+                  onClick={() => {
+                    const newPage = currentPage - 1
+                    if (newPage >= 1) {
+                      fetchAvailableFreelancers(newPage, freelancerSearchTerm)
+                    }
+                  }}
+                  disabled={currentPage === 1}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    currentPage === 1
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-coral text-white hover:bg-coral/90'
+                  }`}
+                >
+                  Previous
+                </button>
+                
+                <div className="flex items-center space-x-2">
+                  <span className="text-white/80">Page</span>
+                  <span className="px-3 py-1 bg-white/20 text-white rounded-lg font-medium">
+                    {currentPage} of {totalPages}
+                  </span>
+                  <span className="text-white/80">
+                    ({totalFreelancers} freelancers total)
+                  </span>
+                </div>
+                
+                <button
+                  onClick={() => {
+                    const newPage = currentPage + 1
+                    if (newPage <= totalPages) {
+                      fetchAvailableFreelancers(newPage, freelancerSearchTerm)
+                    }
+                  }}
+                  disabled={currentPage === totalPages}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    currentPage === totalPages
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-coral text-white hover:bg-coral/90'
+                  }`}
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </div>
         </section>
       )}
