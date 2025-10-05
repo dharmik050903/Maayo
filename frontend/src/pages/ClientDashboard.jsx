@@ -194,13 +194,33 @@ export default function ClientDashboard() {
         }
         
         // Transform the data from backend API to match the expected format
+        console.log('🔍 ClientDashboard: Sample raw freelancer data:', data.data[0])
         const transformedFreelancers = data.data.map(freelancer => {
           const personData = freelancer.personId || {}
           const skills = freelancer.skills ? freelancer.skills.map(s => s.skill || s) : []
           
+          console.log('🔍 ClientDashboard: Processing freelancer:', freelancer._id, {
+            personData,
+            freelancerName: freelancer.name,
+            firstName: personData.first_name,
+            lastName: personData.last_name
+          })
+          
+          // Better name handling
+          let name = 'Anonymous'
+          if (personData.first_name && personData.last_name) {
+            name = `${personData.first_name} ${personData.last_name}`.trim()
+          } else if (personData.first_name) {
+            name = personData.first_name
+          } else if (personData.last_name) {
+            name = personData.last_name
+          } else if (freelancer.name) {
+            name = freelancer.name
+          }
+          
           return {
             _id: freelancer._id,
-            name: `${personData.first_name || ''} ${personData.last_name || ''}`.trim() || 'Anonymous',
+            name: name,
             title: freelancer.title || 'Freelancer',
             skills: skills,
             hourly_rate: freelancer.hourly_rate || 0,
@@ -237,9 +257,15 @@ export default function ClientDashboard() {
           }
         })
         
-        setFreelancers(transformedFreelancers)
+        // Remove duplicates based on _id
+        const uniqueFreelancers = transformedFreelancers.filter((freelancer, index, self) => 
+          index === self.findIndex(f => f._id === freelancer._id)
+        )
+        
+        setFreelancers(uniqueFreelancers)
         setCurrentPage(page)
-        console.log('✅ ClientDashboard: Freelancers loaded successfully:', transformedFreelancers.length)
+        console.log('✅ ClientDashboard: Freelancers loaded successfully:', uniqueFreelancers.length)
+        console.log('🔍 ClientDashboard: Sample freelancer names:', uniqueFreelancers.map(f => f.name))
       } else {
         console.log('❌ ClientDashboard: No freelancers found or invalid response')
         setFreelancers([])
@@ -281,9 +307,21 @@ export default function ClientDashboard() {
           const personData = freelancer.personId || {}
           const skills = freelancer.skills ? freelancer.skills.map(s => s.skill || s) : []
           
+          // Better name handling
+          let name = 'Anonymous'
+          if (personData.first_name && personData.last_name) {
+            name = `${personData.first_name} ${personData.last_name}`.trim()
+          } else if (personData.first_name) {
+            name = personData.first_name
+          } else if (personData.last_name) {
+            name = personData.last_name
+          } else if (freelancer.name) {
+            name = freelancer.name
+          }
+          
           return {
             _id: freelancer._id,
-            name: `${personData.first_name || ''} ${personData.last_name || ''}`.trim() || 'Anonymous',
+            name: name,
             title: freelancer.title || 'Freelancer',
             skills: skills,
             hourly_rate: freelancer.hourly_rate || 0,
@@ -320,13 +358,21 @@ export default function ClientDashboard() {
           }
         })
         
-        setFreelancers(transformedFreelancers)
+        // Remove duplicates based on _id
+        const uniqueFreelancers = transformedFreelancers.filter((freelancer, index, self) => 
+          index === self.findIndex(f => f._id === freelancer._id)
+        )
+        
+        setFreelancers(uniqueFreelancers)
         setCurrentPage(1)
         
         if (data.pagination) {
           setTotalPages(Math.ceil(data.pagination.total_count / freelancersPerPage))
           setTotalFreelancers(data.pagination.total_count)
         }
+        
+        console.log('🔍 ClientDashboard: Search results - unique freelancers:', uniqueFreelancers.length)
+        console.log('🔍 ClientDashboard: Sample search result names:', uniqueFreelancers.map(f => f.name))
       } else {
         setFreelancers([])
         setFreelancerError('No freelancers found matching your search')
