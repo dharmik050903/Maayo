@@ -532,7 +532,7 @@ export default function ProjectForm({ project = null, onSuccess, onCancel }) {
                         className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-violet/10 text-violet border border-violet/20"
                       >
                         {skill.skill}
-                        {skill.skill_id.startsWith('custom_') && (
+                        {skill.skill_id && typeof skill.skill_id === 'string' && skill.skill_id.startsWith('custom_') && (
                           <span className="ml-1 text-xs opacity-75">(custom)</span>
                         )}
                         <button

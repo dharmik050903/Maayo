@@ -855,13 +855,6 @@ export default function ClientDashboard() {
                               >
                                 View Profile
                               </Button>
-                              <Button 
-                                variant="accent" 
-                                size="sm" 
-                                className="px-3 py-1 text-xs"
-                              >
-                                Contact
-                              </Button>
                             </div>
                           </div>
                         </div>

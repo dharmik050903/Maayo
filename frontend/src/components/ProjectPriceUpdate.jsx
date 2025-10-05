@@ -52,7 +52,7 @@ const ProjectPriceUpdate = ({ projectId, currentAmount, onSuccess }) => {
               setFinalAmount(e.target.value)
               setError('')
             }}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 ${
               error ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="Enter final project amount"

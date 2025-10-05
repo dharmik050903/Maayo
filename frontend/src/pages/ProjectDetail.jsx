@@ -24,6 +24,8 @@ export default function ProjectDetail() {
   const [loading, setLoading] = useState(true)
   const [pageLoading, setPageLoading] = useState(true)
   const [message, setMessage] = useState(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [isCompleting, setIsCompleting] = useState(false)
   const hasInitialized = useRef(false)
 
   useEffect(() => {
@@ -76,36 +78,67 @@ export default function ProjectDetail() {
   }
 
   const handleDeleteProject = async () => {
-    const confirmed = await confirmationService.danger(
-      'Are you sure you want to delete this project? This action cannot be undone.',
-      'Delete Project'
-    )
-    if (!confirmed) return
-    
     try {
+      // Try confirmation service, fallback to browser confirm if it fails
+      let confirmed = false
+      try {
+        confirmed = await confirmationService.danger(
+          'Are you sure you want to delete this project? This action cannot be undone.',
+          'Delete Project'
+        )
+      } catch (confirmError) {
+        console.warn('Confirmation service failed, using browser confirm:', confirmError)
+        confirmed = window.confirm('Are you sure you want to delete this project? This action cannot be undone.')
+      }
+      
+      if (!confirmed) return
+      
+      console.log('🗑️ ProjectDetail: Deleting project:', id)
+      setIsDeleting(true)
+      setMessage({ type: 'info', text: 'Deleting project...' })
+      
       const response = await projectService.deleteProject(id)
+      console.log('🗑️ ProjectDetail: Delete response:', response)
+      
       if (response.status) {
         setMessage({ type: 'success', text: 'Project deleted successfully' })
         setTimeout(() => {
-          navigate('/projects')
+          navigate('/client/my-projects')
         }, 1500)
       } else {
         setMessage({ type: 'error', text: response.message || 'Failed to delete project' })
       }
     } catch (error) {
+      console.error('❌ ProjectDetail: Error deleting project:', error)
       setMessage({ type: 'error', text: error.message || 'Failed to delete project' })
+    } finally {
+      setIsDeleting(false)
     }
   }
 
   const handleCompleteProject = async () => {
-    const confirmed = await confirmationService.confirm(
-      'Are you sure you want to mark this project as completed?',
-      'Complete Project'
-    )
-    if (!confirmed) return
-    
     try {
+      // Try confirmation service, fallback to browser confirm if it fails
+      let confirmed = false
+      try {
+        confirmed = await confirmationService.confirm(
+          'Are you sure you want to mark this project as completed?',
+          'Complete Project'
+        )
+      } catch (confirmError) {
+        console.warn('Confirmation service failed, using browser confirm:', confirmError)
+        confirmed = window.confirm('Are you sure you want to mark this project as completed?')
+      }
+      
+      if (!confirmed) return
+      
+      console.log('✅ ProjectDetail: Completing project:', id)
+      setIsCompleting(true)
+      setMessage({ type: 'info', text: 'Marking project as completed...' })
+      
       const response = await projectService.completeProject(id)
+      console.log('✅ ProjectDetail: Complete response:', response)
+      
       if (response.status) {
         setMessage({ type: 'success', text: 'Project marked as completed' })
         loadProject() // Reload project data
@@ -113,7 +146,10 @@ export default function ProjectDetail() {
         setMessage({ type: 'error', text: response.message || 'Failed to complete project' })
       }
     } catch (error) {
+      console.error('❌ ProjectDetail: Error completing project:', error)
       setMessage({ type: 'error', text: error.message || 'Failed to complete project' })
+    } finally {
+      setIsCompleting(false)
     }
   }
 
@@ -189,11 +225,11 @@ export default function ProjectDetail() {
               <Button variant="secondary">{t('editProject')}</Button>
             </Link>
             {project.isactive === 1 && project.iscompleted === 0 && (
-              <Button onClick={handleCompleteProject} variant="accent">
+              <Button onClick={handleCompleteProject} variant="accent" loading={isCompleting}>
                 Mark Complete
               </Button>
             )}
-            <Button onClick={handleDeleteProject} variant="danger">
+            <Button onClick={handleDeleteProject} variant="danger" loading={isDeleting}>
               Delete
             </Button>
           </div>
@@ -204,9 +240,16 @@ export default function ProjectDetail() {
           <div className={`p-4 rounded-lg mb-6 ${
             message.type === 'success' 
               ? 'bg-mint/20 text-mint border border-mint/30' 
+              : message.type === 'info'
+              ? 'bg-blue-100 text-blue-800 border border-blue-200'
               : 'bg-coral/20 text-coral border border-coral/30'
           }`}>
-            {message.text}
+            <div className="flex items-center">
+              {message.type === 'success' && <span className="mr-2">✅</span>}
+              {message.type === 'info' && <span className="mr-2">⏳</span>}
+              {message.type === 'error' && <span className="mr-2">❌</span>}
+              {message.text}
+            </div>
           </div>
         )}
 
@@ -363,11 +406,11 @@ export default function ProjectDetail() {
                   <Button variant="secondary" className="w-full">{t('editProject')}</Button>
                 </Link>
                 {project.isactive === 1 && project.iscompleted === 0 && (
-                  <Button onClick={handleCompleteProject} variant="accent" className="w-full">
+                  <Button onClick={handleCompleteProject} variant="accent" className="w-full" loading={isCompleting}>
                     {t('markComplete')}
                   </Button>
                 )}
-                <Button onClick={handleDeleteProject} variant="danger" className="w-full">
+                <Button onClick={handleDeleteProject} variant="danger" className="w-full" loading={isDeleting}>
                   {t('deleteProject')}
                 </Button>
               </div>

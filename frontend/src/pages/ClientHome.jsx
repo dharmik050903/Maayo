@@ -809,17 +809,6 @@ export default function ClientHome() {
                       >
                         {t('viewProfile')}
                       </Button>
-                      <Button 
-                        variant="accent" 
-                        size="sm" 
-                        className="px-3 py-1 text-xs"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleContactFreelancer(freelancer)
-                        }}
-                      >
-                        Contact
-                      </Button>
                     </div>
                   </div>
                 </div>
@@ -1297,16 +1286,6 @@ export default function ClientHome() {
                   className="px-6 py-2"
                 >
                   Close
-                </Button>
-                <Button
-                  variant="accent"
-                  onClick={() => {
-                    closeFreelancerModal()
-                    handleContactFreelancer(selectedFreelancer)
-                  }}
-                  className="px-6 py-2"
-                >
-                  Contact Freelancer
                 </Button>
               </div>
             </div>
