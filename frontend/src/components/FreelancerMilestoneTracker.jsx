@@ -38,7 +38,8 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
         console.log('📊 FreelancerMilestoneTracker: Milestone details:', milestonesData.map(m => ({
           title: m.title,
           status: m.status,
-          index: m.index
+          index: m.index,
+          fullObject: m // Show complete object structure
         })))
         setMilestones(milestonesData)
         
@@ -120,9 +121,23 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
   }
 
   const getMilestoneStatus = (milestone) => {
+    console.log('🔍 getMilestoneStatus input:', milestone)
+    
+    // Check various possible status fields
     if (milestone.status === 'completed') return 'completed'
     if (milestone.status === 'pending_approval') return 'pending_approval'
     if (milestone.status === 'in_progress') return 'in_progress'
+    
+    // Check if milestone has completion data (indicating it's been completed)
+    if (milestone.completion_notes || milestone.completion_date || milestone.is_completed) {
+      return 'pending_approval' // If it has completion data but no explicit status, it's pending approval
+    }
+    
+    // Check if milestone has been paid (indicating completion)
+    if (milestone.is_paid || milestone.payment_status === 'completed') {
+      return 'completed'
+    }
+    
     return 'pending'
   }
 

@@ -151,9 +151,23 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
   }
 
   const getMilestoneStatus = (milestone) => {
+    console.log('🔍 Client getMilestoneStatus input:', milestone)
+    
+    // Check various possible status fields
     if (milestone.status === 'completed') return 'completed'
     if (milestone.status === 'pending_approval') return 'pending_approval'
     if (milestone.status === 'in_progress') return 'in_progress'
+    
+    // Check if milestone has completion data (indicating it's been completed)
+    if (milestone.completion_notes || milestone.completion_date || milestone.is_completed) {
+      return 'pending_approval' // If it has completion data but no explicit status, it's pending approval
+    }
+    
+    // Check if milestone has been paid (indicating completion)
+    if (milestone.is_paid || milestone.payment_status === 'completed') {
+      return 'completed'
+    }
+    
     return 'pending'
   }
 
