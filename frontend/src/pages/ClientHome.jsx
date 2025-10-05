@@ -91,6 +91,7 @@ export default function ClientHome() {
       console.log('🔄 ClientHome: Fetching freelancers from backend API...')
       console.log('🔍 ClientHome: User authenticated:', isAuthenticated())
       console.log('🔍 ClientHome: Current user:', getCurrentUser())
+      console.log('🔍 ClientHome: API Base URL:', import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api')
       setLoading(true)
       
       const { response, data } = await getFreelancers({ 

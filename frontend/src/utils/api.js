@@ -490,6 +490,18 @@ export async function getFreelancers(filters = {}) {
   
   const data = await response.json()
   console.log('📊 API: Freelancers response:', { status: response.status, data })
+  console.log('🔍 API: Full response details:', {
+    status: response.status,
+    statusText: response.statusText,
+    ok: response.ok,
+    headers: Object.fromEntries(response.headers.entries()),
+    dataKeys: Object.keys(data || {}),
+    dataStatus: data?.status,
+    dataMessage: data?.message,
+    dataDataLength: data?.data?.length,
+    dataDataSample: data?.data?.[0],
+    pagination: data?.pagination
+  })
   return { response, data }
 }
 
