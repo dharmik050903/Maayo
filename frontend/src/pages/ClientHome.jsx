@@ -93,7 +93,10 @@ export default function ClientHome() {
       console.log('🔍 ClientHome: Current user:', getCurrentUser())
       setLoading(true)
       
-      const { response, data } = await getFreelancers({})
+      const { response, data } = await getFreelancers({ 
+        limit: 50,  // Request more freelancers per page
+        page: 1     // Start from first page
+      })
       console.log('📊 ClientHome: Freelancer API response:', { status: response.status, data })
       console.log('🔍 ClientHome: Data structure check:', {
         dataExists: !!data,
@@ -101,7 +104,9 @@ export default function ClientHome() {
         dataDataExists: !!data?.data,
         dataDataLength: data?.data?.length,
         dataDataType: typeof data?.data,
-        dataDataSample: data?.data?.[0]
+        dataDataSample: data?.data?.[0],
+        pagination: data?.pagination,
+        totalCount: data?.pagination?.total_count
       })
       
       if (response.ok && data && data.status && data.data && Array.isArray(data.data) && data.data.length > 0) {
@@ -314,7 +319,11 @@ export default function ClientHome() {
       setLoading(true)
       console.log('Searching freelancers with term:', freelancerSearchTerm)
       
-      const { response, data } = await getFreelancers({ search: freelancerSearchTerm })
+      const { response, data } = await getFreelancers({ 
+        search: freelancerSearchTerm,
+        limit: 50,  // Request more freelancers per page
+        page: 1     // Start from first page
+      })
       
       if (response.ok && data && data.data && Array.isArray(data.data)) {
         // Transform the data from backend API to match the expected format

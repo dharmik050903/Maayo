@@ -85,7 +85,10 @@ export default function Freelancers() {
       setLoading(true)
       console.log('🔄 Freelancers: Starting to fetch freelancers from database...')
       
-      const { response, data } = await getFreelancers({})
+      const { response, data } = await getFreelancers({ 
+        limit: 50,  // Request more freelancers per page
+        page: 1     // Start from first page
+      })
       console.log('📊 Freelancers: API Response:', { response: response.status, data })
       
       if (response.ok && data.status) {
