@@ -8,6 +8,8 @@ export const SUBSCRIPTION_PLANS = {
         features: {
             max_projects: 3,
             max_bids_per_month: 5,
+            max_jobs: 10, // Job postings for clients
+            max_job_applications: 20, // Job applications for freelancers
             ai_proposals: false,
             priority_support: false,
             advanced_analytics: false,
@@ -30,6 +32,8 @@ export const SUBSCRIPTION_PLANS = {
         features: {
             max_projects: 10,
             max_bids_per_month: 25,
+            max_jobs: 50, // Job postings for clients
+            max_job_applications: 100, // Job applications for freelancers
             ai_proposals: true,
             priority_support: true,
             advanced_analytics: true,
@@ -55,6 +59,8 @@ export const SUBSCRIPTION_PLANS = {
         features: {
             max_projects: -1, // Unlimited
             max_bids_per_month: -1, // Unlimited
+            max_jobs: -1, // Unlimited job postings for clients
+            max_job_applications: -1, // Unlimited job applications for freelancers
             ai_proposals: true,
             priority_support: true,
             advanced_analytics: true,

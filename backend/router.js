@@ -21,6 +21,8 @@ import MilestoneController from "./controller/milestoneController.js";
 import BankDetailsController from "./controller/bankDetailsController.js";
 import AdminAuth from "./controller/adminAuth.js";
 import AdminController from "./controller/admin.js";
+import JobController from "./controller/jobController.js";
+import JobApplicationController from "./controller/jobApplicationController.js";
 
 const router = express.Router();
 //Login and Signup Controllers
@@ -46,6 +48,10 @@ const adminController = new AdminController();
 const escrowController = new EscrowController();
 const milestoneController = new MilestoneController();
 const bankDetailsController = new BankDetailsController();
+
+// Job Controllers
+const jobController = new JobController();
+const jobApplicationController = new JobApplicationController();
 
 
 
@@ -127,6 +133,26 @@ router.post("/milestone/add", auth, milestoneController.addMilestone);
 router.post("/milestone/remove", auth, milestoneController.removeMilestone);
 router.post("/milestone/list", auth, milestoneController.getProjectMilestones);
 router.post("/bid/delete", auth, bidController.deleteBid);
+
+// Job Posting routes (Client only)
+router.post("/job/create", auth, jobController.createJob);
+router.post("/job/list", jobController.getJobs); // Public access
+router.post("/job/detail", jobController.getJobById); // Public access
+router.post("/job/update", auth, jobController.updateJob);
+router.post("/job/delete", auth, jobController.deleteJob);
+router.post("/job/close", auth, jobController.closeJob);
+router.post("/job/client-jobs", auth, jobController.getClientJobs);
+router.post("/job/stats", auth, jobController.getJobStats);
+
+// Job Application routes
+router.post("/job/apply", auth, jobApplicationController.applyForJob);
+router.post("/job/applications", auth, jobApplicationController.getFreelancerApplications);
+router.post("/job/job-applications", auth, jobApplicationController.getJobApplications);
+router.post("/job/application/update-status", auth, jobApplicationController.updateApplicationStatus);
+router.post("/job/save", auth, jobApplicationController.toggleJobSave);
+router.post("/job/saved-jobs", auth, jobApplicationController.getSavedJobs);
+router.post("/job/application-stats", auth, jobApplicationController.getApplicationStats);
+router.post("/job/application/withdraw", auth, jobApplicationController.withdrawApplication);
 // AI routes
 router.post("/ai/generate-proposal", auth, requireFeatureAccess('ai_proposals'), aiController.generateProposal);
 router.post("/ai/generate-project-description", auth, requireFeatureAccess('ai_proposals'), aiController.createProposalPrompt);
@@ -149,6 +175,56 @@ router.post("/subscription/verify", auth, subscriptionController.verifySubscript
 router.post("/subscription/cancel", auth, subscriptionController.cancelSubscription);
 router.post("/subscription/check-feature", auth, subscriptionController.checkFeatureAccess);
 router.post("/subscription/usage", auth, subscriptionController.getUsageStats);
+
+
+// Admin Authentication Routes
+router.post("/admin/auth/login", adminAuthController.adminLogin);
+router.post("/admin/auth/setup-super-admin", adminAuthController.createSuperAdmin); // One-time setup
+router.post("/admin/auth/bootstrap", adminAuthController.createPredefinedAdmins); // Bootstrap predefined admins
+router.post("/admin/auth/change-password", adminAuth, adminAuthController.changePassword);
+router.post("/admin/auth/profile", adminAuth, adminAuthController.getAdminProfile);
+router.post("/admin/auth/update-profile", adminAuth, adminAuthController.updateAdminProfile);
+router.post("/admin/auth/logout", adminAuth, adminAuthController.adminLogout);
+
+// Admin Dashboard
+router.post("/admin/dashboard/stats", adminAuth, adminController.getDashboardStats);
+
+// Admin User Management
+router.post("/admin/users/list", adminAuth, checkPermission('users', 'view'), adminController.getUsers);
+router.post("/admin/users/suspend", adminAuth, checkPermission('users', 'suspend'), adminController.suspendUser);
+router.post("/admin/users/activate", adminAuth, checkPermission('users', 'suspend'), adminController.activateUser);
+router.post("/admin/users/delete", adminAuth, checkPermission('users', 'delete'), adminController.deleteUser);
+
+// Admin Freelancer Management
+router.post("/admin/freelancers/list", adminAuth, checkPermission('freelancers', 'view'), adminController.getFreelancers);
+router.post("/admin/freelancers/approve", adminAuth, checkPermission('freelancers', 'approve'), adminController.approveFreelancer);
+
+// Admin Project Management
+router.post("/admin/projects/list", adminAuth, checkPermission('projects', 'view'), adminController.getProjects);
+router.post("/admin/projects/delete", adminAuth, checkPermission('projects', 'delete'), adminController.deleteProject);
+
+// Admin Bid Management
+router.post("/admin/bids/list", adminAuth, checkPermission('bids', 'view'), adminController.getBids);
+router.post("/admin/bids/delete", adminAuth, checkPermission('bids', 'delete'), adminController.deleteBid);
+
+// Admin Payment Management
+router.post("/admin/payments/list", adminAuth, checkPermission('payments', 'view'), adminController.getPayments);
+router.post("/admin/payments/delete", adminAuth, checkPermission('payments', 'delete'), adminController.deletePayment);
+
+// Admin User Update
+router.post("/admin/users/update", adminAuth, checkPermission('users', 'edit'), adminController.updateUser);
+
+// Admin Project Update  
+router.post("/admin/projects/update", adminAuth, checkPermission('projects', 'edit'), adminController.updateProject);
+
+// Admin Management (Super Admin only)
+router.post("/admin/admins/list", adminAuth, superAdminOnly, adminController.getAdmins);
+router.post("/admin/admins/create", adminAuth, superAdminOnly, adminController.createAdmin);
+
+// Permission Request Management
+router.post("/admin/permission-requests/submit", adminAuth, adminController.submitPermissionRequest);
+router.get("/admin/permission-requests/list", adminAuth, superAdminOnly, adminController.getPermissionRequests);
+router.post("/admin/permission-requests/:requestId/handle", adminAuth, superAdminOnly, adminController.handlePermissionRequestAction);
 
 // Test endpoint for Razorpay configuration
 router.get("/payment/test-config", (req, res) => {
@@ -281,54 +357,5 @@ router.get("/chat/health", (req, res) => {
         timestamp: new Date().toISOString()
     });
 });
-
-// Admin Authentication Routes
-router.post("/admin/auth/login", adminAuthController.adminLogin);
-router.post("/admin/auth/setup-super-admin", adminAuthController.createSuperAdmin); // One-time setup
-router.post("/admin/auth/bootstrap", adminAuthController.createPredefinedAdmins); // Bootstrap predefined admins
-router.post("/admin/auth/change-password", adminAuth, adminAuthController.changePassword);
-router.post("/admin/auth/profile", adminAuth, adminAuthController.getAdminProfile);
-router.post("/admin/auth/update-profile", adminAuth, adminAuthController.updateAdminProfile);
-router.post("/admin/auth/logout", adminAuth, adminAuthController.adminLogout);
-
-// Admin Dashboard
-router.post("/admin/dashboard/stats", adminAuth, adminController.getDashboardStats);
-
-// Admin User Management
-router.post("/admin/users/list", adminAuth, checkPermission('users', 'view'), adminController.getUsers);
-router.post("/admin/users/suspend", adminAuth, checkPermission('users', 'suspend'), adminController.suspendUser);
-router.post("/admin/users/activate", adminAuth, checkPermission('users', 'suspend'), adminController.activateUser);
-router.post("/admin/users/delete", adminAuth, checkPermission('users', 'delete'), adminController.deleteUser);
-
-// Admin Freelancer Management
-router.post("/admin/freelancers/list", adminAuth, checkPermission('freelancers', 'view'), adminController.getFreelancers);
-router.post("/admin/freelancers/approve", adminAuth, checkPermission('freelancers', 'approve'), adminController.approveFreelancer);
-
-// Admin Project Management
-router.post("/admin/projects/list", adminAuth, checkPermission('projects', 'view'), adminController.getProjects);
-router.post("/admin/projects/delete", adminAuth, checkPermission('projects', 'delete'), adminController.deleteProject);
-
-// Admin Bid Management
-router.post("/admin/bids/list", adminAuth, checkPermission('bids', 'view'), adminController.getBids);
-router.post("/admin/bids/delete", adminAuth, checkPermission('bids', 'delete'), adminController.deleteBid);
-
-// Admin Payment Management
-router.post("/admin/payments/list", adminAuth, checkPermission('payments', 'view'), adminController.getPayments);
-router.post("/admin/payments/delete", adminAuth, checkPermission('payments', 'delete'), adminController.deletePayment);
-
-// Admin User Update
-router.post("/admin/users/update", adminAuth, checkPermission('users', 'edit'), adminController.updateUser);
-
-// Admin Project Update  
-router.post("/admin/projects/update", adminAuth, checkPermission('projects', 'edit'), adminController.updateProject);
-
-// Admin Management (Super Admin only)
-router.post("/admin/admins/list", adminAuth, superAdminOnly, adminController.getAdmins);
-router.post("/admin/admins/create", adminAuth, superAdminOnly, adminController.createAdmin);
-
-// Permission Request Management
-router.post("/admin/permission-requests/submit", adminAuth, adminController.submitPermissionRequest);
-router.get("/admin/permission-requests/list", adminAuth, superAdminOnly, adminController.getPermissionRequests);
-router.post("/admin/permission-requests/:requestId/handle", adminAuth, superAdminOnly, adminController.handlePermissionRequestAction);
 
 export default router;
