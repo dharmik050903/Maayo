@@ -440,8 +440,8 @@ export const escrowService = {
         body: JSON.stringify({
           project_id: projectId,
           milestone_index: milestoneIndex,
-          completion_notes: completionNotes,
-          evidence: evidence
+          completion_notes: completionNotes
+          // Note: evidence field not supported by backend yet
         })
       })
 
