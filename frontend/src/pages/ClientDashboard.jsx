@@ -586,7 +586,7 @@ export default function ClientDashboard() {
                 {/* Quick Actions */}
                 <div className="card p-6 bg-white/95">
                   <h3 className="text-lg font-semibold text-graphite mb-4">Quick Actions</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <Link to="/create-project" className="w-full">
                       <Button variant="accent" className="w-full border-mint text-mint hover:bg-mint hover:text-white">
                         Post a New Project

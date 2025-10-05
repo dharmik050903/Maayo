@@ -124,7 +124,7 @@ const BankDetailsForm = ({ onSuccess, onCancel, editData = null }) => {
               name="account_holder_name"
               value={formData.account_holder_name}
               onChange={handleInputChange}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 ${
                 errors.account_holder_name ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Enter account holder name"
@@ -143,7 +143,7 @@ const BankDetailsForm = ({ onSuccess, onCancel, editData = null }) => {
               name="account_number"
               value={formData.account_number}
               onChange={handleInputChange}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 ${
                 errors.account_number ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Enter account number"
@@ -163,7 +163,7 @@ const BankDetailsForm = ({ onSuccess, onCancel, editData = null }) => {
               name="ifsc_code"
               value={formData.ifsc_code}
               onChange={handleInputChange}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 ${
                 errors.ifsc_code ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Enter IFSC code"
@@ -184,7 +184,7 @@ const BankDetailsForm = ({ onSuccess, onCancel, editData = null }) => {
               name="bank_name"
               value={formData.bank_name}
               onChange={handleInputChange}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 ${
                 errors.bank_name ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Enter bank name"
@@ -203,7 +203,7 @@ const BankDetailsForm = ({ onSuccess, onCancel, editData = null }) => {
               name="branch_name"
               value={formData.branch_name}
               onChange={handleInputChange}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 ${
                 errors.branch_name ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Enter branch name"
@@ -221,7 +221,7 @@ const BankDetailsForm = ({ onSuccess, onCancel, editData = null }) => {
               name="account_type"
               value={formData.account_type}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900"
             >
               <option value="savings">Savings</option>
               <option value="current">Current</option>
@@ -238,7 +238,7 @@ const BankDetailsForm = ({ onSuccess, onCancel, editData = null }) => {
               name="upi_id"
               value={formData.upi_id}
               onChange={handleInputChange}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 ${
                 errors.upi_id ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Enter UPI ID (e.g., user@paytm)"

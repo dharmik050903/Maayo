@@ -544,8 +544,9 @@ export default function Login() {
       
       // Check if Google Client ID is configured
       const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
-      if (!clientId) {
+      if (!clientId || clientId === 'your_google_client_id_here') {
         console.log('❌ Google Client ID not configured')
+        setMessage({ type: 'error', text: 'Google Sign-In is not configured. Please contact support.' })
         return
       }
 
@@ -640,8 +641,8 @@ export default function Login() {
       
       // Check if Google Client ID is configured
       const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
-      if (!clientId) {
-        setMessage({ type: 'error', text: 'Google Client ID not configured' })
+      if (!clientId || clientId === 'your_google_client_id_here') {
+        setMessage({ type: 'error', text: 'Google Sign-In is not configured. Please contact support.' })
         setLoading(false)
         return
       }
@@ -1277,7 +1278,7 @@ export default function Login() {
               type="button"
               onClick={handleGoogleSignInFallback}
               disabled={!selectedRole || loading || otpLoading}
-              className={`w-full flex items-center justify-center px-4 py-3 border rounded-lg font-medium transition-colors mt-2 hidden ${
+              className={`w-full flex items-center justify-center px-4 py-3 border rounded-lg font-medium transition-colors mt-2 ${
                 selectedRole && !loading && !otpLoading
                   ? 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400'
                   : 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
