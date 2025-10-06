@@ -21,6 +21,7 @@ import MilestoneController from "./controller/milestoneController.js";
 import BankDetailsController from "./controller/bankDetailsController.js";
 import AdminAuth from "./controller/adminAuth.js";
 import AdminController from "./controller/admin.js";
+import AdminJobController from "./controller/adminJobController.js";
 import JobController from "./controller/jobController.js";
 import JobApplicationController from "./controller/jobApplicationController.js";
 
@@ -43,6 +44,7 @@ const subscriptionController = new SubscriptionController();
 
 const adminAuthController = new AdminAuth();
 const adminController = new AdminController();
+const adminJobController = new AdminJobController();
 
 // New Escrow and Milestone Controllers
 const escrowController = new EscrowController();
@@ -217,9 +219,21 @@ router.post("/admin/users/update", adminAuth, checkPermission('users', 'edit'), 
 // Admin Project Update  
 router.post("/admin/projects/update", adminAuth, checkPermission('projects', 'edit'), adminController.updateProject);
 
+// Admin Job Management
+router.post("/admin/jobs/list", adminAuth, checkPermission('jobs', 'view'), adminJobController.getAllJobs);
+router.post("/admin/jobs/detail", adminAuth, checkPermission('jobs', 'view'), adminJobController.getJobById);
+router.post("/admin/jobs/update", adminAuth, checkPermission('jobs', 'edit'), adminJobController.updateJob);
+router.post("/admin/jobs/block", adminAuth, checkPermission('jobs', 'block'), adminJobController.toggleJobBlock);
+router.post("/admin/jobs/delete", adminAuth, checkPermission('jobs', 'delete'), adminJobController.deleteJob);
+router.post("/admin/jobs/applications", adminAuth, checkPermission('jobs', 'view'), adminJobController.getJobApplications);
+router.post("/admin/jobs/stats", adminAuth, checkPermission('jobs', 'view'), adminJobController.getJobDashboardStats);
+
 // Admin Management (Super Admin only)
 router.post("/admin/admins/list", adminAuth, superAdminOnly, adminController.getAdmins);
 router.post("/admin/admins/create", adminAuth, superAdminOnly, adminController.createAdmin);
+
+// Migration route for job permissions
+router.post("/admin/migrate/job-permissions", adminAuth, adminController.migrateJobPermissions);
 
 // Permission Request Management
 router.post("/admin/permission-requests/submit", adminAuth, adminController.submitPermissionRequest);

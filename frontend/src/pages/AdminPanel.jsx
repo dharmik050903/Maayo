@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import AdminSidebar from '../components/AdminSidebar'
 import AdminDashboard from '../components/AdminDashboard'
 import UserManagement from '../components/UserManagement'
+import JobManagement from '../components/JobManagement'
 import PermissionRequests from '../components/PermissionRequests'
 import adminService from '../services/adminService'
 
@@ -1229,6 +1230,7 @@ const AdminPanel = () => {
               <Route path="/users" element={<UserManagement />} />
               <Route path="/freelancers" element={<FreelancerManagement />} />
               <Route path="/projects" element={<ProjectManagement />} />
+              <Route path="/jobs" element={<JobManagement />} />
               <Route path="/bids" element={<BidManagement />} />
               <Route path="/permission-requests" element={<PermissionRequests />} />
 

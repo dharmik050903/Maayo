@@ -25,9 +25,26 @@ const AdminDashboard = () => {
       }
       setError('')
       console.log('🔄 Fetching dashboard stats...')
-      const response = await adminService.getDashboardStats()
+      
+      // Fetch both regular stats and job stats
+      const [response, jobStatsResponse] = await Promise.all([
+        adminService.getDashboardStats(),
+        adminService.getJobDashboardStats().catch(err => {
+          console.warn('Job stats fetch failed:', err)
+          return { data: { job_statistics: {}, application_statistics: {} } }
+        })
+      ])
+      
       console.log('📊 Dashboard stats received:', response.data)
-      setStats(response.data)
+      console.log('💼 Job stats received:', jobStatsResponse.data)
+      
+      // Merge job stats with regular stats
+      const mergedStats = {
+        ...response.data,
+        jobStats: jobStatsResponse.data
+      }
+      
+      setStats(mergedStats)
     } catch (error) {
       console.error('❌ Error fetching stats:', error)
       setError(error.message)
@@ -195,6 +212,44 @@ const DashboardContent = ({ stats, onRefresh, refreshing, navigate }) => (
         clickable={true}
       />
     </div>
+
+    {/* Job Management Stats */}
+    {stats?.jobStats && (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
+        <StatCard
+          title="Total Jobs"
+          value={stats.jobStats.job_statistics?.total_jobs || 0}
+          icon="💼"
+          color="bg-indigo-600"
+          onClick={() => navigate('/admin/jobs')}
+          clickable={true}
+        />
+        <StatCard
+          title="Active Jobs"
+          value={stats.jobStats.job_statistics?.active_jobs || 0}
+          icon="✅"
+          color="bg-green-600"
+          onClick={() => navigate('/admin/jobs')}
+          clickable={true}
+        />
+        <StatCard
+          title="Blocked Jobs"
+          value={stats.jobStats.job_statistics?.blocked_jobs || 0}
+          icon="🚫"
+          color="bg-red-600"
+          onClick={() => navigate('/admin/jobs')}
+          clickable={true}
+        />
+        <StatCard
+          title="Job Applications"
+          value={stats.jobStats.application_statistics?.total_applications || 0}
+          icon="📋"
+          color="bg-teal-600"
+          onClick={() => navigate('/admin/jobs')}
+          clickable={true}
+        />
+      </div>
+    )}
 
     {/* Recent Activity */}
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">

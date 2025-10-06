@@ -93,10 +93,23 @@ const adminAuth = async (req, res, next) => {
 
 const checkPermission = (resource, action) => {
     return (req, res, next) => {
+        // For job permissions, provide default permissions if not set
+        if (resource === 'jobs' && (!req.user.permissions || !req.user.permissions[resource])) {
+            console.log('⚠️ Job permissions not found, providing default permissions');
+            if (!req.user.permissions) req.user.permissions = {};
+            req.user.permissions.jobs = {
+                view: true,
+                edit: true,
+                delete: true,
+                block: true,
+                moderate: true
+            };
+        }
+
         if (!req.user.permissions[resource] || !req.user.permissions[resource][action]) {
             return res.status(403).json({ 
                 status: false, 
-                message: 'Access denied. Insufficient permissions.' 
+                message: `Access denied. Insufficient permissions for ${resource}.${action}` 
             });
         }
         next();

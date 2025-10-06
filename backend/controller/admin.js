@@ -1434,4 +1434,54 @@ export default class AdminController {
         await project.save();
         console.log(`✅ Project ${project.title || project.project_title || 'Untitled'} updated by ${approver.name} via permission approval`);
     }
+
+    // Migration method to add job permissions to existing admins
+    async migrateJobPermissions(req, res) {
+        try {
+            // Admin authentication is handled by middleware
+            if (!req.user || req.user.role !== 'admin') {
+                return res.status(403).json({
+                    status: false,
+                    message: "Access denied. Admin privileges required."
+                });
+            }
+
+            console.log('🔄 Starting job permissions migration...');
+            
+            // Update all existing admins to have job permissions
+            const updateResult = await Admin.updateMany(
+                { 'permissions.jobs': { $exists: false } },
+                {
+                    $set: {
+                        'permissions.jobs': {
+                            view: true,
+                            edit: true,
+                            delete: true,
+                            block: true,
+                            moderate: true
+                        }
+                    }
+                }
+            );
+
+            console.log(`✅ Updated ${updateResult.modifiedCount} admin accounts with job permissions`);
+
+            return res.status(200).json({
+                status: true,
+                message: `Job permissions migration completed. Updated ${updateResult.modifiedCount} admin accounts.`,
+                data: {
+                    modified_count: updateResult.modifiedCount,
+                    matched_count: updateResult.matchedCount
+                }
+            });
+
+        } catch (error) {
+            console.error("❌ Error during job permissions migration:", error);
+            return res.status(500).json({
+                status: false,
+                message: "Migration failed",
+                error: error.message
+            });
+        }
+    }
 }

@@ -1007,6 +1007,336 @@ export const adminService = {
       console.error(`Error ${action} permission request:`, error)
       throw error
     }
+  },
+
+  // Job Management Methods
+  async getJobs(filters = {}) {
+    try {
+      const token = this.getAdminToken()
+      const { 
+        page = 1, 
+        limit = 20, 
+        search = '', 
+        status = 'all', 
+        company_name = '',
+        job_type = 'all',
+        work_mode = 'all',
+        location = '',
+        is_active,
+        date_from = '',
+        date_to = ''
+      } = filters
+      
+      const response = await fetch(`${API_BASE_URL}/admin/jobs/list`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          page, 
+          limit, 
+          search, 
+          status: status !== 'all' ? status : undefined, 
+          company_name,
+          job_type: job_type !== 'all' ? job_type : undefined,
+          work_mode: work_mode !== 'all' ? work_mode : undefined,
+          location,
+          is_active,
+          date_from,
+          date_to
+        })
+      })
+      
+      if (!response.ok) {
+        let errorMessage = 'Failed to get jobs'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.message || errorMessage
+        } catch (parseError) {
+          errorMessage = `Server error: ${response.status} ${response.statusText}`
+        }
+        throw new Error(errorMessage)
+      }
+      
+      const data = await response.json()
+      return {
+        status: true,
+        message: data.message,
+        data: data.data.jobs,
+        pagination: data.data.pagination
+      }
+    } catch (error) {
+      console.error('Error getting jobs:', error)
+      throw error
+    }
+  },
+
+  async getJobById(jobId) {
+    try {
+      const token = this.getAdminToken()
+      
+      const response = await fetch(`${API_BASE_URL}/admin/jobs/detail`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ job_id: jobId })
+      })
+      
+      if (!response.ok) {
+        let errorMessage = 'Failed to get job details'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.message || errorMessage
+        } catch (parseError) {
+          errorMessage = `Server error: ${response.status} ${response.statusText}`
+        }
+        throw new Error(errorMessage)
+      }
+      
+      const data = await response.json()
+      return {
+        status: true,
+        message: data.message,
+        data: data.data
+      }
+    } catch (error) {
+      console.error('Error getting job details:', error)
+      throw error
+    }
+  },
+
+  async updateJob(jobId, updates) {
+    try {
+      const token = this.getAdminToken()
+      
+      const response = await fetch(`${API_BASE_URL}/admin/jobs/update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ job_id: jobId, ...updates })
+      })
+      
+      if (!response.ok) {
+        let errorMessage = 'Failed to update job'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.message || errorMessage
+        } catch (parseError) {
+          errorMessage = `Server error: ${response.status} ${response.statusText}`
+        }
+        throw new Error(errorMessage)
+      }
+      
+      const data = await response.json()
+      return {
+        status: true,
+        message: data.message,
+        data: data.data
+      }
+    } catch (error) {
+      console.error('Error updating job:', error)
+      throw error
+    }
+  },
+
+  async toggleJobBlock(jobId, blockReason = '') {
+    try {
+      const token = this.getAdminToken()
+      
+      const response = await fetch(`${API_BASE_URL}/admin/jobs/block`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ job_id: jobId, block_reason: blockReason })
+      })
+      
+      if (!response.ok) {
+        let errorMessage = 'Failed to toggle job block status'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.message || errorMessage
+        } catch (parseError) {
+          errorMessage = `Server error: ${response.status} ${response.statusText}`
+        }
+        throw new Error(errorMessage)
+      }
+      
+      const data = await response.json()
+      return {
+        status: true,
+        message: data.message,
+        data: data.data
+      }
+    } catch (error) {
+      console.error('Error toggling job block:', error)
+      throw error
+    }
+  },
+
+  async deleteJob(jobId, deleteReason = '') {
+    try {
+      console.log('🔄 AdminService: Starting delete job request')
+      console.log('📋 Job ID:', jobId)
+      console.log('📝 Reason:', deleteReason)
+      
+      const token = this.getAdminToken()
+      console.log('🔑 Token present:', !!token)
+      
+      const requestBody = { job_id: jobId, delete_reason: deleteReason }
+      console.log('📦 Request body:', requestBody)
+      
+      const response = await fetch(`${API_BASE_URL}/admin/jobs/delete`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(requestBody)
+      })
+      
+      console.log('📡 Response status:', response.status)
+      console.log('📡 Response ok:', response.ok)
+      
+      if (!response.ok) {
+        let errorMessage = 'Failed to delete job'
+        try {
+          const errorData = await response.json()
+          console.log('❌ Error response data:', errorData)
+          errorMessage = errorData.message || errorMessage
+        } catch (parseError) {
+          console.log('❌ Failed to parse error response:', parseError)
+          errorMessage = `Server error: ${response.status} ${response.statusText}`
+        }
+        throw new Error(errorMessage)
+      }
+      
+      const data = await response.json()
+      console.log('✅ Success response data:', data)
+      
+      return {
+        status: true,
+        message: data.message,
+        data: data.data
+      }
+    } catch (error) {
+      console.error('❌ AdminService deleteJob error:', error)
+      throw error
+    }
+  },
+
+  async getJobApplications(jobId, filters = {}) {
+    try {
+      const token = this.getAdminToken()
+      const { page = 1, limit = 20, status } = filters
+      
+      const response = await fetch(`${API_BASE_URL}/admin/jobs/applications`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ job_id: jobId, page, limit, status })
+      })
+      
+      if (!response.ok) {
+        let errorMessage = 'Failed to get job applications'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.message || errorMessage
+        } catch (parseError) {
+          errorMessage = `Server error: ${response.status} ${response.statusText}`
+        }
+        throw new Error(errorMessage)
+      }
+      
+      const data = await response.json()
+      return {
+        status: true,
+        message: data.message,
+        data: data.data
+      }
+    } catch (error) {
+      console.error('Error getting job applications:', error)
+      throw error
+    }
+  },
+
+  async getJobDashboardStats() {
+    try {
+      const token = this.getAdminToken()
+      
+      const response = await fetch(`${API_BASE_URL}/admin/jobs/stats`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      
+      if (!response.ok) {
+        let errorMessage = 'Failed to get job dashboard stats'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.message || errorMessage
+        } catch (parseError) {
+          errorMessage = `Server error: ${response.status} ${response.statusText}`
+        }
+        throw new Error(errorMessage)
+      }
+      
+      const data = await response.json()
+      return {
+        status: true,
+        message: data.message,
+        data: data.data
+      }
+    } catch (error) {
+      console.error('Error getting job dashboard stats:', error)
+      throw error
+    }
+  },
+
+  // Migration method for job permissions
+  async migrateJobPermissions() {
+    try {
+      const token = this.getAdminToken()
+      
+      const response = await fetch(`${API_BASE_URL}/admin/migrate/job-permissions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      
+      if (!response.ok) {
+        let errorMessage = 'Failed to migrate job permissions'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.message || errorMessage
+        } catch (parseError) {
+          errorMessage = `Server error: ${response.status} ${response.statusText}`
+        }
+        throw new Error(errorMessage)
+      }
+      
+      const data = await response.json()
+      return {
+        status: true,
+        message: data.message,
+        data: data.data
+      }
+    } catch (error) {
+      console.error('Error migrating job permissions:', error)
+      throw error
+    }
   }
 }
 

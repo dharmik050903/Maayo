@@ -30,6 +30,13 @@ const adminSchema = new mongoose.Schema({
             delete: { type: Boolean, default: true },
             moderate: { type: Boolean, default: true }
         },
+        jobs: {
+            view: { type: Boolean, default: true },
+            edit: { type: Boolean, default: true },
+            delete: { type: Boolean, default: true },
+            block: { type: Boolean, default: true },
+            moderate: { type: Boolean, default: true }
+        },
         bids: {
             view: { type: Boolean, default: true },
             moderate: { type: Boolean, default: true },
