@@ -54,6 +54,7 @@ const router = createBrowserRouter([
       { path: '/find-work', element: <FindWork /> },
       { path: '/browse', element: <BrowseProjects /> },
       { path: '/freelancers', element: <Freelancers /> },
+      
       { path: '/about', element: <Aboutus />},
       { path: '/contact', element: <ContactUs />},
       { path: '/pricing', element: <SubscriptionPage />},

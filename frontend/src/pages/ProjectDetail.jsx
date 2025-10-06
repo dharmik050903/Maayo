@@ -94,7 +94,7 @@ export default function ProjectDetail() {
       if (!confirmed) return
       
       console.log('🗑️ ProjectDetail: Deleting project:', id)
-      setIsDeleting(true)
+      setIsDeleting(true)   
       setMessage({ type: 'info', text: 'Deleting project...' })
       
       const response = await projectService.deleteProject(id)
