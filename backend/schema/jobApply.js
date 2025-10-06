@@ -16,7 +16,7 @@ const jobApplySchema = new mongoose.Schema({
     // Application details
     application_status: { 
         type: String, 
-        enum: ['applied', 'viewed', 'shortlisted', 'interviewed', 'selected', 'rejected', 'withdrawn'], 
+        enum: ['applied', 'viewed', 'shortlisted', 'interviewed', 'selected', 'rejected', 'withdrawn', 'saved'], 
         default: 'applied' 
     },
     
@@ -32,7 +32,7 @@ const jobApplySchema = new mongoose.Schema({
     
     // Resume and portfolio
     resume_link: {
-        url: { type: String, required: true },
+        url: { type: String },
         title: { type: String, default: 'Resume' },
         description: { type: String, maxlength: 200 },
         uploaded_at: { type: Date, default: Date.now }

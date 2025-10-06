@@ -95,23 +95,15 @@ export default class JobApplicationController {
             }
 
             // Validate resume link requirement
-            if (job.application_settings.require_resume_link && !applicationData.resume_link) {
+            if (job.application_settings.require_resume_link && !applicationData.resume_link?.url) {
                 return res.status(400).json({
                     status: false,
                     message: "Resume link is required for this job"
                 });
             }
 
-            // Validate resume link format if provided
-            if (applicationData.resume_link && !applicationData.resume_link.url) {
-                return res.status(400).json({
-                    status: false,
-                    message: "Resume URL is required when providing resume link"
-                });
-            }
-
-            // Validate URL format
-            if (applicationData.resume_link && applicationData.resume_link.url) {
+            // Validate URL format if resume link is provided
+            if (applicationData.resume_link?.url) {
                 const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
                 if (!urlPattern.test(applicationData.resume_link.url)) {
                     return res.status(400).json({
