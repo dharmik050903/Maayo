@@ -33,8 +33,8 @@ const freelancerInfo = new mongoose.Schema({
             link: { type: String }
         }
     ],
-    resume_link:{type:String,require:true},
-    github_link:{type:String,require:true},
+    resume_link:{type:String,required:true},
+    github_link:{type:String,required:true},
     createdAt: { type: String, default: () => new Date().toISOString() },
     updateAt: { type: String, default: null }
 })

@@ -31,6 +31,16 @@ import ShippingPolicy from './pages/ShippingPolicy'
 import AdminLogin from './pages/AdminLogin'
 import AdminPanel from './pages/AdminPanel'
 import AdminSetup from './pages/AdminSetup'
+import JobCreateForm from './components/JobCreateForm'
+import JobEditForm from './components/JobEditForm'
+import JobSearch from './components/JobSearch'
+import JobDetail from './pages/JobDetail'
+import ClientJobs from './pages/ClientJobs'
+import JobApplications from './pages/JobApplications'
+import ApplicationList from './pages/ApplicationList'
+import SavedJobs from './pages/SavedJobs'
+import ApplicationStats from './pages/ApplicationStats'
+import JobStats from './pages/JobStats'
 
 const router = createBrowserRouter([
   {
@@ -54,6 +64,19 @@ const router = createBrowserRouter([
       { path: '/find-work', element: <FindWork /> },
       { path: '/browse', element: <BrowseProjects /> },
       { path: '/freelancers', element: <Freelancers /> },
+      
+      // Job-related routes
+      { path: '/client/jobs', element: <ClientJobs /> },
+      { path: '/client/jobs/create', element: <JobCreateForm /> },
+      { path: '/client/jobs/edit/:id', element: <JobEditForm /> },
+      { path: '/client/jobs/:id/applications', element: <JobApplications /> },
+      { path: '/client/jobs/stats', element: <JobStats /> },
+      
+      { path: '/freelancer/jobs', element: <JobSearch /> },
+      { path: '/freelancer/jobs/:id', element: <JobDetail /> },
+      { path: '/freelancer/applications', element: <ApplicationList /> },
+      { path: '/freelancer/saved-jobs', element: <SavedJobs /> },
+      { path: '/freelancer/application-stats', element: <ApplicationStats /> },
       
       { path: '/about', element: <Aboutus />},
       { path: '/contact', element: <ContactUs />},

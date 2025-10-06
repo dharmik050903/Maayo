@@ -363,15 +363,55 @@ export default function Header({ userType, onLogout, userData }) {
 
   // Helper function to check if a link is active
   const isActiveLink = (path) => {
+    const currentPath = location.pathname
+    
     if (path === '/') {
-      return location.pathname === '/'
+      return currentPath === '/'
     }
-    return location.pathname.startsWith(path)
+    
+    // Special handling for job-related routes to prevent multiple highlights
+    if (path === '/client/jobs') {
+      // Only highlight if it's exactly /client/jobs or /client/jobs/create
+      return currentPath === '/client/jobs' || currentPath === '/client/jobs/create'
+    }
+    
+    if (path === '/client/jobs/stats') {
+      return currentPath === '/client/jobs/stats'
+    }
+    
+    if (path === '/freelancer/jobs') {
+      // Only highlight if it's exactly /freelancer/jobs (not job detail pages)
+      return currentPath === '/freelancer/jobs'
+    }
+    
+    if (path === '/freelancer/applications') {
+      return currentPath === '/freelancer/applications'
+    }
+    
+    if (path === '/freelancer/saved-jobs') {
+      return currentPath === '/freelancer/saved-jobs'
+    }
+    
+    if (path === '/freelancer/application-stats') {
+      return currentPath === '/freelancer/application-stats'
+    }
+    
+    // For other routes, use exact match or parent path logic
+    if (currentPath === path) {
+      return true
+    }
+    
+    // For parent paths, check if current path starts with path + '/'
+    if (currentPath.startsWith(path + '/')) {
+      return true
+    }
+    
+    return false
   }
 
   // Helper function to get link classes with active state
   const getLinkClasses = (path) => {
-    const baseClasses = "px-4 py-2 rounded-md transition-colors whitespace-nowrap flex items-center"
+    const baseClasses = "px-1.5 py-1 rounded-md transition-colors whitespace-nowrap flex items-center text-xs"
     const isActive = isActiveLink(path)
     
     if (isActive) {
@@ -427,30 +467,51 @@ export default function Header({ userType, onLogout, userData }) {
         {t('myProjects')}
       </Link>
       
+      {/* Job-related navigation */}
+      {actualUserType === 'freelancer' ? (
+        <>
+          <Link to="/freelancer/jobs" className={getLinkClasses('/freelancer/jobs')}>
+            Browse Jobs
+          </Link>
+          <Link to="/freelancer/applications" className={getLinkClasses('/freelancer/applications')}>
+            Applications
+          </Link>
+        </>
+      ) : (
+        <>
+          <Link to="/client/jobs" className={getLinkClasses('/client/jobs')}>
+            My Jobs
+          </Link>
+          <Link to="/client/jobs/stats" className={getLinkClasses('/client/jobs/stats')}>
+            Job Statistics
+          </Link>
+        </>
+      )}
+      
       <button 
         onClick={handleMessagesClick}
-        className="hover:text-mint px-4 py-2 rounded-md transition-colors text-graphite whitespace-nowrap flex items-center"
+        className="hover:text-mint px-1.5 py-1 rounded-md transition-colors text-graphite whitespace-nowrap flex items-center relative text-xs"
       >
         {t('messages')}
         {isLoadingNotifications ? (
-          <span className="absolute -top-1 -right-1 bg-gray-400 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+          <span className="absolute -top-1 -right-1 bg-gray-400 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold">
             ...
           </span>
         ) : notificationCounts.total > 0 ? (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold">
             {notificationCounts.total > 99 ? '99+' : notificationCounts.total}
           </span>
         ) : null}
       </button>
       <button 
         onClick={handlePaymentHistoryClick}
-        className="hover:text-mint px-4 py-2 rounded-md transition-colors text-graphite whitespace-nowrap flex items-center"
+        className="hover:text-mint px-1.5 py-1 rounded-md transition-colors text-graphite whitespace-nowrap flex items-center text-xs"
       >
         {t('payments')}
       </button>
       <button 
         onClick={handleProfileClick}
-        className="hover:text-mint px-4 py-2 rounded-md transition-colors text-graphite whitespace-nowrap flex items-center"
+        className="hover:text-mint px-1.5 py-1 rounded-md transition-colors text-graphite whitespace-nowrap flex items-center text-xs"
       >
         {t('profile')}
       </button>
@@ -498,6 +559,30 @@ export default function Header({ userType, onLogout, userData }) {
       <Link to="/my-projects" className={getMobileLinkClasses('/my-projects')} style={getMobileLinkStyles()}>
         {t('myProjects')}
       </Link>
+      
+      {/* Job-related navigation */}
+      {actualUserType === 'freelancer' ? (
+        <>
+          <Link to="/freelancer/jobs" className={getMobileLinkClasses('/freelancer/jobs')} style={getMobileLinkStyles()}>
+            Browse Jobs
+          </Link>
+          <Link to="/freelancer/applications" className={getMobileLinkClasses('/freelancer/applications')} style={getMobileLinkStyles()}>
+            My Applications
+          </Link>
+        </>
+      ) : (
+        <>
+          <Link to="/client/jobs" className={getMobileLinkClasses('/client/jobs')} style={getMobileLinkStyles()}>
+            My Jobs
+          </Link>
+          <Link to="/client/jobs/create" className={getMobileLinkClasses('/client/jobs/create')} style={getMobileLinkStyles()}>
+            Post Job
+          </Link>
+          <Link to="/client/jobs/stats" className={getMobileLinkClasses('/client/jobs/stats')} style={getMobileLinkStyles()}>
+            Job Statistics
+          </Link>
+        </>
+      )}
       
       <button 
         onClick={handleMessagesClick}
@@ -718,38 +803,37 @@ export default function Header({ userType, onLogout, userData }) {
         </div>
 
         {/* Desktop Navigation */}
-        <nav className={`hidden md:flex gap-4 font-medium transition-colors duration-300 ${
+        <nav className={`hidden lg:flex gap-1 font-medium transition-colors duration-300 ${
           isScrolled ? 'text-graphite' : 'text-white/90'
         }`}>
           {navLinks}
         </nav>
 
         {/* Mobile Hamburger Menu Button */}
-        <div className="md:hidden flex items-center gap-3">
+        <div className="lg:hidden flex items-center gap-3">
           <button onClick={toggleMobileMenu} className={`text-2xl ${isScrolled ? 'text-graphite' : 'text-white'}`}>
             ☰
           </button>
         </div>
 
-        <div className="hidden md:flex items-center gap-4">
+        <div className="flex items-center gap-1">
           {isAuthenticated ? (
-            <button onClick={onLogout} className="group relative px-4 py-2 bg-violet/10 border border-violet/30 text-violet rounded-lg hover:bg-violet/20 hover:border-violet/50 transition-all duration-200">
-              <div className="flex items-center gap-2.5">
-                <svg className="w-4 h-4 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button onClick={onLogout} className="group relative px-2 py-1 bg-violet/10 border border-violet/30 text-violet rounded-lg hover:bg-violet/20 hover:border-violet/50 transition-all duration-200 text-xs">
+              <div className="flex items-center gap-1">
+                <svg className="w-3 h-3 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
                 <span className={`font-medium transition-colors duration-300 ${isScrolled ? 'text-graphite' : 'text-white'}`}>{t('logout')}</span>
               </div>
-              <div className="absolute inset-0 bg-gradient-to-r from-coral/20 to-mint/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
             </button>
           ) : (
             <>
               <Link to="/login">
-                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-graphite font-semibold px-6 py-2 shadow-lg">
+                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-graphite font-semibold px-3 py-1 shadow-lg text-xs">
                   {t('login')}
                 </Button>
               </Link>
-              <Link to="/signup"><Button variant="accent">{t('signup')}</Button></Link>
+              <Link to="/signup"><Button variant="accent" className="text-xs px-3 py-1">{t('signup')}</Button></Link>
             </>
           )}
         </div>
@@ -757,7 +841,7 @@ export default function Header({ userType, onLogout, userData }) {
 
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
-        <nav className={`md:hidden bg-white/95 border-t border-white/20 shadow-lg transition-all duration-300`}>
+        <nav className={`lg:hidden bg-white/95 border-t border-white/20 shadow-lg transition-all duration-300`}>
           <div className="flex flex-col gap-2 p-4 text-center">
             {mobileNavLinks}
             <div className="border-t border-gray-200 pt-4 mt-2">

@@ -1,6 +1,7 @@
 import JobApply from "../schema/jobApply.js";
 import JobPosted from "../schema/jobPosted.js";
 import PersonMaster from "../schema/PersonMaster.js";
+import FreelancerInfo from "../schema/freelancerInfo.js";
 import { getPlanById, hasReachedLimit } from "../config/subscriptionPlans.js";
 
 export default class JobApplicationController {
@@ -125,7 +126,11 @@ export default class JobApplicationController {
                 application_source: applicationData.application_source || 'platform',
                 referral_source: applicationData.referral_source,
                 communication_preferences: applicationData.communication_preferences,
-                job_requires_cover_letter: job.application_settings.require_cover_letter
+                job_requires_cover_letter: job.application_settings.require_cover_letter,
+                application_tracking: {
+                    applied_at: new Date(),
+                    last_updated: new Date()
+                }
             });
 
             await application.save();
@@ -428,14 +433,81 @@ export default class JobApplicationController {
                     data: { is_saved: application.is_saved }
                 });
             } else {
-                // Create a saved job entry without application
+                // Fetch freelancer's resume from database
+                console.log('Fetching freelancer info for userId:', userId);
+                console.log('FreelancerInfo model:', FreelancerInfo);
+                
+                let freelancerInfo;
+                try {
+                    freelancerInfo = await FreelancerInfo.findOne({ personId: userId });
+                    console.log('Found freelancer info:', freelancerInfo);
+                } catch (dbError) {
+                    console.error('Database error fetching freelancer info:', dbError);
+                    freelancerInfo = null;
+                }
+                
+                let resumeLink = {
+                    url: '',
+                    title: 'Resume',
+                    description: 'Freelancer Resume',
+                    uploaded_at: new Date()
+                };
+                
+                // Use freelancer's actual resume if available
+                if (freelancerInfo && freelancerInfo.resume_link && typeof freelancerInfo.resume_link === 'string' && freelancerInfo.resume_link.trim() !== '') {
+                    resumeLink.url = freelancerInfo.resume_link.trim();
+                    console.log('Using freelancer resume:', resumeLink.url);
+                } else {
+                    console.log('No resume found or freelancer info not available, using empty string');
+                    resumeLink.url = '';
+                }
+                
+                // Ensure resume_link.url is always a valid string
+                if (typeof resumeLink.url !== 'string') {
+                    console.log('Resume link is not a string, converting to empty string');
+                    resumeLink.url = '';
+                }
+                
+                // Additional validation to prevent any weird characters
+                if (resumeLink.url && resumeLink.url.length > 0) {
+                    // Check if URL looks valid (basic check)
+                    if (!resumeLink.url.includes('http') && !resumeLink.url.includes('www') && !resumeLink.url.includes('.')) {
+                        console.log('Resume link does not look like a valid URL, using empty string');
+                        resumeLink.url = '';
+                    }
+                }
+                
+                // Final safety check - ensure it's a clean string
+                resumeLink.url = String(resumeLink.url || '').trim();
+                
+                console.log('Creating saved job with resume_link:', resumeLink);
+                
+                // Create a saved job entry without application - simplified approach
                 const savedJob = new JobApply({
                     job_id: job_id,
                     freelancer_id: userId,
-                    application_status: 'saved', // Special status for saved jobs
-                    is_saved: true
+                    application_status: 'saved',
+                    is_saved: true,
+                    resume_link: {
+                        url: resumeLink.url || '', // Ensure it's always a string
+                        title: 'Resume',
+                        description: 'Freelancer Resume',
+                        uploaded_at: new Date()
+                    },
+                    cover_letter: '',
+                    job_requires_cover_letter: false,
+                    application_source: 'platform',
+                    communication_preferences: {
+                        preferred_method: 'email'
+                    },
+                    application_tracking: {
+                        applied_at: new Date(),
+                        last_updated: new Date()
+                    },
+                    portfolio_links: []
                 });
 
+                try {
                 await savedJob.save();
 
                 // Update job analytics
@@ -447,10 +519,19 @@ export default class JobApplicationController {
                     message: "Job saved successfully",
                     data: { is_saved: true }
                 });
+                } catch (saveError) {
+                    console.error("Error saving job:", saveError);
+                    return res.status(500).json({
+                        status: false,
+                        message: "Failed to save job",
+                        error: saveError.message
+                    });
+                }
             }
 
         } catch (error) {
             console.error("Error toggling job save:", error);
+            console.error("Error details:", error);
             return res.status(500).json({
                 status: false,
                 message: "Internal server error",
@@ -466,6 +547,8 @@ export default class JobApplicationController {
             const userRole = req.headers.user_role;
             const { page = 1, limit = 20 } = req.body;
 
+            console.log('Getting saved jobs for userId:', userId, 'userRole:', userRole);
+
             if (userRole !== 'freelancer') {
                 return res.status(403).json({
                     status: false,
@@ -474,6 +557,14 @@ export default class JobApplicationController {
             }
 
             const skip = (parseInt(page) - 1) * parseInt(limit);
+
+            // First, let's check what saved jobs exist for this user
+            const allSavedJobs = await JobApply.find({ 
+                freelancer_id: userId, 
+                is_saved: true 
+            });
+            console.log('All saved jobs for user:', allSavedJobs.length);
+            console.log('Sample saved job:', allSavedJobs[0]);
 
             const [savedJobs, total] = await Promise.all([
                 JobApply.find({ 
@@ -490,17 +581,31 @@ export default class JobApplicationController {
                 })
             ]);
 
-            return res.status(200).json({
+            console.log('Found saved jobs after populate:', savedJobs.length, 'total:', total);
+            console.log('Sample populated job:', savedJobs[0]);
+
+            console.log('About to return response with structure:');
+            console.log('- savedJobs length:', savedJobs.length);
+            console.log('- savedJobs[0]:', savedJobs[0]);
+            console.log('- total:', total);
+            
+            const responseData = {
                 status: true,
                 message: "Saved jobs retrieved successfully",
-                data: savedJobs,
-                pagination: {
-                    current_page: parseInt(page),
-                    total_pages: Math.ceil(total / parseInt(limit)),
-                    total_saved_jobs: total,
-                    jobs_per_page: parseInt(limit)
+                data: {
+                    saved_jobs: savedJobs,
+                    pagination: {
+                        currentPage: parseInt(page),
+                        totalPages: Math.ceil(total / parseInt(limit)),
+                        totalItems: total,
+                        limit: parseInt(limit)
+                    }
                 }
-            });
+            };
+            
+            console.log('Response data structure:', JSON.stringify(responseData, null, 2));
+            
+            return res.status(200).json(responseData);
 
         } catch (error) {
             console.error("Error fetching saved jobs:", error);

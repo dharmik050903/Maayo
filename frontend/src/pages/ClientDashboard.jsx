@@ -592,6 +592,11 @@ export default function ClientDashboard() {
                         Post a New Project
                       </Button>
                     </Link>
+                    <Link to="/client/jobs/create" className="w-full">
+                      <Button variant="primary" className="w-full border-violet text-violet hover:bg-violet hover:text-white">
+                        Post a New Job
+                      </Button>
+                    </Link>
                     <Button 
                       variant="primary" 
                       className="w-full border-violet text-violet hover:bg-violet hover:text-white"
@@ -613,6 +618,14 @@ export default function ClientDashboard() {
                     >
                       Manage Projects
                     </Button>
+                    <Link to="/client/jobs">
+                      <Button 
+                        variant="outline" 
+                        className="w-full border-violet text-violet hover:bg-violet hover:text-white"
+                      >
+                        Manage Jobs
+                      </Button>
+                    </Link>
                     <Link to="/client/my-projects">
                       <Button 
                         variant="outline" 

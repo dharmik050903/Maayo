@@ -32,7 +32,7 @@ const jobApplySchema = new mongoose.Schema({
     
     // Resume and portfolio
     resume_link: {
-        url: { type: String },
+        url: { type: String }, // Not required for saved jobs
         title: { type: String, default: 'Resume' },
         description: { type: String, maxlength: 200 },
         uploaded_at: { type: Date, default: Date.now }
