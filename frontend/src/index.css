@@ -402,6 +402,70 @@ a, .link-accent {
   transform: translateY(0);
 }
 
+/* Mobile-specific improvements */
+@media (max-width: 640px) {
+  /* Reduce padding on mobile */
+  .job-card {
+    @apply p-4;
+  }
+  
+  .job-card-header {
+    @apply mb-3;
+  }
+  
+  .job-card-title {
+    @apply text-lg;
+  }
+  
+  .job-card-company {
+    @apply text-base mb-3;
+  }
+  
+  .job-card-meta {
+    @apply mb-3;
+  }
+  
+  .job-card-description {
+    @apply text-sm mb-3;
+  }
+  
+  .job-card-skills {
+    @apply mb-3;
+  }
+  
+  .job-card-footer {
+    @apply pt-3;
+  }
+  
+  /* Mobile button improvements */
+  .btn-primary, .btn-accent, .btn-secondary {
+    @apply text-sm px-4 py-2;
+  }
+  
+  /* Mobile form improvements */
+  .input {
+    @apply text-base px-3 py-2;
+  }
+  
+  /* Mobile card improvements */
+  .card {
+    @apply p-4;
+  }
+  
+  /* Mobile spacing */
+  .space-y-6 > * + * {
+    margin-top: 1rem;
+  }
+  
+  .space-y-8 > * + * {
+    margin-top: 1.5rem;
+  }
+  
+  .space-y-12 > * + * {
+    margin-top: 2rem;
+  }
+}
+
 a:hover, .link-accent:hover {
   transform: translateY(-1px);
 }

@@ -654,13 +654,13 @@ export default function Header({ userType, onLogout, userData }) {
         willChange: 'transform',
         isolation: 'isolate'
       }}>
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3 md:px-6 md:py-4">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-2 py-2 md:px-6 md:py-4">
         <Link to={isAuthenticated ? `/${actualUserType}-home` : "/"} className="logo-link flex items-center space-x-2 hover:opacity-80 transition-opacity">
           <Logo theme={isScrolled ? "dark" : "light"} />
         </Link>
 
         {/* Global Search Bar */}
-        <div className={`flex-1 max-w-full mx-2 relative search-container ${isScrolled ? 'scrolled' : ''}`} style={{ zIndex: 1000000 }}>
+        <div className={`flex-1 max-w-full mx-1 md:mx-2 relative search-container ${isScrolled ? 'scrolled' : ''}`} style={{ zIndex: 1000000 }}>
           <form onSubmit={handleSearch} className="relative">
             <div className="flex gap-2">
               <div className="relative flex-1">
@@ -676,10 +676,10 @@ export default function Header({ userType, onLogout, userData }) {
                   className="search-input"
                   style={{
                     width: '100%',
-                    padding: '8px 16px',
-                    borderRadius: '8px',
+                    padding: '6px 12px',
+                    borderRadius: '6px',
                     border: isScrolled ? 'none' : '2px solid rgba(255, 255, 255, 0.3)',
-                    fontSize: '16px',
+                    fontSize: '14px',
                     fontWeight: 'bold',
                     color: isScrolled ? '#000000' : '#ffffff',
                     backgroundColor: isScrolled ? '#ffffff' : 'rgba(255, 255, 255, 0.2)',
@@ -717,7 +717,7 @@ export default function Header({ userType, onLogout, userData }) {
               <button
                 type="submit"
                 disabled={isSearching}
-                className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 ${
+                className={`px-3 py-1.5 md:px-5 md:py-2.5 rounded-lg text-xs md:text-sm font-semibold transition-all duration-300 ${
                   isScrolled 
                     ? 'bg-mint text-white hover:bg-mint/90 shadow-md hover:shadow-lg transform hover:-translate-y-0.5' 
                     : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30 hover:border-white/50'
@@ -844,11 +844,12 @@ export default function Header({ userType, onLogout, userData }) {
           </button>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Desktop Action Buttons - Hidden on mobile */}
+        <div className="hidden md:flex items-center gap-3">
           {isAuthenticated ? (
-            <button onClick={onLogout} className="group relative px-3 py-2 bg-violet/10 border border-violet/30 text-violet rounded-lg hover:bg-violet/20 hover:border-violet/50 transition-all duration-300 text-sm font-medium">
+            <button onClick={onLogout} className="group relative px-4 py-2.5 bg-violet/10 border border-violet/30 text-violet rounded-lg hover:bg-violet/20 hover:border-violet/50 transition-all duration-300 text-base font-medium">
               <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
                 <span className={`font-medium transition-colors duration-300 ${isScrolled ? 'text-graphite' : 'text-white'}`}>{t('logout')}</span>
@@ -857,11 +858,15 @@ export default function Header({ userType, onLogout, userData }) {
           ) : (
             <>
               <Link to="/login">
-                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-graphite font-medium px-3 py-2 shadow-lg text-sm">
+                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-graphite font-medium px-5 py-2.5 shadow-lg text-base">
                   {t('login')}
                 </Button>
               </Link>
-              <Link to="/signup"><Button variant="accent" className="text-sm px-3 py-2">{t('signup')}</Button></Link>
+              <Link to="/signup">
+                <Button variant="accent" className="text-base px-5 py-2.5">
+                  {t('signup')}
+                </Button>
+              </Link>
             </>
           )}
         </div>
@@ -870,17 +875,35 @@ export default function Header({ userType, onLogout, userData }) {
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
         <nav className={`lg:hidden bg-white/95 border-t border-white/20 shadow-lg transition-all duration-300`}>
-          <div className="flex flex-col gap-2 p-4 text-center">
-            {mobileNavLinks}
-            <div className="border-t border-gray-200 pt-4 mt-3">
+          <div className="flex flex-col gap-4 p-6">
+            {/* Navigation Links */}
+            <div className="flex flex-col gap-3">
+              {mobileNavLinks}
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="border-t border-gray-200 pt-6">
               {isAuthenticated ? (
-                <button onClick={onLogout} className="hover:text-mint px-4 py-2 rounded-lg transition-all duration-300 text-center text-graphite font-medium bg-violet/10 border border-violet/30" style={getMobileButtonStyles()}>
+                <button 
+                  onClick={onLogout} 
+                  className="w-full px-6 py-4 rounded-xl transition-all duration-300 text-center text-graphite font-semibold bg-violet/10 border border-violet/30 hover:bg-violet/20 hover:border-violet/50"
+                >
                   {t('logout')}
                 </button>
               ) : (
                 <div className="flex flex-col gap-4">
-                  <Link to="/login" className="hover:text-mint px-4 py-2 rounded-lg transition-all duration-300 text-center text-graphite font-medium border border-gray-300" style={getMobileButtonStyles()}>{t('login')}</Link>
-                  <Link to="/signup" className="hover:text-mint px-4 py-2 rounded-lg transition-all duration-300 text-center text-graphite font-medium bg-mint text-white" style={getMobileButtonStyles()}>{t('signup')}</Link>
+                  <Link 
+                    to="/login" 
+                    className="w-full px-6 py-4 rounded-xl transition-all duration-300 text-center text-graphite font-semibold border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+                  >
+                    {t('login')}
+                  </Link>
+                  <Link 
+                    to="/signup" 
+                    className="w-full px-6 py-4 rounded-xl transition-all duration-300 text-center text-white font-semibold bg-mint hover:bg-mint/90 shadow-lg"
+                  >
+                    {t('signup')}
+                  </Link>
                 </div>
               )}
             </div>

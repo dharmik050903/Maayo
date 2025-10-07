@@ -165,22 +165,22 @@ export default function SavedJobs() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto px-6 pt-20 pb-8">
+      <main className="flex-1 max-w-7xl mx-auto px-4 md:px-6 pt-20 pb-8">
         {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-6 md:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
                 Saved <span className="text-mint">Jobs</span>
               </h1>
-              <p className="text-lg text-white/80 mt-4">
+              <p className="text-base md:text-lg text-white/80 mt-2 md:mt-4">
                 Your bookmarked job opportunities
               </p>
             </div>
             <Button
               variant="secondary"
               onClick={() => navigate('/freelancer/jobs')}
-              className="border-gray-300 text-graphite hover:bg-gray-50"
+              className="border-gray-300 text-graphite hover:bg-gray-50 w-full sm:w-auto"
             >
               Browse Jobs
             </Button>
@@ -198,7 +198,7 @@ export default function SavedJobs() {
         )}
 
         {/* Filters */}
-        <div className="card p-6 bg-white/95 mb-6">
+        <div className="card p-4 md:p-6 bg-white/95 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-graphite mb-2">Sort By</label>
@@ -269,14 +269,14 @@ export default function SavedJobs() {
           ) : (
             <div className="divide-y divide-gray-200">
               {savedJobs.map((savedJob) => (
-                <div key={savedJob._id} className="p-6 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-start justify-between">
+                <div key={savedJob._id} className="p-4 md:p-6 hover:bg-gray-50 transition-colors">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h3 className="text-lg font-semibold text-graphite">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                        <h3 className="text-base md:text-lg font-semibold text-graphite">
                           {savedJob.job_id?.job_title || 'Job Title Not Available'}
                         </h3>
-                        <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">
+                        <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800 w-fit">
                           Saved {formatDate(savedJob.created_at)}
                         </span>
                       </div>
@@ -344,7 +344,7 @@ export default function SavedJobs() {
                       </div>
                     </div>
 
-                    <div className="flex flex-col space-y-2 ml-6">
+                    <div className="flex flex-col sm:flex-row sm:space-y-0 sm:space-x-2 space-y-2 sm:ml-6">
                       <Button
                         size="sm"
                         onClick={() => {
@@ -352,7 +352,7 @@ export default function SavedJobs() {
                           console.log('Navigating to job:', jobId);
                           navigate(`/freelancer/jobs/${jobId}`);
                         }}
-                        className="bg-mint text-white hover:bg-mint/90"
+                        className="bg-mint text-white hover:bg-mint/90 w-full sm:w-auto"
                       >
                         View Job
                       </Button>
@@ -365,7 +365,7 @@ export default function SavedJobs() {
                           console.log('Navigating to apply for job:', jobId);
                           navigate(`/freelancer/jobs/${jobId}?apply=true`);
                         }}
-                        className="border-green-300 text-green-700 hover:bg-green-50"
+                        className="border-green-300 text-green-700 hover:bg-green-50 w-full sm:w-auto"
                       >
                         Apply Now
                       </Button>
@@ -378,7 +378,7 @@ export default function SavedJobs() {
                           console.log('Removing job:', jobId);
                           handleUnsaveJob(jobId);
                         }}
-                        className="border-red-300 text-red-600 hover:bg-red-50"
+                        className="border-red-300 text-red-600 hover:bg-red-50 w-full sm:w-auto"
                       >
                         Remove
                       </Button>
