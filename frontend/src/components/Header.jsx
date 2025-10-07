@@ -411,24 +411,24 @@ export default function Header({ userType, onLogout, userData }) {
 
   // Helper function to get link classes with active state
   const getLinkClasses = (path) => {
-    const baseClasses = "px-1.5 py-1 rounded-md transition-colors whitespace-nowrap flex items-center text-xs"
+    const baseClasses = "px-3 py-2 rounded-lg transition-all duration-300 whitespace-nowrap flex items-center text-sm font-semibold"
     const isActive = isActiveLink(path)
     
     if (isActive) {
-      return `${baseClasses} text-mint font-semibold bg-mint/10 border-b-2 border-mint`
+      return `${baseClasses} text-mint bg-mint/10 border-b-2 border-mint shadow-sm`
     }
-    return `${baseClasses} hover:text-mint text-graphite`
+    return `${baseClasses} hover:text-mint hover:bg-white/10 text-graphite`
   }
 
   // Helper function to get mobile-specific link classes
   const getMobileLinkClasses = (path) => {
-    const baseClasses = "px-4 py-2 rounded-md transition-colors mobile-nav-link text-center"
+    const baseClasses = "px-6 py-3 rounded-lg transition-all duration-300 mobile-nav-link text-center font-semibold"
     const isActive = isActiveLink(path)
     
     if (isActive) {
-      return `${baseClasses} text-mint !font-bold bg-mint/10 border-b-2 border-mint`
+      return `${baseClasses} text-mint bg-mint/10 border-b-2 border-mint`
     }
-    return `${baseClasses} hover:text-mint text-graphite !font-bold`
+    return `${baseClasses} hover:text-mint hover:bg-gray-50 text-graphite`
   }
 
   // Helper function to get mobile button styles
@@ -490,28 +490,28 @@ export default function Header({ userType, onLogout, userData }) {
       
       <button 
         onClick={handleMessagesClick}
-        className="hover:text-mint px-1.5 py-1 rounded-md transition-colors text-graphite whitespace-nowrap flex items-center relative text-xs"
+        className="hover:text-mint px-3 py-2 rounded-lg transition-all duration-300 text-graphite whitespace-nowrap flex items-center relative text-sm font-semibold hover:bg-white/10"
       >
         {t('messages')}
         {isLoadingNotifications ? (
-          <span className="absolute -top-1 -right-1 bg-gray-400 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold">
+          <span className="absolute -top-1 -right-1 bg-gray-400 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
             ...
           </span>
         ) : notificationCounts.total > 0 ? (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold">
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
             {notificationCounts.total > 99 ? '99+' : notificationCounts.total}
           </span>
         ) : null}
       </button>
       <button 
         onClick={handlePaymentHistoryClick}
-        className="hover:text-mint px-1.5 py-1 rounded-md transition-colors text-graphite whitespace-nowrap flex items-center text-xs"
+        className="hover:text-mint px-3 py-2 rounded-lg transition-all duration-300 text-graphite whitespace-nowrap flex items-center text-sm font-semibold hover:bg-white/10"
       >
         {t('payments')}
       </button>
       <button 
         onClick={handleProfileClick}
-        className="hover:text-mint px-1.5 py-1 rounded-md transition-colors text-graphite whitespace-nowrap flex items-center text-xs"
+        className="hover:text-mint px-3 py-2 rounded-lg transition-all duration-300 text-graphite whitespace-nowrap flex items-center text-sm font-semibold hover:bg-white/10"
       >
         {t('profile')}
       </button>
@@ -586,30 +586,30 @@ export default function Header({ userType, onLogout, userData }) {
       
       <button 
         onClick={handleMessagesClick}
-        className="hover:text-mint px-4 py-2 rounded-md transition-colors text-center text-graphite !font-bold"
+        className="hover:text-mint px-6 py-3 rounded-lg transition-all duration-300 text-center text-graphite font-semibold hover:bg-gray-50"
         style={getMobileButtonStyles()}
       >
         {t('messages')}
         {isLoadingNotifications ? (
-          <span className="absolute -top-1 -right-1 bg-gray-400 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+          <span className="absolute -top-1 -right-1 bg-gray-400 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold">
             ...
           </span>
         ) : notificationCounts.total > 0 ? (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold">
             {notificationCounts.total > 99 ? '99+' : notificationCounts.total}
           </span>
         ) : null}
       </button>
       <button 
         onClick={handlePaymentHistoryClick}
-        className="hover:text-mint px-4 py-2 rounded-md transition-colors text-center text-graphite !font-bold"
+        className="hover:text-mint px-6 py-3 rounded-lg transition-all duration-300 text-center text-graphite font-semibold hover:bg-gray-50"
         style={getMobileButtonStyles()}
       >
         {t('payments')}
       </button>
       <button 
         onClick={handleProfileClick}
-        className="hover:text-mint px-4 py-2 rounded-md transition-colors text-center text-graphite !font-bold"
+        className="hover:text-mint px-6 py-3 rounded-lg transition-all duration-300 text-center text-graphite font-semibold hover:bg-gray-50"
         style={getMobileButtonStyles()}
       >
         {t('profile')}
@@ -641,25 +641,26 @@ export default function Header({ userType, onLogout, userData }) {
   return (
     <>
     {createPortal(
-      <header className={`w-full border-b ${
-        isScrolled ? 'bg-white/95 border-gray-200 shadow-lg' : 'bg-white/10 border-white/20'
+      <header className={`w-full border-b transition-all duration-300 ${
+        isScrolled ? 'bg-white/95 backdrop-blur-md border-gray-100 shadow-xl' : 'bg-white/10 border-white/20'
       }`} style={{
         position: 'fixed',
         top: 0,
         left: 0,
         right: 0,
-        zIndex: 99999,
+        zIndex: 1000,
         width: '100vw',
         transform: 'translateZ(0)',
-        willChange: 'transform'
+        willChange: 'transform',
+        isolation: 'isolate'
       }}>
-      <div className="max-w-7xl mx-auto flex items-center justify-between p-2 md:p-4">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3 md:px-6 md:py-4">
         <Link to={isAuthenticated ? `/${actualUserType}-home` : "/"} className="logo-link flex items-center space-x-2 hover:opacity-80 transition-opacity">
           <Logo theme={isScrolled ? "dark" : "light"} />
         </Link>
 
         {/* Global Search Bar */}
-        <div className="flex-1 max-w-md mx-4 relative search-container">
+        <div className={`flex-1 max-w-full mx-2 relative search-container ${isScrolled ? 'scrolled' : ''}`} style={{ zIndex: 1000000 }}>
           <form onSubmit={handleSearch} className="relative">
             <div className="flex gap-2">
               <div className="relative flex-1">
@@ -668,48 +669,75 @@ export default function Header({ userType, onLogout, userData }) {
                   placeholder={t('searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className={`w-full px-4 py-2 pl-10 pr-4 rounded-lg border transition-colors text-sm ${
-                    isScrolled 
-                      ? 'border-gray-300 bg-white text-gray-900 placeholder-gray-500' 
-                      : 'border-white/30 bg-white/20 text-white placeholder-white/70'
-                  } backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-mint/50`}
+                  spellCheck={false}
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  className="search-input"
+                  style={{
+                    width: '100%',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    border: isScrolled ? 'none' : '2px solid rgba(255, 255, 255, 0.3)',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    color: isScrolled ? '#000000' : '#ffffff',
+                    backgroundColor: isScrolled ? '#ffffff' : 'rgba(255, 255, 255, 0.2)',
+                    outline: 'none',
+                    transition: 'all 0.3s ease',
+                    boxShadow: isScrolled ? '0 4px 8px rgba(0, 0, 0, 0.1)' : '0 2px 4px rgba(0, 0, 0, 0.1)',
+                    backdropFilter: isScrolled ? 'none' : 'blur(8px)',
+                    WebkitBackdropFilter: isScrolled ? 'none' : 'blur(8px)',
+                    transform: 'none !important',
+                    zIndex: '1',
+                    opacity: '1',
+                    textShadow: 'none',
+                    fontFamily: 'Arial, sans-serif',
+                    lineHeight: '1.5',
+                    textAlign: 'left',
+                    verticalAlign: 'middle',
+                    display: 'block',
+                    position: 'relative',
+                    visibility: 'visible',
+                    clip: 'auto',
+                    clipPath: 'none',
+                    WebkitTextFillColor: isScrolled ? '#000000' : '#ffffff',
+                    WebkitTextStroke: 'none'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.boxShadow = isScrolled ? '0 4px 8px rgba(35, 209, 164, 0.5)' : '0 0 0 2px rgba(35, 209, 164, 0.5)';
+                    e.target.style.borderColor = isScrolled ? '#23D1A4' : 'rgba(35, 209, 164, 0.5)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.boxShadow = isScrolled ? '0 4px 8px rgba(35, 209, 164, 0.3)' : '0 2px 4px rgba(0, 0, 0, 0.1)';
+                    e.target.style.borderColor = isScrolled ? '#23D1A4' : 'rgba(255, 255, 255, 0.3)';
+                  }}
                 />
-                <div className={`absolute left-3 top-0 bottom-0 w-4 flex items-center justify-center ${
-                  isScrolled ? 'text-gray-400' : 'text-white/60'
-                }`}>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={clearSearch}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors"
-                  >
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                )}
               </div>
               <button
                 type="submit"
                 disabled={isSearching}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 ${
                   isScrolled 
-                    ? 'bg-mint text-white hover:bg-mint/90' 
-                    : 'bg-white/20 text-white hover:bg-white/30'
-                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    ? 'bg-mint text-white hover:bg-mint/90 shadow-md hover:shadow-lg transform hover:-translate-y-0.5' 
+                    : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30 hover:border-white/50'
+                } disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
               >
-                {isSearching ? '...' : t('search')}
+                {isSearching ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Searching...</span>
+                  </div>
+                ) : (
+                  t('search')
+                )}
               </button>
             </div>
           </form>
 
           {/* Search Results Dropdown */}
           {showSearchResults && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-[1100] max-h-96 overflow-y-auto">
               <div className="p-4">
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-sm font-medium text-graphite">
@@ -810,17 +838,17 @@ export default function Header({ userType, onLogout, userData }) {
         </nav>
 
         {/* Mobile Hamburger Menu Button */}
-        <div className="lg:hidden flex items-center gap-3">
+        <div className="lg:hidden flex items-center gap-2">
           <button onClick={toggleMobileMenu} className={`text-2xl ${isScrolled ? 'text-graphite' : 'text-white'}`}>
             ☰
           </button>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           {isAuthenticated ? (
-            <button onClick={onLogout} className="group relative px-2 py-1 bg-violet/10 border border-violet/30 text-violet rounded-lg hover:bg-violet/20 hover:border-violet/50 transition-all duration-200 text-xs">
-              <div className="flex items-center gap-1">
-                <svg className="w-3 h-3 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button onClick={onLogout} className="group relative px-3 py-2 bg-violet/10 border border-violet/30 text-violet rounded-lg hover:bg-violet/20 hover:border-violet/50 transition-all duration-300 text-sm font-medium">
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
                 <span className={`font-medium transition-colors duration-300 ${isScrolled ? 'text-graphite' : 'text-white'}`}>{t('logout')}</span>
@@ -829,11 +857,11 @@ export default function Header({ userType, onLogout, userData }) {
           ) : (
             <>
               <Link to="/login">
-                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-graphite font-semibold px-3 py-1 shadow-lg text-xs">
+                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-graphite font-medium px-3 py-2 shadow-lg text-sm">
                   {t('login')}
                 </Button>
               </Link>
-              <Link to="/signup"><Button variant="accent" className="text-xs px-3 py-1">{t('signup')}</Button></Link>
+              <Link to="/signup"><Button variant="accent" className="text-sm px-3 py-2">{t('signup')}</Button></Link>
             </>
           )}
         </div>
@@ -844,15 +872,15 @@ export default function Header({ userType, onLogout, userData }) {
         <nav className={`lg:hidden bg-white/95 border-t border-white/20 shadow-lg transition-all duration-300`}>
           <div className="flex flex-col gap-2 p-4 text-center">
             {mobileNavLinks}
-            <div className="border-t border-gray-200 pt-4 mt-2">
+            <div className="border-t border-gray-200 pt-4 mt-3">
               {isAuthenticated ? (
-                <button onClick={onLogout} className="hover:text-mint px-4 py-2 rounded-md transition-colors text-center text-graphite !font-bold bg-violet/10 border border-violet/30" style={getMobileButtonStyles()}>
+                <button onClick={onLogout} className="hover:text-mint px-4 py-2 rounded-lg transition-all duration-300 text-center text-graphite font-medium bg-violet/10 border border-violet/30" style={getMobileButtonStyles()}>
                   {t('logout')}
                 </button>
               ) : (
-                <div className="flex flex-col gap-3">
-                  <Link to="/login" className="hover:text-mint px-4 py-2 rounded-md transition-colors text-center text-graphite !font-bold border border-gray-300" style={getMobileButtonStyles()}>{t('login')}</Link>
-                  <Link to="/signup" className="hover:text-mint px-4 py-2 rounded-md transition-colors text-center text-graphite !font-bold bg-mint text-white" style={getMobileButtonStyles()}>{t('signup')}</Link>
+                <div className="flex flex-col gap-4">
+                  <Link to="/login" className="hover:text-mint px-4 py-2 rounded-lg transition-all duration-300 text-center text-graphite font-medium border border-gray-300" style={getMobileButtonStyles()}>{t('login')}</Link>
+                  <Link to="/signup" className="hover:text-mint px-4 py-2 rounded-lg transition-all duration-300 text-center text-graphite font-medium bg-mint text-white" style={getMobileButtonStyles()}>{t('signup')}</Link>
                 </div>
               )}
             </div>
@@ -866,7 +894,7 @@ export default function Header({ userType, onLogout, userData }) {
       {/* Project Detail Modal */}
       {showProjectModal && selectedProject && createPortal(
         <div 
-          className="modal-overlay fixed top-0 left-0 right-0 bottom-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4"
+          className="modal-overlay fixed top-0 left-0 right-0 bottom-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-[1100] p-4"
           onClick={closeProjectModal}
         >
           <div 
@@ -997,7 +1025,7 @@ export default function Header({ userType, onLogout, userData }) {
       {/* Freelancer Profile Modal */}
       {showFreelancerModal && selectedFreelancer && createPortal(
         <div 
-          className="modal-overlay fixed top-0 left-0 right-0 bottom-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4"
+          className="modal-overlay fixed top-0 left-0 right-0 bottom-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-[1100] p-4"
           onClick={closeFreelancerModal}
         >
           <div 

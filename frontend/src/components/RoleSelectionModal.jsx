@@ -109,7 +109,7 @@ const RoleSelectionModal = ({ isOpen, onClose, onRoleSelected, userData }) => {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center p-4 pt-8">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-[1100] flex justify-center p-4 pt-8">
       <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-200 rounded-t-xl">

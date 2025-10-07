@@ -140,9 +140,9 @@ export default function ConversationsModal({ isOpen, onClose, currentUser }) {
 
   return (
     <div 
-      className="fixed inset-0 bg-black bg-opacity-50 z-[99999] flex justify-center p-4 pt-8" 
+      className="fixed inset-0 bg-black bg-opacity-50 z-[1200] flex justify-center p-4 pt-8" 
       style={{ 
-        zIndex: 99999,
+        zIndex: 1200,
         position: 'fixed',
         top: 0,
         left: 0,

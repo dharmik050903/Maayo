@@ -238,12 +238,12 @@ export default function MessagingModal({ isOpen, onClose, currentUser, otherUser
     return null
   }
 
-  console.log('MessagingModal: Rendering modal with z-index 99999')
+  console.log('MessagingModal: Rendering modal with z-index 1200')
   return (
     <div 
-      className="fixed inset-0 bg-black bg-opacity-50 z-[99999] flex justify-center p-4 pt-8" 
+      className="fixed inset-0 bg-black bg-opacity-50 z-[1200] flex justify-center p-4 pt-8" 
       style={{ 
-        zIndex: 99999,
+        zIndex: 1200,
         position: 'fixed',
         top: 0,
         left: 0,

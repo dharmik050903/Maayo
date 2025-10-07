@@ -63,7 +63,7 @@ export default function NotificationModal({
   const typeStyles = getTypeStyles()
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1100] p-4">
       <div className={`bg-white rounded-xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-100 border-l-4 ${typeStyles.borderColor}`}>
         {/* Header */}
         <div className="px-6 py-4">

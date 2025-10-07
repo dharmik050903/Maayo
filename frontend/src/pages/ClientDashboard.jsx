@@ -421,23 +421,44 @@ export default function ClientDashboard() {
       {/* Main Content */}
       <main className="flex-1 max-w-7xl mx-auto px-6 pt-20 pb-8">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-            Welcome back, <span className="text-mint">{userData?.first_name}</span>!
-          </h1>
-          <p className="text-lg text-white/80 mt-4">
-            Here's your client dashboard overview
-          </p>
+        <div className="mb-12">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-5xl md:text-6xl font-bold leading-tight text-balance">
+                Welcome back, <span className="text-mint">{userData?.first_name}</span>!
+              </h1>
+              <p className="text-xl text-white/90 mt-6 max-w-2xl">
+                Here's your client dashboard overview - manage your projects and connect with talented freelancers
+              </p>
+            </div>
+            <div className="flex gap-4">
+              <Button
+                variant="secondary"
+                onClick={() => navigate('/create-project')}
+                className="border-gray-300 text-graphite hover:bg-gray-50"
+                size="lg"
+              >
+                Create Project
+              </Button>
+              <Button
+                onClick={() => navigate('/client/jobs')}
+                className="bg-mint text-white hover:bg-mint/90"
+                size="lg"
+              >
+                Manage Jobs
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="mb-8">
-          <div className="flex space-x-1 bg-white/10 p-1 rounded-lg w-fit">
+        <div className="mb-12">
+          <div className="flex space-x-2 bg-white/10 p-2 rounded-xl w-fit">
             <button
               onClick={() => setActiveSection('overview')}
-              className={`px-6 py-3 rounded-md font-medium transition-colors ${
+              className={`px-8 py-4 rounded-lg font-semibold transition-all duration-300 ${
                 activeSection === 'overview'
-                  ? 'bg-white text-graphite shadow-sm'
+                  ? 'bg-white text-graphite shadow-lg'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
@@ -445,9 +466,9 @@ export default function ClientDashboard() {
             </button>
             <button
               onClick={() => setActiveSection('projects')}
-              className={`px-6 py-3 rounded-md font-medium transition-colors ${
+              className={`px-8 py-4 rounded-lg font-semibold transition-all duration-300 ${
                 activeSection === 'projects'
-                  ? 'bg-white text-graphite shadow-sm'
+                  ? 'bg-white text-graphite shadow-lg'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
@@ -455,9 +476,9 @@ export default function ClientDashboard() {
             </button>
             <button
               onClick={() => setActiveSection('freelancers')}
-              className={`px-6 py-3 rounded-md font-medium transition-colors ${
+              className={`px-8 py-4 rounded-lg font-semibold transition-all duration-300 ${
                 activeSection === 'freelancers'
-                  ? 'bg-white text-graphite shadow-sm'
+                  ? 'bg-white text-graphite shadow-lg'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >

@@ -82,7 +82,7 @@ export default function AnimatedCounter({
   }
 
   return (
-    <div ref={counterRef} className={className}>
+    <div ref={counterRef} className={`font-bold text-2xl ${className}`}>
       {prefix}{formatNumber(count)}{suffix}
     </div>
   )

@@ -166,53 +166,53 @@ const GoogleSignIn = ({ onSuccess, onError, loading, disabled, buttonText = "Con
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* User Type Selection */}
-      <div className="space-y-3">
-        <label className="block text-sm font-medium text-graphite">
+      <div className="space-y-6">
+        <label className="block text-base font-semibold text-graphite">
           Select your role <span className="text-red-500">*</span>
         </label>
-        <div className="space-y-2">
-          <label className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+        <div className="space-y-6">
+          <label className="flex items-center space-x-4 p-5 border-2 border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 hover-lift">
             <input
               type="radio"
               name="userType"
               value="client"
               checked={selectedRole === 'client'}
               onChange={() => handleRoleChange('client')}
-              className="w-4 h-4 text-violet focus:ring-violet border-gray-300"
+              className="w-5 h-5 text-violet focus:ring-violet border-gray-300"
             />
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex items-center space-x-4">
+              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center shadow-sm">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
               <div>
-                <span className="text-sm font-medium text-gray-900">Client</span>
-                <p className="text-xs text-gray-500">I want to hire freelancers</p>
+                <span className="text-base font-semibold text-gray-900">Client</span>
+                <p className="text-sm text-gray-500">I want to hire freelancers</p>
               </div>
             </div>
           </label>
           
-          <label className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+          <label className="flex items-center space-x-4 p-5 border-2 border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 hover-lift">
             <input
               type="radio"
               name="userType"
               value="freelancer"
               checked={selectedRole === 'freelancer'}
               onChange={() => handleRoleChange('freelancer')}
-              className="w-4 h-4 text-violet focus:ring-violet border-gray-300"
+              className="w-5 h-5 text-violet focus:ring-violet border-gray-300"
             />
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex items-center space-x-4">
+              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center shadow-sm">
+                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6z" />
                 </svg>
               </div>
               <div>
-                <span className="text-sm font-medium text-gray-900">Freelancer</span>
-                <p className="text-xs text-gray-500">I want to find work</p>
+                <span className="text-base font-semibold text-gray-900">Freelancer</span>
+                <p className="text-sm text-gray-500">I want to find work</p>
               </div>
             </div>
           </label>
@@ -224,7 +224,7 @@ const GoogleSignIn = ({ onSuccess, onError, loading, disabled, buttonText = "Con
         type="button"
         onClick={handleGoogleSignIn}
         disabled={loading || disabled || !isGoogleLoaded || isAuthenticating || !selectedRole}
-        className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full flex items-center justify-center gap-3 px-6 py-4 border border-gray-300 rounded-xl bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 hover-lift transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-none shadow-sm"
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -232,16 +232,16 @@ const GoogleSignIn = ({ onSuccess, onError, loading, disabled, buttonText = "Con
           <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
           <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
         </svg>
-        <span className="text-gray-700 font-medium">
+        <span className="text-gray-700 font-semibold text-base">
           {isAuthenticating ? 'Opening Google...' : loading ? 'Signing in...' : buttonText}
         </span>
       </button>
 
       {/* Show authentication status when authenticating */}
       {isAuthenticating && (
-        <div className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-md bg-gray-50">
-          <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-gray-700 font-medium">Authenticating with Google...</span>
+        <div className="w-full flex items-center justify-center gap-3 px-6 py-4 border border-gray-300 rounded-xl bg-gray-50 shadow-sm">
+          <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-gray-700 font-semibold text-base">Authenticating with Google...</span>
         </div>
       )}
     </div>

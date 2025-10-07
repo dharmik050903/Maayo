@@ -594,19 +594,40 @@ export default function FreelancerDashboard() {
       {/* Main Content */}
       <main className="flex-1 max-w-7xl mx-auto px-6 pt-20 pb-8">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-            Welcome back, <span className="text-mint">{userData?.first_name}</span>!
-          </h1>
-          <p className="text-lg text-white/80 mt-4">
-            Here's your freelancer dashboard overview
-          </p>
+        <div className="mb-12">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-5xl md:text-6xl font-bold leading-tight text-balance">
+                Welcome back, <span className="text-mint">{userData?.first_name}</span>!
+              </h1>
+              <p className="text-xl text-white/90 mt-6 max-w-2xl">
+                Here's your freelancer dashboard overview - track your progress and find new opportunities
+              </p>
+            </div>
+            <div className="flex gap-4">
+              <Button
+                variant="secondary"
+                onClick={() => window.location.href = '/freelancer/jobs'}
+                className="border-gray-300 text-graphite hover:bg-gray-50"
+                size="lg"
+              >
+                Find Jobs
+              </Button>
+              <Button
+                onClick={() => window.location.href = '/freelancer/applications'}
+                className="bg-mint text-white hover:bg-mint/90"
+                size="lg"
+              >
+                My Applications
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="card p-6 bg-white/95">
-            <div className="flex items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          <div className="card-elevated p-8">
+            <div className="flex items-center justify-between">
               <div className="p-3 bg-mint/20 rounded-lg">
                 <svg className="w-6 h-6 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />

@@ -1,6 +1,14 @@
 import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 
-export default function Button({ children, variant = 'primary', loading = false, className = '', ...props }) {
+export default function Button({ 
+  children, 
+  variant = 'primary', 
+  size = 'md',
+  loading = false, 
+  disabled = false,
+  className = '', 
+  ...props 
+}) {
   const { t } = useComprehensiveTranslation()
   
   const getVariantClasses = () => {
@@ -8,16 +16,45 @@ export default function Button({ children, variant = 'primary', loading = false,
       case 'accent':
         return 'btn-accent'
       case 'secondary':
-        return 'inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-graphite bg-gray-100 hover:bg-gray-200 transition'
+        return 'btn-secondary'
+      case 'success':
+        return 'btn-success'
+      case 'warning':
+        return 'btn-warning'
       case 'danger':
-        return 'inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-white bg-coral hover:bg-coral/90 transition'
+        return 'btn-danger'
+      case 'outline':
+        return 'btn-outline'
+      case 'ghost':
+        return 'btn-ghost'
       default:
         return 'btn-primary'
     }
   }
 
+  const getSizeClasses = () => {
+    switch (size) {
+      case 'xs':
+        return 'px-3 py-1.5 text-xs'
+      case 'sm':
+        return 'px-4 py-2 text-sm'
+      case 'lg':
+        return 'px-8 py-4 text-lg'
+      case 'xl':
+        return 'px-10 py-5 text-xl'
+      default:
+        return 'px-6 py-3 text-base'
+    }
+  }
+
+  const isDisabled = disabled || loading
+
   return (
-    <button className={`${getVariantClasses()} disabled:opacity-60 ${className}`} disabled={loading} {...props}>
+    <button 
+      className={`${getVariantClasses()} ${getSizeClasses()} disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-none hover-lift ${className}`} 
+      disabled={isDisabled} 
+      {...props}
+    >
       {loading ? (
         <span className="flex items-center gap-2">
           <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">

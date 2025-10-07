@@ -996,32 +996,59 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen grid md:grid-cols-2">
-      <div className="hidden md:flex bg-brand-gradient text-white p-10 items-center justify-center">
-        <div className="space-y-8 max-w-md text-center">
+    <div className="min-h-screen grid lg:grid-cols-2">
+      <div className="hidden lg:flex bg-brand-gradient text-white p-12 items-center justify-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-violet/20"></div>
+        <div className="relative z-10 space-y-10 max-w-lg text-center">
           <div className="flex justify-center">
             <Logo theme="light" />
           </div>
-          <div className="space-y-4">
-            <h2 className="text-4xl font-bold">Welcome back</h2>
-            <p className="text-xl text-white/90">Login to continue your journey with Maayo</p>
-            <p className="text-white/80">Connect with talented professionals and grow your business</p>
+          <div className="space-y-6">
+            <h2 className="text-5xl font-bold leading-tight">Welcome back</h2>
+            <p className="text-2xl text-white/90 leading-relaxed">Login to continue your journey with Maayo</p>
+            <p className="text-lg text-white/80 leading-relaxed">Connect with talented professionals and grow your business</p>
+          </div>
+          <div className="flex justify-center space-x-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-white/20 rounded-2xl mx-auto mb-3 flex items-center justify-center">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <p className="text-sm text-white/80">Secure</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-white/20 rounded-2xl mx-auto mb-3 flex items-center justify-center">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <p className="text-sm text-white/80">Fast</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-white/20 rounded-2xl mx-auto mb-3 flex items-center justify-center">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <p className="text-sm text-white/80">Reliable</p>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center justify-center p-6 md:p-12 bg-base">
+      <div className="flex items-center justify-center p-6 lg:p-12 bg-base">
         <div className="w-full max-w-md">
-          <div className="mb-8 md:hidden text-center">
+          <div className="mb-8 lg:hidden text-center">
             <div className="flex justify-center">
               <Logo theme="dark" />
             </div>
           </div>
           
-          <div className="card p-8">
+          <div className="card-elevated p-10">
             <div className="mb-8 text-center">
-              <h1 className="text-2xl font-semibold text-graphite">{t('welcomeBack')}</h1>
-              <p className="text-coolgray mt-1">{t('loginToContinue')}</p>
+              <h1 className="text-3xl font-bold text-graphite mb-2">{t('welcomeBack')}</h1>
+              <p className="text-coolgray text-lg">{t('loginToContinue')}</p>
               
               <div className="flex bg-gray-100 rounded-lg p-1 mt-4">
                 <button
@@ -1059,39 +1086,45 @@ export default function Login() {
               </div>
             </div>
 
-      <form className="space-y-4" onSubmit={handleSubmit}>
-               <div>
-                 <label className="block text-sm font-medium text-graphite mb-1">{t('email')} <span className="text-red-500">*</span></label>
-                 <input
-                   type="email"
-          name="email"
-          placeholder="you@example.com"
-          value={form.email}
-          onChange={handleChange}
-          required
-                   className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-violet ${
-                     fieldErrors.email ? "border-red-500" : "border-gray-300"
-                   }`}
-                 />
-                 {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-               </div>
-
-               {loginMethod === 'password' ? (
-                 <div>
-                   <label className="block text-sm font-medium text-graphite mb-1">{t('password')} <span className="text-red-500">*</span></label>
-                   <input
-                     type="password"
-            name="password"
-            placeholder="••••••••"
-            value={form.password}
+      <form className="space-y-6" onSubmit={handleSubmit}>
+        <div>
+          <Input
+            label={t('email')}
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            value={form.email}
             onChange={handleChange}
             required
-                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-violet ${
-                       fieldErrors.password ? "border-red-500" : "border-gray-300"
-                     }`}
+            error={fieldErrors.email ? "Please enter a valid email" : null}
+            icon={
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+              </svg>
+            }
           />
-                   {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
-                 </div>
+          {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+        </div>
+
+        {loginMethod === 'password' ? (
+          <div>
+            <Input
+              label={t('password')}
+              type="password"
+              name="password"
+              placeholder="••••••••"
+              value={form.password}
+              onChange={handleChange}
+              required
+              error={fieldErrors.password ? "Please enter your password" : null}
+              icon={
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              }
+            />
+            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+          </div>
                ) : (
                  <div>
                    {!otpSent ? (
@@ -1204,7 +1237,13 @@ export default function Login() {
               </div>
             )}
             {loginMethod === 'password' && (
-              <Button type="submit" variant="accent" loading={loading}>
+              <Button 
+                type="submit" 
+                variant="accent" 
+                loading={loading}
+                size="lg"
+                className="w-full"
+              >
                 {loading ? 'Signing in...' : 'Login'}
               </Button>
             )}

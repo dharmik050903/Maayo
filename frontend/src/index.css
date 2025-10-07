@@ -9,7 +9,7 @@ html body header {
     left: 0 !important;
     right: 0 !important;
     width: 100vw !important;
-    z-index: 99999 !important;
+    z-index: 1000 !important;
     transform: translateZ(0) !important;
     will-change: transform !important;
     margin: 0 !important;
@@ -23,7 +23,7 @@ header {
     left: 0 !important;
     right: 0 !important;
     width: 100vw !important;
-    z-index: 99999 !important;
+    z-index: 1000 !important;
     transform: translateZ(0) !important;
     will-change: transform !important;
 }
@@ -117,11 +117,168 @@ html, body, #root {
   max-height: 4.2em; /* 3 lines * 1.4 line-height */
 }
 
+/* Job Card Styles */
+.job-card {
+  @apply bg-white rounded-xl shadow-soft border border-gray-100 p-6 hover:shadow-md transition-all duration-300;
+}
+
+.job-card-header {
+  @apply flex items-start justify-between mb-4;
+}
+
+.job-card-title {
+  @apply text-xl font-semibold text-graphite hover:text-mint transition-colors;
+}
+
+.job-card-company {
+  @apply text-lg font-medium text-coolgray;
+}
+
+.job-card-meta {
+  @apply flex flex-wrap gap-4 mb-4;
+}
+
+.job-card-meta-item {
+  @apply flex items-center gap-2 text-sm text-coolgray;
+}
+
+.job-card-description {
+  @apply text-coolgray leading-relaxed mb-4;
+}
+
+.job-card-skills {
+  @apply flex flex-wrap gap-2 mb-4;
+}
+
+.job-card-skill {
+  @apply px-3 py-1 bg-violet/10 text-violet rounded-full text-sm font-medium;
+}
+
+.job-card-footer {
+  @apply flex items-center justify-between pt-4 border-t border-gray-100;
+}
+
+.job-card-stats {
+  @apply flex items-center gap-4 text-sm text-coolgray;
+}
+
+.job-card-actions {
+  @apply flex items-center gap-3;
+}
+
+/* Status Badges */
+.status-badge {
+  @apply px-3 py-1 rounded-full text-xs font-semibold;
+}
+
+.status-active {
+  @apply bg-green-100 text-green-800;
+}
+
+.status-pending {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.status-inactive {
+  @apply bg-gray-100 text-gray-800;
+}
+
+/* Form Elements */
+.form-label {
+  @apply block text-sm font-medium text-graphite mb-2;
+}
+
+.form-error {
+  @apply text-red-600 text-sm mt-1;
+}
+
+.form-help {
+  @apply text-coolgray text-sm mt-1;
+}
+
+.input-error {
+  @apply border-red-300 focus:ring-red-500 focus:border-red-500;
+}
+
+.input-success {
+  @apply border-green-300 focus:ring-green-500 focus:border-green-500;
+}
+
+.form-group {
+  @apply mb-4;
+}
+
+/* Button Variants */
+.btn-secondary {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-graphite bg-white border border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition;
+}
+
+.btn-success {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-white bg-green-600 hover:bg-green-700 transition;
+}
+
+.btn-warning {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-white bg-yellow-600 hover:bg-yellow-700 transition;
+}
+
+.btn-danger {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 transition;
+}
+
+.btn-outline {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-graphite bg-transparent border border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition;
+}
+
+.btn-ghost {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-graphite bg-transparent hover:bg-gray-100 transition;
+}
+
+/* Card Variants */
+.card-elevated {
+  @apply bg-white rounded-xl shadow-lg border border-gray-100;
+}
+
+/* Loading States */
+.loading-spinner {
+  @apply animate-spin rounded-full border-2 border-gray-300 border-t-mint;
+}
+
+/* Focus States */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-mint focus:ring-offset-2;
+}
+
+/* Hover Effects */
+.hover-lift {
+  @apply transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg;
+}
+
+.hover-scale {
+  @apply transition-transform duration-200 hover:scale-105;
+}
+
+/* Text Utilities */
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Spacing Utilities */
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+.space-y-8 > * + * {
+  margin-top: 2rem;
+}
+
+.space-y-12 > * + * {
+  margin-top: 3rem;
+}
+
 /* Global Smooth Transitions */
 * {
   transition: all 0.3s ease-in-out;
 }
-
 /* Smooth slide transitions for all elements */
 * {
   transition-property: transform, opacity, background-color, border-color, color, box-shadow;
@@ -167,6 +324,78 @@ input:focus, textarea:focus, select:focus {
   box-shadow: 0 4px 12px rgba(118, 53, 255, 0.2);
 }
 
+/* Search input specific styles */
+.search-container input,
+.search-input {
+  color: inherit !important;
+  background-color: inherit !important;
+  transform: none !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  line-height: inherit !important;
+  text-align: left !important;
+  text-indent: 0 !important;
+  text-shadow: none !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+  writing-mode: horizontal-tb !important;
+  direction: ltr !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.search-container input:focus,
+.search-input:focus {
+  transform: none !important;
+  box-shadow: inherit !important;
+  outline: none !important;
+}
+
+/* Override any header transform rules for search input */
+header .search-input,
+.search-container .search-input {
+  transform: none !important;
+  transition: all 0.3s ease !important;
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  font-size: 16px !important;
+  font-weight: bold !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  text-shadow: none !important;
+  -webkit-text-fill-color: #ffffff !important;
+  -webkit-text-stroke: none !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+/* Force black text when scrolled - more specific selector */
+html body header .search-container .search-input[style*="color: rgb(0, 0, 0)"],
+html body header .search-container .search-input[style*="color: #000000"] {
+  color: #000000 !important;
+  background-color: #ffffff !important;
+  -webkit-text-fill-color: #000000 !important;
+  border: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* When search container has scrolled class */
+.search-container.scrolled .search-input {
+  color: #000000 !important;
+  background-color: #ffffff !important;
+  -webkit-text-fill-color: #000000 !important;
+  border: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
 /* Smooth link transitions */
 a, .link-accent {
   transition: all 0.3s ease-in-out;
@@ -188,7 +417,7 @@ header {
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
-  z-index: 9999 !important;
+  z-index: 1000 !important;
   transform: translateZ(0) !important;
   will-change: transform !important;
 }
@@ -199,7 +428,7 @@ header[class*="fixed"] {
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
-  z-index: 9999 !important;
+  z-index: 1000 !important;
 }
 
 /* Prevent any transforms from affecting the header */
@@ -219,7 +448,7 @@ html body header {
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
-  z-index: 99999 !important;
+  z-index: 1000 !important;
   transform: translateZ(0) !important;
   will-change: transform !important;
   transition: none !important;
@@ -231,7 +460,7 @@ header[class*="fixed"] {
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
-  z-index: 99999 !important;
+  z-index: 1000 !important;
   transform: translateZ(0) !important;
   will-change: transform !important;
   transition: none !important;
@@ -239,24 +468,24 @@ header[class*="fixed"] {
 
 /* Ensure modals are properly displayed */
 .modal-overlay, [class*="modal"], [class*="fixed"][class*="inset-0"] {
-  z-index: 99999 !important;
+  z-index: 1100 !important;
   position: fixed !important;
 }
 
 /* Override all z-50 modals to have higher z-index */
 [class*="z-50"] {
-  z-index: 99999 !important;
+  z-index: 1100 !important;
 }
 
 /* Specific fixes for chat and messaging modals */
 [class*="MessagingModal"], [class*="ConversationsModal"] {
-  z-index: 99999 !important;
+  z-index: 1200 !important;
   position: fixed !important;
 }
 
 /* Ensure chat boxes are fully visible */
 div[class*="fixed"][class*="inset-0"] {
-  z-index: 99999 !important;
+  z-index: 1100 !important;
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
@@ -361,5 +590,6 @@ div[class*="fixed"][class*="inset-0"] {
     transform: translateY(0);
   }
 }
+
 
 
