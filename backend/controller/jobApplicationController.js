@@ -135,6 +135,11 @@ export default class JobApplicationController {
 
             await application.save();
 
+            console.log('Application created successfully:', application._id);
+            console.log('Job ID:', job_id);
+            console.log('Freelancer ID:', userId);
+            console.log('Application status:', application.application_status);
+
             // Update job analytics
             job.analytics.total_applications += 1;
             job.analytics.last_application = new Date();
@@ -256,6 +261,10 @@ export default class JobApplicationController {
 
             const skip = (parseInt(page) - 1) * parseInt(limit);
 
+            console.log('Fetching applications for job:', job_id);
+            console.log('Filter:', filter);
+            console.log('User ID:', userId);
+
             const [applications, total] = await Promise.all([
                 JobApply.find(filter)
                     .populate('freelancer_id', 'first_name last_name email profile_pic contact_number')
@@ -266,15 +275,21 @@ export default class JobApplicationController {
                 JobApply.countDocuments(filter)
             ]);
 
+            console.log('Found applications:', applications.length);
+            console.log('Total applications:', total);
+            console.log('Sample application:', applications[0]);
+
             return res.status(200).json({
                 status: true,
                 message: "Job applications retrieved successfully",
-                data: applications,
-                pagination: {
-                    current_page: parseInt(page),
-                    total_pages: Math.ceil(total / parseInt(limit)),
-                    total_applications: total,
-                    applications_per_page: parseInt(limit)
+                data: {
+                    applications: applications,
+                    pagination: {
+                        currentPage: parseInt(page),
+                        totalPages: Math.ceil(total / parseInt(limit)),
+                        totalItems: total,
+                        limit: parseInt(limit)
+                    }
                 }
             });
 
