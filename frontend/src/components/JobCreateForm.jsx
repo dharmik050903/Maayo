@@ -338,13 +338,13 @@ export default function JobCreateForm() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-4xl mx-auto px-6 pt-20 pb-8">
-        <div className="card bg-white/95 rounded-lg shadow-sm p-8">
-          <div className="mb-8 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold leading-tight text-graphite mb-2">
+      <main className="flex-1 max-w-4xl mx-auto px-4 md:px-6 pt-20 pb-8">
+        <div className="card bg-white/95 rounded-lg shadow-sm p-4 md:p-8">
+          <div className="mb-6 md:mb-8 text-center">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-graphite mb-2">
               Post a New <span className="text-mint">Job</span>
             </h1>
-            <p className="text-lg text-coolgray">Create a job posting to attract talented freelancers</p>
+            <p className="text-base md:text-lg text-coolgray">Create a job posting to attract talented freelancers</p>
           </div>
 
           {message && (
@@ -925,21 +925,21 @@ export default function JobCreateForm() {
             </div>
 
             {/* Submit Button */}
-            <div className="flex justify-end space-x-4 pt-6 border-t">
-              <Button
+            <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+              <button
                 type="button"
-                variant="secondary"
                 onClick={() => navigate('/client/jobs')}
+                className="px-6 py-3 border-2 border-gray-400 text-gray-700 bg-white rounded-lg hover:bg-gray-50 hover:border-gray-500 transition-all duration-300 font-medium shadow-sm"
               >
                 Cancel
-              </Button>
-              <Button
+              </button>
+              <button
                 type="submit"
-                loading={loading}
                 disabled={loading}
+                className="px-6 py-3 bg-mint text-white rounded-lg hover:bg-mint/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 font-medium shadow-sm"
               >
                 {loading ? 'Creating Job...' : 'Post Job'}
-              </Button>
+              </button>
             </div>
           </form>
         </div>

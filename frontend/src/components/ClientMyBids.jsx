@@ -358,26 +358,26 @@ export default function ClientMyBids() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-white mb-2">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">
             My <span className="text-mint">Bids</span>
           </h2>
-          <p className="text-white/80">
+          <p className="text-white/80 text-sm sm:text-base">
             {filteredBids.length} bid{filteredBids.length !== 1 ? 's' : ''} found
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
           {/* Searchable Project Dropdown */}
-          <div className="relative" ref={dropdownRef}>
+          <div className="relative w-full sm:w-auto" ref={dropdownRef}>
             <button
               onClick={() => setShowProjectDropdown(!showProjectDropdown)}
-              className="px-4 py-2 bg-white/95 text-graphite rounded-lg focus:ring-2 focus:ring-mint focus:border-transparent border-0 min-w-[200px] text-left flex items-center justify-between"
+              className="px-3 sm:px-4 py-2 bg-white/95 text-graphite rounded-lg focus:ring-2 focus:ring-mint focus:border-transparent border-0 w-full sm:min-w-[200px] text-left flex items-center justify-between text-sm sm:text-base"
             >
-              <span>
+              <span className="truncate">
                 {selectedProject === 'all' ? 'All Projects' : getProjectTitle(selectedProject)}
               </span>
-              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </button>
@@ -446,7 +446,7 @@ export default function ClientMyBids() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 bg-white/95 text-graphite rounded-lg focus:ring-2 focus:ring-mint focus:border-transparent border-0"
+            className="px-3 sm:px-4 py-2 bg-white/95 text-graphite rounded-lg focus:ring-2 focus:ring-mint focus:border-transparent border-0 text-sm sm:text-base w-full sm:w-auto"
           >
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
@@ -457,7 +457,7 @@ export default function ClientMyBids() {
             variant="outline"
             size="sm"
             onClick={fetchBids}
-            className="border-white text-white hover:bg-white hover:text-graphite"
+            className="border-white text-white hover:bg-white hover:text-graphite w-full sm:w-auto text-sm sm:text-base px-3 sm:px-4 py-2"
           >
             Refresh
           </Button>

@@ -188,21 +188,29 @@ export default function ClientJobs() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto px-6 pt-20 pb-8">
+      <main className="flex-1 max-w-7xl mx-auto px-4 md:px-6 pt-20 pb-8">
         {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-8 md:mb-12">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 md:gap-6">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
                 My <span className="text-mint">Jobs</span>
               </h1>
-              <p className="text-lg text-white/80 mt-4">
+              <p className="text-base md:text-lg text-white/80 mt-2 md:mt-4">
                 Manage your job postings and applications
               </p>
             </div>
             <Link to="/client/jobs/create">
-              <Button variant="accent" className="border-mint text-mint hover:bg-mint hover:text-white">
-                Post New Job
+              <Button 
+                variant="accent" 
+                className="bg-mint text-white hover:bg-mint/90 border-2 border-mint hover:border-mint/80 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-6 py-3 font-semibold w-full sm:w-auto"
+              >
+                <div className="flex items-center space-x-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <span>Post New Job</span>
+                </div>
               </Button>
             </Link>
           </div>
@@ -219,8 +227,8 @@ export default function ClientJobs() {
         )}
 
         {/* Filters */}
-        <div className="card p-6 bg-white/95 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="card p-4 md:p-6 bg-white/95 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-graphite mb-2">Status</label>
               <select
@@ -298,35 +306,45 @@ export default function ClientJobs() {
               <h3 className="text-lg font-semibold text-graphite mb-2">No jobs found</h3>
               <p className="text-coolgray mb-6">Start by posting your first job to attract talented freelancers.</p>
               <Link to="/client/jobs/create">
-                <Button variant="accent" className="border-mint text-mint hover:bg-mint hover:text-white">
-                  Post Your First Job
+                <Button 
+                  variant="accent" 
+                  className="bg-mint text-white hover:bg-mint/90 border-2 border-mint hover:border-mint/80 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-6 py-3 font-semibold"
+                >
+                  <div className="flex items-center space-x-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <span>Post Your First Job</span>
+                  </div>
                 </Button>
               </Link>
             </div>
           ) : (
             <div className="divide-y divide-gray-200">
               {jobs.map((job) => (
-                <div key={job._id} className="p-6 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-start justify-between">
+                <div key={job._id} className="p-4 md:p-6 hover:bg-gray-50 transition-colors">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                     <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 mb-2 gap-2">
                         <Link
                           to={`/client/jobs/edit/${job._id}`}
-                          className="text-lg font-semibold text-graphite hover:text-mint transition-colors"
+                          className="text-base md:text-lg font-semibold text-graphite hover:text-mint transition-colors"
                         >
                           {job.job_title}
                         </Link>
-                        <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(job.status)}`}>
-                          {job.status}
-                        </span>
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          job.job_type === 'full-time' ? 'bg-green-100 text-green-800' :
-                          job.job_type === 'part-time' ? 'bg-yellow-100 text-yellow-800' :
-                          job.job_type === 'contract' ? 'bg-blue-100 text-blue-800' :
-                          'bg-purple-100 text-purple-800'
-                        }`}>
-                          {job.job_type}
-                        </span>
+                        <div className="flex flex-wrap gap-2">
+                          <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(job.status)}`}>
+                            {job.status}
+                          </span>
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            job.job_type === 'full-time' ? 'bg-green-100 text-green-800' :
+                            job.job_type === 'part-time' ? 'bg-yellow-100 text-yellow-800' :
+                            job.job_type === 'contract' ? 'bg-blue-100 text-blue-800' :
+                            'bg-purple-100 text-purple-800'
+                          }`}>
+                            {job.job_type}
+                          </span>
+                        </div>
                       </div>
 
                       <div className="text-sm text-coolgray mb-3">
@@ -337,7 +355,7 @@ export default function ClientJobs() {
                         <span>Posted {formatDate(job.created_at)}</span>
                       </div>
 
-                      <div className="flex items-center space-x-6 text-sm text-coolgray">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6 text-sm text-coolgray gap-2 sm:gap-0">
                         <span>
                           <strong className="text-graphite">{job.analytics.total_applications}</strong> applications
                         </span>
@@ -353,7 +371,7 @@ export default function ClientJobs() {
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-2 ml-6">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 lg:ml-6">
                       <Link to={`/client/jobs/${job._id}/applications`}>
                         <Button size="sm" variant="secondary" className="border-violet text-violet hover:bg-violet hover:text-white">
                           View Applications

@@ -839,6 +839,22 @@ export default function Header({ userType, onLogout, userData }) {
 
         {/* Mobile Hamburger Menu Button */}
         <div className="lg:hidden flex items-center gap-2">
+          {/* Mobile Logout Button - Only for authenticated users */}
+          {isAuthenticated && (
+            <button 
+              onClick={onLogout} 
+              className={`px-3 py-2 rounded-lg transition-all duration-300 text-sm font-medium ${
+                isScrolled 
+                  ? 'bg-violet/10 border border-violet/30 text-violet hover:bg-violet/20' 
+                  : 'bg-white/20 border border-white/30 text-white hover:bg-white/30'
+              }`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </button>
+          )}
+          
           <button onClick={toggleMobileMenu} className={`text-2xl ${isScrolled ? 'text-graphite' : 'text-white'}`}>
             ☰
           </button>

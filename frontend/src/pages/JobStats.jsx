@@ -107,32 +107,42 @@ export default function JobStats() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto px-6 pt-20 pb-8">
+      <main className="flex-1 max-w-7xl mx-auto px-4 md:px-6 pt-20 pb-8">
         {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-6 md:mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 md:gap-6">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
                 Job <span className="text-mint">Statistics</span>
               </h1>
-              <p className="text-lg text-white/80 mt-4">
+              <p className="text-base md:text-lg text-white/80 mt-2 md:mt-4">
                 Track your job posting performance
               </p>
             </div>
-            <div className="flex space-x-3">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Button
                 variant="secondary"
                 onClick={() => navigate('/client/jobs')}
-                className="border-gray-300 text-graphite hover:bg-gray-50"
+                className="border-2 border-white/30 text-white bg-white/10 hover:bg-white/20 hover:border-white/50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-6 py-3 font-semibold"
               >
-                Manage Jobs
+                <div className="flex items-center space-x-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                  </svg>
+                  <span>Manage Jobs</span>
+                </div>
               </Button>
               <Button
-                variant="secondary"
+                variant="accent"
                 onClick={() => navigate('/client/jobs/create')}
-                className="border-gray-300 text-graphite hover:bg-gray-50"
+                className="bg-mint text-white hover:bg-mint/90 border-2 border-mint hover:border-mint/80 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-6 py-3 font-semibold"
               >
-                Post New Job
+                <div className="flex items-center space-x-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <span>Post New Job</span>
+                </div>
               </Button>
             </div>
           </div>
@@ -164,9 +174,14 @@ export default function JobStats() {
             <p className="text-coolgray mb-6">You haven't posted any jobs yet.</p>
             <Button
               onClick={() => navigate('/client/jobs/create')}
-              className="bg-mint text-white hover:bg-mint/90"
+              className="bg-mint text-white hover:bg-mint/90 border-2 border-mint hover:border-mint/80 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-6 py-3 font-semibold"
             >
-              Post Your First Job
+              <div className="flex items-center space-x-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                <span>Post Your First Job</span>
+              </div>
             </Button>
           </div>
         ) : (

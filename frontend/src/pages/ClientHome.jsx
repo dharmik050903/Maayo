@@ -466,25 +466,25 @@ export default function ClientHome() {
       )}
       
       {/* Hero Section */}
-      <section className="flex-1 flex items-center justify-center px-6 py-20">
+      <section className="flex-1 flex items-center justify-center px-4 md:px-6 py-12 md:py-20">
         <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-4 md:mb-6">
             Find the Perfect <span className="text-coral">Freelancer</span>
           </h1>
-          <p className="text-xl md:text-2xl text-white/80 mb-8 max-w-3xl mx-auto">
+          <p className="text-base md:text-lg lg:text-xl xl:text-2xl text-white/80 mb-6 md:mb-8 max-w-3xl mx-auto">
             {t('connectWithTalent')}
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center mb-8 md:mb-12">
             <Link to="/client-dashboard">
-              <Button variant="accent" size="lg" className="px-8 py-4 text-lg">
+              <Button variant="accent" size="lg" className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg w-full sm:w-auto">
                 Go to Dashboard
               </Button>
             </Link>
             <Button 
               variant="outline" 
               size="lg" 
-              className="px-8 py-4 text-lg border-white text-white hover:bg-white hover:text-graphite"
+              className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg border-white text-white hover:bg-white hover:text-graphite w-full sm:w-auto"
               onClick={() => setActiveTab('freelancers')}
             >
               Find Freelancers
@@ -492,20 +492,20 @@ export default function ClientHome() {
             <Button 
               variant="outline" 
               size="lg" 
-              className="px-8 py-4 text-lg border-white text-white hover:bg-white hover:text-graphite"
+              className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg border-white text-white hover:bg-white hover:text-graphite w-full sm:w-auto"
               onClick={() => setActiveTab('escrow')}
             >
                 {t('escrowManagement')}
             </Button>
             <Link to="/create-project">
-              <Button variant="outline" size="lg" className="px-8 py-4 text-lg border-white text-white hover:bg-white hover:text-graphite">
+              <Button variant="outline" size="lg" className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg border-white text-white hover:bg-white hover:text-graphite w-full sm:w-auto">
                 {t('postAProject')}
               </Button>
             </Link>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 max-w-4xl mx-auto">
             <div className="text-center">
               <AnimatedCounter 
                 end={15000} 
@@ -541,9 +541,9 @@ export default function ClientHome() {
       </section>
 
       {/* Tab Navigation */}
-      <section className="py-8 px-6 bg-white/5">
+      <section className="py-6 md:py-8 px-4 md:px-6 bg-white/5">
         <div className="max-w-6xl mx-auto">
-          <div className="flex justify-center space-x-1 bg-white/10 p-1 rounded-lg w-fit mx-auto">
+          <div className="flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-1 bg-white/10 p-1 rounded-lg w-full sm:w-fit mx-auto">
             <button
               onClick={() => setActiveTab('freelancers')}
               className={`px-6 py-3 rounded-md font-medium transition-colors ${
@@ -580,17 +580,17 @@ export default function ClientHome() {
 
       {/* Freelancer Search Section */}
       {activeTab === 'freelancers' && (
-        <section className="py-16 px-6 bg-white/5">
+        <section className="py-8 md:py-16 px-4 md:px-6 bg-white/5">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-8">
               Available <span className="text-coral">Freelancers</span>
             </h2>
             
             
             {/* Search and Filter Controls */}
-            <div className="mb-8 space-y-4">
+            <div className="mb-6 md:mb-8 space-y-4">
               {/* Search Input */}
-              <div className="flex flex-col md:flex-row gap-4 items-center">
+              <div className="flex flex-col md:flex-row gap-3 md:gap-4 items-center">
                 <div className="flex-1 relative">
                   <input
                     type="text"
@@ -598,29 +598,29 @@ export default function ClientHome() {
                     value={freelancerSearchTerm}
                     onChange={(e) => setFreelancerSearchTerm(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                    className="w-full px-4 py-3 border border-white/20 rounded-lg text-graphite bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral"
+                    className="w-full px-3 md:px-4 py-2 md:py-3 border border-white/20 rounded-lg text-graphite bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral text-sm md:text-base"
                   />
                   <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-1">
                     <button
                       onClick={handleSearch}
-                      className="px-3 py-1 bg-coral text-white rounded text-sm hover:bg-coral/90"
+                      className="px-2 md:px-3 py-1 bg-coral text-white rounded text-xs md:text-sm hover:bg-coral/90"
                     >
                       Search
                     </button>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                   <Button
                     variant="outline"
                     onClick={() => setShowFilters(!showFilters)}
-                    className="border-white text-white hover:bg-white hover:text-graphite"
+                    className="border-white text-white hover:bg-white hover:text-graphite w-full sm:w-auto text-sm md:text-base"
                   >
                     {showFilters ? 'Hide Filters' : 'Show Filters'}
                   </Button>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="px-4 py-3 border border-white/20 rounded-lg text-graphite bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50"
+                    className="px-3 md:px-4 py-2 md:py-3 border border-white/20 rounded-lg text-graphite bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50 text-sm md:text-base w-full sm:w-auto"
                   >
                     <option value="rating">Sort by Rating</option>
                     <option value="rate_low">Sort by Rate (Low to High)</option>
@@ -728,9 +728,9 @@ export default function ClientHome() {
             </div>
 
             {/* Freelancers List */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {getFilteredAndSortedFreelancers().map((freelancer, index) => (
-                <div key={freelancer._id} className="card p-6 bg-white/95 hover:bg-white transition-all duration-300 hover:shadow-lg cursor-pointer slide-in-up" style={{animationDelay: `${index * 0.1}s`}} onClick={() => handleFreelancerClick(freelancer)}>
+                <div key={freelancer._id} className="card p-4 md:p-6 bg-white/95 hover:bg-white transition-all duration-300 hover:shadow-lg cursor-pointer slide-in-up" style={{animationDelay: `${index * 0.1}s`}} onClick={() => handleFreelancerClick(freelancer)}>
                   <div className="flex items-start space-x-4 mb-4">
                     <div className="w-16 h-16 bg-coral/20 rounded-full flex items-center justify-center">
                       <svg className="w-8 h-8 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">

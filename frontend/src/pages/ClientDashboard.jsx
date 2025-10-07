@@ -419,30 +419,30 @@ export default function ClientDashboard() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto px-6 pt-20 pb-8">
+      <main className="flex-1 max-w-7xl mx-auto px-4 md:px-6 pt-20 pb-8">
         {/* Welcome Section */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between">
+        <div className="mb-6 md:mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 md:gap-6">
             <div>
-              <h1 className="text-5xl md:text-6xl font-bold leading-tight text-balance">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-balance">
                 Welcome back, <span className="text-mint">{userData?.first_name}</span>!
               </h1>
-              <p className="text-xl text-white/90 mt-6 max-w-2xl">
+              <p className="text-sm md:text-base lg:text-lg text-white/90 mt-2 md:mt-4 max-w-2xl">
                 Here's your client dashboard overview - manage your projects and connect with talented freelancers
               </p>
             </div>
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <Button
                 variant="secondary"
                 onClick={() => navigate('/create-project')}
-                className="border-gray-300 text-graphite hover:bg-gray-50"
+                className="border-gray-300 text-graphite hover:bg-gray-50 w-full sm:w-auto"
                 size="lg"
               >
                 Create Project
               </Button>
               <Button
                 onClick={() => navigate('/client/jobs')}
-                className="bg-mint text-white hover:bg-mint/90"
+                className="bg-mint text-white hover:bg-mint/90 w-full sm:w-auto"
                 size="lg"
               >
                 Manage Jobs
@@ -452,13 +452,13 @@ export default function ClientDashboard() {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="mb-12">
-          <div className="flex space-x-2 bg-white/10 p-2 rounded-xl w-fit">
+        <div className="mb-6 md:mb-8">
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-1 bg-white/10 p-1 rounded-lg w-full sm:w-fit">
             <button
               onClick={() => setActiveSection('overview')}
-              className={`px-8 py-4 rounded-lg font-semibold transition-all duration-300 ${
+              className={`px-3 sm:px-6 py-2 sm:py-3 rounded-md font-medium transition-all duration-300 text-sm ${
                 activeSection === 'overview'
-                  ? 'bg-white text-graphite shadow-lg'
+                  ? 'bg-white text-graphite shadow-sm'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
@@ -466,9 +466,9 @@ export default function ClientDashboard() {
             </button>
             <button
               onClick={() => setActiveSection('projects')}
-              className={`px-8 py-4 rounded-lg font-semibold transition-all duration-300 ${
+              className={`px-3 sm:px-6 py-2 sm:py-3 rounded-md font-medium transition-all duration-300 text-sm ${
                 activeSection === 'projects'
-                  ? 'bg-white text-graphite shadow-lg'
+                  ? 'bg-white text-graphite shadow-sm'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
@@ -476,9 +476,9 @@ export default function ClientDashboard() {
             </button>
             <button
               onClick={() => setActiveSection('freelancers')}
-              className={`px-8 py-4 rounded-lg font-semibold transition-all duration-300 ${
+              className={`px-3 sm:px-6 py-2 sm:py-3 rounded-md font-medium transition-all duration-300 text-sm ${
                 activeSection === 'freelancers'
-                  ? 'bg-white text-graphite shadow-lg'
+                  ? 'bg-white text-graphite shadow-sm'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
@@ -491,8 +491,8 @@ export default function ClientDashboard() {
         {activeSection === 'overview' && (
           <>
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <div className="card p-6 bg-white/95">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
+              <div className="card p-4 md:p-6 bg-white/95">
                 <div className="flex items-center">
                   <div className="p-3 bg-mint/20 rounded-lg">
                     <svg className="w-6 h-6 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -564,10 +564,10 @@ export default function ClientDashboard() {
             </div>
 
             {/* Profile Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
               {/* Profile Card */}
               <div className="lg:col-span-1">
-                <div className="card p-6 bg-white/95">
+                <div className="card p-4 md:p-6 bg-white/95">
                   <div className="text-center">
                     <div className="w-24 h-24 bg-mint/20 rounded-full mx-auto mb-4 flex items-center justify-center">
                       <span className="text-2xl font-bold text-mint uppercase">
@@ -605,9 +605,9 @@ export default function ClientDashboard() {
               {/* Main Content */}
               <div className="lg:col-span-2 space-y-8">
                 {/* Quick Actions */}
-                <div className="card p-6 bg-white/95">
+                <div className="card p-4 md:p-6 bg-white/95">
                   <h3 className="text-lg font-semibold text-graphite mb-4">Quick Actions</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                     <Link to="/create-project" className="w-full">
                       <Button variant="accent" className="w-full border-mint text-mint hover:bg-mint hover:text-white">
                         Post a New Project
@@ -758,32 +758,28 @@ export default function ClientDashboard() {
         {activeSection === 'freelancers' && (
           <div className="space-y-8">
             {/* Freelancer Search Section */}
-            <div className="card p-6 bg-white/95">
-              <h2 className="text-2xl font-bold text-graphite mb-6">
+            <div className="card p-4 md:p-6 bg-white/95">
+              <h2 className="text-xl md:text-2xl font-bold text-graphite mb-4 md:mb-6">
                 Browse <span className="text-coral">Freelancers</span>
               </h2>
               
               {/* Search Input */}
-              <div className="mb-6">
-                <div className="flex flex-col md:flex-row gap-4 items-center">
-                  <div className="flex-1 relative">
-                    <input
-                      type="text"
-                      placeholder="Search freelancers by name, skills, location, or expertise..."
-                      value={freelancerSearchTerm}
-                      onChange={(e) => setFreelancerSearchTerm(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleFreelancerSearch()}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg text-graphite bg-white focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral"
-                    />
-                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-                      <button
-                        onClick={handleFreelancerSearch}
-                        className="px-4 py-2 bg-coral text-white rounded text-sm hover:bg-coral/90"
-                      >
-                        Search
-                      </button>
-                    </div>
-                  </div>
+              <div className="mb-4 md:mb-6">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    type="text"
+                    placeholder="Search freelancers..."
+                    value={freelancerSearchTerm}
+                    onChange={(e) => setFreelancerSearchTerm(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleFreelancerSearch()}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-graphite bg-white focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral text-sm"
+                  />
+                  <button
+                    onClick={handleFreelancerSearch}
+                    className="px-4 py-2 bg-coral text-white rounded-lg text-sm hover:bg-coral/90 w-full sm:w-auto"
+                  >
+                    Search
+                  </button>
                 </div>
               </div>
 
@@ -812,9 +808,9 @@ export default function ClientDashboard() {
               {!freelancersLoading && !freelancerError && (
                 <>
                   {freelancers.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                       {freelancers.map((freelancer, index) => (
-                        <div key={freelancer._id} className="card p-6 bg-white hover:shadow-lg transition-all duration-300 cursor-pointer">
+                        <div key={freelancer._id} className="card p-4 md:p-6 bg-white hover:shadow-lg transition-all duration-300 cursor-pointer">
                           <div className="flex items-start space-x-4 mb-4">
                             <div className="w-16 h-16 bg-coral/20 rounded-full flex items-center justify-center">
                               <svg className="w-8 h-8 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">

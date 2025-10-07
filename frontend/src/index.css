@@ -1,479 +1,6 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Header completely separate from page - aggressive fix */
-html body header {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100vw !important;
-    z-index: 1000 !important;
-    transform: translateZ(0) !important;
-    will-change: transform !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-/* Override any parent container styles */
-header {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100vw !important;
-    z-index: 1000 !important;
-    transform: translateZ(0) !important;
-    will-change: transform !important;
-}
-
-/* Main content areas need top padding */
-main, .main-content, [class*="main"] {
-    padding-top: 80px !important;
-}
-
-@media (max-width: 768px) {
-    main, .main-content, [class*="main"] {
-        padding-top: 70px !important;
-    }
-}
-
-:root {
-  --color-primary: #173257;
-  --color-violet: #7635FF;
-  --color-coral: #FF5A69;
-  --color-mint: #23D1A4;
-  --color-base: #F6F6FB;
-  --color-graphite: #252525;
-  --color-coolgray: #8B94A6;
-}
-
-html, body, #root {
-  height: 100%;
-  background: var(--color-base);
-  color: var(--color-graphite);
-}
-
-.btn-primary {
-  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-white bg-primary hover:bg-[#132845] transition;
-}
-
-.btn-accent {
-  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-white bg-violet hover:bg-[#5d1cff] transition;
-}
-
-.card {
-  @apply bg-white rounded-xl shadow-soft border border-[#E9ECF2];
-}
-
-.input {
-  @apply w-full px-4 py-3 rounded-lg border border-[#E3E8EF] bg-white placeholder-coolgray text-graphite focus:outline-none focus:ring-2 focus:ring-violet;
-}
-
-.link-accent { @apply text-violet hover:text-primary; }
-
-/* Remove any borders from logo links */
-.logo-link {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-.logo-link:focus {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* Mobile navigation link styling */
-.mobile-nav-link {
-  color: var(--color-graphite) !important;
-}
-
-.mobile-nav-link:hover {
-  color: var(--color-mint) !important;
-}
-
-/* Ensure mobile navigation text is visible */
-@media (max-width: 768px) {
-  .mobile-nav-link {
-    color: #252525 !important;
-    font-weight: 500;
-  }
-  
-  .mobile-nav-link:hover {
-    color: var(--color-mint) !important;
-  }
-}
-
-/* Project description truncation */
-.project-description {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  line-height: 1.4;
-  max-height: 4.2em; /* 3 lines * 1.4 line-height */
-}
-
-/* Job Card Styles */
-.job-card {
-  @apply bg-white rounded-xl shadow-soft border border-gray-100 p-6 hover:shadow-md transition-all duration-300;
-}
-
-.job-card-header {
-  @apply flex items-start justify-between mb-4;
-}
-
-.job-card-title {
-  @apply text-xl font-semibold text-graphite hover:text-mint transition-colors;
-}
-
-.job-card-company {
-  @apply text-lg font-medium text-coolgray;
-}
-
-.job-card-meta {
-  @apply flex flex-wrap gap-4 mb-4;
-}
-
-.job-card-meta-item {
-  @apply flex items-center gap-2 text-sm text-coolgray;
-}
-
-.job-card-description {
-  @apply text-coolgray leading-relaxed mb-4;
-}
-
-.job-card-skills {
-  @apply flex flex-wrap gap-2 mb-4;
-}
-
-.job-card-skill {
-  @apply px-3 py-1 bg-violet/10 text-violet rounded-full text-sm font-medium;
-}
-
-.job-card-footer {
-  @apply flex items-center justify-between pt-4 border-t border-gray-100;
-}
-
-.job-card-stats {
-  @apply flex items-center gap-4 text-sm text-coolgray;
-}
-
-.job-card-actions {
-  @apply flex items-center gap-3;
-}
-
-/* Status Badges */
-.status-badge {
-  @apply px-3 py-1 rounded-full text-xs font-semibold;
-}
-
-.status-active {
-  @apply bg-green-100 text-green-800;
-}
-
-.status-pending {
-  @apply bg-yellow-100 text-yellow-800;
-}
-
-.status-inactive {
-  @apply bg-gray-100 text-gray-800;
-}
-
-/* Form Elements */
-.form-label {
-  @apply block text-sm font-medium text-graphite mb-2;
-}
-
-.form-error {
-  @apply text-red-600 text-sm mt-1;
-}
-
-.form-help {
-  @apply text-coolgray text-sm mt-1;
-}
-
-.input-error {
-  @apply border-red-300 focus:ring-red-500 focus:border-red-500;
-}
-
-.input-success {
-  @apply border-green-300 focus:ring-green-500 focus:border-green-500;
-}
-
-.form-group {
-  @apply mb-4;
-}
-
-/* Button Variants */
-.btn-secondary {
-  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-graphite bg-white border border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition;
-}
-
-.btn-success {
-  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-white bg-green-600 hover:bg-green-700 transition;
-}
-
-.btn-warning {
-  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-white bg-yellow-600 hover:bg-yellow-700 transition;
-}
-
-.btn-danger {
-  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 transition;
-}
-
-.btn-outline {
-  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-graphite bg-transparent border border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition;
-}
-
-.btn-ghost {
-  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-graphite bg-transparent hover:bg-gray-100 transition;
-}
-
-/* Card Variants */
-.card-elevated {
-  @apply bg-white rounded-xl shadow-lg border border-gray-100;
-}
-
-/* Loading States */
-.loading-spinner {
-  @apply animate-spin rounded-full border-2 border-gray-300 border-t-mint;
-}
-
-/* Focus States */
-.focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-mint focus:ring-offset-2;
-}
-
-/* Hover Effects */
-.hover-lift {
-  @apply transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg;
-}
-
-.hover-scale {
-  @apply transition-transform duration-200 hover:scale-105;
-}
-
-/* Text Utilities */
-.text-balance {
-  text-wrap: balance;
-}
-
-/* Spacing Utilities */
-.space-y-6 > * + * {
-  margin-top: 1.5rem;
-}
-
-.space-y-8 > * + * {
-  margin-top: 2rem;
-}
-
-.space-y-12 > * + * {
-  margin-top: 3rem;
-}
-
-/* Global Smooth Transitions */
-* {
-  transition: all 0.3s ease-in-out;
-}
-/* Smooth slide transitions for all elements */
-* {
-  transition-property: transform, opacity, background-color, border-color, color, box-shadow;
-  transition-duration: 0.3s;
-  transition-timing-function: ease-in-out;
-}
-
-/* Enhanced button transitions */
-button, .btn-primary, .btn-accent, [role="button"] {
-  transition: all 0.3s ease-in-out;
-  transform: translateY(0);
-}
-
-button:hover, .btn-primary:hover, .btn-accent:hover, [role="button"]:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-button:active, .btn-primary:active, .btn-accent:active, [role="button"]:active {
-  transform: translateY(0);
-  transition-duration: 0.1s;
-}
-
-/* Smooth card transitions */
-.card, .bg-white {
-  transition: all 0.3s ease-in-out;
-  transform: translateY(0);
-}
-
-.card:hover, .bg-white:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-}
-
-/* Smooth input transitions */
-input, textarea, select {
-  transition: all 0.3s ease-in-out;
-  transform: translateY(0);
-}
-
-input:focus, textarea:focus, select:focus {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(118, 53, 255, 0.2);
-}
-
-/* Search input specific styles */
-.search-container input,
-.search-input {
-  color: inherit !important;
-  background-color: inherit !important;
-  transform: none !important;
-  font-family: inherit !important;
-  font-size: inherit !important;
-  font-weight: inherit !important;
-  line-height: inherit !important;
-  text-align: left !important;
-  text-indent: 0 !important;
-  text-shadow: none !important;
-  text-transform: none !important;
-  letter-spacing: normal !important;
-  word-spacing: normal !important;
-  writing-mode: horizontal-tb !important;
-  direction: ltr !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: block !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.search-container input:focus,
-.search-input:focus {
-  transform: none !important;
-  box-shadow: inherit !important;
-  outline: none !important;
-}
-
-/* Override any header transform rules for search input */
-header .search-input,
-.search-container .search-input {
-  transform: none !important;
-  transition: all 0.3s ease !important;
-  color: #ffffff !important;
-  background-color: rgba(255, 255, 255, 0.2) !important;
-  font-size: 16px !important;
-  font-weight: bold !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  text-shadow: none !important;
-  -webkit-text-fill-color: #ffffff !important;
-  -webkit-text-stroke: none !important;
-  border: 2px solid rgba(255, 255, 255, 0.3) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-}
-
-/* Force black text when scrolled - more specific selector */
-html body header .search-container .search-input[style*="color: rgb(0, 0, 0)"],
-html body header .search-container .search-input[style*="color: #000000"] {
-  color: #000000 !important;
-  background-color: #ffffff !important;
-  -webkit-text-fill-color: #000000 !important;
-  border: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* When search container has scrolled class */
-.search-container.scrolled .search-input {
-  color: #000000 !important;
-  background-color: #ffffff !important;
-  -webkit-text-fill-color: #000000 !important;
-  border: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* Smooth link transitions */
-a, .link-accent {
-  transition: all 0.3s ease-in-out;
-  transform: translateY(0);
-}
-
-/* Mobile-specific improvements */
-@media (max-width: 640px) {
-  /* Reduce padding on mobile */
-  .job-card {
-    @apply p-4;
-  }
-  
-  .job-card-header {
-    @apply mb-3;
-  }
-  
-  .job-card-title {
-    @apply text-lg;
-  }
-  
-  .job-card-company {
-    @apply text-base mb-3;
-  }
-  
-  .job-card-meta {
-    @apply mb-3;
-  }
-  
-  .job-card-description {
-    @apply text-sm mb-3;
-  }
-  
-  .job-card-skills {
-    @apply mb-3;
-  }
-  
-  .job-card-footer {
-    @apply pt-3;
-  }
-  
-  /* Mobile button improvements */
-  .btn-primary, .btn-accent, .btn-secondary {
-    @apply text-sm px-4 py-2;
-  }
-  
-  /* Mobile form improvements */
-  .input {
-    @apply text-base px-3 py-2;
-  }
-  
-  /* Mobile card improvements */
-  .card {
-    @apply p-4;
-  }
-  
-  /* Mobile spacing */
-  .space-y-6 > * + * {
-    margin-top: 1rem;
-  }
-  
-  .space-y-8 > * + * {
-    margin-top: 1.5rem;
-  }
-  
-  .space-y-12 > * + * {
-    margin-top: 2rem;
-  }
-}
-
-a:hover, .link-accent:hover {
-  transform: translateY(-1px);
-}
-
-/* Smooth modal transitions */
-.modal, .fixed {
-  transition: all 0.3s ease-in-out;
-}
 
 /* Ensure header stays fixed */
 header {
@@ -482,178 +9,229 @@ header {
   left: 0 !important;
   right: 0 !important;
   z-index: 1000 !important;
+  width: 100vw !important;
   transform: translateZ(0) !important;
   will-change: transform !important;
+  isolation: isolate !important;
 }
 
-/* Additional header positioning fixes */
-header[class*="fixed"] {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  z-index: 1000 !important;
+/* Enhanced UI Design System */
+.card-elevated {
+  @apply bg-white rounded-2xl shadow-large border border-gray-100;
 }
 
-/* Prevent any transforms from affecting the header */
-header, header * {
-  transform: none !important;
+.btn-primary {
+  @apply bg-mint text-white font-semibold px-6 py-3 rounded-xl hover:bg-mint/90 transition-all duration-300 shadow-medium hover:shadow-large;
 }
 
-/* Override global transform rules for header */
-header {
-  transform: translateZ(0) !important;
-  transition: none !important;
+.btn-outline {
+  @apply border-2 border-gray-300 text-graphite font-semibold px-6 py-3 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300;
 }
 
-/* Force header to stay at top - most specific rule */
-html body header {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  z-index: 1000 !important;
-  transform: translateZ(0) !important;
-  will-change: transform !important;
-  transition: none !important;
+.form-label {
+  @apply text-sm font-semibold text-graphite mb-3;
 }
 
-/* Additional fallback for header visibility */
-header[class*="fixed"] {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  z-index: 1000 !important;
-  transform: translateZ(0) !important;
-  will-change: transform !important;
-  transition: none !important;
+.form-error {
+  @apply text-coral text-sm mt-2 font-medium;
 }
 
-/* Ensure modals are properly displayed */
-.modal-overlay, [class*="modal"], [class*="fixed"][class*="inset-0"] {
-  z-index: 1100 !important;
-  position: fixed !important;
+.loading-spinner {
+  @apply animate-spin;
 }
 
-/* Override all z-50 modals to have higher z-index */
-[class*="z-50"] {
-  z-index: 1100 !important;
+.hover-lift {
+  @apply transform hover:-translate-y-1 transition-all duration-300;
 }
 
-/* Specific fixes for chat and messaging modals */
-[class*="MessagingModal"], [class*="ConversationsModal"] {
-  z-index: 1200 !important;
-  position: fixed !important;
+/* JobCreateForm text visibility fixes */
+.JobCreateForm input,
+.JobCreateForm textarea,
+.JobCreateForm select {
+  color: #374151 !important;
+  background-color: white !important;
+  -webkit-text-fill-color: #374151 !important;
 }
 
-/* Ensure chat boxes are fully visible */
-div[class*="fixed"][class*="inset-0"] {
-  z-index: 1100 !important;
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
+.JobCreateForm input::placeholder,
+.JobCreateForm textarea::placeholder {
+  color: #9CA3AF !important;
+  opacity: 1 !important;
 }
 
-/* Smooth page transitions */
-.page-transition {
-  transition: all 0.3s ease-in-out;
-  transform: translateX(0);
+.form-group input,
+.form-group textarea {
+  color: #374151 !important;
+  background-color: white !important;
+  -webkit-text-fill-color: #374151 !important;
 }
 
-/* Smooth fade transitions */
-.fade-in {
-  animation: fadeIn 0.3s ease-in-out;
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #9CA3AF !important;
+  opacity: 1 !important;
 }
 
-.fade-out {
-  animation: fadeOut 0.3s ease-in-out;
+/* Simple button styling for JobCreateForm */
+.JobCreateForm button {
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+.JobCreateForm button:not(:disabled):hover {
+  transform: translateY(-1px) !important;
+}
+
+/* Additional form styling for JobCreateForm */
+.JobCreateForm .form-group {
+  margin-bottom: 1rem;
+}
+
+.JobCreateForm label {
+  display: block;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.JobCreateForm .border-b {
+  border-bottom: 1px solid #E5E7EB;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.JobCreateForm .space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+.JobCreateForm .space-y-3 > * + * {
+  margin-top: 0.75rem;
+}
+
+.JobCreateForm .space-x-4 > * + * {
+  margin-left: 1rem;
+}
+
+/* Mobile-specific improvements for all client pages */
+@media (max-width: 640px) {
+  /* JobCreateForm mobile fixes */
+  .JobCreateForm input,
+  .JobCreateForm textarea,
+  .JobCreateForm select {
+    color: #374151 !important;
+    background-color: white !important;
+    font-size: 16px !important;
+    -webkit-text-fill-color: #374151 !important;
+    border: 1px solid #D1D5DB !important;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  
+  .form-group input,
+  .form-group textarea {
+    color: #374151 !important;
+    background-color: white !important;
+    font-size: 16px !important;
+    -webkit-text-fill-color: #374151 !important;
+    border: 1px solid #D1D5DB !important;
+  }
+  
+  .card input,
+  .card textarea,
+  .card select {
+    color: #374151 !important;
+    background-color: white !important;
+    -webkit-text-fill-color: #374151 !important;
+    border: 1px solid #D1D5DB !important;
+  }
+  
+  .JobCreateForm input::placeholder,
+  .JobCreateForm textarea::placeholder {
+    color: #9CA3AF !important;
+    opacity: 1 !important;
+  }
+  
+  .form-group input::placeholder,
+  .form-group textarea::placeholder {
+    color: #9CA3AF !important;
+    opacity: 1 !important;
+  }
+  
+  .JobCreateForm select option {
+    color: #374151 !important;
+    background-color: white !important;
+  }
+  
+  .JobCreateForm button[type="button"],
+  .JobCreateForm button[type="submit"] {
+    width: 100% !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  /* Client pages mobile improvements */
+  .card {
+    padding: 1rem !important;
+  }
+  
+  .card p-4 {
+    padding: 1rem !important;
+  }
+  
+  .card p-6 {
+    padding: 1rem !important;
+  }
+  
+  /* Button improvements for mobile */
+  button {
+    min-height: 44px !important; /* iOS touch target */
+  }
+  
+  /* Form improvements */
+  input, textarea, select {
+    min-height: 44px !important; /* iOS touch target */
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+  
+  /* Grid improvements */
+  .grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+  
+  /* Spacing improvements */
+  .space-y-6 > * + * {
+    margin-top: 1rem !important;
+  }
+  
+  .space-y-4 > * + * {
+    margin-top: 0.75rem !important;
+  }
+  
+  .space-y-3 > * + * {
+    margin-top: 0.5rem !important;
+  }
+  
+  /* Text size improvements */
+  .text-4xl {
+    font-size: 1.875rem !important; /* 30px */
+    line-height: 2.25rem !important;
+  }
+  
+  .text-3xl {
+    font-size: 1.5rem !important; /* 24px */
+    line-height: 2rem !important;
+  }
+  
+  .text-2xl {
+    font-size: 1.25rem !important; /* 20px */
+    line-height: 1.75rem !important;
+  }
+  
+  .text-xl {
+    font-size: 1.125rem !important; /* 18px */
+    line-height: 1.75rem !important;
+  }
+  
+  .text-lg {
+    font-size: 1rem !important; /* 16px */
+    line-height: 1.5rem !important;
   }
 }
-
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-}
-
-/* Smooth slide transitions */
-.slide-in-right {
-  animation: slideInRight 0.3s ease-in-out;
-}
-
-.slide-in-left {
-  animation: slideInLeft 0.3s ease-in-out;
-}
-
-.slide-in-up {
-  animation: slideInUp 0.3s ease-in-out;
-}
-
-.slide-in-down {
-  animation: slideInDown 0.3s ease-in-out;
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-
-
