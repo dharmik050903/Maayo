@@ -78,13 +78,19 @@ export default function JobApplications() {
 
   const handleStatusUpdate = async (applicationId, newStatus, notes = '') => {
     try {
+      // Add confirmation for accepting applications
+      if (newStatus === 'selected') {
+        const confirmed = window.confirm('Are you sure you want to accept this application? This will mark the candidate as selected.')
+        if (!confirmed) return
+      }
+      
       const response = await applicationService.updateApplicationStatus(applicationId, {
         application_status: newStatus,
         client_notes: notes
       })
       
       if (response.status) {
-        setMessage({ type: 'success', text: 'Application status updated successfully!' })
+        setMessage({ type: 'success', text: `Application ${newStatus === 'selected' ? 'accepted' : 'updated'} successfully!` })
         fetchJobAndApplications() // Refresh the list
       } else {
         setMessage({ type: 'error', text: response.message || 'Failed to update status' })
@@ -455,7 +461,28 @@ export default function JobApplications() {
                         </>
                       )}
                       
-                      {!['selected', 'rejected', 'withdrawn'].includes(application.application_status) && (
+                      {application.application_status === 'applied' && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            onClick={() => handleStatusUpdate(application._id, 'selected')}
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                          >
+                            Accept
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => handleStatusUpdate(application._id, 'rejected')}
+                            className="border-red-300 text-red-600 hover:bg-red-50"
+                          >
+                            Reject
+                          </Button>
+                        </>
+                      )}
+                      
+                      {!['selected', 'rejected', 'withdrawn', 'applied'].includes(application.application_status) && (
                         <Button
                           size="sm"
                           variant="secondary"
