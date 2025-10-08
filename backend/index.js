@@ -36,32 +36,53 @@ const finalOrigins = allowedOrigins.length > 0 ? allowedOrigins : defaultOrigins
 
 app.use(cors({
   origin: function(origin, callback) {
-
+    console.log('CORS request from origin:', origin)
+    
     // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true)
+    if (!origin) {
+      console.log('CORS: Allowing request with no origin')
+      return callback(null, true)
+    }
   
     // Allow localhost and 127.0.0.1 for development
     if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      console.log('CORS: Allowing localhost/127.0.0.1 origin:', origin)
       return callback(null, true)
     }
     
     // Allow Vercel domains
     if (origin.includes('vercel.app')) {
+      console.log('CORS: Allowing Vercel origin:', origin)
       return callback(null, true)
     }
     
     // Check against allowed origins
-    if (allowedOrigins.includes(origin)) return callback(null, true)
+    if (allowedOrigins.includes(origin)) {
+      console.log('CORS: Allowing origin from allowed list:', origin)
+      return callback(null, true)
+    }
     
     // Log the blocked origin for debugging
     console.log('CORS: Blocked origin:', origin)
+    console.log('Allowed origins:', allowedOrigins)
 
     return callback(new Error('Not allowed by CORS'))
   },
   credentials: true,
   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization','id','user_role','user_email','first_name','last_name']
+  allowedHeaders: ['Content-Type','Authorization','id','user_role','user_email','first_name','last_name'],
+  optionsSuccessStatus: 200
 }));
+
+// Handle preflight OPTIONS requests
+app.options('*', (req, res) => {
+  console.log('OPTIONS request for:', req.path)
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*')
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, id, user_role, user_email, first_name, last_name')
+  res.header('Access-Control-Allow-Credentials', 'true')
+  res.sendStatus(200)
+})
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
