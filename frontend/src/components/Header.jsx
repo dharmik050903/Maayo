@@ -457,13 +457,8 @@ export default function Header({ userType, onLogout, userData }) {
           {t('findWork')}
         </Link>
       ) : (
-        <Link to="/project/create" className="bg-mint text-white hover:bg-mint/90 border-2 border-mint hover:border-mint/80 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-4 py-2 rounded-lg font-semibold text-sm">
-          <div className="flex items-center space-x-2">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            <span>{t('postProject')}</span>
-          </div>
+        <Link to="/project/create" className={getLinkClasses('/project/create')}>
+          {t('postProject')}
         </Link>
       )}
       
@@ -532,13 +527,8 @@ export default function Header({ userType, onLogout, userData }) {
       <Link to="/browse" className={getLinkClasses('/browse')}>
         {t('findWork')}
       </Link>
-      <Link to="/project/create" className="bg-mint text-white hover:bg-mint/90 border-2 border-mint hover:border-mint/80 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-4 py-2 rounded-lg font-semibold text-sm">
-        <div className="flex items-center space-x-2">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-          <span>{t('postProject')}</span>
-        </div>
+      <Link to="/project/create" className={getLinkClasses('/project/create')}>
+        {t('postProject')}
       </Link>
       <Link to="/pricing" className={getLinkClasses('/pricing')}>
         {t('pricing')}
@@ -636,13 +626,8 @@ export default function Header({ userType, onLogout, userData }) {
       <Link to="/browse" className={getMobileLinkClasses('/browse')} style={getMobileLinkStyles()}>
         {t('findWork')}
       </Link>
-      <Link to="/project/create" className="bg-mint text-white hover:bg-mint/90 border-2 border-mint hover:border-mint/80 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-6 py-4 rounded-xl font-semibold text-center">
-        <div className="flex items-center justify-center space-x-2">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-          <span>{t('postProject')}</span>
-        </div>
+      <Link to="/project/create" className={getMobileLinkClasses('/project/create')} style={getMobileLinkStyles()}>
+        {t('postProject')}
       </Link>
       <Link to="/pricing" className={getMobileLinkClasses('/pricing')} style={getMobileLinkStyles()}>
         {t('pricing')}

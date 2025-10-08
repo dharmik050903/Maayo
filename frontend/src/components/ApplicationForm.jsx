@@ -116,68 +116,75 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
     }
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    
-    if (!validateForm()) {
-      setMessage({ type: 'error', text: 'Please fix the errors below' })
-      return
-    }
-
-    setLoading(true)
-    setMessage(null)
-
-    try {
-      // Convert form data to match backend schema
-      const applicationData = {
-        ...formData,
-        expected_salary: {
-          amount: formData.expected_salary.amount ? parseInt(formData.expected_salary.amount) : null,
-          currency: formData.expected_salary.currency,
-          salary_type: formData.expected_salary.salary_type
-        },
-        availability: {
-          ...formData.availability,
-          start_date: formData.availability.start_date ? new Date(formData.availability.start_date) : null
+      const handleSubmit = async (e) => {
+        e.preventDefault()
+        
+        if (!validateForm()) {
+          setMessage({ type: 'error', text: 'Please fix the errors below' })
+          return
         }
-      }
 
-      console.log('Submitting application with data:', applicationData)
-      console.log('Job ID:', job._id)
-      console.log('Job application settings:', job.application_settings)
+        setLoading(true)
+        setMessage(null)
 
-      const response = await applicationService.applyForJob(job._id, applicationData)
-      
-      console.log('Application response:', response)
-      
-      if (response.status) {
-        setMessage({ type: 'success', text: 'Application submitted successfully!' })
-        setTimeout(() => {
-          onSuccess()
-        }, 1500)
-      } else {
-        setMessage({ type: 'error', text: response.message || 'Failed to submit application' })
-      }
-    } catch (error) {
-      console.error('Error submitting application:', error)
-      console.error('Error details:', error.response)
-      
-      let errorMessage = 'Failed to submit application. Please try again.'
-      
-      if (error.response) {
         try {
-          const errorData = await error.response.json()
-          errorMessage = errorData.message || errorMessage
-        } catch (parseError) {
-          console.error('Error parsing error response:', parseError)
+          // Convert form data to match backend schema
+          const applicationData = {
+            ...formData,
+            expected_salary: {
+              amount: formData.expected_salary.amount ? parseInt(formData.expected_salary.amount) : null,
+              currency: formData.expected_salary.currency,
+              salary_type: formData.expected_salary.salary_type
+            },
+            availability: {
+              ...formData.availability,
+              start_date: formData.availability.start_date ? new Date(formData.availability.start_date) : null
+            }
+          }
+
+          console.log('Submitting application with data:', applicationData)
+          console.log('Job ID:', job._id)
+          console.log('Job application settings:', job.application_settings)
+          console.log('User ID from localStorage:', localStorage.getItem('userId'))
+
+          const response = await applicationService.applyForJob(job._id, applicationData)
+          
+          console.log('Application response:', response)
+          
+          if (response.status) {
+            setMessage({ type: 'success', text: 'Application submitted successfully!' })
+            setTimeout(() => {
+              onSuccess()
+            }, 1500)
+          } else {
+            setMessage({ type: 'error', text: response.message || 'Failed to submit application' })
+          }
+        } catch (error) {
+          console.error('Error submitting application:', error)
+          console.error('Error details:', error.response)
+          
+          let errorMessage = 'Failed to submit application. Please try again.'
+          
+          if (error.response) {
+            try {
+              const errorData = await error.response.json()
+              errorMessage = errorData.message || errorMessage
+              console.log('Error data:', errorData)
+              
+              // If it's a duplicate application error, provide more helpful message
+              if (errorData.message === 'You have already applied for this job') {
+                errorMessage = 'You have already applied for this job. Please check your applications or contact support if this is incorrect.'
+              }
+            } catch (parseError) {
+              console.error('Error parsing error response:', parseError)
+            }
+          }
+          
+          setMessage({ type: 'error', text: errorMessage })
+        } finally {
+          setLoading(false)
         }
       }
-      
-      setMessage({ type: 'error', text: errorMessage })
-    } finally {
-      setLoading(false)
-    }
-  }
 
   return (
     <div>

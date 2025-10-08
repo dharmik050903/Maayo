@@ -180,9 +180,14 @@ export default function SavedJobs() {
             <Button
               variant="secondary"
               onClick={() => navigate('/freelancer/jobs')}
-              className="border-gray-300 text-graphite hover:bg-gray-50 w-full sm:w-auto"
+              className="border-2 border-white/30 text-white bg-white/10 hover:bg-white/20 hover:border-white/50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-6 py-3 font-semibold w-full sm:w-auto"
             >
-              Browse Jobs
+              <div className="flex items-center space-x-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <span>Browse Jobs</span>
+              </div>
             </Button>
           </div>
         </div>
@@ -261,9 +266,14 @@ export default function SavedJobs() {
               <p className="text-coolgray mb-6">You haven't saved any jobs yet. Start browsing to find opportunities!</p>
               <Button
                 onClick={() => navigate('/freelancer/jobs')}
-                className="bg-mint text-white hover:bg-mint/90"
+                className="bg-mint text-white hover:bg-mint/90 border-2 border-mint hover:border-mint/80 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-6 py-3 font-semibold"
               >
-                Browse Jobs
+                <div className="flex items-center space-x-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <span>Browse Jobs</span>
+                </div>
               </Button>
             </div>
           ) : (

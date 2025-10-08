@@ -48,6 +48,7 @@ export default function JobDetail() {
         setJob(response.data)
         setHasApplied(response.data.has_applied || false)
         setIsSaved(response.data.is_saved || false)
+        checkExistingApplication(response.data._id)
       } else {
         setMessage({ type: 'error', text: response.message || 'Failed to fetch job details' })
       }
@@ -56,6 +57,40 @@ export default function JobDetail() {
       setMessage({ type: 'error', text: 'Failed to fetch job details. Please try again.' })
     } finally {
       setLoading(false)
+    }
+  }
+
+  const checkExistingApplication = async (jobId) => {
+    try {
+      console.log('Checking for existing application for job:', jobId)
+      console.log('User ID:', userData?._id)
+      
+      // Get user's applications to check if they've already applied for this job
+      const applicationsResponse = await applicationService.getFreelancerApplications({
+        page: 1,
+        limit: 100 // Get all applications to check
+      })
+      
+      if (applicationsResponse.status) {
+        const existingApp = applicationsResponse.data.applications.find(app => 
+          app.job_id === jobId || app.job_id._id === jobId
+        )
+        
+        if (existingApp) {
+          console.log('Found existing application:', existingApp)
+          setHasApplied(true)
+          setMessage({ 
+            type: 'info', 
+            text: `You have already applied for this job on ${new Date(existingApp.application_tracking.applied_at).toLocaleDateString()}. Status: ${existingApp.application_status}` 
+          })
+        } else {
+          console.log('No existing application found')
+          setHasApplied(false)
+        }
+      }
+    } catch (error) {
+      console.error('Error checking existing application:', error)
+      // Don't set error message here as it's not critical
     }
   }
 
