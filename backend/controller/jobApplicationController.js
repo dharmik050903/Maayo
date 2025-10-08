@@ -88,7 +88,7 @@ export default class JobApplicationController {
             const applicationData = req.body;
             
             // Validate required fields
-            if (job.application_settings.require_cover_letter && !applicationData.cover_letter) {
+            if (job.application_settings?.require_cover_letter && !applicationData.cover_letter) {
                 return res.status(400).json({
                     status: false,
                     message: "Cover letter is required for this job"
@@ -96,7 +96,7 @@ export default class JobApplicationController {
             }
 
             // Validate resume link requirement
-            if (job.application_settings.require_resume_link && !applicationData.resume_link?.url) {
+            if (job.application_settings?.require_resume_link && !applicationData.resume_link?.url) {
                 return res.status(400).json({
                     status: false,
                     message: "Resume link is required for this job"
@@ -105,8 +105,9 @@ export default class JobApplicationController {
 
             // Validate URL format if resume link is provided
             if (applicationData.resume_link?.url) {
-                const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
-                if (!urlPattern.test(applicationData.resume_link.url)) {
+                try {
+                    new URL(applicationData.resume_link.url);
+                } catch (error) {
                     return res.status(400).json({
                         status: false,
                         message: "Please provide a valid resume URL"
@@ -118,15 +119,15 @@ export default class JobApplicationController {
             const application = new JobApply({
                 job_id: job_id,
                 freelancer_id: userId,
-                cover_letter: applicationData.cover_letter,
-                resume_link: applicationData.resume_link,
+                cover_letter: applicationData.cover_letter || undefined,
+                resume_link: applicationData.resume_link || undefined,
                 portfolio_links: applicationData.portfolio_links || [],
-                expected_salary: applicationData.expected_salary,
-                availability: applicationData.availability,
+                expected_salary: applicationData.expected_salary || undefined,
+                availability: applicationData.availability || undefined,
                 application_source: applicationData.application_source || 'platform',
-                referral_source: applicationData.referral_source,
-                communication_preferences: applicationData.communication_preferences,
-                job_requires_cover_letter: job.application_settings.require_cover_letter,
+                referral_source: applicationData.referral_source || undefined,
+                communication_preferences: applicationData.communication_preferences || undefined,
+                job_requires_cover_letter: job.application_settings?.require_cover_letter || false,
                 application_tracking: {
                     applied_at: new Date(),
                     last_updated: new Date()

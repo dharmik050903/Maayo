@@ -109,8 +109,8 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
 
   const isValidUrl = (url) => {
     try {
-      new URL(url)
-      return true
+      const urlObj = new URL(url)
+      return urlObj.protocol === 'http:' || urlObj.protocol === 'https:'
     } catch {
       return false
     }
@@ -128,19 +128,48 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
         setMessage(null)
 
         try {
-          // Convert form data to match backend schema
+          // Clean and prepare data for backend
           const applicationData = {
-            ...formData,
-            expected_salary: {
-              amount: formData.expected_salary.amount ? parseInt(formData.expected_salary.amount) : null,
+            // Basic application info
+            cover_letter: formData.cover_letter.trim() || undefined,
+            
+            // Resume link - only include if URL is provided
+            resume_link: formData.resume_link.url.trim() ? {
+              url: formData.resume_link.url.trim(),
+              title: formData.resume_link.title.trim() || 'Resume',
+              description: formData.resume_link.description.trim() || undefined
+            } : undefined,
+            
+            // Portfolio links - filter out empty ones
+            portfolio_links: formData.portfolio_links.filter(link => 
+              link.url.trim() && link.title.trim()
+            ).map(link => ({
+              title: link.title.trim(),
+              url: link.url.trim(),
+              description: link.description.trim() || undefined
+            })),
+            
+            // Expected salary - only include if amount is provided
+            expected_salary: formData.expected_salary.amount ? {
+              amount: parseInt(formData.expected_salary.amount),
               currency: formData.expected_salary.currency,
               salary_type: formData.expected_salary.salary_type
-            },
+            } : undefined,
+            
+            // Availability
             availability: {
-              ...formData.availability,
-              start_date: formData.availability.start_date ? new Date(formData.availability.start_date) : null
+              start_date: formData.availability.start_date ? new Date(formData.availability.start_date).toISOString() : undefined,
+              notice_period: formData.availability.notice_period,
+              working_hours: formData.availability.working_hours
             }
           }
+
+          // Remove undefined values to avoid sending empty fields
+          Object.keys(applicationData).forEach(key => {
+            if (applicationData[key] === undefined) {
+              delete applicationData[key]
+            }
+          })
 
           console.log('Submitting application with data:', applicationData)
           console.log('Job ID:', job._id)
@@ -171,9 +200,13 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
               errorMessage = errorData.message || errorMessage
               console.log('Error data:', errorData)
               
-              // If it's a duplicate application error, provide more helpful message
+              // Provide specific error messages
               if (errorData.message === 'You have already applied for this job') {
                 errorMessage = 'You have already applied for this job. Please check your applications or contact support if this is incorrect.'
+              } else if (errorData.message.includes('required')) {
+                errorMessage = `Missing required information: ${errorData.message}`
+              } else if (errorData.message.includes('invalid')) {
+                errorMessage = `Invalid data provided: ${errorData.message}`
               }
             } catch (parseError) {
               console.error('Error parsing error response:', parseError)
@@ -443,3 +476,4 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
     </div>
   )
 }
+
