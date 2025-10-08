@@ -1,4 +1,5 @@
 import JobPosted from "../schema/jobPosted.js";
+import mongoose from "mongoose";
 import JobApply from "../schema/jobApply.js";
 import PersonMaster from "../schema/PersonMaster.js";
 import { getPlanById, hasReachedLimit } from "../config/subscriptionPlans.js";
@@ -495,6 +496,8 @@ export default class JobController {
             const userId = req.headers.id;
             const userRole = req.headers.user_role;
 
+            console.log('📊 Getting job stats for user:', userId, 'role:', userRole);
+
             if (userRole !== 'client') {
                 return res.status(403).json({
                     status: false,
@@ -502,8 +505,20 @@ export default class JobController {
                 });
             }
 
+            // Convert userId to ObjectId for proper matching
+            const clientObjectId = new mongoose.Types.ObjectId(userId);
+            console.log('📊 Client ObjectId:', clientObjectId);
+
+            // First, let's check if there are any jobs for this client
+            const totalJobsCount = await JobPosted.countDocuments({ client_id: clientObjectId });
+            console.log('📊 Total jobs count for client:', totalJobsCount);
+
+            // Get all jobs for this client to debug
+            const allJobs = await JobPosted.find({ client_id: clientObjectId }).select('job_title status analytics');
+            console.log('📊 All jobs for client:', allJobs);
+
             const stats = await JobPosted.aggregate([
-                { $match: { client_id: userId } },
+                { $match: { client_id: clientObjectId } },
                 {
                     $group: {
                         _id: null,
@@ -524,18 +539,45 @@ export default class JobController {
                 }
             ]);
 
+            console.log('📊 Aggregation result:', stats);
+
+            const result = stats[0] || {
+                total_jobs: 0,
+                active_jobs: 0,
+                closed_jobs: 0,
+                filled_jobs: 0,
+                total_views: 0,
+                total_applications: 0,
+                total_saves: 0
+            };
+
+            // Calculate average applications per job
+            result.avg_applications = result.total_jobs > 0 ? 
+                Math.round((result.total_applications / result.total_jobs) * 10) / 10 : 0;
+
+            // Get job status breakdown
+            const statusBreakdown = await JobPosted.aggregate([
+                { $match: { client_id: clientObjectId } },
+                {
+                    $group: {
+                        _id: '$status',
+                        count: { $sum: 1 }
+                    }
+                }
+            ]);
+
+            // Convert to object format expected by frontend
+            result.job_status_breakdown = {};
+            statusBreakdown.forEach(item => {
+                result.job_status_breakdown[item._id] = item.count;
+            });
+
+            console.log('📊 Final stats result:', result);
+
             return res.status(200).json({
                 status: true,
                 message: "Job statistics retrieved successfully",
-                data: stats[0] || {
-                    total_jobs: 0,
-                    active_jobs: 0,
-                    closed_jobs: 0,
-                    filled_jobs: 0,
-                    total_views: 0,
-                    total_applications: 0,
-                    total_saves: 0
-                }
+                data: result
             });
 
         } catch (error) {
