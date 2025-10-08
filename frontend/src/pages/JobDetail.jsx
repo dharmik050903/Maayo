@@ -136,7 +136,7 @@ export default function JobDetail() {
     return (
       <div className="min-h-screen bg-brand-gradient">
         <Header userData={userData} onLogout={handleLogout} />
-        <main className="py-8">
+        <main className="py-8 pt-24">
           <div className="max-w-6xl mx-auto px-4">
             <div className="card p-8 bg-white/95">
               <div className="animate-pulse">
@@ -159,7 +159,7 @@ export default function JobDetail() {
     return (
       <div className="min-h-screen bg-brand-gradient">
         <Header userData={userData} onLogout={handleLogout} />
-        <main className="py-8">
+        <main className="py-8 pt-24">
           <div className="max-w-6xl mx-auto px-4">
             <div className="card p-8 bg-white/95 text-center">
               <h1 className="text-2xl font-bold text-graphite mb-4">Job Not Found</h1>
@@ -182,7 +182,7 @@ export default function JobDetail() {
     <div className="min-h-screen bg-brand-gradient">
       <Header userData={userData} onLogout={handleLogout} />
       
-      <main className="py-8">
+      <main className="py-8 pt-24">
         <div className="max-w-6xl mx-auto px-4">
           {/* Back Button */}
           <div className="mb-6">
@@ -447,14 +447,14 @@ export default function JobDetail() {
 
       {/* Application Form Modal */}
       {showApplicationForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1100] p-4">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-graphite">Apply for {job.job_title}</h2>
                 <button
                   onClick={() => setShowApplicationForm(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-600 text-2xl font-bold"
                 >
                   ✕
                 </button>

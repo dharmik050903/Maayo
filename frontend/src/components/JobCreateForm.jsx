@@ -600,11 +600,16 @@ export default function JobCreateForm() {
                   <Button
                     type="button"
                     onClick={handleAddSkill}
-                    variant="secondary"
+                    variant="accent"
                     disabled={!newSkill.trim()}
-                    className="px-6 py-2"
+                    className="bg-mint text-white hover:bg-mint/90 border-2 border-mint hover:border-mint/80 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-6 py-3 font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
-                    Add Skill
+                    <div className="flex items-center space-x-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                      <span>Add Skill</span>
+                    </div>
                   </Button>
                 </div>
               </div>

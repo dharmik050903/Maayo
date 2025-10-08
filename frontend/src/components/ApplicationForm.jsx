@@ -81,11 +81,11 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
   const validateForm = () => {
     const newErrors = {}
 
-    if (job.application_settings.require_cover_letter && !formData.cover_letter.trim()) {
+    if (job.application_settings?.require_cover_letter && !formData.cover_letter.trim()) {
       newErrors.cover_letter = 'Cover letter is required for this job'
     }
 
-    if (job.application_settings.require_resume_link && !formData.resume_link.url.trim()) {
+    if (job.application_settings?.require_resume_link && !formData.resume_link.url.trim()) {
       newErrors.resume_url = 'Resume link is required for this job'
     }
 
@@ -142,7 +142,13 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
         }
       }
 
+      console.log('Submitting application with data:', applicationData)
+      console.log('Job ID:', job._id)
+      console.log('Job application settings:', job.application_settings)
+
       const response = await applicationService.applyForJob(job._id, applicationData)
+      
+      console.log('Application response:', response)
       
       if (response.status) {
         setMessage({ type: 'success', text: 'Application submitted successfully!' })
@@ -154,7 +160,20 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
       }
     } catch (error) {
       console.error('Error submitting application:', error)
-      setMessage({ type: 'error', text: 'Failed to submit application. Please try again.' })
+      console.error('Error details:', error.response)
+      
+      let errorMessage = 'Failed to submit application. Please try again.'
+      
+      if (error.response) {
+        try {
+          const errorData = await error.response.json()
+          errorMessage = errorData.message || errorMessage
+        } catch (parseError) {
+          console.error('Error parsing error response:', parseError)
+        }
+      }
+      
+      setMessage({ type: 'error', text: errorMessage })
     } finally {
       setLoading(false)
     }
@@ -166,16 +185,16 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
         <h3 className="text-lg font-semibold text-gray-900 mb-2">Application Requirements</h3>
         <div className="bg-blue-50 p-4 rounded-lg">
           <ul className="text-sm text-blue-800 space-y-1">
-            {job.application_settings.require_resume_link && (
+            {job.application_settings?.require_resume_link && (
               <li>• Resume link is required</li>
             )}
-            {job.application_settings.require_cover_letter && (
+            {job.application_settings?.require_cover_letter && (
               <li>• Cover letter is required</li>
             )}
-            {job.application_settings.allow_portfolio_links && (
+            {job.application_settings?.allow_portfolio_links && (
               <li>• Portfolio links are optional</li>
             )}
-            <li>• Maximum {job.application_settings.max_applications} applications allowed</li>
+            <li>• Maximum {job.application_settings?.max_applications || 'unlimited'} applications allowed</li>
           </ul>
         </div>
       </div>
@@ -192,7 +211,7 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Cover Letter */}
-        {job.application_settings.require_cover_letter && (
+        {job.application_settings?.require_cover_letter && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Cover Letter *
@@ -211,7 +230,7 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
         )}
 
         {/* Resume Link */}
-        {job.application_settings.require_resume_link && (
+        {job.application_settings?.require_resume_link && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Resume Link *
@@ -246,7 +265,7 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
         )}
 
         {/* Portfolio Links */}
-        {job.application_settings.allow_portfolio_links && (
+        {job.application_settings?.allow_portfolio_links && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Portfolio Links
@@ -400,6 +419,7 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
             variant="secondary"
             onClick={onCancel}
             disabled={loading}
+            className="px-6 py-3 border-2 border-gray-300 text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 font-semibold"
           >
             Cancel
           </Button>
@@ -407,6 +427,7 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
             type="submit"
             loading={loading}
             disabled={loading}
+            className="px-6 py-3 bg-mint text-white hover:bg-mint/90 border-2 border-mint hover:border-mint/80 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
             {loading ? 'Submitting...' : 'Submit Application'}
           </Button>
