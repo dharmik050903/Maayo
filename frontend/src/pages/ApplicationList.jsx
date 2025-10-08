@@ -5,10 +5,13 @@ import Header from '../components/Header'
 import { applicationService } from '../services/applicationService'
 import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
+import { useNotification } from '../hooks/useModal'
+import socketService from '../services/socketService'
 
 export default function ApplicationList() {
   const { t } = useComprehensiveTranslation()
   const navigate = useNavigate()
+  const { notification, showNotification, hideNotification } = useNotification()
   const [userData, setUserData] = useState(null)
   const [applications, setApplications] = useState([])
   const [loading, setLoading] = useState(true)
@@ -32,6 +35,38 @@ export default function ApplicationList() {
     const user = getCurrentUser()
     setUserData(user)
     fetchApplications()
+
+    // Connect to socket for real-time notifications
+    if (user && user._id) {
+      socketService.connect(user._id)
+    }
+
+    // Listen for socket notifications
+    const handleSocketNotification = (event) => {
+      const notificationData = event.detail
+      console.log('📧 ApplicationList: Received notification:', notificationData)
+      
+      if (notificationData.type === 'application_accepted') {
+        showNotification({
+          title: notificationData.title,
+          message: notificationData.message,
+          type: 'success',
+          autoClose: true,
+          autoCloseDelay: 5000
+        })
+        
+        // Refresh applications to show updated status
+        fetchApplications()
+      }
+    }
+
+    window.addEventListener('socketNotification', handleSocketNotification)
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('socketNotification', handleSocketNotification)
+      socketService.disconnect()
+    }
   }, [filters])
 
   const handleLogout = () => {
@@ -410,6 +445,33 @@ export default function ApplicationList() {
           )}
         </div>
       </main>
+
+      {/* Notification Modal */}
+      {notification.isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl">
+            <div className="flex items-center mb-4">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${
+                notification.type === 'success' ? 'bg-green-100' : 
+                notification.type === 'error' ? 'bg-red-100' : 'bg-blue-100'
+              }`}>
+                {notification.type === 'success' ? '✅' : 
+                 notification.type === 'error' ? '❌' : 'ℹ️'}
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">{notification.title}</h3>
+            </div>
+            <p className="text-gray-600 mb-4">{notification.message}</p>
+            <div className="flex justify-end">
+              <Button
+                onClick={hideNotification}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

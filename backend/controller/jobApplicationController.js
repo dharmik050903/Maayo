@@ -3,6 +3,7 @@ import JobPosted from "../schema/jobPosted.js";
 import PersonMaster from "../schema/PersonMaster.js";
 import FreelancerInfo from "../schema/freelancerInfo.js";
 import { getPlanById, hasReachedLimit } from "../config/subscriptionPlans.js";
+import { getIO } from "../services/socket.js";
 
 export default class JobApplicationController {
     
@@ -384,6 +385,30 @@ export default class JobApplicationController {
             }
 
             await application.save();
+
+            // Send notification to freelancer if application is accepted
+            if (status === 'selected') {
+                try {
+                    const io = getIO();
+                    if (io) {
+                        const notification = {
+                            type: 'application_accepted',
+                            title: '🎉 Application Accepted!',
+                            message: `Congratulations! Your application for "${application.job_id.job_title}" has been accepted by the client.`,
+                            application_id: application._id,
+                            job_title: application.job_id.job_title,
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        // Send to freelancer's room
+                        io.to(`user:${application.freelancer_id}`).emit('notification', notification);
+                        console.log('📧 Sent acceptance notification to freelancer:', application.freelancer_id);
+                    }
+                } catch (notificationError) {
+                    console.error('Error sending notification:', notificationError);
+                    // Don't fail the request if notification fails
+                }
+            }
 
             // Populate updated data
             await application.populate([

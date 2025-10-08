@@ -381,19 +381,19 @@ export default function JobApplications() {
                         <>
                           <Button
                             size="sm"
-                            variant="secondary"
-                            onClick={() => handleStatusUpdate(application._id, 'viewed')}
-                            className="border-yellow-300 text-yellow-700 hover:bg-yellow-50"
+                            variant="primary"
+                            onClick={() => handleStatusUpdate(application._id, 'selected')}
+                            className="bg-green-600 hover:bg-green-700 text-white"
                           >
-                            Mark as Viewed
+                            Accept
                           </Button>
                           <Button
                             size="sm"
                             variant="secondary"
-                            onClick={() => handleStatusUpdate(application._id, 'shortlisted')}
-                            className="border-purple-300 text-purple-700 hover:bg-purple-50"
+                            onClick={() => handleStatusUpdate(application._id, 'rejected')}
+                            className="border-red-300 text-red-600 hover:bg-red-50"
                           >
-                            Shortlist
+                            Reject
                           </Button>
                         </>
                       )}
@@ -461,26 +461,6 @@ export default function JobApplications() {
                         </>
                       )}
                       
-                      {application.application_status === 'applied' && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="primary"
-                            onClick={() => handleStatusUpdate(application._id, 'selected')}
-                            className="bg-green-600 hover:bg-green-700 text-white"
-                          >
-                            Accept
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => handleStatusUpdate(application._id, 'rejected')}
-                            className="border-red-300 text-red-600 hover:bg-red-50"
-                          >
-                            Reject
-                          </Button>
-                        </>
-                      )}
                       
                       {!['selected', 'rejected', 'withdrawn', 'applied'].includes(application.application_status) && (
                         <Button

@@ -61,6 +61,17 @@ class SocketService {
       console.error('Socket error:', error)
     })
 
+    // Handle notifications
+    this.socket.on('notification', (notification) => {
+      console.log('📧 Received notification:', notification)
+      
+      // Dispatch custom event for notification handling
+      const notificationEvent = new CustomEvent('socketNotification', {
+        detail: notification
+      })
+      window.dispatchEvent(notificationEvent)
+    })
+
     return this.socket
   }
 
