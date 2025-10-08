@@ -273,7 +273,7 @@ export default function ApplicationList() {
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-2">
                         <h3 className="text-lg font-semibold text-graphite">
-                          {application.job_info?.job_title || 'Job Title Not Available'}
+                          {application.job_id?.job_title || 'Job Title Not Available'}
                         </h3>
                         <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(application.application_status)}`}>
                           {application.application_status}
@@ -286,13 +286,13 @@ export default function ApplicationList() {
                       </div>
 
                       <div className="text-sm text-coolgray mb-3">
-                        <span>{application.job_info?.company_name || 'Company Name Not Available'}</span>
+                        <span>{application.job_id?.company_info?.company_name || 'Company Name Not Available'}</span>
                         <span className="mx-2">•</span>
-                        <span>{application.job_info?.location?.city}, {application.job_info?.location?.country}</span>
+                        <span>{application.job_id?.location?.city}, {application.job_id?.location?.country}</span>
                         <span className="mx-2">•</span>
-                        <span className="capitalize">{application.job_info?.work_mode}</span>
+                        <span className="capitalize">{application.job_id?.work_mode}</span>
                         <span className="mx-2">•</span>
-                        <span className="capitalize">{application.job_info?.job_type}</span>
+                        <span className="capitalize">{application.job_id?.job_type}</span>
                       </div>
 
                       <div className="text-sm text-coolgray mb-3">
@@ -347,7 +347,7 @@ export default function ApplicationList() {
                       <Button
                         size="sm"
                         variant="secondary"
-                        onClick={() => navigate(`/freelancer/jobs/${application.job_id}`)}
+                        onClick={() => navigate(`/freelancer/jobs/${application.job_id?._id || application.job_id}`)}
                         className="border-gray-300 text-graphite hover:bg-gray-50"
                       >
                         View Job

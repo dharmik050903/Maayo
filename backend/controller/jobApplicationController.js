@@ -210,7 +210,7 @@ export default class JobApplicationController {
 
             const [applications, total] = await Promise.all([
                 JobApply.find(filter)
-                    .populate('job_id', 'job_title company_info.company_name location.city salary application_deadline status')
+                    .populate('job_id', 'job_title company_info.company_name location.city location.country salary application_deadline status work_mode job_type job_description')
                     .populate('freelancer_id', 'first_name last_name email')
                     .sort({ 'application_tracking.applied_at': -1 })
                     .skip(skip)
