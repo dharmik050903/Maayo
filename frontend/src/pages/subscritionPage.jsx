@@ -13,6 +13,7 @@ export default function SubscriptionPage() {
   const [loading, setLoading] = useState(true);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [successfulPurchase, setSuccessfulPurchase] = useState(null); // Track successful purchase
   const hasInitialized = useRef(false);
 
   useEffect(() => {
@@ -76,10 +77,19 @@ export default function SubscriptionPage() {
       const paymentResult = await processSubscriptionPayment(planDetails, userData)
       
       if (paymentResult.success) {
+        // Set successful purchase state
+        setSuccessfulPurchase(planId)
+        
         await confirmationService.alert(
           `🎉 Payment successful! Your ${plan.name} subscription is now active. You can start enjoying all the premium features immediately.`,
           'Subscription Activated'
         )
+        
+        // Reset success state after 3 seconds
+        setTimeout(() => {
+          setSuccessfulPurchase(null)
+        }, 3000)
+        
         // Here you could redirect to dashboard or refresh user data
       } else {
         await confirmationService.alert(
@@ -223,12 +233,27 @@ export default function SubscriptionPage() {
             <Button
               variant="accent"
               size="lg"
-              className="w-full py-4 text-lg bg-mint text-white hover:bg-mint/90 mt-auto"
+              className={`w-full py-4 text-lg mt-auto transition-all duration-300 ${
+                successfulPurchase === 'MAYYO_PLUS' 
+                  ? 'bg-green-600 text-white hover:bg-green-700' 
+                  : 'bg-mint text-white hover:bg-mint/90'
+              }`}
               onClick={() => handleSubscribe('MAYYO_PLUS')}
               loading={processingPayment && selectedPlan === 'MAYYO_PLUS'}
               disabled={processingPayment}
             >
-              {processingPayment && selectedPlan === 'MAYYO_PLUS' ? 'Processing...' : 'Choose Maayo Plus'}
+              {successfulPurchase === 'MAYYO_PLUS' ? (
+                <div className="flex items-center justify-center">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Purchase Successful!
+                </div>
+              ) : processingPayment && selectedPlan === 'MAYYO_PLUS' ? (
+                'Processing...'
+              ) : (
+                'Choose Maayo Plus'
+              )}
             </Button>
           </div>
 
@@ -279,12 +304,27 @@ export default function SubscriptionPage() {
             <Button
               variant="accent"
               size="lg"
-              className="w-full py-4 text-lg bg-mint text-white hover:bg-mint/90 mt-auto"
+              className={`w-full py-4 text-lg mt-auto transition-all duration-300 ${
+                successfulPurchase === 'MAYYO_PLUS_PRO' 
+                  ? 'bg-green-600 text-white hover:bg-green-700' 
+                  : 'bg-mint text-white hover:bg-mint/90'
+              }`}
               onClick={() => handleSubscribe('MAYYO_PLUS_PRO')}
               loading={processingPayment && selectedPlan === 'MAYYO_PLUS_PRO'}
               disabled={processingPayment}
             >
-              {processingPayment && selectedPlan === 'MAYYO_PLUS_PRO' ? 'Processing...' : 'Choose Maayo Plus Pro'}
+              {successfulPurchase === 'MAYYO_PLUS_PRO' ? (
+                <div className="flex items-center justify-center">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Purchase Successful!
+                </div>
+              ) : processingPayment && selectedPlan === 'MAYYO_PLUS_PRO' ? (
+                'Processing...'
+              ) : (
+                'Choose Maayo Plus Pro'
+              )}
             </Button>
           </div>
             </div>

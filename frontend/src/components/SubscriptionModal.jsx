@@ -7,11 +7,28 @@ const SubscriptionModal = ({ isOpen, onClose, onUpgrade }) => {
   const [selectedPlan, setSelectedPlan] = useState(null)
   const [billingCycle, setBillingCycle] = useState('monthly')
   const [currentSubscription, setCurrentSubscription] = useState(null)
+  const [successfulPurchase, setSuccessfulPurchase] = useState(null) // Track successful purchase
 
   useEffect(() => {
     if (isOpen) {
       fetchPlans()
       fetchCurrentSubscription()
+      
+      // Check if user just returned from successful payment
+      const urlParams = new URLSearchParams(window.location.search)
+      const paymentSuccess = urlParams.get('payment_success')
+      const planId = urlParams.get('plan_id')
+      
+      if (paymentSuccess === 'true' && planId) {
+        setSuccessfulPurchase(planId)
+        // Clear URL parameters
+        window.history.replaceState({}, document.title, window.location.pathname)
+        
+        // Reset success state after 3 seconds
+        setTimeout(() => {
+          setSuccessfulPurchase(null)
+        }, 3000)
+      }
     }
   }, [isOpen, billingCycle])
 
@@ -258,7 +275,9 @@ const SubscriptionModal = ({ isOpen, onClose, onUpgrade }) => {
                   onClick={() => handleUpgrade(plan)}
                   disabled={loading || currentSubscription?.plan?.id === plan.id}
                   className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
-                    plan.popular
+                    successfulPurchase === plan.id
+                      ? 'bg-green-600 text-white hover:bg-green-700'
+                      : plan.popular
                       ? 'bg-violet-500 text-white hover:bg-violet-600'
                       : 'bg-gray-900 text-white hover:bg-gray-800'
                   } ${
@@ -269,7 +288,14 @@ const SubscriptionModal = ({ isOpen, onClose, onUpgrade }) => {
                     loading ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
-                  {loading ? (
+                  {successfulPurchase === plan.id ? (
+                    <div className="flex items-center justify-center">
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Purchase Successful!
+                    </div>
+                  ) : loading ? (
                     <div className="flex items-center justify-center">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                       Processing...
