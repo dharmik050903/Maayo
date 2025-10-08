@@ -44,6 +44,8 @@ export default function ApplicationList() {
       setLoading(true)
       const response = await applicationService.getFreelancerApplications(filters)
       
+      console.log('Applications response:', response)
+      
       if (response.status) {
         setApplications(response.data.applications || [])
         setPagination(response.data.pagination || {})

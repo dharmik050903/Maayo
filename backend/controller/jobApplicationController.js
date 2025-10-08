@@ -52,10 +52,20 @@ export default class JobApplicationController {
                 freelancer_id: userId
             });
 
+            console.log('Checking for existing application:');
+            console.log('Job ID:', job_id);
+            console.log('User ID:', userId);
+            console.log('Existing application found:', existingApplication);
+
             if (existingApplication) {
                 return res.status(400).json({
                     status: false,
-                    message: "You have already applied for this job"
+                    message: "You have already applied for this job",
+                    data: {
+                        existing_application_id: existingApplication._id,
+                        applied_at: existingApplication.application_tracking?.applied_at,
+                        status: existingApplication.application_status
+                    }
                 });
             }
 
@@ -192,6 +202,10 @@ export default class JobApplicationController {
             if (status) filter.application_status = status;
             if (saved_only) filter.is_saved = true;
 
+            console.log('Fetching applications for user:', userId);
+            console.log('Filter:', filter);
+            console.log('Page:', page, 'Limit:', limit);
+
             const skip = (parseInt(page) - 1) * parseInt(limit);
 
             const [applications, total] = await Promise.all([
@@ -204,15 +218,20 @@ export default class JobApplicationController {
                 JobApply.countDocuments(filter)
             ]);
 
+            console.log('Found applications:', applications.length);
+            console.log('Total applications:', total);
+
             return res.status(200).json({
                 status: true,
                 message: "Applications retrieved successfully",
-                data: applications,
-                pagination: {
-                    current_page: parseInt(page),
-                    total_pages: Math.ceil(total / parseInt(limit)),
-                    total_applications: total,
-                    applications_per_page: parseInt(limit)
+                data: {
+                    applications: applications,
+                    pagination: {
+                        current_page: parseInt(page),
+                        total_pages: Math.ceil(total / parseInt(limit)),
+                        total_applications: total,
+                        applications_per_page: parseInt(limit)
+                    }
                 }
             });
 
