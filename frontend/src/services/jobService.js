@@ -35,9 +35,8 @@ export const jobService = {
   // Get job details by ID (Public access)
   getJobById: async (jobId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/job/detail`, {
+      const response = await authenticatedFetch(`${API_BASE_URL}/job/detail`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ job_id: jobId })
       })
       return await response.json()
