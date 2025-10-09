@@ -278,7 +278,7 @@ export default function FindWork() {
                     placeholder="Search projects..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-4 py-3 pl-12 bg-white/95 text-graphite rounded-xl focus:ring-2 focus:ring-violet focus:border-transparent border-0 text-sm sm:text-base"
+                    className="w-full px-4 py-3 pl-12 bg-white/95 text-graphite rounded-xl focus:ring-2 focus:ring-violet focus:border-transparent border-0 text-sm sm:text-base shadow-lg backdrop-blur-sm"
                   />
                   <svg className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-coolgray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -290,7 +290,7 @@ export default function FindWork() {
               <Button
                 variant="outline"
                 onClick={() => setShowFilters(!showFilters)}
-                className="border-violet text-violet hover:bg-violet hover:text-white transition-all duration-200 px-6 py-3 font-semibold w-full sm:w-auto"
+                className="border-2 border-violet/30 bg-violet/10 text-violet hover:bg-violet hover:text-white hover:border-violet transition-all duration-300 px-6 py-3 font-semibold w-full sm:w-auto shadow-lg hover:shadow-xl backdrop-blur-sm"
               >
                 <svg className={`w-5 h-5 mr-2 transition-transform duration-300 ${showFilters ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z" />
