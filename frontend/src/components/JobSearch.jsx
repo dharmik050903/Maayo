@@ -170,41 +170,41 @@ export default function JobSearch() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto px-6 pt-20 pb-8">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 pt-20 pb-8">
         {/* Header Section */}
         <div className="mb-8">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
                 Find Your Next <span className="text-mint">Job</span>
               </h1>
-              <p className="text-lg text-white/80 mt-4">
+              <p className="text-base sm:text-lg text-white/80 mt-4">
                 Discover opportunities that match your skills and interests
               </p>
             </div>
-            <div className="flex space-x-3">
+            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
               <Button
                 variant="secondary"
                 onClick={() => navigate('/freelancer/applications')}
-                className="border-2 border-white/30 text-white bg-white/10 hover:bg-white/20 hover:border-white/50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-6 py-3 font-semibold"
+                className="border-2 border-white/30 text-white bg-white/10 hover:bg-white/20 hover:border-white/50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-4 sm:px-6 py-3 font-semibold w-full sm:w-auto"
               >
-                <div className="flex items-center space-x-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center justify-center space-x-2">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
-                  <span>My Applications</span>
+                  <span className="text-sm sm:text-base">My Applications</span>
                 </div>
               </Button>
               <Button
                 variant="secondary"
                 onClick={() => navigate('/freelancer/saved-jobs')}
-                className="border-2 border-white/30 text-white bg-white/10 hover:bg-white/20 hover:border-white/50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-6 py-3 font-semibold"
+                className="border-2 border-white/30 text-white bg-white/10 hover:bg-white/20 hover:border-white/50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-4 sm:px-6 py-3 font-semibold w-full sm:w-auto"
               >
-                <div className="flex items-center space-x-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center justify-center space-x-2">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                   </svg>
-                  <span>Saved Jobs</span>
+                  <span className="text-sm sm:text-base">Saved Jobs</span>
                 </div>
               </Button>
             </div>
@@ -221,15 +221,15 @@ export default function JobSearch() {
           </div>
         )}
 
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
           {/* Filters Sidebar */}
           <div className="lg:w-1/3">
-            <div className="card bg-white/95 rounded-lg shadow-sm p-6">
+            <div className="card bg-white/95 rounded-lg shadow-sm p-4 sm:p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-graphite">Filters</h2>
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className="lg:hidden text-mint hover:text-mint/80"
+                  className="lg:hidden text-mint hover:text-mint/80 px-3 py-2 rounded-md hover:bg-mint/10 transition-colors"
                 >
                   {showFilters ? 'Hide' : 'Show'}
                 </button>
@@ -380,22 +380,21 @@ export default function JobSearch() {
           <div className="lg:w-2/3">
             <div className="card bg-white/95 rounded-lg shadow-sm">
               {loading ? (
-                <div className="p-8 text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-mint mx-auto"></div>
-                  <p className="mt-2 text-coolgray">Loading jobs...</p>
+                <div className="p-6 text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-mint mx-auto mb-4"></div>
+                  <p className="text-coolgray">Loading jobs...</p>
                 </div>
               ) : jobs.length === 0 ? (
-                <div className="p-8 text-center">
-                  <div className="mb-4">
-                    <svg className="w-16 h-16 text-gray-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                  </div>
-                  <p className="text-coolgray mb-4">No jobs found matching your criteria.</p>
+                <div className="p-6 text-center">
+                  <svg className="w-16 h-16 mx-auto mb-4 text-coolgray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <h3 className="text-lg font-semibold text-graphite mb-2">No jobs found</h3>
+                  <p className="text-coolgray mb-4">Try adjusting your filters or search criteria</p>
                   <Button
                     onClick={clearFilters}
                     variant="secondary"
-                    className="border-gray-300 text-graphite hover:bg-gray-50"
+                    className="border-mint text-mint hover:bg-mint hover:text-white"
                   >
                     Clear Filters
                   </Button>
@@ -414,21 +413,21 @@ export default function JobSearch() {
 
               {/* Pagination */}
               {pagination.totalPages > 1 && (
-                <div className="px-6 py-4 border-t border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-coolgray">
+                <div className="px-4 sm:px-6 py-4 border-t border-gray-200">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="text-sm text-coolgray text-center sm:text-left">
                       Showing {((pagination.currentPage - 1) * pagination.limit) + 1} to{' '}
                       {Math.min(pagination.currentPage * pagination.limit, pagination.totalItems)} of{' '}
                       {pagination.totalItems} results
                     </div>
                     
-                    <div className="flex space-x-2">
+                    <div className="flex items-center justify-center space-x-2">
                       <Button
                         onClick={() => handlePageChange(pagination.currentPage - 1)}
                         disabled={pagination.currentPage === 1}
                         variant="secondary"
                         size="sm"
-                        className="border-gray-300 text-graphite hover:bg-gray-50"
+                        className="border-gray-300 text-graphite hover:bg-gray-50 px-3 py-2"
                       >
                         Previous
                       </Button>
@@ -442,7 +441,7 @@ export default function JobSearch() {
                         disabled={pagination.currentPage === pagination.totalPages}
                         variant="secondary"
                         size="sm"
-                        className="border-gray-300 text-graphite hover:bg-gray-50"
+                        className="border-gray-300 text-graphite hover:bg-gray-50 px-3 py-2"
                       >
                         Next
                       </Button>
