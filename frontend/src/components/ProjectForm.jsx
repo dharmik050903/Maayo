@@ -440,48 +440,7 @@ export default function ProjectForm({ project = null, onSuccess, onCancel }) {
                   onChange={handleSkillSearch}
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-graphite bg-white focus:outline-none focus:ring-2 focus:ring-violet/50 focus:border-violet"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowCustomSkillInput(!showCustomSkillInput)}
-                  className="px-4 py-2 bg-violet text-white rounded-md hover:bg-violet/90 focus:outline-none focus:ring-2 focus:ring-violet/50 transition-colors"
-                  title="Add custom skill"
-                >
-                  + Custom
-                </button>
               </div>
-              
-              {/* Custom Skill Input */}
-              {showCustomSkillInput && (
-                <div className="flex gap-2 p-3 bg-violet/5 border border-violet/20 rounded-md">
-                  <input
-                    type="text"
-                    placeholder="Enter custom skill..."
-                    value={customSkillInput}
-                    onChange={(e) => setCustomSkillInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddCustomSkill()}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-graphite bg-white focus:outline-none focus:ring-2 focus:ring-violet/50 focus:border-violet"
-                    autoFocus
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddCustomSkill}
-                    disabled={!customSkillInput.trim()}
-                    className="px-4 py-2 bg-violet text-white rounded-md hover:bg-violet/90 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-violet/50 transition-colors"
-                  >
-                    Add
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowCustomSkillInput(false)
-                      setCustomSkillInput('')
-                    }}
-                    className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500/50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              )}
               
               {availableSkills.length === 0 ? (
                 <div className="p-4 text-center text-coolgray border border-gray-300 rounded-md">
@@ -565,9 +524,9 @@ export default function ProjectForm({ project = null, onSuccess, onCancel }) {
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-6">
             <Button
               type="button"
-              variant="secondary"
+              variant="outline"
               onClick={onCancel}
-              className="flex-1 px-6 py-3"
+              className="flex-1 px-6 py-3 border-gray-300 text-graphite hover:bg-gray-50"
             >
               Cancel
             </Button>

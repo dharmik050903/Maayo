@@ -372,7 +372,8 @@ export default function ClientMyBids() {
           <div className="relative w-full sm:w-auto" ref={dropdownRef}>
             <button
               onClick={() => setShowProjectDropdown(!showProjectDropdown)}
-              className="px-3 sm:px-4 py-2 bg-white/95 text-graphite rounded-lg focus:ring-2 focus:ring-mint focus:border-transparent border-0 w-full sm:min-w-[200px] text-left flex items-center justify-between text-sm sm:text-base"
+              className="px-3 sm:px-4 py-2 bg-white text-graphite rounded-lg focus:ring-2 focus:ring-mint focus:border-transparent border border-gray-300 w-full sm:min-w-[200px] text-left flex items-center justify-between text-sm sm:text-base"
+              style={{ color: '#374151' }}
             >
               <span className="truncate">
                 {selectedProject === 'all' ? 'All Projects' : getProjectTitle(selectedProject)}
