@@ -598,25 +598,25 @@ export default function FreelancerHome() {
             
             {/* Project Search Input */}
             <div className="mb-8">
-              <div className="flex flex-col sm:flex-row gap-4 items-center max-w-2xl mx-auto">
+              <div className="flex flex-col sm:flex-row gap-4 items-center max-w-4xl mx-auto">
                 <div className="flex-1 relative">
-              <input
-                type="text"
-                placeholder="Search projects by title, description, skills, or client..."
-                value={projectSearchTerm}
-                onChange={(e) => {
-                  setProjectSearchTerm(e.target.value)
-                  resetPagination() // Reset to first page when typing
-                }}
+                  <input
+                    type="text"
+                    placeholder="Search projects by title, description, skills, or client..."
+                    value={projectSearchTerm}
+                    onChange={(e) => {
+                      setProjectSearchTerm(e.target.value)
+                      resetPagination() // Reset to first page when typing
+                    }}
                     onKeyPress={(e) => e.key === 'Enter' && handleProjectSearch()}
-                    className="w-full px-4 py-3 border border-white/20 rounded-lg text-graphite bg-white/95 focus:outline-none focus:ring-2 focus:ring-mint/50 focus:border-mint"
-              />
-            </div>
-                <div className="flex gap-2">
+                    className="w-full px-4 py-3 border border-white/20 rounded-xl text-graphite bg-white/95 focus:outline-none focus:ring-2 focus:ring-mint/50 focus:border-mint text-sm sm:text-base"
+                  />
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                   <button
                     onClick={handleProjectSearch}
                     disabled={loading}
-                    className="px-6 py-3 bg-mint text-white rounded-lg hover:bg-mint/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-6 py-3 bg-mint text-white rounded-xl hover:bg-mint/90 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm sm:text-base w-full sm:w-auto transition-all duration-200"
                   >
                     {loading ? 'Searching...' : 'Search'}
                   </button>
@@ -625,13 +625,13 @@ export default function FreelancerHome() {
                       setProjectSearchTerm('')
                       fetchAvailableProjects()
                     }}
-                    className="px-6 py-3 bg-coral text-white rounded-lg hover:bg-coral/90"
+                    className="px-6 py-3 bg-coral text-white rounded-xl hover:bg-coral/90 font-semibold text-sm sm:text-base w-full sm:w-auto transition-all duration-200"
                   >
                     Show All
                   </button>
                   <button
                     onClick={() => setShowFilters(!showFilters)}
-                    className="px-6 py-3 bg-violet text-white rounded-lg hover:bg-violet/90"
+                    className="px-6 py-3 bg-violet text-white rounded-xl hover:bg-violet/90 font-semibold text-sm sm:text-base w-full sm:w-auto transition-all duration-200"
                   >
                     {showFilters ? 'Hide Filters' : 'Filters'}
                   </button>
@@ -641,8 +641,8 @@ export default function FreelancerHome() {
 
             {/* Filters Section */}
             {showFilters && (
-              <div className="mb-8 bg-white/10 rounded-lg p-6 max-w-4xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="mb-8 bg-white/10 rounded-xl p-4 sm:p-6 max-w-4xl mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Skills Filter */}
                   <div>
                     <div className="flex items-center justify-between mb-3">
@@ -852,7 +852,7 @@ export default function FreelancerHome() {
               {getPaginatedProjects().map((project, index) => (
                 <div 
                   key={project._id} 
-                  className="card p-4 sm:p-6 bg-white/95 hover:bg-white hover:shadow-lg transition-all duration-200 slide-in-up cursor-pointer group flex flex-col h-full" 
+                  className="card p-4 sm:p-6 bg-white hover:bg-white hover:shadow-xl transition-all duration-300 slide-in-up cursor-pointer group flex flex-col h-full border border-gray-100 rounded-xl" 
                   style={{animationDelay: `{index * 0.1}s`}}
                   onClick={(e) => {
                     // Only open project details if not clicking on bid button or its container
@@ -889,26 +889,27 @@ export default function FreelancerHome() {
                     </p>
                     {/* Budget and Duration */}
                     <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4">
-                      <div className="bg-mint/5 p-2 sm:p-3 rounded-lg">
-                        <p className="text-xs text-coolgray uppercase tracking-wide mb-1">Budget</p>
-                        <p className="text-base sm:text-lg font-semibold text-mint">{formatBudget(project.budget, false)}</p>
+                      <div className="bg-gradient-to-br from-mint/10 to-mint/5 p-3 sm:p-4 rounded-lg border border-mint/20">
+                        <p className="text-xs text-coolgray uppercase tracking-wide mb-1 font-medium">Budget</p>
+                        <p className="text-base sm:text-lg font-bold text-mint">{formatBudget(project.budget, false)}</p>
                       </div>
-                      <div className="bg-coral/5 p-2 sm:p-3 rounded-lg">
-                        <p className="text-xs text-coolgray uppercase tracking-wide mb-1">Duration</p>
-                        <p className="text-base sm:text-lg font-semibold text-coral">{project.duration} days</p>
+                      <div className="bg-gradient-to-br from-coral/10 to-coral/5 p-3 sm:p-4 rounded-lg border border-coral/20">
+                        <p className="text-xs text-coolgray uppercase tracking-wide mb-1 font-medium">Duration</p>
+                        <p className="text-base sm:text-lg font-bold text-coral">{project.duration} days</p>
                       </div>
                     </div>
                     
                     {/* Skills */}
                     <div className="mb-4">
+                      <p className="text-xs text-coolgray uppercase tracking-wide mb-2 font-medium">Skills Required</p>
                       <div className="flex flex-wrap gap-1 sm:gap-2">
                         {project.skills_required.slice(0, 3).map((skill, index) => (
-                          <span key={index} className="px-2 py-1 bg-violet/10 text-violet rounded-full text-xs font-medium">
+                          <span key={index} className="px-2 py-1 bg-gradient-to-r from-violet/10 to-violet/5 text-violet rounded-full text-xs font-medium border border-violet/20">
                             {skill}
                           </span>
                         ))}
                         {project.skills_required.length > 3 && (
-                          <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
+                          <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs border border-gray-200">
                             +{project.skills_required.length - 3} more
                           </span>
                         )}
@@ -916,18 +917,18 @@ export default function FreelancerHome() {
                     </div>
                     
                     {/* Project Details */}
-                    <div className="space-y-2 text-xs sm:text-sm text-coolgray mb-4">
+                    <div className="space-y-2 text-xs sm:text-sm text-coolgray mb-4 bg-gray-50 p-3 rounded-lg">
                       <div className="flex items-center gap-2">
-                        <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
-                        <span>Posted by: {project.client_name}</span>
+                        <span className="font-medium">Posted by: {project.client_name}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span>Posted: {new Date(project.created_at).toLocaleDateString()}</span>
+                        <span className="font-medium">Posted: {new Date(project.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
                   </div>

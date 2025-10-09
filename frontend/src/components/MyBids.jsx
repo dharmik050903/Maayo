@@ -340,10 +340,10 @@ const MyBids = () => {
                 {bid.status === 'pending' && (
                   <div className="flex flex-col sm:flex-row gap-2 w-full sm:min-w-[200px]">
                     <Button
-                      variant="accent"
+                      variant="outline"
                       size="sm"
                       onClick={() => handleUpdateBid(bid)}
-                      className="flex-1 min-w-[120px] w-full sm:w-auto px-4 py-2 text-sm font-semibold"
+                      className="flex-1 min-w-[120px] w-full sm:w-auto px-4 py-2 text-sm font-semibold border-violet text-violet hover:bg-violet hover:text-white transition-all duration-200"
                     >
                       Update Bid
                     </Button>
@@ -351,7 +351,7 @@ const MyBids = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => handleWithdrawBid(bid._id)}
-                      className="flex-1 min-w-[120px] border-coral text-coral hover:bg-coral hover:text-white w-full sm:w-auto px-4 py-2 text-sm font-semibold"
+                      className="flex-1 min-w-[120px] border-coral text-coral hover:bg-coral hover:text-white w-full sm:w-auto px-4 py-2 text-sm font-semibold transition-all duration-200"
                     >
                       Withdraw Bid
                     </Button>
