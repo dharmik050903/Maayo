@@ -397,7 +397,8 @@ export default function ClientMyBids() {
                       placeholder="Search projects..."
                       value={projectSearchQuery}
                       onChange={(e) => setProjectSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-mint focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-mint focus:border-transparent text-graphite bg-white"
+                      style={{ color: '#374151' }}
                       autoFocus
                     />
                   </div>
@@ -446,12 +447,13 @@ export default function ClientMyBids() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 sm:px-4 py-2 bg-white/95 text-graphite rounded-lg focus:ring-2 focus:ring-mint focus:border-transparent border-0 text-sm sm:text-base w-full sm:w-auto"
+            className="px-3 sm:px-4 py-2 bg-white text-graphite rounded-lg focus:ring-2 focus:ring-mint focus:border-transparent border border-gray-300 text-sm sm:text-base w-full sm:w-auto"
+            style={{ color: '#374151' }}
           >
-            <option value="all">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="accepted">Accepted</option>
-            <option value="rejected">Rejected</option>
+            <option value="all" style={{ color: '#374151', backgroundColor: 'white' }}>All Status</option>
+            <option value="pending" style={{ color: '#374151', backgroundColor: 'white' }}>Pending</option>
+            <option value="accepted" style={{ color: '#374151', backgroundColor: 'white' }}>Accepted</option>
+            <option value="rejected" style={{ color: '#374151', backgroundColor: 'white' }}>Rejected</option>
           </select>
           <Button
             variant="outline"
@@ -556,7 +558,7 @@ export default function ClientMyBids() {
                       <Button 
                         variant="success" 
                         size="sm" 
-                        className="flex-1 min-w-[120px]"
+                        className="flex-1 min-w-[120px] border-mint text-mint hover:bg-mint hover:text-white"
                         onClick={() => handleAcceptBid(bid._id)}
                         disabled={actionLoading}
                       >

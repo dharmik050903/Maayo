@@ -194,7 +194,7 @@ const ActiveEscrowProjects = () => {
                 <Button
                   variant="accent"
                   size="sm"
-                  className="flex-1"
+                  className="flex-1 border-mint text-mint hover:bg-mint hover:text-white"
                   onClick={() => handleProjectClick(project)}
                 >
                   <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -204,7 +204,7 @@ const ActiveEscrowProjects = () => {
                   Review Milestones
                 </Button>
                 <Button
-                  variant="outline"
+                  variant="accent"
                   size="sm"
                   className="px-3 border-mint text-mint hover:bg-mint hover:text-white"
                   onClick={() => handleProjectClick(project)}
