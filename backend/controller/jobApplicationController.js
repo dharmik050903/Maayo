@@ -402,6 +402,8 @@ export default class JobApplicationController {
                     interactionType = 'viewed';
             }
 
+            console.log('🔍 Status mapping:', { status, interactionType });
+
             // Add interaction record
             application.client_interactions.push({
                 interaction_type: interactionType,
