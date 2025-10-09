@@ -23,16 +23,19 @@ const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,ht
   .map(o => o.trim())
   .filter(Boolean)
 
-// Default origins if none specified in environment
+// Default origins - always include these
 const defaultOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5173',
   'https://maayo-frontend.vercel.app',
   'https://maayo.vercel.app',
   'https://maayo-alpha.vercel.app'
 ]
 
-const finalOrigins = allowedOrigins.length > 0 ? allowedOrigins : defaultOrigins
+// Combine allowed origins with default origins
+const finalOrigins = [...new Set([...allowedOrigins, ...defaultOrigins])]
 
 app.use(cors({
   origin: function(origin, callback) {
@@ -56,15 +59,15 @@ app.use(cors({
       return callback(null, true)
     }
     
-    // Check against allowed origins
-    if (allowedOrigins.includes(origin)) {
-      console.log('CORS: Allowing origin from allowed list:', origin)
+    // Check against final origins list
+    if (finalOrigins.includes(origin)) {
+      console.log('CORS: Allowing origin from final list:', origin)
       return callback(null, true)
     }
     
     // Log the blocked origin for debugging
     console.log('CORS: Blocked origin:', origin)
-    console.log('Allowed origins:', allowedOrigins)
+    console.log('Final allowed origins:', finalOrigins)
 
     return callback(new Error('Not allowed by CORS'))
   },
@@ -128,5 +131,5 @@ httpServer.listen(PORT, () => {
     console.log(`🚀 Server is running on port ${PORT}`);
     console.log(`📡 API endpoints available at http://localhost:${PORT}/api`);
     console.log(`🔌 Socket.IO server initialized`);
-    console.log(`🌐 CORS allowed origins:`, allowedOrigins.length > 0 ? allowedOrigins : 'All localhost origins allowed');
+    console.log(`🌐 CORS allowed origins:`, finalOrigins);
 });
