@@ -269,7 +269,7 @@ export default function FindWork() {
 
           {/* Search and Filters */}
           <div className="mb-8">
-            <div className="flex flex-col lg:flex-row gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
               {/* Search Bar */}
               <div className="flex-1">
                 <div className="relative">
@@ -278,7 +278,7 @@ export default function FindWork() {
                     placeholder="Search projects..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-4 py-3 pl-12 bg-white/95 text-graphite rounded-lg focus:ring-2 focus:ring-mint focus:border-transparent border-0"
+                    className="w-full px-4 py-3 pl-12 bg-white/95 text-graphite rounded-xl focus:ring-2 focus:ring-violet focus:border-transparent border-0 text-sm sm:text-base"
                   />
                   <svg className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-coolgray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -290,7 +290,7 @@ export default function FindWork() {
               <Button
                 variant="outline"
                 onClick={() => setShowFilters(!showFilters)}
-                className="border-white text-white hover:bg-white hover:text-graphite"
+                className="border-violet text-violet hover:bg-violet hover:text-white transition-all duration-200 px-6 py-3 font-semibold w-full sm:w-auto"
               >
                 <svg className={`w-5 h-5 mr-2 transition-transform duration-300 ${showFilters ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z" />
@@ -501,7 +501,7 @@ export default function FindWork() {
                         <Button
                           variant="accent"
                           size="sm"
-                          className="w-full"
+                          className="w-full px-4 py-2 bg-violet text-white hover:bg-violet/90 font-semibold transition-all duration-200"
                           onClick={() => handleSubmitBid(project)}
                         >
                           Submit Bid
@@ -752,7 +752,7 @@ export default function FindWork() {
                       handleProjectDetailClose()
                       handleSubmitBid(selectedProjectDetail)
                     }}
-                    className="flex-1 px-6 py-3 bg-mint text-white rounded-xl hover:bg-mint/80 transition-colors font-medium"
+                    className="flex-1 px-6 py-3 bg-violet text-white rounded-xl hover:bg-violet/90 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl"
                   >
                     Submit Bid
                   </button>
