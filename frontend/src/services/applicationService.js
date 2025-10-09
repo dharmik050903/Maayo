@@ -55,7 +55,16 @@ export const applicationService = {
         method: 'POST',
         body: JSON.stringify(requestBody)
       })
-      return await response.json()
+      
+      const responseData = await response.json()
+      console.log('📥 API Response:', responseData)
+      
+      if (!response.ok) {
+        console.error('❌ API Error Response:', responseData)
+        throw new Error(responseData.message || 'API request failed')
+      }
+      
+      return responseData
     } catch (error) {
       console.error('Error updating application status:', error)
       throw error
