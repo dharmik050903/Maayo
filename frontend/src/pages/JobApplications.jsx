@@ -507,7 +507,7 @@ export default function JobApplications() {
                       )}
                       
                       
-                      {!['selected', 'rejected', 'withdrawn', 'applied'].includes(application.application_status) && (
+                      {!['selected', 'rejected', 'withdrawn', 'applied', 'saved', 'viewed', 'shortlisted', 'interviewed'].includes(application.application_status) && (
                         <Button
                           size="sm"
                           variant="secondary"
