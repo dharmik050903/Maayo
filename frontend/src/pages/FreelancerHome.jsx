@@ -852,7 +852,7 @@ export default function FreelancerHome() {
               {getPaginatedProjects().map((project, index) => (
                 <div 
                   key={project._id} 
-                  className="card p-4 sm:p-6 bg-white hover:bg-white hover:shadow-xl transition-all duration-300 slide-in-up cursor-pointer group flex flex-col h-full border border-gray-100 rounded-xl" 
+                  className="card p-4 sm:p-6 bg-white hover:bg-white hover:shadow-xl transition-all duration-300 slide-in-up cursor-pointer group flex flex-col h-full border border-gray-200 rounded-2xl" 
                   style={{animationDelay: `{index * 0.1}s`}}
                   onClick={(e) => {
                     // Only open project details if not clicking on bid button or its container
@@ -889,11 +889,11 @@ export default function FreelancerHome() {
                     </p>
                     {/* Budget and Duration */}
                     <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4">
-                      <div className="bg-gradient-to-br from-mint/10 to-mint/5 p-3 sm:p-4 rounded-lg border border-mint/20">
+                      <div className="bg-gradient-to-br from-mint/15 to-mint/5 p-3 sm:p-4 rounded-xl border border-mint/30 shadow-sm">
                         <p className="text-xs text-coolgray uppercase tracking-wide mb-1 font-medium">Budget</p>
                         <p className="text-base sm:text-lg font-bold text-mint">{formatBudget(project.budget, false)}</p>
                       </div>
-                      <div className="bg-gradient-to-br from-coral/10 to-coral/5 p-3 sm:p-4 rounded-lg border border-coral/20">
+                      <div className="bg-gradient-to-br from-coral/15 to-coral/5 p-3 sm:p-4 rounded-xl border border-coral/30 shadow-sm">
                         <p className="text-xs text-coolgray uppercase tracking-wide mb-1 font-medium">Duration</p>
                         <p className="text-base sm:text-lg font-bold text-coral">{project.duration} days</p>
                       </div>
@@ -904,12 +904,12 @@ export default function FreelancerHome() {
                       <p className="text-xs text-coolgray uppercase tracking-wide mb-2 font-medium">Skills Required</p>
                       <div className="flex flex-wrap gap-1 sm:gap-2">
                         {project.skills_required.slice(0, 3).map((skill, index) => (
-                          <span key={index} className="px-2 py-1 bg-gradient-to-r from-violet/10 to-violet/5 text-violet rounded-full text-xs font-medium border border-violet/20">
+                          <span key={index} className="px-2 py-1 bg-gradient-to-r from-violet/15 to-violet/5 text-violet rounded-full text-xs font-medium border border-violet/30 shadow-sm">
                             {skill}
                           </span>
                         ))}
                         {project.skills_required.length > 3 && (
-                          <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs border border-gray-200">
+                          <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs border border-gray-200 shadow-sm">
                             +{project.skills_required.length - 3} more
                           </span>
                         )}
@@ -917,7 +917,7 @@ export default function FreelancerHome() {
                     </div>
                     
                     {/* Project Details */}
-                    <div className="space-y-2 text-xs sm:text-sm text-coolgray mb-4 bg-gray-50 p-3 rounded-lg">
+                    <div className="space-y-2 text-xs sm:text-sm text-coolgray mb-4 bg-gradient-to-r from-gray-50 to-gray-100/50 p-3 rounded-xl border border-gray-200">
                       <div className="flex items-center gap-2">
                         <svg className="w-3 h-3 sm:w-4 sm:h-4 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -931,48 +931,40 @@ export default function FreelancerHome() {
                         <span className="font-medium">Posted: {new Date(project.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
-                  </div>
-                    
-                    <div className="ml-6 text-right bid-action-container">
-                      <div className="mb-2">
-                        <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                          {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
-                        </span>
-                      </div>
-                      <div className="text-sm text-coolgray mb-3">
-                        {project.proposals_count} proposals
-                      </div>
-                      {hasUserSubmittedBid(project._id) ? (
-                        <div className="px-6 py-2 bg-green-100 text-green-800 rounded-lg text-sm font-medium text-center">
-                          ✓ Bid Submitted
+                    {/* Action Section */}
+                    <div className="mt-auto pt-4 border-t border-gray-100">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                            {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+                          </span>
+                          <span className="text-xs text-coolgray">
+                            {project.proposals_count} proposals
+                          </span>
                         </div>
-                      ) : (
-                        <Button 
-                          variant="accent" 
-                          size="sm" 
-                          className="px-6 py-2"
-                          onClick={(e) => {
-                            e.stopPropagation() // Prevent card click
-                            handleSubmitBid(project)
-                          }}
-                        >
-                          Submit Bid
-                        </Button>
-                      )}
-                      <div className="text-xs text-coolgray mt-2">
+                        
+                        {hasUserSubmittedBid(project._id) ? (
+                          <div className="px-4 py-2 bg-green-100 text-green-800 rounded-lg text-sm font-medium text-center">
+                            ✓ Bid Submitted
+                          </div>
+                        ) : (
+                          <Button 
+                            variant="accent" 
+                            size="sm" 
+                            className="px-4 py-2 text-sm font-semibold"
+                            onClick={(e) => {
+                              e.stopPropagation() // Prevent card click
+                              handleSubmitBid(project)
+                            }}
+                          >
+                            Submit Bid
+                          </Button>
+                        )}
+                      </div>
+                      
+                      <div className="text-xs text-coolgray mt-2 text-center sm:text-right">
                         Posted: {new Date(project.createdAt).toLocaleDateString()}
                       </div>
-                    </div>
-                  </div>
-                  
-                  {/* Click indicator */}
-                  <div className="mt-4 pt-3 border-t border-gray-100">
-                    <div className="flex items-center justify-center text-xs text-coolgray group-hover:text-violet transition-colors">
-                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                      Click anywhere to view project details
                     </div>
                   </div>
                 </div>
