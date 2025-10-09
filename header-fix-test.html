@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header Fix Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        header {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            width: 100% !important;
+            height: 80px !important;
+            background: white !important;
+            border-bottom: 1px solid #ccc !important;
+            z-index: 999999 !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        body {
+            padding-top: 80px;
+        }
+        
+        .content {
+            height: 2000px;
+            background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="padding: 20px; text-align: center; font-weight: bold;">
+            FIXED HEADER - SHOULD STAY AT TOP WHEN SCROLLING
+        </div>
+    </header>
+    
+    <div class="content">
+        <h1>Scroll Test</h1>
+        <p>This is a test page to verify header stays fixed.</p>
+        <p>Scroll down and the header should remain at the top.</p>
+        <div style="height: 500px; background: #ddd; margin: 20px 0;"></div>
+        <p>More content...</p>
+        <div style="height: 500px; background: #ccc; margin: 20px 0;"></div>
+        <p>Even more content...</p>
+        <div style="height: 500px; background: #bbb; margin: 20px 0;"></div>
+        <p>Final content...</p>
+    </div>
+</body>
+</html>

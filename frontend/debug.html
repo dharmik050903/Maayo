@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug API Connection</title>
+</head>
+<body>
+    <h1>Debug API Connection</h1>
+    <div id="output"></div>
+    
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+        
+        async function testConnection() {
+            const output = document.getElementById('output');
+            
+            try {
+                // Test 1: Health check
+                output.innerHTML += '<h3>Test 1: Health Check</h3>';
+                const healthResponse = await fetch(`${API_BASE_URL}/chat/health`);
+                const healthData = await healthResponse.json();
+                output.innerHTML += `<p>Health check: ${JSON.stringify(healthData)}</p>`;
+                
+                // Test 2: Check localStorage
+                output.innerHTML += '<h3>Test 2: LocalStorage Check</h3>';
+                const authHeaders = localStorage.getItem('authHeaders');
+                const userData = localStorage.getItem('userData');
+                output.innerHTML += `<p>Auth Headers: ${authHeaders || 'None'}</p>`;
+                output.innerHTML += `<p>User Data: ${userData || 'None'}</p>`;
+                
+                // Test 3: Try authenticated request
+                if (authHeaders) {
+                    output.innerHTML += '<h3>Test 3: Authenticated Request</h3>';
+                    try {
+                        const { token, _id, userRole, userEmail } = JSON.parse(authHeaders);
+                        
+                        // Test with minimal headers first
+                        output.innerHTML += '<h4>Test 3a: Minimal Headers</h4>';
+                        try {
+                            const response1 = await fetch(`${API_BASE_URL}/bid/freelancer`, {
+                                method: 'POST',
+                                headers: {
+                                    'Authorization': `Bearer ${token}`,
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ test: 'data' })
+                            });
+                            
+                            const data1 = await response1.json();
+                            output.innerHTML += `<p>Minimal headers request: ${JSON.stringify(data1)}</p>`;
+                        } catch (error) {
+                            output.innerHTML += `<p>Minimal headers error: ${error.message}</p>`;
+                        }
+                        
+                        // Test with all headers
+                        output.innerHTML += '<h4>Test 3b: All Headers</h4>';
+                        try {
+                            const response2 = await fetch(`${API_BASE_URL}/bid/freelancer`, {
+                                method: 'POST',
+                                headers: {
+                                    'Authorization': `Bearer ${token}`,
+                                    'Content-Type': 'application/json',
+                                    'id': _id,
+                                    'user_role': userRole,
+                                    'user_email': userEmail
+                                },
+                                body: JSON.stringify({ test: 'data' })
+                            });
+                            
+                            const data2 = await response2.json();
+                            output.innerHTML += `<p>All headers request: ${JSON.stringify(data2)}</p>`;
+                        } catch (error) {
+                            output.innerHTML += `<p>All headers error: ${error.message}</p>`;
+                            output.innerHTML += `<p>Error details: ${JSON.stringify(error)}</p>`;
+                        }
+                        
+                    } catch (error) {
+                        output.innerHTML += `<p>Authenticated request error: ${error.message}</p>`;
+                    }
+                } else {
+                    output.innerHTML += '<p>No auth headers found - user not logged in</p>';
+                }
+                
+            } catch (error) {
+                output.innerHTML += `<p>Error: ${error.message}</p>`;
+            }
+        }
+        
+        // Run test when page loads
+        testConnection();
+    </script>
+</body>
+</html>

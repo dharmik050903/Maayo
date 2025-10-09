@@ -1,5 +1,6 @@
 import { createPortal } from 'react-dom'
 import ConfirmationModal from '../components/ConfirmationModal'
+import React from 'react'
 
 class ConfirmationService {
   constructor() {
@@ -42,16 +43,16 @@ class ConfirmationService {
       }
 
       this.currentModal = createPortal(
-        <ConfirmationModal
-          isOpen={true}
-          onClose={handleCancel}
-          onConfirm={handleConfirm}
-          title={title}
-          message={message}
-          type={type}
-          confirmText={confirmText}
-          cancelText={cancelText}
-        />,
+        React.createElement(ConfirmationModal, {
+          isOpen: true,
+          onClose: handleCancel,
+          onConfirm: handleConfirm,
+          title: title,
+          message: message,
+          type: type,
+          confirmText: confirmText,
+          cancelText: cancelText
+        }),
         this.container
       )
 
