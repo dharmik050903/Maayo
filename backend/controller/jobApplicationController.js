@@ -376,9 +376,29 @@ export default class JobApplicationController {
                 application.feedback.client_feedback = feedback;
             }
 
+            // Map application status to valid interaction_type
+            let interactionType = 'viewed'; // default
+            switch (status) {
+                case 'viewed':
+                    interactionType = 'viewed';
+                    break;
+                case 'shortlisted':
+                case 'interviewed':
+                    interactionType = 'contacted';
+                    break;
+                case 'selected':
+                    interactionType = 'feedback_given';
+                    break;
+                case 'rejected':
+                    interactionType = 'feedback_given';
+                    break;
+                default:
+                    interactionType = 'viewed';
+            }
+
             // Add interaction record
             application.client_interactions.push({
-                interaction_type: status,
+                interaction_type: interactionType,
                 interaction_date: new Date(),
                 notes: notes || '',
                 initiated_by: 'client'
@@ -389,7 +409,19 @@ export default class JobApplicationController {
                 application.application_tracking.last_viewed_by_client = new Date();
             }
 
-            await application.save();
+            try {
+                await application.save();
+            } catch (saveError) {
+                console.error("Error saving application:", saveError);
+                if (saveError.name === 'ValidationError') {
+                    return res.status(400).json({
+                        status: false,
+                        message: "Validation error: " + saveError.message,
+                        details: saveError.errors
+                    });
+                }
+                throw saveError; // Re-throw if it's not a validation error
+            }
 
             // Send notification to freelancer if application is accepted
             if (status === 'selected') {

@@ -27,6 +27,7 @@ export default function JobApplications() {
     sort_order: 'desc'
   })
   const [pagination, setPagination] = useState({})
+  const [applicationNotes, setApplicationNotes] = useState({})
 
   useEffect(() => {
     // Check authentication
@@ -79,7 +80,8 @@ export default function JobApplications() {
     }))
   }
 
-  const handleStatusUpdate = async (applicationId, newStatus, notes = '') => {
+  const handleStatusUpdate = async (applicationId, newStatus) => {
+    const notes = applicationNotes[applicationId] || ''
     console.log('🔍 handleStatusUpdate called:', { applicationId, newStatus, notes })
     
     // Add confirmation for accepting applications
@@ -415,162 +417,64 @@ export default function JobApplications() {
                       </div>
                     </div>
 
-                    <div className="flex flex-col space-y-2 ml-6">
-                      {application.application_status === 'applied' && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="primary"
-                            onClick={() => {
-                              console.log('🔥 Accept button clicked!', application._id)
-                              handleStatusUpdate(application._id, 'selected')
-                            }}
-                            className="bg-green-600 hover:bg-green-700 text-white"
-                          >
-                            Accept
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => handleStatusUpdate(application._id, 'rejected')}
-                            className="border-red-300 text-red-600 hover:bg-red-50"
-                          >
-                            Reject
-                          </Button>
-                        </>
-                      )}
-
-                      {application.application_status === 'saved' && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="primary"
-                            onClick={() => {
-                              console.log('🔥 Accept button clicked!', application._id)
-                              handleStatusUpdate(application._id, 'selected')
-                            }}
-                            className="bg-green-600 hover:bg-green-700 text-white"
-                          >
-                            Accept
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => handleStatusUpdate(application._id, 'rejected')}
-                            className="border-red-300 text-red-600 hover:bg-red-50"
-                          >
-                            Reject
-                          </Button>
-                        </>
-                      )}
-                      
-                      {application.application_status === 'viewed' && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="primary"
-                            onClick={() => {
-                              console.log('🔥 Accept button clicked!', application._id)
-                              handleStatusUpdate(application._id, 'selected')
-                            }}
-                            className="bg-green-600 hover:bg-green-700 text-white"
-                          >
-                            Accept
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => handleStatusUpdate(application._id, 'shortlisted')}
-                            className="border-purple-300 text-purple-700 hover:bg-purple-50"
-                          >
-                            Shortlist
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => handleStatusUpdate(application._id, 'interviewed')}
-                            className="border-indigo-300 text-indigo-700 hover:bg-indigo-50"
-                          >
-                            Schedule Interview
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => handleStatusUpdate(application._id, 'rejected')}
-                            className="border-red-300 text-red-600 hover:bg-red-50"
-                          >
-                            Reject
-                          </Button>
-                        </>
-                      )}
-                      
-                      {application.application_status === 'shortlisted' && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="primary"
-                            onClick={() => {
-                              console.log('🔥 Accept button clicked!', application._id)
-                              handleStatusUpdate(application._id, 'selected')
-                            }}
-                            className="bg-green-600 hover:bg-green-700 text-white"
-                          >
-                            Accept
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => handleStatusUpdate(application._id, 'interviewed')}
-                            className="border-indigo-300 text-indigo-700 hover:bg-indigo-50"
-                          >
-                            Schedule Interview
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => handleStatusUpdate(application._id, 'rejected')}
-                            className="border-red-300 text-red-600 hover:bg-red-50"
-                          >
-                            Reject
-                          </Button>
-                        </>
-                      )}
-                      
-                      {application.application_status === 'interviewed' && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="primary"
-                            onClick={() => {
-                              console.log('🔥 Accept button clicked!', application._id)
-                              handleStatusUpdate(application._id, 'selected')
-                            }}
-                            className="bg-green-600 hover:bg-green-700 text-white"
-                          >
-                            Accept
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => handleStatusUpdate(application._id, 'rejected')}
-                            className="border-red-300 text-red-600 hover:bg-red-50"
-                          >
-                            Reject
-                          </Button>
-                        </>
-                      )}
-                      
-                      
-                      {!['selected', 'rejected', 'withdrawn', 'applied', 'saved', 'viewed', 'shortlisted', 'interviewed'].includes(application.application_status) && (
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={() => handleStatusUpdate(application._id, 'rejected')}
-                          className="border-red-300 text-red-600 hover:bg-red-50"
+                    <div className="flex flex-col space-y-3 ml-6 min-w-[200px]">
+                      {/* Status Selector */}
+                      <div>
+                        <label className="block text-sm font-medium text-graphite mb-2">Status</label>
+                        <select
+                          value={application.application_status}
+                          onChange={(e) => handleStatusUpdate(application._id, e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-mint text-graphite bg-white text-sm"
                         >
-                          Reject
-                        </Button>
-                      )}
+                          <option value="applied">Applied</option>
+                          <option value="viewed">Viewed</option>
+                          <option value="shortlisted">Shortlisted</option>
+                          <option value="interviewed">Interviewed</option>
+                          <option value="selected">Selected</option>
+                          <option value="rejected">Rejected</option>
+                          <option value="withdrawn">Withdrawn</option>
+                        </select>
+                      </div>
+
+                      {/* Notes Section */}
+                      <div>
+                        <label className="block text-sm font-medium text-graphite mb-2">Notes</label>
+                        <textarea
+                          placeholder="Add notes about this application..."
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-mint text-graphite bg-white text-sm resize-none"
+                          rows="3"
+                          value={applicationNotes[application._id] || ''}
+                          onChange={(e) => {
+                            setApplicationNotes(prev => ({
+                              ...prev,
+                              [application._id]: e.target.value
+                            }))
+                          }}
+                        />
+                      </div>
+
+                      {/* Quick Actions */}
+                      <div className="flex flex-col space-y-2">
+                        <div className="text-xs text-coolgray font-medium">Quick Actions:</div>
+                        <div className="flex space-x-2">
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            onClick={() => handleStatusUpdate(application._id, 'selected')}
+                            className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1"
+                          >
+                            Accept
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => handleStatusUpdate(application._id, 'rejected')}
+                            className="border-red-300 text-red-600 hover:bg-red-50 text-xs px-3 py-1"
+                          >
+                            Reject
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
