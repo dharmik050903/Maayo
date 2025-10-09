@@ -125,6 +125,10 @@ export default function JobApplications() {
   const performStatusUpdate = async (applicationId, newStatus, notes = '') => {
     try {
       console.log('🚀 Proceeding with status update...')
+      console.log('📋 Application ID:', applicationId)
+      console.log('📋 New Status:', newStatus)
+      console.log('📋 Notes:', notes)
+      
       const response = await applicationService.updateApplicationStatus(applicationId, {
         status: newStatus,
         notes: notes

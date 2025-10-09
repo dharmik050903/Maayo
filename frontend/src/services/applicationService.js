@@ -48,9 +48,12 @@ export const applicationService = {
   // Update application status (Client only)
   updateApplicationStatus: async (applicationId, statusData) => {
     try {
+      const requestBody = { application_id: applicationId, ...statusData }
+      console.log('📤 API Request Body:', requestBody)
+      
       const response = await authenticatedFetch(`${API_BASE_URL}/job/application/update-status`, {
         method: 'POST',
-        body: JSON.stringify({ application_id: applicationId, ...statusData })
+        body: JSON.stringify(requestBody)
       })
       return await response.json()
     } catch (error) {
