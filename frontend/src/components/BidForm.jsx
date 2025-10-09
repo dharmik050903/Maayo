@@ -236,41 +236,43 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
   }
 
   return (
-    <div ref={formRef} className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 md:p-8 max-w-4xl mx-auto relative">
-      {/* Cancel Button */}
-      <button
-        onClick={onCancel}
-        className="absolute top-2 right-2 sm:top-4 sm:right-4 text-coolgray hover:text-graphite transition-colors p-2 hover:bg-gray-100 rounded-full"
-        aria-label="Close"
-      >
-        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+    <div ref={formRef} className="bg-white rounded-2xl shadow-xl flex flex-col max-h-full">
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
+        {/* Cancel Button */}
+        <button
+          onClick={onCancel}
+          className="absolute top-2 right-2 sm:top-4 sm:right-4 text-coolgray hover:text-graphite transition-colors p-2 hover:bg-gray-100 rounded-full z-10"
+          aria-label="Close"
+        >
+          <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
 
-      <div className="mb-6 sm:mb-8">
-        <h2 className="text-2xl sm:text-3xl font-bold text-graphite mb-3 sm:mb-4">Submit a Bid</h2>
-        <div className="bg-gradient-to-r from-violet/5 to-mint/5 border border-violet/20 rounded-2xl p-4 sm:p-6">
-          <h3 className="font-bold text-graphite text-lg sm:text-xl mb-2 sm:mb-3">Project: {project.title}</h3>
-          <p className="text-coolgray mb-3 sm:mb-4 leading-relaxed text-sm sm:text-base">{project.description}</p>
-          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-6 text-xs sm:text-sm">
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-violet rounded-full"></div>
-              <span className="text-graphite font-medium">Budget: <span className="text-violet font-bold">{project.budget?.toLocaleString()}</span></span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-mint rounded-full"></div>
-              <span className="text-graphite font-medium">Duration: <span className="text-mint font-bold">{project.duration} days</span></span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-coral rounded-full"></div>
-              <span className="text-graphite font-medium">Skills: <span className="text-coral font-bold">{project.skills_required?.join(', ') || 'N/A'}</span></span>
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-graphite mb-3 sm:mb-4">Submit a Bid</h2>
+          <div className="bg-gradient-to-r from-violet/5 to-mint/5 border border-violet/20 rounded-2xl p-4 sm:p-6">
+            <h3 className="font-bold text-graphite text-lg sm:text-xl mb-2 sm:mb-3">Project: {project.title}</h3>
+            <p className="text-coolgray mb-3 sm:mb-4 leading-relaxed text-sm sm:text-base">{project.description}</p>
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-6 text-xs sm:text-sm">
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-violet rounded-full"></div>
+                <span className="text-graphite font-medium">Budget: <span className="text-violet font-bold">{project.budget?.toLocaleString()}</span></span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-mint rounded-full"></div>
+                <span className="text-graphite font-medium">Duration: <span className="text-mint font-bold">{project.duration} days</span></span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-coral rounded-full"></div>
+                <span className="text-graphite font-medium">Skills: <span className="text-coral font-bold">{project.skills_required?.join(', ') || 'N/A'}</span></span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
+        <form id="bid-form" onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
         {/* Bid Amount and Duration */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
           <div className="space-y-2">
@@ -552,9 +554,12 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
             </div>
           </div>
         )}
+      </form>
+      </div>
 
-        {/* Submit Buttons */}
-        <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-6 sm:pt-8 border-t border-gray-200">
+      {/* Sticky Submit Button */}
+      <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 sm:p-6 md:p-8 rounded-b-2xl">
+        <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
           <button
             type="button"
             onClick={onCancel}
@@ -564,13 +569,14 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
           </button>
           <button
             type="submit"
+            form="bid-form"
             disabled={loading}
             className="px-6 sm:px-8 py-3 bg-violet text-white rounded-xl hover:bg-violet/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold shadow-lg hover:shadow-xl w-full sm:w-auto"
           >
             {loading ? 'Submitting...' : 'Submit Bid'}
           </button>
         </div>
-      </form>
+      </div>
     </div>
   )
 }
