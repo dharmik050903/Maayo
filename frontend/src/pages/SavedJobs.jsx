@@ -401,21 +401,21 @@ export default function SavedJobs() {
 
           {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <div className="px-6 py-4 border-t border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-coolgray">
+            <div className="px-4 sm:px-6 py-4 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="text-sm text-coolgray text-center sm:text-left">
                   Showing {((pagination.currentPage - 1) * pagination.limit) + 1} to{' '}
                   {Math.min(pagination.currentPage * pagination.limit, pagination.totalItems)} of{' '}
                   {pagination.totalItems} results
                 </div>
                 
-                <div className="flex space-x-2">
+                <div className="flex items-center justify-center space-x-2">
                   <Button
                     onClick={() => setFilters(prev => ({ ...prev, page: prev.page - 1 }))}
                     disabled={pagination.currentPage === 1}
                     variant="secondary"
                     size="sm"
-                    className="border-gray-300 text-graphite hover:bg-gray-50"
+                    className="border-gray-300 text-graphite hover:bg-gray-50 px-3 py-2"
                   >
                     Previous
                   </Button>
@@ -429,7 +429,7 @@ export default function SavedJobs() {
                     disabled={pagination.currentPage === pagination.totalPages}
                     variant="secondary"
                     size="sm"
-                    className="border-gray-300 text-graphite hover:bg-gray-50"
+                    className="border-gray-300 text-graphite hover:bg-gray-50 px-3 py-2"
                   >
                     Next
                   </Button>

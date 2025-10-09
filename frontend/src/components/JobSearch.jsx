@@ -221,21 +221,28 @@ export default function JobSearch() {
           </div>
         )}
 
+        {/* Mobile Filter Toggle */}
+        <div className="lg:hidden mb-4">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="w-full flex items-center justify-between p-4 bg-white/95 rounded-lg shadow-sm text-graphite hover:bg-white transition-colors"
+          >
+            <span className="font-semibold">Filters</span>
+            <svg className={`w-5 h-5 transition-transform duration-200 ${showFilters ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+        </div>
+
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
           {/* Filters Sidebar */}
-          <div className="lg:w-1/3">
+          <div className={`lg:w-1/3 ${showFilters ? 'block' : 'hidden lg:block'}`}>
             <div className="card bg-white/95 rounded-lg shadow-sm p-4 sm:p-6">
-              <div className="flex items-center justify-between mb-4">
+              <div className="hidden lg:flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-graphite">Filters</h2>
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="lg:hidden text-mint hover:text-mint/80 px-3 py-2 rounded-md hover:bg-mint/10 transition-colors"
-                >
-                  {showFilters ? 'Hide' : 'Show'}
-                </button>
               </div>
 
-              <div className={`space-y-4 ${showFilters ? 'block' : 'hidden lg:block'}`}>
+              <div className="space-y-4">
                 {/* Search */}
                 <div>
                   <label className="block text-sm font-medium text-graphite mb-2">Search</label>
@@ -377,7 +384,7 @@ export default function JobSearch() {
           </div>
 
           {/* Jobs List */}
-          <div className="lg:w-2/3">
+          <div className={`${showFilters ? 'lg:w-2/3' : 'w-full lg:w-2/3'}`}>
             <div className="card bg-white/95 rounded-lg shadow-sm">
               {loading ? (
                 <div className="p-6 text-center">

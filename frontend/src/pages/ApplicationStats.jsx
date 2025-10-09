@@ -107,30 +107,30 @@ export default function ApplicationStats() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto px-6 pt-20 pb-8">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 pt-20 pb-8">
         {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
                 Application <span className="text-mint">Statistics</span>
               </h1>
-              <p className="text-lg text-white/80 mt-4">
+              <p className="text-base sm:text-lg text-white/80 mt-2 sm:mt-4">
                 Track your job application performance
               </p>
             </div>
-            <div className="flex space-x-3">
+            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
               <Button
                 variant="secondary"
                 onClick={() => navigate('/freelancer/applications')}
-                className="border-gray-300 text-graphite hover:bg-gray-50"
+                className="border-gray-300 text-graphite hover:bg-gray-50 w-full sm:w-auto px-4 sm:px-6 py-3 font-semibold"
               >
                 View Applications
               </Button>
               <Button
                 variant="secondary"
                 onClick={() => navigate('/freelancer/jobs')}
-                className="border-gray-300 text-graphite hover:bg-gray-50"
+                className="border-gray-300 text-graphite hover:bg-gray-50 w-full sm:w-auto px-4 sm:px-6 py-3 font-semibold"
               >
                 Browse Jobs
               </Button>
@@ -172,8 +172,8 @@ export default function ApplicationStats() {
         ) : (
           <div className="space-y-6">
             {/* Overview Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="card bg-white/95 p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              <div className="card bg-white/95 p-4 sm:p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -189,7 +189,7 @@ export default function ApplicationStats() {
                 </div>
               </div>
 
-              <div className="card bg-white/95 p-6">
+              <div className="card bg-white/95 p-4 sm:p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
@@ -205,7 +205,7 @@ export default function ApplicationStats() {
                 </div>
               </div>
 
-              <div className="card bg-white/95 p-6">
+              <div className="card bg-white/95 p-4 sm:p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -221,7 +221,7 @@ export default function ApplicationStats() {
                 </div>
               </div>
 
-              <div className="card bg-white/95 p-6">
+              <div className="card bg-white/95 p-4 sm:p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
@@ -277,7 +277,7 @@ export default function ApplicationStats() {
 
             {/* Recent Activity */}
             {stats.recent_applications && stats.recent_applications.length > 0 && (
-              <div className="card bg-white/95 p-6">
+              <div className="card bg-white/95 p-4 sm:p-6">
                 <h2 className="text-xl font-semibold text-graphite mb-6">Recent Applications</h2>
                 
                 <div className="space-y-4">
@@ -303,7 +303,7 @@ export default function ApplicationStats() {
 
             {/* Skills Performance */}
             {stats.skills_performance && stats.skills_performance.length > 0 && (
-              <div className="card bg-white/95 p-6">
+              <div className="card bg-white/95 p-4 sm:p-6">
                 <h2 className="text-xl font-semibold text-graphite mb-6">Skills Performance</h2>
                 
                 <div className="space-y-3">
@@ -329,7 +329,7 @@ export default function ApplicationStats() {
 
             {/* Monthly Trends */}
             {stats.monthly_trends && stats.monthly_trends.length > 0 && (
-              <div className="card bg-white/95 p-6">
+              <div className="card bg-white/95 p-4 sm:p-6">
                 <h2 className="text-xl font-semibold text-graphite mb-6">Monthly Application Trends</h2>
                 
                 <div className="space-y-4">
