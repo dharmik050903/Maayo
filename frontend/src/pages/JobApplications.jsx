@@ -191,22 +191,22 @@ export default function JobApplications() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto px-6 pt-20 pb-8">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 pt-20 pb-8">
         {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
                 Job <span className="text-mint">Applications</span>
               </h1>
-              <p className="text-lg text-white/80 mt-4">
+              <p className="text-base sm:text-lg text-white/80 mt-2 sm:mt-4">
                 {job ? `Applications for "${job.job_title}"` : 'Manage job applications'}
               </p>
             </div>
             <Button
               variant="secondary"
               onClick={() => navigate('/client/jobs')}
-              className="border-gray-300 text-graphite hover:bg-gray-50"
+              className="border-gray-300 text-graphite hover:bg-gray-50 w-full sm:w-auto"
             >
               Back to Jobs
             </Button>
@@ -225,10 +225,10 @@ export default function JobApplications() {
 
         {/* Job Info */}
         {job && (
-          <div className="card p-6 bg-white/95 mb-6">
-            <div className="flex items-start justify-between">
+          <div className="card p-4 sm:p-6 bg-white/95 mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
               <div className="flex-1">
-                <h2 className="text-xl font-semibold text-graphite mb-2">{job.job_title}</h2>
+                <h2 className="text-lg sm:text-xl font-semibold text-graphite mb-2">{job.job_title}</h2>
                 <div className="text-sm text-coolgray mb-3">
                   <span>{job.location.city}, {job.location.country}</span>
                   <span className="mx-2">•</span>
@@ -236,7 +236,7 @@ export default function JobApplications() {
                   <span className="mx-2">•</span>
                   <span className="capitalize">{job.job_type}</span>
                 </div>
-                <div className="flex items-center space-x-6 text-sm text-coolgray">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6 space-y-2 sm:space-y-0 text-sm text-coolgray">
                   <span>
                     <strong className="text-graphite">{job.analytics.total_applications}</strong> total applications
                   </span>
@@ -248,7 +248,7 @@ export default function JobApplications() {
                   </span>
                 </div>
               </div>
-              <div className="ml-6">
+              <div className="sm:ml-6">
                 <span className={`px-3 py-1 text-sm rounded-full ${
                   job.status === 'active' ? 'bg-green-100 text-green-800' :
                   job.status === 'closed' ? 'bg-red-100 text-red-800' :
@@ -262,8 +262,8 @@ export default function JobApplications() {
         )}
 
         {/* Filters */}
-        <div className="card p-6 bg-white/95 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="card p-4 sm:p-6 bg-white/95 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-graphite mb-2">Status</label>
               <select
@@ -358,33 +358,37 @@ export default function JobApplications() {
           ) : (
             <div className="divide-y divide-gray-200">
               {applications.map((application) => (
-                <div key={application._id} className="p-6 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-start justify-between">
+                <div key={application._id} className="p-4 sm:p-6 hover:bg-gray-50 transition-colors">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                     <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h3 className="text-lg font-semibold text-graphite">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-2 sm:space-y-0 mb-2">
+                        <h3 className="text-base sm:text-lg font-semibold text-graphite">
                           {application.freelancer_info?.name || 'Anonymous Freelancer'}
                         </h3>
-                        <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(application.application_status)}`}>
-                          {application.application_status}
-                        </span>
-                        {application.skills_match?.match_percentage && (
-                          <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
-                            {application.skills_match.match_percentage}% match
+                        <div className="flex flex-wrap gap-2">
+                          <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(application.application_status)}`}>
+                            {application.application_status}
                           </span>
-                        )}
+                          {application.skills_match?.match_percentage && (
+                            <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                              {application.skills_match.match_percentage}% match
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       <div className="text-sm text-coolgray mb-3">
-                        <span>Applied {formatDate(application.application_tracking?.applied_at)}</span>
-                        <span className="mx-2">•</span>
-                        <span>{getDaysSinceApplication(application.application_tracking?.applied_at)} days ago</span>
-                        {application.expected_salary?.amount && (
-                          <>
-                            <span className="mx-2">•</span>
-                            <span>Expected: ₹{application.expected_salary.amount.toLocaleString()} {application.expected_salary.salary_type}</span>
-                          </>
-                        )}
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-1 sm:space-y-0">
+                          <span>Applied {formatDate(application.application_tracking?.applied_at)}</span>
+                          <span className="hidden sm:inline">•</span>
+                          <span>{getDaysSinceApplication(application.application_tracking?.applied_at)} days ago</span>
+                          {application.expected_salary?.amount && (
+                            <>
+                              <span className="hidden sm:inline">•</span>
+                              <span>Expected: ₹{application.expected_salary.amount.toLocaleString()} {application.expected_salary.salary_type}</span>
+                            </>
+                          )}
+                        </div>
                       </div>
 
                       {application.cover_letter && (
@@ -421,7 +425,7 @@ export default function JobApplications() {
                       </div>
                     </div>
 
-                    <div className="flex flex-col space-y-3 ml-6 min-w-[200px]">
+                    <div className="flex flex-col space-y-3 lg:ml-6 lg:min-w-[200px]">
                       {/* Status Selector */}
                       <div>
                         <label className="block text-sm font-medium text-graphite mb-2">Status</label>
@@ -460,12 +464,12 @@ export default function JobApplications() {
                       {/* Quick Actions */}
                       <div className="flex flex-col space-y-2">
                         <div className="text-xs text-coolgray font-medium">Quick Actions:</div>
-                        <div className="flex space-x-2">
+                        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                           <Button
                             size="sm"
                             variant="primary"
                             onClick={() => handleStatusUpdate(application._id, 'selected')}
-                            className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1"
+                            className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1 w-full sm:w-auto"
                           >
                             Accept
                           </Button>
@@ -473,7 +477,7 @@ export default function JobApplications() {
                             size="sm"
                             variant="secondary"
                             onClick={() => handleStatusUpdate(application._id, 'rejected')}
-                            className="border-red-300 text-red-600 hover:bg-red-50 text-xs px-3 py-1"
+                            className="border-red-300 text-red-600 hover:bg-red-50 text-xs px-3 py-1 w-full sm:w-auto"
                           >
                             Reject
                           </Button>
@@ -488,15 +492,15 @@ export default function JobApplications() {
 
           {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <div className="px-6 py-4 border-t border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-coolgray">
+            <div className="px-4 sm:px-6 py-4 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="text-sm text-coolgray text-center sm:text-left">
                   Showing {((pagination.currentPage - 1) * pagination.limit) + 1} to{' '}
                   {Math.min(pagination.currentPage * pagination.limit, pagination.totalItems)} of{' '}
                   {pagination.totalItems} results
                 </div>
                 
-                <div className="flex space-x-2">
+                <div className="flex items-center justify-center space-x-2">
                   <Button
                     onClick={() => setFilters(prev => ({ ...prev, page: prev.page - 1 }))}
                     disabled={pagination.currentPage === 1}

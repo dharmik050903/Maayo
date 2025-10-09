@@ -437,37 +437,37 @@ export default function FreelancerHome() {
       )}
       
       {/* Hero Section */}
-      <section className="flex-1 flex items-center justify-center px-6 py-20">
+      <section className="flex-1 flex items-center justify-center px-4 sm:px-6 py-12 sm:py-16 lg:py-20">
         <div className="max-w-6xl mx-auto text-center">
           {/* Personalized Welcome */}
           {userData && (
             <div className="mb-8">
-              <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-4">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4">
                 {t('welcomeBack')}, <span className="text-mint">{userData.first_name}!</span>
               </h1>
-              <p className="text-lg text-white/80 mb-6">
+              <p className="text-base sm:text-lg text-white/80 mb-6">
                 {t('readyToFind')}
               </p>
             </div>
           )}
           
-          <h2 className="text-3xl md:text-5xl font-bold leading-tight mb-6">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4 sm:mb-6">
             {t('findYourNext')} <span className="text-mint">{t('project')}</span>
           </h2>
-          <p className="text-xl md:text-2xl text-white/80 mb-8 max-w-3xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/80 mb-6 sm:mb-8 max-w-3xl mx-auto">
             {t('connectWithClients')}
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12">
             <Link to="/freelancer-dashboard">
-              <Button variant="accent" size="lg" className="px-8 py-4 text-lg">
+              <Button variant="accent" size="lg" className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg w-full sm:w-auto">
                 {t('manageProfile')}
               </Button>
             </Link>
             <Button 
               variant="outline" 
               size="lg" 
-              className="px-8 py-4 text-lg border-white text-white hover:bg-white hover:text-graphite"
+              className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg border-white text-white hover:bg-white hover:text-graphite w-full sm:w-auto"
               onClick={() => setActiveView(activeView === 'projects' ? null : 'projects')}
             >
               {activeView === 'projects' ? t('hideProjects') : t('browseProjects')}
@@ -475,7 +475,7 @@ export default function FreelancerHome() {
             <Button 
               variant="outline" 
               size="lg" 
-              className="px-8 py-4 text-lg border-white text-white hover:bg-white hover:text-graphite"
+              className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg border-white text-white hover:bg-white hover:text-graphite w-full sm:w-auto"
               onClick={() => setActiveView(activeView === 'bids' ? null : 'bids')}
             >
               {activeView === 'bids' ? t('hideMyBids') : t('myBids')}
@@ -484,7 +484,7 @@ export default function FreelancerHome() {
 
           {/* Profile Quick Stats */}
           {profileData && (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-4xl mx-auto mb-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto mb-8 sm:mb-12">
               <div className="card p-6 bg-white/95 text-center">
                 <div className="text-2xl font-bold text-mint mb-1">{formatHourlyRate(profileData.hourly_rate || 0, false)}</div>
                 <div className="text-sm text-coolgray">Hourly Rate</div>

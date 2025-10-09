@@ -258,18 +258,18 @@ export default function ProjectForm({ project = null, onSuccess, onCancel }) {
 
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="card p-8 bg-white/95 backdrop-blur-sm text-gray-900">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6">
+      <div className="card p-4 sm:p-6 lg:p-8 bg-white/95 backdrop-blur-sm text-gray-900">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-graphite">
+          <h2 className="text-2xl sm:text-3xl font-bold text-graphite">
             {project ? 'Edit Project' : 'Create New Project'}
           </h2>
-          <p className="text-coolgray mt-2 text-lg">
+          <p className="text-coolgray mt-2 text-base sm:text-lg">
             {project ? 'Update your project details' : 'Fill in the details to create a new project'}
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-8 text-gray-900">
+        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8 text-gray-900">
           <Input
             label="Project Title"
             name="title"
@@ -562,7 +562,7 @@ export default function ProjectForm({ project = null, onSuccess, onCancel }) {
             </div>
           )}
 
-          <div className="flex gap-4 pt-6">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-6">
             <Button
               type="button"
               variant="secondary"

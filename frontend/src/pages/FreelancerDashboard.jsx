@@ -592,27 +592,27 @@ export default function FreelancerDashboard() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto px-6 pt-20 pb-8">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 pt-20 pb-8">
         {/* Welcome Section */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between">
+        <div className="mb-8 sm:mb-12">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-5xl md:text-6xl font-bold leading-tight text-balance">
-            Welcome back, <span className="text-mint">{userData?.first_name}</span>!
-          </h1>
-              <p className="text-xl text-white/90 mt-6 max-w-2xl">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-balance">
+                Welcome back, <span className="text-mint">{userData?.first_name}</span>!
+              </h1>
+              <p className="text-base sm:text-lg lg:text-xl text-white/90 mt-2 sm:mt-4 sm:mt-6 max-w-2xl">
                 Here's your freelancer dashboard overview - track your progress and find new opportunities
               </p>
             </div>
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
               <Button
                 variant="secondary"
                 onClick={() => window.location.href = '/freelancer/jobs'}
-                className="border-2 border-white/30 text-white bg-white/10 hover:bg-white/20 hover:border-white/50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-6 py-3 font-semibold"
+                className="border-2 border-white/30 text-white bg-white/10 hover:bg-white/20 hover:border-white/50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-4 sm:px-6 py-2 sm:py-3 font-semibold text-sm sm:text-base"
                 size="lg"
               >
                 <div className="flex items-center space-x-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                   <span>Find Jobs</span>
@@ -620,11 +620,11 @@ export default function FreelancerDashboard() {
               </Button>
               <Button
                 onClick={() => window.location.href = '/freelancer/applications'}
-                className="bg-mint text-white hover:bg-mint/90 border-2 border-mint hover:border-mint/80 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-6 py-3 font-semibold"
+                className="bg-mint text-white hover:bg-mint/90 border-2 border-mint hover:border-mint/80 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-4 sm:px-6 py-2 sm:py-3 font-semibold text-sm sm:text-base"
                 size="lg"
               >
                 <div className="flex items-center space-x-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   <span>My Applications</span>
@@ -635,8 +635,8 @@ export default function FreelancerDashboard() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          <div className="card-elevated p-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12">
+          <div className="card-elevated p-4 sm:p-6 lg:p-8">
             <div className="flex items-center justify-between">
               <div className="p-3 bg-mint/20 rounded-lg">
                 <svg className="w-6 h-6 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
