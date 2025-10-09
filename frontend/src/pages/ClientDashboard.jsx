@@ -433,16 +433,17 @@ export default function ClientDashboard() {
             </div>
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <Button
-                variant="secondary"
+                variant="accent"
                 onClick={() => navigate('/create-project')}
-                className="border-gray-300 text-graphite hover:bg-gray-50 w-full sm:w-auto"
+                className="border-mint text-mint hover:bg-mint hover:text-white w-full sm:w-auto"
                 size="lg"
               >
                 Create Project
               </Button>
               <Button
+                variant="accent"
                 onClick={() => navigate('/client/jobs')}
-                className="bg-mint text-white hover:bg-mint/90 w-full sm:w-auto"
+                className="border-mint text-mint hover:bg-mint hover:text-white w-full sm:w-auto"
                 size="lg"
               >
                 Manage Jobs
@@ -614,26 +615,26 @@ export default function ClientDashboard() {
                       </Button>
                     </Link>
                     <Link to="/client/jobs/create" className="w-full">
-                      <Button variant="primary" className="w-full border-violet text-violet hover:bg-violet hover:text-white">
+                      <Button variant="accent" className="w-full border-mint text-mint hover:bg-mint hover:text-white">
                         Post a New Job
                       </Button>
                     </Link>
                     <Button 
-                      variant="primary" 
-                      className="w-full border-violet text-violet hover:bg-violet hover:text-white"
+                      variant="accent" 
+                      className="w-full border-mint text-mint hover:bg-mint hover:text-white"
                       onClick={() => setActiveSection('freelancers')}
                     >
                       Browse Freelancers
                     </Button>
                     <Button 
-                      variant="outline" 
-                      className="w-full border-violet text-violet hover:bg-violet hover:text-white"
-                      onClick={() => navigate('/client/my-projects')}
+                      variant="accent" 
+                      className="w-full border-mint text-mint hover:bg-mint hover:text-white"
+                      onClick={() => navigate('/messages')}
                     >
                       View Messages
                     </Button>
                     <Button 
-                      variant="outline" 
+                      variant="accent" 
                       className="w-full border-mint text-mint hover:bg-mint hover:text-white"
                       onClick={() => setActiveSection('projects')}
                     >
@@ -641,16 +642,16 @@ export default function ClientDashboard() {
                     </Button>
                     <Link to="/client/jobs">
                       <Button 
-                        variant="outline" 
-                        className="w-full border-violet text-violet hover:bg-violet hover:text-white"
+                        variant="accent" 
+                        className="w-full border-mint text-mint hover:bg-mint hover:text-white"
                       >
                         Manage Jobs
                       </Button>
                     </Link>
                     <Link to="/client/my-projects">
                       <Button 
-                        variant="outline" 
-                        className="w-full border-violet text-violet hover:bg-violet hover:text-white"
+                        variant="accent" 
+                        className="w-full border-mint text-mint hover:bg-mint hover:text-white"
                       >
                         View All Projects
                       </Button>

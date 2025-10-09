@@ -632,15 +632,15 @@ const handleCloseBidRequest = () => {
             variant="accent"
             size="sm"
             onClick={handleCreateProject}
-            className="px-3 sm:px-6 text-sm sm:text-base w-full sm:w-auto"
+            className="px-3 sm:px-6 text-sm sm:text-base w-full sm:w-auto border-mint text-mint hover:bg-mint hover:text-white"
           >
             Create Project
           </Button>
           <Button
-            variant="outline"
+            variant="accent"
             size="sm"
             onClick={fetchMyProjects}
-            className="border-white text-white hover:bg-white hover:text-graphite w-full sm:w-auto text-sm sm:text-base px-3 sm:px-4 py-2"
+            className="border-mint text-mint hover:bg-mint hover:text-white w-full sm:w-auto text-sm sm:text-base px-3 sm:px-4 py-2"
           >
             Refresh
           </Button>
@@ -757,7 +757,7 @@ const handleCloseBidRequest = () => {
                 <div className="flex flex-wrap gap-2 min-w-[200px]">
                   
                   {/* Always show Edit button for all projects */}
-                  <Button variant="accent" size="sm" onClick={() => handleEditProject(project)} className="flex-1 min-w-[120px]">
+                  <Button variant="accent" size="sm" onClick={() => handleEditProject(project)} className="flex-1 min-w-[120px] border-mint text-mint hover:bg-mint hover:text-white">
                     {t('editProject')}
                   </Button>
                   
@@ -776,7 +776,7 @@ const handleCloseBidRequest = () => {
                   )}
                   {getProjectStatus(project) === 'in_progress' && (
                     <>
-                      <Button variant="accent" size="sm" onClick={() => handleCompleteProject(project._id)} className="flex-1 min-w-[120px]">
+                      <Button variant="accent" size="sm" onClick={() => handleCompleteProject(project._id)} className="flex-1 min-w-[120px] border-mint text-mint hover:bg-mint hover:text-white">
                         {t('markComplete')}
                       </Button>
                       <Button variant="outline" size="sm" onClick={() => handleDeactivateProject(project._id)} className="flex-1 min-w-[120px] border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white">
