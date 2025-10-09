@@ -6,12 +6,13 @@ import { applicationService } from '../services/applicationService'
 import { jobService } from '../services/jobService'
 import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
-import confirmationService from '../services/confirmationService'
+import { useConfirmation } from '../hooks/useConfirmation'
 
 export default function JobApplications() {
   const { t } = useComprehensiveTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
+  const { showConfirmation, ConfirmationComponent } = useConfirmation()
   const [userData, setUserData] = useState(null)
   const [job, setJob] = useState(null)
   const [applications, setApplications] = useState([])
@@ -81,16 +82,19 @@ export default function JobApplications() {
     try {
       // Add confirmation for accepting applications
       if (newStatus === 'selected') {
-        const confirmed = await confirmationService.confirm(
-          'Are you sure you want to accept this application? This will mark the candidate as selected.',
-          'Accept Application'
-        )
+        const confirmed = await showConfirmation({
+          title: 'Accept Application',
+          message: 'Are you sure you want to accept this application? This will mark the candidate as selected.',
+          type: 'success',
+          confirmText: 'Yes, Accept',
+          cancelText: 'Cancel'
+        })
         if (!confirmed) return
       }
       
       // Add confirmation for rejecting applications
       if (newStatus === 'rejected') {
-        const confirmed = await confirmationService.show({
+        const confirmed = await showConfirmation({
           title: 'Reject Application',
           message: 'Are you sure you want to reject this application? This action cannot be undone.',
           type: 'danger',
@@ -580,6 +584,9 @@ export default function JobApplications() {
           )}
         </div>
       </main>
+      
+      {/* Confirmation Modal */}
+      <ConfirmationComponent />
     </div>
   )
 }
