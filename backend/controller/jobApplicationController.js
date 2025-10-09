@@ -379,6 +379,9 @@ export default class JobApplicationController {
             // Map application status to valid interaction_type
             let interactionType = 'viewed'; // default
             switch (status) {
+                case 'applied':
+                    interactionType = 'viewed';
+                    break;
                 case 'viewed':
                     interactionType = 'viewed';
                     break;
@@ -390,6 +393,9 @@ export default class JobApplicationController {
                     interactionType = 'feedback_given';
                     break;
                 case 'rejected':
+                    interactionType = 'feedback_given';
+                    break;
+                case 'withdrawn':
                     interactionType = 'feedback_given';
                     break;
                 default:
@@ -827,7 +833,7 @@ export default class JobApplicationController {
 
             // Add interaction record
             application.client_interactions.push({
-                interaction_type: 'withdrawn',
+                interaction_type: 'feedback_given',
                 interaction_date: new Date(),
                 initiated_by: 'freelancer'
             });
