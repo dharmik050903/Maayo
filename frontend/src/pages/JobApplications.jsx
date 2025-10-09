@@ -2,17 +2,18 @@ import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
 import Header from '../components/Header'
+import ConfirmationModal from '../components/ConfirmationModal'
 import { applicationService } from '../services/applicationService'
 import { jobService } from '../services/jobService'
 import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
-import { useConfirmation } from '../hooks/useConfirmation'
+import { useConfirmation } from '../hooks/useModal'
 
 export default function JobApplications() {
   const { t } = useComprehensiveTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
-  const { showConfirmation, ConfirmationComponent } = useConfirmation()
+  const { confirmation, showConfirmation, hideConfirmation } = useConfirmation()
   const [userData, setUserData] = useState(null)
   const [job, setJob] = useState(null)
   const [applications, setApplications] = useState([])
@@ -81,35 +82,46 @@ export default function JobApplications() {
   const handleStatusUpdate = async (applicationId, newStatus, notes = '') => {
     console.log('🔍 handleStatusUpdate called:', { applicationId, newStatus, notes })
     
+    // Add confirmation for accepting applications
+    if (newStatus === 'selected') {
+      console.log('🎯 Showing accept confirmation...')
+      showConfirmation({
+        title: 'Accept Application',
+        message: 'Are you sure you want to accept this application? This will mark the candidate as selected.',
+        type: 'success',
+        confirmText: 'Yes, Accept',
+        cancelText: 'Cancel',
+        onConfirm: () => {
+          hideConfirmation()
+          performStatusUpdate(applicationId, newStatus, notes)
+        }
+      })
+      return
+    }
+    
+    // Add confirmation for rejecting applications
+    if (newStatus === 'rejected') {
+      console.log('🎯 Showing reject confirmation...')
+      showConfirmation({
+        title: 'Reject Application',
+        message: 'Are you sure you want to reject this application? This action cannot be undone.',
+        type: 'danger',
+        confirmText: 'Yes, Reject',
+        cancelText: 'Cancel',
+        onConfirm: () => {
+          hideConfirmation()
+          performStatusUpdate(applicationId, newStatus, notes)
+        }
+      })
+      return
+    }
+    
+    // For other status updates, proceed directly
+    performStatusUpdate(applicationId, newStatus, notes)
+  }
+
+  const performStatusUpdate = async (applicationId, newStatus, notes = '') => {
     try {
-      // Add confirmation for accepting applications
-      if (newStatus === 'selected') {
-        console.log('🎯 Showing accept confirmation...')
-        const confirmed = await showConfirmation({
-          title: 'Accept Application',
-          message: 'Are you sure you want to accept this application? This will mark the candidate as selected.',
-          type: 'success',
-          confirmText: 'Yes, Accept',
-          cancelText: 'Cancel'
-        })
-        console.log('✅ Confirmation result:', confirmed)
-        if (!confirmed) return
-      }
-      
-      // Add confirmation for rejecting applications
-      if (newStatus === 'rejected') {
-        console.log('🎯 Showing reject confirmation...')
-        const confirmed = await showConfirmation({
-          title: 'Reject Application',
-          message: 'Are you sure you want to reject this application? This action cannot be undone.',
-          type: 'danger',
-          confirmText: 'Yes, Reject',
-          cancelText: 'Cancel'
-        })
-        console.log('✅ Confirmation result:', confirmed)
-        if (!confirmed) return
-      }
-      
       console.log('🚀 Proceeding with status update...')
       const response = await applicationService.updateApplicationStatus(applicationId, {
         application_status: newStatus,
@@ -615,7 +627,17 @@ export default function JobApplications() {
       </main>
       
       {/* Confirmation Modal */}
-      <ConfirmationComponent />
+      <ConfirmationModal
+        isOpen={confirmation.isOpen}
+        onClose={hideConfirmation}
+        onConfirm={confirmation.onConfirm}
+        title={confirmation.title}
+        message={confirmation.message}
+        type={confirmation.type}
+        confirmText={confirmation.confirmText}
+        cancelText={confirmation.cancelText}
+        isLoading={confirmation.isLoading}
+      />
     </div>
   )
 }
