@@ -489,17 +489,17 @@ function JobCard({ job, onSaveJob }) {
   const daysUntilDeadline = getDaysUntilDeadline(job.application_deadline)
 
   return (
-    <div className="p-6 hover:bg-gray-50 transition-colors">
-      <div className="flex items-start justify-between">
+    <div className="p-4 sm:p-6 hover:bg-gray-50 transition-colors border-b border-gray-200">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div className="flex-1">
-          <div className="flex items-center space-x-2 mb-2">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
             <Link
               to={`/freelancer/jobs/${job._id}`}
-              className="text-lg font-semibold text-mint hover:text-mint/80"
+              className="text-base sm:text-lg font-semibold text-mint hover:text-mint/80"
             >
               {job.job_title}
             </Link>
-            <span className={`px-2 py-1 text-xs rounded-full ${
+            <span className={`px-2 py-1 text-xs rounded-full w-fit ${
               job.job_type === 'full-time' ? 'bg-green-100 text-green-800' :
               job.job_type === 'part-time' ? 'bg-yellow-100 text-yellow-800' :
               job.job_type === 'contract' ? 'bg-blue-100 text-blue-800' :
@@ -518,7 +518,7 @@ function JobCard({ job, onSaveJob }) {
             <span className="capitalize">{job.work_mode}</span>
           </div>
 
-          <p className="text-graphite mb-3 line-clamp-2">
+          <p className="text-graphite mb-3 line-clamp-2 text-sm sm:text-base">
             {job.job_description.substring(0, 200)}...
           </p>
 
@@ -538,8 +538,8 @@ function JobCard({ job, onSaveJob }) {
             )}
           </div>
 
-          <div className="flex items-center justify-between text-sm text-coolgray">
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 text-sm text-coolgray">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
               <span className="font-medium text-mint">
                 {formatSalary(job.salary)}
               </span>
@@ -555,7 +555,7 @@ function JobCard({ job, onSaveJob }) {
               </span>
             </div>
             
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               <span className="text-coolgray">
                 {job.analytics.total_applications} applications
               </span>
@@ -563,7 +563,7 @@ function JobCard({ job, onSaveJob }) {
           </div>
         </div>
 
-        <div className="flex flex-col space-y-2 ml-4">
+        <div className="flex flex-row sm:flex-col gap-2 sm:gap-2 sm:ml-4">
           <button
             onClick={() => onSaveJob(job._id)}
             className={`p-2 rounded-md transition-colors ${
@@ -576,8 +576,8 @@ function JobCard({ job, onSaveJob }) {
             {job.is_saved ? '★' : '☆'}
           </button>
           
-          <Link to={`/freelancer/jobs/${job._id}`}>
-            <Button size="sm" className="bg-mint hover:bg-mint/90 text-white">
+          <Link to={`/freelancer/jobs/${job._id}`} className="flex-1 sm:flex-none">
+            <Button size="sm" className="bg-mint hover:bg-mint/90 text-white w-full sm:w-auto">
               View Details
             </Button>
           </Link>
