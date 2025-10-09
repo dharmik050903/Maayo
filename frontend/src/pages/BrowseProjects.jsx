@@ -158,7 +158,7 @@ export default function BrowseProjects() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {projects.map((project, index) => (
-              <div key={project._id} className="card p-3 sm:p-4 lg:p-6 bg-white/95 hover:bg-white transition-colors slide-in-up" style={{animationDelay: `${index * 0.1}s`}}>
+              <div key={project._id} className="card p-4 sm:p-6 bg-white/95 hover:bg-white hover:shadow-xl transition-all duration-300 slide-in-up border border-gray-200 rounded-2xl" style={{animationDelay: `${index * 0.1}s`}}>
                 <div className="flex flex-col h-full">
                   <div className="flex-1">
                     {/* Header with title and status */}
@@ -182,11 +182,11 @@ export default function BrowseProjects() {
                     
                     {/* Budget and Duration */}
                     <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4">
-                      <div className="bg-mint/5 p-2 sm:p-3 rounded-lg">
+                      <div className="bg-gradient-to-br from-mint/15 to-mint/5 p-3 sm:p-4 rounded-xl border border-mint/30 shadow-sm">
                         <p className="text-xs text-coolgray uppercase tracking-wide mb-1">Budget</p>
                         <p className="text-base sm:text-lg font-semibold text-mint">{formatBudget(project.budget)}</p>
                       </div>
-                      <div className="bg-coral/5 p-2 sm:p-3 rounded-lg">
+                      <div className="bg-gradient-to-br from-coral/15 to-coral/5 p-3 sm:p-4 rounded-xl border border-coral/30 shadow-sm">
                         <p className="text-xs text-coolgray uppercase tracking-wide mb-1">Duration</p>
                         <p className="text-base sm:text-lg font-semibold text-coral">{project.duration} days</p>
                       </div>
@@ -200,13 +200,13 @@ export default function BrowseProjects() {
                           {project.skills_required.slice(0, 3).map((skill, index) => (
                             <span
                               key={index}
-                              className="px-2 py-1 bg-violet/10 text-violet rounded-full text-xs font-medium"
+                              className="px-2 py-1 bg-gradient-to-r from-violet/15 to-violet/5 text-violet rounded-full text-xs font-medium border border-violet/30 shadow-sm"
                             >
                               {skill.skill}
                             </span>
                           ))}
                           {project.skills_required.length > 3 && (
-                            <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
+                            <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs border border-gray-200 shadow-sm">
                               +{project.skills_required.length - 3} more
                             </span>
                           )}
@@ -215,10 +215,10 @@ export default function BrowseProjects() {
                     )}
 
                     {/* Project Details */}
-                    <div className="space-y-2 text-xs sm:text-sm text-coolgray mb-4">
+                    <div className="space-y-2 text-xs sm:text-sm text-coolgray mb-4 bg-gradient-to-r from-gray-50 to-gray-100/50 p-3 rounded-xl border border-gray-200">
                       {project.location && (
                         <div className="flex items-center gap-2">
-                          <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3 h-3 sm:w-4 sm:h-4 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                           </svg>
@@ -228,7 +228,7 @@ export default function BrowseProjects() {
                       
                       {project.project_type && (
                         <div className="flex items-center gap-2">
-                          <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3 h-3 sm:w-4 sm:h-4 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                           </svg>
                           <span>{project.project_type}</span>
@@ -237,7 +237,7 @@ export default function BrowseProjects() {
 
                       {project.experience_level && (
                         <div className="flex items-center gap-2">
-                          <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3 h-3 sm:w-4 sm:h-4 text-violet" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                           </svg>
                           <span>{project.experience_level}</span>
@@ -246,9 +246,18 @@ export default function BrowseProjects() {
                     </div>
                   </div>
 
-                  {/* Posted Date */}
+                  {/* Action Button */}
                   <div className="mt-4 pt-4 border-t border-gray-200">
-                    <p className="text-xs text-coolgray">
+                    <button
+                      onClick={() => {
+                        // Navigate to project detail or show bid form
+                        console.log('View project:', project._id)
+                      }}
+                      className="w-full px-4 py-2 bg-violet text-white rounded-lg hover:bg-violet/90 transition-colors font-semibold text-sm"
+                    >
+                      View Project Details
+                    </button>
+                    <p className="text-xs text-coolgray mt-2 text-center">
                       Posted {new Date(project.createdAt).toLocaleDateString()}
                     </p>
                   </div>
