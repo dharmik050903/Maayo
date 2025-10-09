@@ -195,8 +195,8 @@ export default function FreelancerProjects() {
               {/* Action Buttons */}
               <div className="flex gap-3">
                 <Button
-                  variant="accent"
-                  className="flex-1"
+                  variant="outline"
+                  className="flex-1 px-4 border-mint text-mint hover:bg-mint hover:text-white"
                   onClick={() => handleProjectClick(project)}
                 >
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
