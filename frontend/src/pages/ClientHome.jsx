@@ -620,13 +620,14 @@ export default function ClientHome() {
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="px-3 md:px-4 py-2 md:py-3 border border-white/20 rounded-lg text-graphite bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50 text-sm md:text-base w-full sm:w-auto"
+                    className="px-3 md:px-4 py-2 md:py-3 border border-white/20 rounded-lg text-graphite bg-white focus:outline-none focus:ring-2 focus:ring-coral/50 text-sm md:text-base w-full sm:w-auto"
+                    style={{ color: '#374151' }}
                   >
-                    <option value="rating">Sort by Rating</option>
-                    <option value="rate_low">Sort by Rate (Low to High)</option>
-                    <option value="rate_high">Sort by Rate (High to Low)</option>
-                    <option value="projects">Sort by Projects</option>
-                    <option value="name">Sort by Name</option>
+                    <option value="rating" style={{ color: '#374151', backgroundColor: 'white' }}>Sort by Rating</option>
+                    <option value="rate_low" style={{ color: '#374151', backgroundColor: 'white' }}>Sort by Rate (Low to High)</option>
+                    <option value="rate_high" style={{ color: '#374151', backgroundColor: 'white' }}>Sort by Rate (High to Low)</option>
+                    <option value="projects" style={{ color: '#374151', backgroundColor: 'white' }}>Sort by Projects</option>
+                    <option value="name" style={{ color: '#374151', backgroundColor: 'white' }}>Sort by Name</option>
                   </select>
                 </div>
               </div>
@@ -640,12 +641,13 @@ export default function ClientHome() {
                       <select
                         value={filters.experience_level}
                         onChange={(e) => handleFilterChange('experience_level', e.target.value)}
-                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-graphite bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50"
+                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-graphite bg-white focus:outline-none focus:ring-2 focus:ring-coral/50"
+                        style={{ color: '#374151' }}
                       >
-                        <option value="">{t('allLevels')}</option>
-                        <option value="Beginner">{t('beginner')}</option>
-                        <option value="Intermediate">{t('intermediate')}</option>
-                        <option value="Expert">{t('expert')}</option>
+                        <option value="" style={{ color: '#374151', backgroundColor: 'white' }}>{t('allLevels')}</option>
+                        <option value="Beginner" style={{ color: '#374151', backgroundColor: 'white' }}>{t('beginner')}</option>
+                        <option value="Intermediate" style={{ color: '#374151', backgroundColor: 'white' }}>{t('intermediate')}</option>
+                        <option value="Expert" style={{ color: '#374151', backgroundColor: 'white' }}>{t('expert')}</option>
                       </select>
                     </div>
                     
@@ -680,11 +682,12 @@ export default function ClientHome() {
                       <select
                         value={filters.availability}
                         onChange={(e) => handleFilterChange('availability', e.target.value)}
-                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-graphite bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50"
+                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-graphite bg-white focus:outline-none focus:ring-2 focus:ring-coral/50"
+                        style={{ color: '#374151' }}
                       >
-                        <option value="">All Availability</option>
-                        <option value="full-time">Full-time</option>
-                        <option value="part-time">Part-time</option>
+                        <option value="" style={{ color: '#374151', backgroundColor: 'white' }}>All Availability</option>
+                        <option value="full-time" style={{ color: '#374151', backgroundColor: 'white' }}>Full-time</option>
+                        <option value="part-time" style={{ color: '#374151', backgroundColor: 'white' }}>Part-time</option>
                       </select>
                     </div>
                     
