@@ -6,6 +6,7 @@ import { applicationService } from '../services/applicationService'
 import { jobService } from '../services/jobService'
 import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
+import confirmationService from '../services/confirmationService'
 
 export default function JobApplications() {
   const { t } = useComprehensiveTranslation()
@@ -80,7 +81,22 @@ export default function JobApplications() {
     try {
       // Add confirmation for accepting applications
       if (newStatus === 'selected') {
-        const confirmed = window.confirm('Are you sure you want to accept this application? This will mark the candidate as selected.')
+        const confirmed = await confirmationService.confirm(
+          'Are you sure you want to accept this application? This will mark the candidate as selected.',
+          'Accept Application'
+        )
+        if (!confirmed) return
+      }
+      
+      // Add confirmation for rejecting applications
+      if (newStatus === 'rejected') {
+        const confirmed = await confirmationService.show({
+          title: 'Reject Application',
+          message: 'Are you sure you want to reject this application? This action cannot be undone.',
+          type: 'danger',
+          confirmText: 'Yes, Reject',
+          cancelText: 'Cancel'
+        })
         if (!confirmed) return
       }
       
