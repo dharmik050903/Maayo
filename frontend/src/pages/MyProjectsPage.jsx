@@ -3,6 +3,7 @@ import Header from '../components/Header'
 import MyProjects from '../components/MyProjects'
 import ClientMyBids from '../components/ClientMyBids'
 import FreelancerProjects from '../components/FreelancerProjects'
+import MyBids from '../components/MyBids'
 import { getCurrentUser } from '../utils/api'
 
 export default function MyProjectsPage() {
@@ -96,14 +97,7 @@ export default function MyProjectsPage() {
           {activeTab === 'bids' && (
             <div className="fade-in">
               {userType === 'freelancer' ? (
-                <div className="text-center py-12 text-white/70">
-                  <svg className="w-16 h-16 mx-auto mb-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                  </svg>
-                  <h3 className="text-xl font-semibold text-white mb-2">My Submitted Bids</h3>
-                  <p className="text-white/80 mb-4">Coming Soon: View all your submitted bids</p>
-                  <p className="text-sm text-white/60">This feature will show bid history and status</p>
-                </div>
+                <MyBids />
               ) : (
                 <ClientMyBids />
               )}
