@@ -133,42 +133,42 @@ export default function BrowseProjects() {
       />
       
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 pt-20 pb-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-16 sm:pt-20 pb-6 sm:pb-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-4">
             Browse <span className="text-mint">Projects</span>
           </h1>
-          <p className="text-lg text-white/80">
+          <p className="text-base sm:text-lg text-white/80">
             Discover amazing projects from talented professionals
           </p>
         </div>
 
         {/* Projects Grid */}
         {projects.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-white/10 rounded-full mx-auto mb-6 flex items-center justify-center">
+          <div className="text-center py-12 sm:py-16">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white/10 rounded-full mx-auto mb-4 sm:mb-6 flex items-center justify-center">
               <svg className="w-12 h-12 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">No Projects Available</h3>
-            <p className="text-white/80">Check back later for new projects!</p>
+            <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">No Projects Available</h3>
+            <p className="text-white/80 text-sm sm:text-base">Check back later for new projects!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {projects.map((project, index) => (
-              <div key={project._id} className="card p-6 bg-white/95 hover:bg-white transition-colors slide-in-up" style={{animationDelay: `${index * 0.1}s`}}>
+              <div key={project._id} className="card p-4 sm:p-6 bg-white/95 hover:bg-white transition-colors slide-in-up" style={{animationDelay: `${index * 0.1}s`}}>
                 <div className="flex flex-col h-full">
                   <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-graphite mb-2 line-clamp-2">
+                    <h3 className="text-lg sm:text-xl font-semibold text-graphite mb-2 line-clamp-2">
                       {project.title}
                     </h3>
-                    <p className="text-coolgray text-sm mb-4 line-clamp-3">
+                    <p className="text-coolgray text-sm sm:text-base mb-4 line-clamp-3">
                       {project.description}
                     </p>
                     
-                    <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4">
                       <div>
                         <p className="text-xs text-coolgray uppercase tracking-wide">Budget</p>
                         <p className="text-lg font-semibold text-mint">{formatBudget(project.budget)}</p>

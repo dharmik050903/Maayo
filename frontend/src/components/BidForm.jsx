@@ -554,18 +554,18 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
         )}
 
         {/* Submit Buttons */}
-        <div className="flex justify-end gap-4 pt-8 border-t border-gray-200">
+        <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-6 sm:pt-8 border-t border-gray-200">
           <button
             type="button"
             onClick={onCancel}
-            className="px-8 py-3 border border-gray-300 text-graphite rounded-xl hover:bg-gray-50 transition-all duration-200 font-semibold"
+            className="px-6 sm:px-8 py-3 border border-gray-300 text-graphite rounded-xl hover:bg-gray-50 transition-all duration-200 font-semibold w-full sm:w-auto"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="px-8 py-3 bg-violet text-white rounded-xl hover:bg-violet/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold shadow-lg hover:shadow-xl"
+            className="px-6 sm:px-8 py-3 bg-violet text-white rounded-xl hover:bg-violet/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold shadow-lg hover:shadow-xl w-full sm:w-auto"
           >
             {loading ? 'Submitting...' : 'Submit Bid'}
           </button>

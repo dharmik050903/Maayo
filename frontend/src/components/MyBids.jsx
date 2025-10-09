@@ -338,12 +338,12 @@ const MyBids = () => {
 
                 {/* Action Buttons */}
                 {bid.status === 'pending' && (
-                  <div className="flex flex-wrap gap-2 min-w-[200px]">
+                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:min-w-[200px]">
                     <Button
                       variant="accent"
                       size="sm"
                       onClick={() => handleUpdateBid(bid)}
-                      className="flex-1 min-w-[120px]"
+                      className="flex-1 min-w-[120px] w-full sm:w-auto"
                     >
                       Update Bid
                     </Button>
@@ -351,7 +351,7 @@ const MyBids = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => handleWithdrawBid(bid._id)}
-                      className="flex-1 min-w-[120px] border-coral text-coral hover:bg-coral hover:text-white"
+                      className="flex-1 min-w-[120px] border-coral text-coral hover:bg-coral hover:text-white w-full sm:w-auto"
                     >
                       Withdraw Bid
                     </Button>
@@ -359,7 +359,7 @@ const MyBids = () => {
                 )}
 
                 {bid.status === 'accepted' && (
-                  <div className="min-w-[200px]">
+                  <div className="w-full sm:min-w-[200px]">
                     <div className="bg-gradient-to-r from-green-50 to-mint/10 border border-green-200 rounded-lg p-4 mb-3">
                       <div className="flex items-center mb-2">
                         <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
@@ -404,7 +404,7 @@ const MyBids = () => {
                 )}
 
                 {bid.status === 'rejected' && bid.client_message && (
-                  <div className="min-w-[200px]">
+                  <div className="w-full sm:min-w-[200px]">
                     <div className="bg-gradient-to-r from-red-50 to-coral/10 border border-red-200 rounded-lg p-4">
                       <div className="flex items-center mb-2">
                         <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
@@ -534,7 +534,7 @@ const MyBids = () => {
                 </p>
               </div>
               
-              <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-6 border-t border-gray-200">
                 <Button
                   variant="outline"
                   onClick={() => {
@@ -542,14 +542,14 @@ const MyBids = () => {
                     setSelectedBid(null)
                     setUpdateData({})
                   }}
-                  className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                  className="border-gray-300 text-gray-700 hover:bg-gray-50 w-full sm:w-auto"
                 >
                   Cancel
                 </Button>
                 <Button
                   variant="accent"
                   type="submit"
-                  className="px-8"
+                  className="px-8 w-full sm:w-auto"
                 >
                   Update Bid
                 </Button>
