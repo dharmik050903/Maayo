@@ -848,11 +848,11 @@ export default function FreelancerHome() {
 
             {/* Projects List */}
             {!loading && (
-            <div id="projects-section" className="space-y-6">
+            <div id="projects-section" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {getPaginatedProjects().map((project, index) => (
                 <div 
                   key={project._id} 
-                  className="card p-6 bg-white/95 hover:bg-white hover:shadow-lg transition-all duration-200 slide-in-up cursor-pointer group" 
+                  className="card p-4 sm:p-6 bg-white/95 hover:bg-white hover:shadow-lg transition-all duration-200 slide-in-up cursor-pointer group flex flex-col h-full" 
                   style={{animationDelay: `{index * 0.1}s`}}
                   onClick={(e) => {
                     // Only open project details if not clicking on bid button or its container
@@ -861,58 +861,76 @@ export default function FreelancerHome() {
                     }
                   }}
                 >
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-semibold text-graphite mb-2 hover:text-violet transition-colors flex items-center gap-2">
+                  <div className="flex flex-col h-full">
+                    {/* Header with title and status */}
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-3 mb-3">
+                      <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-graphite hover:text-violet transition-colors flex items-center gap-2 flex-1">
                         {project.title}
-                        <svg className="w-4 h-4 text-coolgray group-hover:text-violet transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4 text-coolgray group-hover:text-violet transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                       </h3>
-                      <p className="text-coolgray mb-3 project-description">
-                        {project.description.length > 100 
-                          ? `${project.description.substring(0, 100)}...` 
-                          : project.description
-                        }
-                      </p>
-                      
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {project.skills_required.slice(0, 4).map((skill, index) => (
-                          <span key={index} className="px-3 py-1 bg-mint/10 text-mint rounded-full text-sm font-medium">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                          Active
+                        </span>
+                        <span className="text-xs text-coolgray">
+                          {project.proposals_count || 0} proposals
+                        </span>
+                      </div>
+                    </div>
+
+                    <p className="text-coolgray text-sm sm:text-base mb-4 project-description leading-relaxed flex-1">
+                      {project.description.length > 100 
+                        ? `${project.description.substring(0, 100)}...` 
+                        : project.description
+                      }
+                    </p>
+                    {/* Budget and Duration */}
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4">
+                      <div className="bg-mint/5 p-2 sm:p-3 rounded-lg">
+                        <p className="text-xs text-coolgray uppercase tracking-wide mb-1">Budget</p>
+                        <p className="text-base sm:text-lg font-semibold text-mint">{formatBudget(project.budget, false)}</p>
+                      </div>
+                      <div className="bg-coral/5 p-2 sm:p-3 rounded-lg">
+                        <p className="text-xs text-coolgray uppercase tracking-wide mb-1">Duration</p>
+                        <p className="text-base sm:text-lg font-semibold text-coral">{project.duration} days</p>
+                      </div>
+                    </div>
+                    
+                    {/* Skills */}
+                    <div className="mb-4">
+                      <div className="flex flex-wrap gap-1 sm:gap-2">
+                        {project.skills_required.slice(0, 3).map((skill, index) => (
+                          <span key={index} className="px-2 py-1 bg-violet/10 text-violet rounded-full text-xs font-medium">
                             {skill}
                           </span>
                         ))}
-                        {project.skills_required.length > 4 && (
-                          <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm font-medium">
-                            +{project.skills_required.length - 4} more
+                        {project.skills_required.length > 3 && (
+                          <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
+                            +{project.skills_required.length - 3} more
                           </span>
                         )}
                       </div>
-                      
-                      <div className="flex justify-between items-center text-sm text-coolgray">
-                        <div className="flex space-x-6">
-                          <span className="flex items-center">
-                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                            </svg>
-                            {formatBudget(project.budget, false)}
-                          </span>
-                          <span className="flex items-center">
-                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            {project.duration} days
-                          </span>
-                          <span className="flex items-center">
-                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                            {project.client_name}
-                          </span>
-                        </div>
+                    </div>
+                    
+                    {/* Project Details */}
+                    <div className="space-y-2 text-xs sm:text-sm text-coolgray mb-4">
+                      <div className="flex items-center gap-2">
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span>Posted by: {project.client_name}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Posted: {new Date(project.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
+                  </div>
                     
                     <div className="ml-6 text-right bid-action-container">
                       <div className="mb-2">
