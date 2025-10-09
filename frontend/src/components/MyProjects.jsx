@@ -620,13 +620,14 @@ const handleCloseBidRequest = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 sm:px-4 py-2 bg-white/95 text-graphite rounded-lg focus:ring-2 focus:ring-mint focus:border-transparent border-0 text-sm sm:text-base w-full sm:w-auto"
+            className="px-3 sm:px-4 py-2 bg-white text-graphite rounded-lg focus:ring-2 focus:ring-mint focus:border-transparent border border-gray-300 text-sm sm:text-base w-full sm:w-auto"
+            style={{ color: '#374151' }}
           >
-            <option value="all">All Status</option>
-            <option value="open">Open</option>
-            <option value="in_progress">In Progress</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
+            <option value="all" style={{ color: '#374151', backgroundColor: 'white' }}>All Status</option>
+            <option value="open" style={{ color: '#374151', backgroundColor: 'white' }}>Open</option>
+            <option value="in_progress" style={{ color: '#374151', backgroundColor: 'white' }}>In Progress</option>
+            <option value="completed" style={{ color: '#374151', backgroundColor: 'white' }}>Completed</option>
+            <option value="cancelled" style={{ color: '#374151', backgroundColor: 'white' }}>Cancelled</option>
           </select>
           <Button
             variant="accent"
