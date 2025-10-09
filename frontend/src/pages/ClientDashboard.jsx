@@ -508,7 +508,7 @@ export default function ClientDashboard() {
                 </div>
               </div>
 
-              <div className="card p-6 bg-white/95">
+              <div className="card p-4 md:p-6 bg-white/95">
                 <div className="flex items-center">
                   <div className="p-3 bg-violet/20 rounded-lg">
                     <svg className="w-6 h-6 text-violet" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -530,7 +530,7 @@ export default function ClientDashboard() {
                 </div>
               </div>
 
-              <div className="card p-6 bg-white/95">
+              <div className="card p-4 md:p-6 bg-white/95">
                 <div className="flex items-center">
                   <div className="p-3 bg-coral/20 rounded-lg">
                     <svg className="w-6 h-6 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -546,7 +546,7 @@ export default function ClientDashboard() {
                 </div>
               </div>
 
-              <div className="card p-6 bg-white/95">
+              <div className="card p-4 md:p-6 bg-white/95">
                 <div className="flex items-center">
                   <div className="p-3 bg-primary/20 rounded-lg">
                     <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
