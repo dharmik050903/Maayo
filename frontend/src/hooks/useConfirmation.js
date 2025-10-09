@@ -22,6 +22,8 @@ export const useConfirmation = () => {
     onConfirm,
     onCancel
   }) => {
+    console.log('🎯 useConfirmation: showConfirmation called with:', { title, message, type })
+    
     return new Promise((resolve) => {
       setConfirmationState({
         isOpen: true,
@@ -31,11 +33,13 @@ export const useConfirmation = () => {
         confirmText,
         cancelText,
         onConfirm: () => {
+          console.log('✅ useConfirmation: onConfirm called')
           setConfirmationState(prev => ({ ...prev, isOpen: false }))
           if (onConfirm) onConfirm()
           resolve(true)
         },
         onCancel: () => {
+          console.log('❌ useConfirmation: onCancel called')
           setConfirmationState(prev => ({ ...prev, isOpen: false }))
           if (onCancel) onCancel()
           resolve(false)
@@ -48,18 +52,22 @@ export const useConfirmation = () => {
     setConfirmationState(prev => ({ ...prev, isOpen: false }))
   }
 
-  const ConfirmationComponent = () => (
-    <ConfirmationModal
-      isOpen={confirmationState.isOpen}
-      onClose={confirmationState.onCancel}
-      onConfirm={confirmationState.onConfirm}
-      title={confirmationState.title}
-      message={confirmationState.message}
-      type={confirmationState.type}
-      confirmText={confirmationState.confirmText}
-      cancelText={confirmationState.cancelText}
-    />
-  )
+  const ConfirmationComponent = () => {
+    console.log('🎨 ConfirmationComponent rendering with state:', confirmationState)
+    
+    return (
+      <ConfirmationModal
+        isOpen={confirmationState.isOpen}
+        onClose={confirmationState.onCancel}
+        onConfirm={confirmationState.onConfirm}
+        title={confirmationState.title}
+        message={confirmationState.message}
+        type={confirmationState.type}
+        confirmText={confirmationState.confirmText}
+        cancelText={confirmationState.cancelText}
+      />
+    )
+  }
 
   return {
     showConfirmation,

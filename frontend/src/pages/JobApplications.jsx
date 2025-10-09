@@ -79,9 +79,12 @@ export default function JobApplications() {
   }
 
   const handleStatusUpdate = async (applicationId, newStatus, notes = '') => {
+    console.log('🔍 handleStatusUpdate called:', { applicationId, newStatus, notes })
+    
     try {
       // Add confirmation for accepting applications
       if (newStatus === 'selected') {
+        console.log('🎯 Showing accept confirmation...')
         const confirmed = await showConfirmation({
           title: 'Accept Application',
           message: 'Are you sure you want to accept this application? This will mark the candidate as selected.',
@@ -89,11 +92,13 @@ export default function JobApplications() {
           confirmText: 'Yes, Accept',
           cancelText: 'Cancel'
         })
+        console.log('✅ Confirmation result:', confirmed)
         if (!confirmed) return
       }
       
       // Add confirmation for rejecting applications
       if (newStatus === 'rejected') {
+        console.log('🎯 Showing reject confirmation...')
         const confirmed = await showConfirmation({
           title: 'Reject Application',
           message: 'Are you sure you want to reject this application? This action cannot be undone.',
@@ -101,9 +106,11 @@ export default function JobApplications() {
           confirmText: 'Yes, Reject',
           cancelText: 'Cancel'
         })
+        console.log('✅ Confirmation result:', confirmed)
         if (!confirmed) return
       }
       
+      console.log('🚀 Proceeding with status update...')
       const response = await applicationService.updateApplicationStatus(applicationId, {
         application_status: newStatus,
         client_notes: notes
