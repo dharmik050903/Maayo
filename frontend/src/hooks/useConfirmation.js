@@ -2,76 +2,71 @@ import { useState } from 'react'
 import ConfirmationModal from '../components/ConfirmationModal'
 
 export const useConfirmation = () => {
-  const [confirmationState, setConfirmationState] = useState({
-    isOpen: false,
+  const [isOpen, setIsOpen] = useState(false)
+  const [config, setConfig] = useState({
     title: '',
     message: '',
     type: 'warning',
     confirmText: 'Confirm',
-    cancelText: 'Cancel',
-    onConfirm: null,
-    onCancel: null
+    cancelText: 'Cancel'
   })
+  const [resolvePromise, setResolvePromise] = useState(null)
 
   const showConfirmation = ({
     title = 'Confirm Action',
     message = 'Are you sure you want to proceed?',
     type = 'warning',
     confirmText = 'Confirm',
-    cancelText = 'Cancel',
-    onConfirm,
-    onCancel
+    cancelText = 'Cancel'
   }) => {
     console.log('🎯 useConfirmation: showConfirmation called with:', { title, message, type })
     
     return new Promise((resolve) => {
-      setConfirmationState({
-        isOpen: true,
-        title,
-        message,
-        type,
-        confirmText,
-        cancelText,
-        onConfirm: () => {
-          console.log('✅ useConfirmation: onConfirm called')
-          setConfirmationState(prev => ({ ...prev, isOpen: false }))
-          if (onConfirm) onConfirm()
-          resolve(true)
-        },
-        onCancel: () => {
-          console.log('❌ useConfirmation: onCancel called')
-          setConfirmationState(prev => ({ ...prev, isOpen: false }))
-          if (onCancel) onCancel()
-          resolve(false)
-        }
-      })
+      setConfig({ title, message, type, confirmText, cancelText })
+      setResolvePromise(() => resolve)
+      setIsOpen(true)
     })
   }
 
-  const hideConfirmation = () => {
-    setConfirmationState(prev => ({ ...prev, isOpen: false }))
+  const handleConfirm = () => {
+    console.log('✅ useConfirmation: handleConfirm called')
+    setIsOpen(false)
+    if (resolvePromise) {
+      resolvePromise(true)
+      setResolvePromise(null)
+    }
+  }
+
+  const handleCancel = () => {
+    console.log('❌ useConfirmation: handleCancel called')
+    setIsOpen(false)
+    if (resolvePromise) {
+      resolvePromise(false)
+      setResolvePromise(null)
+    }
   }
 
   const ConfirmationComponent = () => {
-    console.log('🎨 ConfirmationComponent rendering with state:', confirmationState)
+    console.log('🎨 ConfirmationComponent rendering with isOpen:', isOpen)
+    
+    if (!isOpen) return null
     
     return (
       <ConfirmationModal
-        isOpen={confirmationState.isOpen}
-        onClose={confirmationState.onCancel}
-        onConfirm={confirmationState.onConfirm}
-        title={confirmationState.title}
-        message={confirmationState.message}
-        type={confirmationState.type}
-        confirmText={confirmationState.confirmText}
-        cancelText={confirmationState.cancelText}
+        isOpen={isOpen}
+        onClose={handleCancel}
+        onConfirm={handleConfirm}
+        title={config.title}
+        message={config.message}
+        type={config.type}
+        confirmText={config.confirmText}
+        cancelText={config.cancelText}
       />
     )
   }
 
   return {
     showConfirmation,
-    hideConfirmation,
     ConfirmationComponent
   }
 }

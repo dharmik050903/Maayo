@@ -409,7 +409,10 @@ export default function JobApplications() {
                           <Button
                             size="sm"
                             variant="primary"
-                            onClick={() => handleStatusUpdate(application._id, 'selected')}
+                            onClick={() => {
+                              console.log('🔥 Accept button clicked!', application._id)
+                              handleStatusUpdate(application._id, 'selected')
+                            }}
                             className="bg-green-600 hover:bg-green-700 text-white"
                           >
                             Accept
@@ -430,7 +433,10 @@ export default function JobApplications() {
                           <Button
                             size="sm"
                             variant="primary"
-                            onClick={() => handleStatusUpdate(application._id, 'selected')}
+                            onClick={() => {
+                              console.log('🔥 Accept button clicked!', application._id)
+                              handleStatusUpdate(application._id, 'selected')
+                            }}
                             className="bg-green-600 hover:bg-green-700 text-white"
                           >
                             Accept
@@ -451,7 +457,10 @@ export default function JobApplications() {
                           <Button
                             size="sm"
                             variant="primary"
-                            onClick={() => handleStatusUpdate(application._id, 'selected')}
+                            onClick={() => {
+                              console.log('🔥 Accept button clicked!', application._id)
+                              handleStatusUpdate(application._id, 'selected')
+                            }}
                             className="bg-green-600 hover:bg-green-700 text-white"
                           >
                             Accept
@@ -488,7 +497,10 @@ export default function JobApplications() {
                           <Button
                             size="sm"
                             variant="primary"
-                            onClick={() => handleStatusUpdate(application._id, 'selected')}
+                            onClick={() => {
+                              console.log('🔥 Accept button clicked!', application._id)
+                              handleStatusUpdate(application._id, 'selected')
+                            }}
                             className="bg-green-600 hover:bg-green-700 text-white"
                           >
                             Accept
@@ -517,7 +529,10 @@ export default function JobApplications() {
                           <Button
                             size="sm"
                             variant="primary"
-                            onClick={() => handleStatusUpdate(application._id, 'selected')}
+                            onClick={() => {
+                              console.log('🔥 Accept button clicked!', application._id)
+                              handleStatusUpdate(application._id, 'selected')
+                            }}
                             className="bg-green-600 hover:bg-green-700 text-white"
                           >
                             Accept
