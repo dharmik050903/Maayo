@@ -86,7 +86,7 @@ const jobApplySchema = new mongoose.Schema({
     client_interactions: [{
         interaction_type: { 
             type: String, 
-            enum: ['viewed', 'contacted', 'interview_scheduled', 'interview_completed', 'feedback_given'] 
+            enum: ['viewed', 'contacted', 'interview_scheduled', 'interview_completed', 'feedback_given', 'applied', 'shortlisted', 'interviewed', 'selected', 'rejected', 'withdrawn'] 
         },
         interaction_date: { type: Date, default: Date.now },
         notes: { type: String, maxlength: 1000 },

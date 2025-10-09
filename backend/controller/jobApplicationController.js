@@ -369,7 +369,12 @@ export default class JobApplicationController {
             application.application_status = status;
             if (notes) application.client_notes = notes;
             if (rating) application.client_rating = rating;
-            if (feedback) application.feedback.client_feedback = feedback;
+            if (feedback) {
+                if (!application.feedback) {
+                    application.feedback = {};
+                }
+                application.feedback.client_feedback = feedback;
+            }
 
             // Add interaction record
             application.client_interactions.push({
