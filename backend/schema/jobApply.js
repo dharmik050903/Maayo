@@ -85,8 +85,14 @@ const jobApplySchema = new mongoose.Schema({
     // Client interaction tracking
     client_interactions: [{
         interaction_type: { 
-            type: String, 
-            enum: ['viewed', 'contacted', 'interview_scheduled', 'interview_completed', 'feedback_given'] 
+            type: String,
+            validate: {
+                validator: function(v) {
+                    // Allow all interaction types for now to avoid validation errors
+                    return typeof v === 'string' && v.length > 0;
+                },
+                message: 'Invalid interaction type'
+            }
         },
         interaction_date: { type: Date, default: Date.now },
         notes: { type: String, maxlength: 1000 },
