@@ -133,7 +133,7 @@ export default function ApplicationList() {
       case 'viewed': return 'bg-yellow-100 text-yellow-800'
       case 'shortlisted': return 'bg-purple-100 text-purple-800'
       case 'interviewed': return 'bg-indigo-100 text-indigo-800'
-      case 'selected': return 'bg-green-100 text-green-800'
+      case 'selected': return 'bg-green-200 text-green-900 font-semibold'
       case 'rejected': return 'bg-red-100 text-red-800'
       case 'withdrawn': return 'bg-gray-100 text-gray-800'
       default: return 'bg-gray-100 text-gray-800'
@@ -311,7 +311,7 @@ export default function ApplicationList() {
                           {application.job_id?.job_title || 'Job Title Not Available'}
                         </h3>
                         <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(application.application_status)}`}>
-                          {application.application_status}
+                          {application.application_status === 'selected' ? 'Accepted' : application.application_status}
                         </span>
                         {application.skills_match?.match_percentage && (
                           <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">

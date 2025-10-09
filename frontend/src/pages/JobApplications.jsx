@@ -397,9 +397,38 @@ export default function JobApplications() {
                           </Button>
                         </>
                       )}
+
+                      {application.application_status === 'saved' && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            onClick={() => handleStatusUpdate(application._id, 'selected')}
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                          >
+                            Accept
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => handleStatusUpdate(application._id, 'rejected')}
+                            className="border-red-300 text-red-600 hover:bg-red-50"
+                          >
+                            Reject
+                          </Button>
+                        </>
+                      )}
                       
                       {application.application_status === 'viewed' && (
                         <>
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            onClick={() => handleStatusUpdate(application._id, 'selected')}
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                          >
+                            Accept
+                          </Button>
                           <Button
                             size="sm"
                             variant="secondary"
@@ -416,11 +445,27 @@ export default function JobApplications() {
                           >
                             Schedule Interview
                           </Button>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => handleStatusUpdate(application._id, 'rejected')}
+                            className="border-red-300 text-red-600 hover:bg-red-50"
+                          >
+                            Reject
+                          </Button>
                         </>
                       )}
                       
                       {application.application_status === 'shortlisted' && (
                         <>
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            onClick={() => handleStatusUpdate(application._id, 'selected')}
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                          >
+                            Accept
+                          </Button>
                           <Button
                             size="sm"
                             variant="secondary"
@@ -432,10 +477,10 @@ export default function JobApplications() {
                           <Button
                             size="sm"
                             variant="secondary"
-                            onClick={() => handleStatusUpdate(application._id, 'selected')}
-                            className="border-green-300 text-green-700 hover:bg-green-50"
+                            onClick={() => handleStatusUpdate(application._id, 'rejected')}
+                            className="border-red-300 text-red-600 hover:bg-red-50"
                           >
-                            Select Candidate
+                            Reject
                           </Button>
                         </>
                       )}
@@ -444,11 +489,11 @@ export default function JobApplications() {
                         <>
                           <Button
                             size="sm"
-                            variant="secondary"
+                            variant="primary"
                             onClick={() => handleStatusUpdate(application._id, 'selected')}
-                            className="border-green-300 text-green-700 hover:bg-green-50"
+                            className="bg-green-600 hover:bg-green-700 text-white"
                           >
-                            Select Candidate
+                            Accept
                           </Button>
                           <Button
                             size="sm"

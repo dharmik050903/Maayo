@@ -116,20 +116,20 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
     }
   }
 
-      const handleSubmit = async (e) => {
-        e.preventDefault()
-        
-        if (!validateForm()) {
-          setMessage({ type: 'error', text: 'Please fix the errors below' })
-          return
-        }
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    
+    if (!validateForm()) {
+      setMessage({ type: 'error', text: 'Please fix the errors below' })
+      return
+    }
 
-        setLoading(true)
-        setMessage(null)
+    setLoading(true)
+    setMessage(null)
 
-        try {
+    try {
           // Clean and prepare data for backend
-          const applicationData = {
+      const applicationData = {
             // Basic application info
             cover_letter: formData.cover_letter.trim() || undefined,
             
@@ -152,12 +152,12 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
             // Expected salary - only include if amount is provided
             expected_salary: formData.expected_salary.amount ? {
               amount: parseInt(formData.expected_salary.amount),
-              currency: formData.expected_salary.currency,
-              salary_type: formData.expected_salary.salary_type
+          currency: formData.expected_salary.currency,
+          salary_type: formData.expected_salary.salary_type
             } : undefined,
             
             // Availability
-            availability: {
+        availability: {
               start_date: formData.availability.start_date ? new Date(formData.availability.start_date).toISOString() : undefined,
               notice_period: formData.availability.notice_period,
               working_hours: formData.availability.working_hours
@@ -176,20 +176,20 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
           console.log('Job application settings:', job.application_settings)
           console.log('User ID from localStorage:', localStorage.getItem('userId'))
 
-          const response = await applicationService.applyForJob(job._id, applicationData)
+      const response = await applicationService.applyForJob(job._id, applicationData)
           
           console.log('Application response:', response)
-          
-          if (response.status) {
-            setMessage({ type: 'success', text: 'Application submitted successfully!' })
-            setTimeout(() => {
-              onSuccess()
-            }, 1500)
-          } else {
-            setMessage({ type: 'error', text: response.message || 'Failed to submit application' })
-          }
-        } catch (error) {
-          console.error('Error submitting application:', error)
+      
+      if (response.status) {
+        setMessage({ type: 'success', text: 'Application submitted successfully!' })
+        setTimeout(() => {
+          onSuccess()
+        }, 1500)
+      } else {
+        setMessage({ type: 'error', text: response.message || 'Failed to submit application' })
+      }
+    } catch (error) {
+      console.error('Error submitting application:', error)
           console.error('Error details:', error.response)
           
           let errorMessage = 'Failed to submit application. Please try again.'
@@ -214,10 +214,10 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
           }
           
           setMessage({ type: 'error', text: errorMessage })
-        } finally {
-          setLoading(false)
-        }
-      }
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div>

@@ -1144,11 +1144,11 @@ const handleCloseBidRequest = () => {
                             <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium w-fit ${
                               bid.status === 'accepted' ? 'bg-green-100 text-green-800' :
                               bid.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                              'bg-yellow-100 text-yellow-800'
-                            }`}>
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>
                               {bid.status.charAt(0).toUpperCase() + bid.status.slice(1)}
-                            </span>
-                          </div>
+                      </span>
+                  </div>
 
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-3 sm:mb-4">
                             <div className="flex items-center">
@@ -1158,13 +1158,13 @@ const handleCloseBidRequest = () => {
                               <div>
                                 <p className="text-xs sm:text-sm text-coolgray">Bid Amount</p>
                                 <p className="font-semibold text-mint text-sm sm:text-base">{formatBudget(bid.bid_amount)}</p>
-                              </div>
-                            </div>
+                </div>
+              </div>
                             <div className="flex items-center">
                               <svg className="w-4 h-4 mr-2 text-violet flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg>
-                              <div>
+                <div>
                                 <p className="text-xs sm:text-sm text-coolgray">Duration</p>
                                 <p className="font-semibold text-violet text-sm sm:text-base">{bid.proposed_duration} days</p>
                               </div>
@@ -1234,16 +1234,16 @@ const handleCloseBidRequest = () => {
                                     </div>
                                   )}
                                 </div>
-                              </div>
-                            </div>
-                          )}
+                  </div>
+                </div>
+              )}
 
                           <div className="flex flex-col sm:flex-row sm:items-center text-xs text-coolgray bg-gray-50 p-2 sm:p-3 rounded-lg gap-1 sm:gap-0">
                             <div className="flex items-center">
                               <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                              <span>Submitted: {new Date(bid.createdAt).toLocaleDateString()}</span>
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Submitted: {new Date(bid.createdAt).toLocaleDateString()}</span>
                             </div>
                             {bid.freelancer_id?.email && (
                               <div className="flex items-center sm:ml-2">
@@ -1257,8 +1257,8 @@ const handleCloseBidRequest = () => {
               {/* Action Buttons */}
                         {bid.status === 'pending' && (
                           <div className="flex flex-col sm:flex-row lg:flex-col gap-2 w-full sm:w-auto lg:w-[200px]">
-                            <Button 
-                              variant="success" 
+                    <Button 
+                      variant="success" 
                               size="sm" 
                               onClick={async () => {
                                 try {
@@ -1288,11 +1288,11 @@ const handleCloseBidRequest = () => {
                                 }
                               }}
                               className="w-full sm:w-auto lg:w-full text-xs sm:text-sm"
-                            >
-                              Accept Bid
-                            </Button>
-                            <Button 
-                              variant="outline" 
+                    >
+                      Accept Bid
+                    </Button>
+                    <Button 
+                      variant="outline" 
                               size="sm" 
                               onClick={async () => {
                                 try {
@@ -1323,11 +1323,11 @@ const handleCloseBidRequest = () => {
                                 }
                               }}
                               className="w-full sm:w-auto lg:w-full text-xs sm:text-sm border-red-300 text-red-700 hover:bg-red-50"
-                            >
-                              Reject Bid
-                            </Button>
+                    >
+                      Reject Bid
+                    </Button>
                           </div>
-                        )}
+                )}
               </div>
             </div>
                   ))}

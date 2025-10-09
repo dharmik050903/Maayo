@@ -459,7 +459,7 @@ export default function Header({ userType, onLogout, userData }) {
       ) : (
         <Link to="/project/create" className={getLinkClasses('/project/create')}>
           {t('postProject')}
-        </Link>
+          </Link>
       )}
       
       {/* My Projects Link */}
@@ -894,7 +894,7 @@ export default function Header({ userType, onLogout, userData }) {
           <div className="flex flex-col gap-4 p-6">
             {/* Navigation Links */}
             <div className="flex flex-col gap-3">
-              {mobileNavLinks}
+            {mobileNavLinks}
             </div>
             
             {/* Action Buttons */}

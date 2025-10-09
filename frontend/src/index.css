@@ -4,14 +4,14 @@
 
 /* Ensure header stays fixed */
 header {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
   z-index: 1000 !important;
-  width: 100vw !important;
-  transform: translateZ(0) !important;
-  will-change: transform !important;
+    width: 100vw !important;
+    transform: translateZ(0) !important;
+    will-change: transform !important;
   isolation: isolate !important;
 }
 

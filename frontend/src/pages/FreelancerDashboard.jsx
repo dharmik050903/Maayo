@@ -598,8 +598,8 @@ export default function FreelancerDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-5xl md:text-6xl font-bold leading-tight text-balance">
-                Welcome back, <span className="text-mint">{userData?.first_name}</span>!
-              </h1>
+            Welcome back, <span className="text-mint">{userData?.first_name}</span>!
+          </h1>
               <p className="text-xl text-white/90 mt-6 max-w-2xl">
                 Here's your freelancer dashboard overview - track your progress and find new opportunities
               </p>
