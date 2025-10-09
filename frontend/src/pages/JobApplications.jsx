@@ -124,8 +124,8 @@ export default function JobApplications() {
     try {
       console.log('🚀 Proceeding with status update...')
       const response = await applicationService.updateApplicationStatus(applicationId, {
-        application_status: newStatus,
-        client_notes: notes
+        status: newStatus,
+        notes: notes
       })
       
       if (response.status) {
@@ -416,13 +416,6 @@ export default function JobApplications() {
                     </div>
 
                     <div className="flex flex-col space-y-2 ml-6">
-                      {/* Test button */}
-                      <button 
-                        onClick={() => console.log('🧪 Test button clicked!')}
-                        className="bg-red-500 text-white px-4 py-2 rounded"
-                      >
-                        Test Button
-                      </button>
                       {application.application_status === 'applied' && (
                         <>
                           <Button
