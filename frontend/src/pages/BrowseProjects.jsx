@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 import { formatBudget } from '../utils/currency'
@@ -6,6 +7,7 @@ import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslatio
 
 export default function BrowseProjects() {
   const { t } = useComprehensiveTranslation()
+  const navigate = useNavigate()
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -206,7 +208,14 @@ export default function BrowseProjects() {
                             </span>
                           ))}
                           {project.skills_required.length > 3 && (
-                            <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs border border-gray-200 shadow-sm">
+                            <span 
+                              className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs border border-gray-200 shadow-sm cursor-pointer hover:bg-gray-200 transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevent card click
+                                navigate(`/project/${project._id}`);
+                              }}
+                              title="Click to see all skills"
+                            >
                               +{project.skills_required.length - 3} more
                             </span>
                           )}

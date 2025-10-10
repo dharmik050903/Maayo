@@ -288,7 +288,7 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
               min="0"
               step="0.01"
               required
-              className="text-graphite w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-violet focus:border-violet transition-all duration-200 text-sm sm:text-base"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 text-base border border-gray-200 bg-white text-graphite placeholder-gray-400 focus:border-violet focus:ring-2 focus:ring-violet/20 hover:border-gray-300 transition-all duration-300 focus:outline-none rounded-xl"
               placeholder="Enter your bid amount"
             />
           </div>
@@ -306,7 +306,7 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
               min="1"
               step="1"
               required
-              className="text-graphite w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-violet focus:border-violet transition-all duration-200 text-sm sm:text-base"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 text-base border border-gray-200 bg-white text-graphite placeholder-gray-400 focus:border-violet focus:ring-2 focus:ring-violet/20 hover:border-gray-300 transition-all duration-300 focus:outline-none rounded-xl"
               placeholder="Enter duration in days (whole numbers only)"
             />
           </div>
@@ -325,7 +325,7 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
               value={formData.start_date}
               onChange={handleInputChange}
               min={new Date().toISOString().split('T')[0]}
-              className="text-graphite w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-violet focus:border-violet transition-all duration-200 text-sm sm:text-base"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 text-base border border-gray-200 bg-white text-graphite placeholder-gray-400 focus:border-violet focus:ring-2 focus:ring-violet/20 hover:border-gray-300 transition-all duration-300 focus:outline-none rounded-xl"
             />
           </div>
           
@@ -342,7 +342,7 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
               min="1"
               max="168"
               step="1"
-              className="text-graphite w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-violet focus:border-violet transition-all duration-200 text-sm sm:text-base"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 text-base border border-gray-200 bg-white text-graphite placeholder-gray-400 focus:border-violet focus:ring-2 focus:ring-violet/20 hover:border-gray-300 transition-all duration-300 focus:outline-none rounded-xl"
               placeholder="Enter hours per week (whole numbers only)"
             />
           </div>
@@ -405,7 +405,7 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
         rows="6"
         maxLength="2000"
         required
-        className="text-graphite w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-violet focus:border-violet transition-all duration-200 resize-none"
+        className="w-full px-4 py-3 text-base border border-gray-200 bg-white text-graphite placeholder-gray-400 focus:border-violet focus:ring-2 focus:ring-violet/20 hover:border-gray-300 transition-all duration-300 focus:outline-none rounded-xl resize-none"
         placeholder="Describe your approach, experience, and why you're the best fit for this project..."
       />  
           <div className="flex justify-between items-center">
@@ -434,7 +434,7 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
 
         {/* Milestones */}
         <div className="space-y-6">
-          <h3 className="text-xl font-semibold text-graphite">Project Milestones (Optional)</h3>
+          <h3 className="text-xl font-semibold text-graphite">Project Milestones *</h3>
           
           {/* Add Milestone Form */}
           <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl border border-gray-200">
@@ -447,7 +447,7 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
                   type="text"
                   value={milestoneTitle}
                   onChange={(e) => setMilestoneTitle(e.target.value)}
-                  className="text-graphite w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-violet focus:border-violet transition-all duration-200"
+                  className="w-full px-4 py-3 text-base border border-gray-200 bg-white text-graphite placeholder-gray-400 focus:border-violet focus:ring-2 focus:ring-violet/20 hover:border-gray-300 transition-all duration-300 focus:outline-none rounded-xl"
                   placeholder="e.g., Design Phase"
                 />
               </div>
@@ -461,7 +461,7 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
                   onChange={(e) => setMilestoneAmount(e.target.value)}
                   min="0"
                   step="0.01"
-                  className="text-graphite w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-violet focus:border-violet transition-all duration-200"
+                  className="w-full px-4 py-3 text-base border border-gray-200 bg-white text-graphite placeholder-gray-400 focus:border-violet focus:ring-2 focus:ring-violet/20 hover:border-gray-300 transition-all duration-300 focus:outline-none rounded-xl"
                   placeholder="0.00"
                 />
               </div>
@@ -476,7 +476,7 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
                   type="text"
                   value={milestoneDescription}
                   onChange={(e) => setMilestoneDescription(e.target.value)}
-                  className="text-graphite w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-violet focus:border-violet transition-all duration-200"
+                  className="w-full px-4 py-3 text-base border border-gray-200 bg-white text-graphite placeholder-gray-400 focus:border-violet focus:ring-2 focus:ring-violet/20 hover:border-gray-300 transition-all duration-300 focus:outline-none rounded-xl"
                   placeholder="Brief description of the milestone"
                 />
               </div>
@@ -489,7 +489,7 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
                   value={milestoneDueDate}
                   onChange={(e) => setMilestoneDueDate(e.target.value)}
                   min={new Date().toISOString().split('T')[0]}
-                  className="text-graphite w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-violet focus:border-violet transition-all duration-200"
+                  className="w-full px-4 py-3 text-base border border-gray-200 bg-white text-graphite placeholder-gray-400 focus:border-violet focus:ring-2 focus:ring-violet/20 hover:border-gray-300 transition-all duration-300 focus:outline-none rounded-xl"
                 />
               </div>
             </div>

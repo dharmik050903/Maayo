@@ -518,10 +518,10 @@ export default function Signup() {
             </div>
           </div>
           
-          <div className="card p-8">
-            <div className="mb-6 text-center">
-              <h1 className="text-2xl font-semibold text-graphite">Create your account</h1>
-              <p className="text-coolgray mt-1">Join Maayo and get started</p>
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+            <div className="mb-8 text-center">
+              <h1 className="text-3xl font-bold text-graphite mb-2">Create your account</h1>
+              <p className="text-coolgray text-lg">Join Maayo and get started</p>
             </div>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
@@ -590,19 +590,32 @@ export default function Signup() {
                   />
                   {errors.contact_number && <p className="text-coral text-sm">{errors.contact_number}</p>}
                 </div>
-                <CountrySelect countries={countries} value={form.country} onChange={handleCountryChange} required />
-                {errors.country && <p className="text-coral text-sm">{errors.country}</p>}
+                <div>
+                  <CountrySelect countries={countries} value={form.country} onChange={handleCountryChange} required />
+                  {errors.country && <p className="text-coral text-sm">{errors.country}</p>}
+                </div>
               </div>
 
-              <label className="block space-y-1.5">
-                <span className="text-sm text-graphite">User type <span className="text-red-500">*</span></span>
-                <select name="user_type" value={form.user_type} onChange={handleChange} className="input" required>
-                  <option value="">Select type</option>
-                  <option value="client">Client</option>
-                  <option value="freelancer">Freelancer</option>
-                </select>
-              </label>
-              {errors.user_type && <p className="text-coral text-sm">{errors.user_type}</p>}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block space-y-1.5">
+                    <span className="text-sm text-graphite">User type <span className="text-red-500">*</span></span>
+                    <select 
+                      name="user_type" 
+                      value={form.user_type} 
+                      onChange={handleChange} 
+                      className="w-full px-4 py-3 text-base border border-gray-200 bg-white text-graphite placeholder-gray-400 focus:border-violet focus:ring-2 focus:ring-violet/20 hover:border-gray-300 transition-all duration-300 focus:outline-none rounded-xl" 
+                      required
+                    >
+                      <option value="">Select type</option>
+                      <option value="client">Client</option>
+                      <option value="freelancer">Freelancer</option>
+                    </select>
+                  </label>
+                  {errors.user_type && <p className="text-coral text-sm">{errors.user_type}</p>}
+                </div>
+                <div></div>
+              </div>
 
               {message && (
                 <div className={`p-3 rounded-lg text-sm ${
@@ -615,7 +628,7 @@ export default function Signup() {
               )}
 
               <div className="flex items-center justify-between pt-4">
-                <Link to="/login" className="link-accent text-sm">
+                <Link to="/login" className="text-sm text-violet hover:text-violet/80 hover:underline transition-all duration-200 font-medium">
                   {t('haveAccount')} {t('login')}
                 </Link>
                 <Button type="submit" loading={loading}>
@@ -633,44 +646,44 @@ export default function Signup() {
                 {/* Role Selection */}
                 <div className="space-y-3">
                   {/* Client Option */}
-                  <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-300 transition-colors">
+                  <label className="flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:border-violet/50 hover:bg-violet/5 transition-all duration-300 shadow-sm hover:shadow-md">
                     <input
                       type="radio"
                       name="userRole"
                       value="client"
-                      className="mr-3 text-blue-600 focus:ring-blue-500"
+                      className="mr-4 text-violet focus:ring-violet/20"
                       onChange={(e) => setSelectedRole(e.target.value)}
                     />
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <div className="w-10 h-10 bg-gradient-to-br from-violet/20 to-violet/10 rounded-xl flex items-center justify-center">
+                        <svg className="w-5 h-5 text-violet" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm3 1h2v2H7V5zm0 4h2v2H7V9zm0 4h2v2H7v-2zm4-8h2v2h-2V5zm0 4h2v2h-2V9zm0 4h2v2h-2v-2z" clipRule="evenodd" />
                         </svg>
                       </div>
                       <div>
-                        <div className="font-medium text-graphite">Client</div>
+                        <div className="font-semibold text-graphite">Client</div>
                         <div className="text-sm text-gray-500">I want to hire freelancers</div>
                       </div>
                     </div>
                   </label>
 
                   {/* Freelancer Option */}
-                  <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-green-300 transition-colors">
+                  <label className="flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:border-mint/50 hover:bg-mint/5 transition-all duration-300 shadow-sm hover:shadow-md">
                     <input
                       type="radio"
                       name="userRole"
                       value="freelancer"
-                      className="mr-3 text-green-600 focus:ring-green-500"
+                      className="mr-4 text-mint focus:ring-mint/20"
                       onChange={(e) => setSelectedRole(e.target.value)}
                     />
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                        <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <div className="w-10 h-10 bg-gradient-to-br from-mint/20 to-mint/10 rounded-xl flex items-center justify-center">
+                        <svg className="w-5 h-5 text-mint" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                       </div>
                       <div>
-                        <div className="font-medium text-graphite">Freelancer</div>
+                        <div className="font-semibold text-graphite">Freelancer</div>
                         <div className="text-sm text-gray-500">I want to find work</div>
                       </div>
                     </div>
@@ -690,7 +703,7 @@ export default function Signup() {
                     type="button"
                     onClick={handleGoogleSignUpFallback}
                     disabled={!selectedRole || loading}
-                    className={`w-full flex items-center justify-center px-4 py-3 border rounded-lg font-medium transition-colors mt-2 hidden ${
+                    className={`w-full flex items-center justify-center px-6 py-3 border rounded-xl font-semibold transition-all duration-300 mt-2 hidden shadow-sm hover:shadow-md ${
                       selectedRole && !loading
                         ? 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400'
                         : 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'

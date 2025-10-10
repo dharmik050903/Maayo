@@ -186,7 +186,7 @@ export default function JobSearch() {
               <Button
                 variant="secondary"
                 onClick={() => navigate('/freelancer/applications')}
-                className="border-2 border-white/30 text-white bg-white/10 hover:bg-white/20 hover:border-white/50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-4 sm:px-6 py-3 font-semibold w-full sm:w-auto"
+                className="border-2 border-mint/30 bg-mint/10 text-mint hover:bg-mint hover:text-white hover:border-mint transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-6 py-3 font-semibold w-full sm:w-auto rounded-2xl"
               >
                 <div className="flex items-center justify-center space-x-2">
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -198,7 +198,7 @@ export default function JobSearch() {
               <Button
                 variant="secondary"
                 onClick={() => navigate('/freelancer/saved-jobs')}
-                className="border-2 border-white/30 text-white bg-white/10 hover:bg-white/20 hover:border-white/50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-4 sm:px-6 py-3 font-semibold w-full sm:w-auto"
+                className="border-2 border-coral/30 bg-coral/10 text-coral hover:bg-coral hover:text-white hover:border-coral transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-6 py-3 font-semibold w-full sm:w-auto rounded-2xl"
               >
                 <div className="flex items-center justify-center space-x-2">
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -566,14 +566,14 @@ function JobCard({ job, onSaveJob }) {
         <div className="flex flex-row sm:flex-col gap-2 sm:gap-2 sm:ml-4">
           <button
             onClick={() => onSaveJob(job._id)}
-            className={`p-2 rounded-md transition-colors ${
+            className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 ${
               job.is_saved 
-                ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200' 
-                : 'bg-gray-100 text-graphite hover:bg-gray-200'
+                ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200 border border-yellow-300' 
+                : 'bg-gray-100 text-graphite hover:bg-gray-200 border border-gray-300'
             }`}
             title={job.is_saved ? 'Unsave job' : 'Save job'}
           >
-            {job.is_saved ? '★' : '☆'}
+            {job.is_saved ? 'Saved' : 'Save'}
           </button>
           
           <Link to={`/freelancer/jobs/${job._id}`} className="flex-1 sm:flex-none">

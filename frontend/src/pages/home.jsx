@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import { Link, useSearchParams } from "react-router-dom"
+import { Link, useSearchParams, useNavigate } from "react-router-dom"
 import Header from "../components/Header"
 import Button from "../components/Button"
 import { projectService } from "../services/projectService"
@@ -11,6 +11,7 @@ import hero from "../assets/medium-shot-woman-typing-keyboard.jpg"
 export default function Home() {
   const [searchParams] = useSearchParams()
   const { t } = useComprehensiveTranslation()
+  const navigate = useNavigate()
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -104,7 +105,7 @@ export default function Home() {
       />
 
       {/* Hero Section */}
-      <section className="flex flex-col lg:flex-row items-center justify-between flex-1 max-w-7xl mx-auto px-4 md:px-6 pt-16 md:pt-20 pb-12 md:pb-16">
+      <section className="flex flex-col lg:flex-row items-center justify-between flex-1 max-w-7xl mx-auto px-4 md:px-6 pt-24 md:pt-32 pb-12 md:pb-16">
         <div className="max-w-2xl space-y-6 md:space-y-8 slide-in-left text-center lg:text-left">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight text-balance">
             {t('heroTitle')} <span className="text-mint">{t('freelancer')}</span> {t('heroTitleEnd')}
@@ -114,12 +115,12 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center lg:justify-start">
             <Link to="/signup">
-              <Button variant="accent" size="lg" className="w-full sm:w-auto text-sm md:text-base px-6 md:px-8 py-3 md:py-4">
+              <Button variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-graphite text-sm md:text-base px-6 md:px-8 py-3 md:py-4">
                 {t('getStarted')}
               </Button>
             </Link>
             <Link to="/browse">
-              <Button variant="outline" size="lg" className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-graphite text-sm md:text-base px-6 md:px-8 py-3 md:py-4">
+              <Button variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-graphite text-sm md:text-base px-6 md:px-8 py-3 md:py-4">
                 {t('browseProjects')}
               </Button>
             </Link>
@@ -260,7 +261,14 @@ export default function Home() {
                               </span>
                             ))}
                             {project.skills_required.length > 4 && (
-                              <span className="px-2 md:px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs md:text-sm font-medium">
+                              <span 
+                                className="px-2 md:px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs md:text-sm font-medium cursor-pointer hover:bg-gray-200 transition-colors"
+                                onClick={(e) => {
+                                  e.stopPropagation(); // Prevent card click
+                                  navigate(`/project/${project._id}`);
+                                }}
+                                title="Click to see all skills"
+                              >
                                 +{project.skills_required.length - 4} more
                               </span>
                             )}
@@ -343,12 +351,12 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
         <Link to="/signup">
-                <Button variant="accent" size="lg" className="w-full sm:w-auto text-sm md:text-base px-6 md:px-8 py-3 md:py-4">
+                <Button variant="outline" className="w-full sm:w-auto border-primary hover:bg-primary hover:text-white text-sm md:text-base px-6 md:px-8 py-3 md:py-4 custom-button-text">
                   {t('createAccount')}
                 </Button>
               </Link>
               <Link to="/browse">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto border-primary text-primary hover:bg-primary hover:text-white text-sm md:text-base px-6 md:px-8 py-3 md:py-4">
+                <Button variant="outline" className="w-full sm:w-auto border-primary hover:bg-primary hover:text-white text-sm md:text-base px-6 md:px-8 py-3 md:py-4 custom-button-text">
                   Browse Projects
                 </Button>
         </Link>

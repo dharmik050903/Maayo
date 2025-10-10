@@ -73,6 +73,14 @@ export default function Header({ userType, onLogout, userData }) {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Set placeholder color based on scroll state
+  useEffect(() => {
+    const searchInput = document.querySelector('.search-input')
+    if (searchInput) {
+      searchInput.style.setProperty('--placeholder-color', isScrolled ? '#9CA3AF' : 'rgba(252, 251, 253, 0.7)')
+    }
+  }, [isScrolled])
+
   // Fetch initial data for search
   useEffect(() => {
     if (!hasFetchedData.current) {
@@ -680,7 +688,7 @@ export default function Header({ userType, onLogout, userData }) {
                     borderRadius: '6px',
                     border: isScrolled ? 'none' : '2px solid rgba(255, 255, 255, 0.3)',
                     fontSize: '14px',
-                    fontWeight: 'bold',
+                    fontWeight: 'normal',
                     color: isScrolled ? '#000000' : '#ffffff',
                     backgroundColor: isScrolled ? '#ffffff' : 'rgba(255, 255, 255, 0.2)',
                     outline: 'none',
@@ -702,7 +710,8 @@ export default function Header({ userType, onLogout, userData }) {
                     clip: 'auto',
                     clipPath: 'none',
                     WebkitTextFillColor: isScrolled ? '#000000' : '#ffffff',
-                    WebkitTextStroke: 'none'
+                    WebkitTextStroke: 'none',
+                    height: '40px'
                   }}
                   onFocus={(e) => {
                     e.target.style.boxShadow = isScrolled ? '0 4px 8px rgba(35, 209, 164, 0.5)' : '0 0 0 2px rgba(35, 209, 164, 0.5)';
@@ -717,7 +726,7 @@ export default function Header({ userType, onLogout, userData }) {
               <button
                 type="submit"
                 disabled={isSearching}
-                className={`px-3 py-1.5 md:px-5 md:py-2.5 rounded-lg text-xs md:text-sm font-semibold transition-all duration-300 ${
+                className={`px-3 py-1.5 md:px-5 md:py-2.5 rounded-lg text-xs md:text-sm font-semibold transition-all duration-300 h-10 ${
                   isScrolled 
                     ? 'bg-mint text-white hover:bg-mint/90 shadow-md hover:shadow-lg transform hover:-translate-y-0.5' 
                     : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30 hover:border-white/50'
@@ -874,12 +883,12 @@ export default function Header({ userType, onLogout, userData }) {
           ) : (
             <>
               <Link to="/login">
-                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-graphite font-medium px-5 py-2.5 shadow-lg text-base">
+                <Button variant="outline" className="border-violet text-violet hover:bg-violet hover:text-white font-medium px-5 py-2.5 shadow-lg text-base">
                   {t('login')}
                 </Button>
               </Link>
               <Link to="/signup">
-                <Button variant="accent" className="text-base px-5 py-2.5">
+                <Button variant="outline" className="border-violet text-violet hover:bg-violet hover:text-white font-medium px-5 py-2.5 shadow-lg text-base">
                   {t('signup')}
                 </Button>
               </Link>

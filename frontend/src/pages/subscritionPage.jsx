@@ -233,7 +233,7 @@ export default function SubscriptionPage() {
             <Button
               variant="accent"
               size="lg"
-              className={`w-full py-4 text-lg mt-auto transition-all duration-300 ${
+              className={`w-full py-4 text-lg mt-auto transition-all duration-300 rounded-2xl ${
                 successfulPurchase === 'MAYYO_PLUS' 
                   ? 'bg-green-600 text-white hover:bg-green-700' 
                   : 'bg-mint text-white hover:bg-mint/90'
@@ -304,7 +304,7 @@ export default function SubscriptionPage() {
             <Button
               variant="accent"
               size="lg"
-              className={`w-full py-4 text-lg mt-auto transition-all duration-300 ${
+              className={`w-full py-4 text-lg mt-auto transition-all duration-300 rounded-2xl ${
                 successfulPurchase === 'MAYYO_PLUS_PRO' 
                   ? 'bg-green-600 text-white hover:bg-green-700' 
                   : 'bg-mint text-white hover:bg-mint/90'
@@ -433,7 +433,7 @@ export default function SubscriptionPage() {
             <Button variant="outline" size="lg" className="px-8 py-4 text-lg border-2 border-white text-white hover:bg-white hover:text-graphite">
               Try Maayo Plus
             </Button>
-            <Button variant="accent" size="lg" className="px-8 py-4 text-lg bg-mint text-white hover:bg-mint/90">
+            <Button variant="accent" size="lg" className="px-8 py-4 text-lg bg-mint text-white hover:bg-mint/80 hover:scale-105 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl">
               Go Pro Now
             </Button>
           </div>

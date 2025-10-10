@@ -278,7 +278,7 @@ export default function FindWork() {
                     placeholder="Search projects..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-4 py-3 pl-12 bg-white/95 text-graphite rounded-xl focus:ring-2 focus:ring-violet focus:border-transparent border-0 text-sm sm:text-base shadow-lg backdrop-blur-sm"
+                    className="w-full px-4 py-3 pl-12 bg-white/95 text-graphite rounded-xl focus:ring-2 focus:ring-violet focus:border-transparent border-0 text-sm sm:text-base shadow-lg backdrop-blur-sm h-12"
                   />
                   <svg className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-coolgray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -290,7 +290,7 @@ export default function FindWork() {
               <Button
                 variant="outline"
                 onClick={() => setShowFilters(!showFilters)}
-                className="border-2 border-violet/30 bg-violet/10 text-violet hover:bg-violet hover:text-white hover:border-violet transition-all duration-300 px-6 py-3 font-semibold w-full sm:w-auto shadow-lg hover:shadow-xl backdrop-blur-sm"
+                className="border-2 border-violet/30 bg-violet/10 text-violet hover:bg-violet hover:text-white hover:border-violet transition-all duration-300 px-6 py-3 font-semibold w-full sm:w-auto shadow-lg hover:shadow-xl backdrop-blur-sm rounded-xl h-12 flex items-center justify-center"
               >
                 <svg className={`w-5 h-5 mr-2 transition-transform duration-300 ${showFilters ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z" />
@@ -305,7 +305,7 @@ export default function FindWork() {
                 ? 'max-h-[800px] opacity-100 mb-6' 
                 : 'max-h-0 opacity-0 mb-0'
             }`}>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
                 <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 transition-all duration-500 delay-100 ${
                   showFilters ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                 }`}>
@@ -394,19 +394,19 @@ export default function FindWork() {
                       <div className="flex items-center gap-2">
                         <span className="text-white/80 text-sm">Active filters:</span>
                         {selectedSkills.length > 0 && (
-                          <span className="px-2 py-1 bg-mint/20 text-mint rounded text-sm">
+                          <span className="px-3 py-1 bg-mint/20 text-mint rounded-full text-sm font-medium border border-mint/30">
                             {selectedSkills.length} skill{selectedSkills.length !== 1 ? 's' : ''}
                           </span>
                         )}
                         {maxBudget && (
-                          <span className="px-2 py-1 bg-mint/20 text-mint rounded text-sm">
+                          <span className="px-3 py-1 bg-mint/20 text-mint rounded-full text-sm font-medium border border-mint/30">
                             Max {formatBudget(parseFloat(maxBudget), false)}
                           </span>
                         )}
                       </div>
                       <button
                         onClick={clearFilters}
-                        className="text-white/80 hover:text-white text-sm underline"
+                        className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all duration-200 font-medium border border-white/20"
                       >
                         Clear all
                       </button>
@@ -434,7 +434,7 @@ export default function FindWork() {
                 {(searchTerm || selectedSkills.length > 0 || maxBudget) && (
                   <button
                     onClick={clearFilters}
-                    className="px-4 py-2 bg-mint text-white rounded-lg hover:bg-mint/80 transition-colors"
+                    className="px-6 py-3 bg-mint text-white rounded-xl hover:bg-mint/80 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl"
                   >
                     Clear Filters
                   </button>
@@ -442,7 +442,7 @@ export default function FindWork() {
               </div>
             ) : (
               paginatedProjects.map((project) => (
-                <div key={project._id} className="card p-6 bg-white/95 hover:bg-white transition-colors">
+                <div key={project._id} className="bg-white/95 hover:bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
                   <div className="flex flex-col h-full">
                     <div className="flex-1">
                       <h3 
@@ -479,7 +479,14 @@ export default function FindWork() {
                               </span>
                             ))}
                             {project.skills_required.length > 3 && (
-                              <span className="px-2 py-1 bg-gray-100 text-coolgray rounded text-xs">
+                              <span 
+                                className="px-2 py-1 bg-gray-100 text-coolgray rounded text-xs cursor-pointer hover:bg-gray-200 transition-colors"
+                                onClick={(e) => {
+                                  e.stopPropagation(); // Prevent card click
+                                  handleProjectTitleClick(project);
+                                }}
+                                title="Click to see all skills"
+                              >
                                 +{project.skills_required.length - 3} more
                               </span>
                             )}
@@ -602,7 +609,7 @@ export default function FindWork() {
 
       {/* Project Detail Modal */}
       {showProjectDetail && selectedProjectDetail && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1200] p-4">
           <div className="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-3xl font-bold text-graphite">Project Details</h2>
@@ -765,7 +772,7 @@ export default function FindWork() {
 
       {/* Bid Form Modal */}
       {showBidForm && selectedProject && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1100] p-2 sm:p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1200] p-2 sm:p-4">
           <div className="max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] flex flex-col rounded-2xl">
             <div className="flex-1 overflow-y-auto rounded-2xl">
               <BidForm 

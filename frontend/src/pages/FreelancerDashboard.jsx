@@ -608,7 +608,7 @@ export default function FreelancerDashboard() {
               <Button
                 variant="secondary"
                 onClick={() => window.location.href = '/freelancer/jobs'}
-                className="border-2 border-white/30 text-white bg-white/10 hover:bg-white/20 hover:border-white/50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-4 sm:px-6 py-2 sm:py-3 font-semibold text-sm sm:text-base"
+                className="border-2 border-violet/30 bg-violet/10 text-violet hover:bg-violet hover:text-white hover:border-violet transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-4 sm:px-6 py-2 sm:py-3 font-semibold text-sm sm:text-base rounded-[1.5rem]"
                 size="lg"
               >
                 <div className="flex items-center space-x-2">
@@ -620,7 +620,7 @@ export default function FreelancerDashboard() {
               </Button>
               <Button
                 onClick={() => window.location.href = '/freelancer/applications'}
-                className="bg-mint text-white hover:bg-mint/90 border-2 border-mint hover:border-mint/80 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-4 sm:px-6 py-2 sm:py-3 font-semibold text-sm sm:text-base"
+                className="bg-mint text-white hover:bg-mint/90 border-2 border-mint hover:border-mint/80 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-4 sm:px-6 py-2 sm:py-3 font-semibold text-sm sm:text-base rounded-[1.5rem]"
                 size="lg"
               >
                 <div className="flex items-center space-x-2">
@@ -636,7 +636,7 @@ export default function FreelancerDashboard() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12">
-          <div className="card p-4 sm:p-6 lg:p-8 bg-white/95">
+          <div className="bg-white/95 rounded-[2rem] p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-200">
             <div className="flex items-center">
               <div className="p-3 bg-mint/20 rounded-lg flex-shrink-0">
                 <svg className="w-6 h-6 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -658,7 +658,7 @@ export default function FreelancerDashboard() {
             </div>
           </div>
 
-          <div className="card p-4 sm:p-6 lg:p-8 bg-white/95">
+          <div className="bg-white/95 rounded-[2rem] p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-200">
             <div className="flex items-center">
               <div className="p-3 bg-violet/20 rounded-lg flex-shrink-0">
                 <svg className="w-6 h-6 text-violet" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -679,7 +679,7 @@ export default function FreelancerDashboard() {
             </div>
           </div>
 
-          <div className="card p-4 sm:p-6 lg:p-8 bg-white/95">
+          <div className="bg-white/95 rounded-[2rem] p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-200">
             <div className="flex items-center">
               <div className="p-3 bg-coral/20 rounded-lg flex-shrink-0">
                 <svg className="w-6 h-6 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -700,7 +700,7 @@ export default function FreelancerDashboard() {
             </div>
           </div>
 
-          <div className="card p-4 sm:p-6 lg:p-8 bg-white/95">
+          <div className="bg-white/95 rounded-[2rem] p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-200">
             <div className="flex items-center">
               <div className="p-3 bg-primary/20 rounded-lg flex-shrink-0">
                 <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -726,7 +726,7 @@ export default function FreelancerDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Card */}
           <div className="lg:col-span-1">
-            <div className="card p-4 sm:p-6 lg:p-8 bg-white/95">
+            <div className="bg-white/95 rounded-[2rem] p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-200">
               <div className="text-center">
                 <div className="w-24 h-24 bg-mint/20 rounded-full mx-auto mb-4 flex items-center justify-center">
                   <span className="text-2xl font-bold text-mint uppercase">
@@ -867,7 +867,7 @@ export default function FreelancerDashboard() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Profile Details */}
-            <div className="card p-4 sm:p-6 lg:p-8 bg-white/95">
+            <div className="bg-white/95 rounded-[2rem] p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-200">
               <h3 className="text-lg font-semibold text-graphite mb-4">Profile Details</h3>
               <div className="space-y-4">
                 <div>
@@ -1007,7 +1007,7 @@ export default function FreelancerDashboard() {
             </div>
 
             {/* Skills */}
-            <div className="card p-4 sm:p-6 lg:p-8 bg-white/95">
+            <div className="bg-white/95 rounded-[2rem] p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-200">
               <h3 className="text-lg font-semibold text-graphite mb-4">Skills</h3>
               
               {/* Skills Multi-Select */}
@@ -1084,7 +1084,7 @@ export default function FreelancerDashboard() {
             </div>
 
             {/* Certifications */}
-            <div className="card p-4 sm:p-6 lg:p-8 bg-white/95">
+            <div className="bg-white/95 rounded-[2rem] p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-200">
               <h3 className="text-lg font-semibold text-graphite mb-4">Certifications</h3>
               <div className="space-y-4">
                 {certifications.map((cert, index) => (
@@ -1142,7 +1142,7 @@ export default function FreelancerDashboard() {
             </div>
 
             {/* Save Profile Button */}
-            <div className="card p-6 bg-white border-2 border-violet/20">
+            <div className="bg-white rounded-[2rem] p-6 shadow-lg border-2 border-violet/20">
               <h3 className="text-lg font-semibold text-graphite mb-4">{isFirstTime ? 'Create Profile' : 'Save Changes'}</h3>
               <div className="flex flex-col space-y-4">
                 {/* Message Display */}
@@ -1167,22 +1167,6 @@ export default function FreelancerDashboard() {
               </div>
             </div>
 
-            {/* Recent Projects */}
-            <div className="card p-4 sm:p-6 lg:p-8 bg-white/95">
-              <h3 className="text-lg font-semibold text-graphite mb-4">Recent Projects</h3>
-              <div className="space-y-4">
-                <div className="border-l-4 border-mint pl-4">
-                  <h4 className="font-medium text-graphite">Website Development</h4>
-                  <p className="text-sm text-coolgray">Client: John Doe</p>
-                  <p className="text-sm text-coolgray">Completed 2 days ago</p>
-                </div>
-                <div className="border-l-4 border-violet pl-4">
-                  <h4 className="font-medium text-graphite">Mobile App Design</h4>
-                  <p className="text-sm text-coolgray">Client: Jane Smith</p>
-                  <p className="text-sm text-coolgray">In Progress</p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </main>

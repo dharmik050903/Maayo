@@ -180,7 +180,7 @@ export default function SavedJobs() {
             <Button
               variant="secondary"
               onClick={() => navigate('/freelancer/jobs')}
-              className="border-2 border-white/30 text-white bg-white/10 hover:bg-white/20 hover:border-white/50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-6 py-3 font-semibold w-full sm:w-auto"
+              className="border-2 border-mint/30 bg-mint/10 text-mint hover:bg-mint hover:text-white hover:border-mint transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-6 py-3 font-semibold w-full sm:w-auto rounded-[2rem]"
             >
               <div className="flex items-center space-x-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -203,14 +203,14 @@ export default function SavedJobs() {
         )}
 
         {/* Filters */}
-        <div className="card p-4 md:p-6 bg-white/95 mb-6">
+        <div className="bg-white/95 rounded-[2rem] p-4 md:p-6 mb-6 shadow-lg border border-gray-200">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-graphite mb-2">Sort By</label>
               <select
                 value={filters.sort_by}
                 onChange={(e) => handleFilterChange('sort_by', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-mint text-graphite bg-white"
+                className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-mint text-graphite bg-white"
               >
                 <option value="saved_at">Date Saved</option>
                 <option value="job_title">Job Title</option>
@@ -224,7 +224,7 @@ export default function SavedJobs() {
               <select
                 value={filters.sort_order}
                 onChange={(e) => handleFilterChange('sort_order', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-mint text-graphite bg-white"
+                className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-mint text-graphite bg-white"
               >
                 <option value="desc">Newest First</option>
                 <option value="asc">Oldest First</option>
@@ -277,9 +277,9 @@ export default function SavedJobs() {
               </Button>
             </div>
           ) : (
-            <div className="divide-y divide-gray-200">
+            <div className="space-y-4">
               {savedJobs.map((savedJob) => (
-                <div key={savedJob._id} className="p-4 md:p-6 hover:bg-gray-50 transition-colors">
+                <div key={savedJob._id} className="bg-white/95 rounded-[2rem] p-4 md:p-6 hover:bg-white hover:shadow-xl transition-all duration-300 border border-gray-200 mb-4">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
@@ -362,7 +362,7 @@ export default function SavedJobs() {
                           console.log('Navigating to job:', jobId);
                           navigate(`/freelancer/jobs/${jobId}`);
                         }}
-                        className="bg-mint text-white hover:bg-mint/90 w-full sm:w-auto"
+                        className="bg-mint text-white hover:bg-mint/90 w-full sm:w-auto rounded-[1.5rem] px-4 py-2 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
                       >
                         View Job
                       </Button>
@@ -375,7 +375,7 @@ export default function SavedJobs() {
                           console.log('Navigating to apply for job:', jobId);
                           navigate(`/freelancer/jobs/${jobId}?apply=true`);
                         }}
-                        className="border-green-300 text-green-700 hover:bg-green-50 w-full sm:w-auto"
+                        className="border-2 border-green-300 bg-green-50 text-green-700 hover:bg-green-100 hover:border-green-400 w-full sm:w-auto rounded-[1.5rem] px-4 py-2 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
                       >
                         Apply Now
                       </Button>
@@ -388,7 +388,7 @@ export default function SavedJobs() {
                           console.log('Removing job:', jobId);
                           handleUnsaveJob(jobId);
                         }}
-                        className="border-red-300 text-red-600 hover:bg-red-50 w-full sm:w-auto"
+                        className="border-2 border-red-300 bg-red-50 text-red-700 hover:bg-red-100 hover:border-red-400 w-full sm:w-auto rounded-[1.5rem] px-4 py-2 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
                       >
                         Remove
                       </Button>

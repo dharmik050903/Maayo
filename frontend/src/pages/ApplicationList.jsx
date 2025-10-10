@@ -184,7 +184,7 @@ export default function ApplicationList() {
               <Button
                 variant="secondary"
                 onClick={() => navigate('/freelancer/saved-jobs')}
-                className="border-2 border-white/30 text-white bg-white/10 hover:bg-white/20 hover:border-white/50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-4 sm:px-6 py-3 font-semibold w-full sm:w-auto"
+                className="border-2 border-coral/30 bg-coral/10 text-coral hover:bg-coral hover:text-white hover:border-coral transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-4 sm:px-6 py-3 font-semibold w-full sm:w-auto rounded-[1.5rem]"
               >
                 <div className="flex items-center justify-center space-x-2">
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -196,7 +196,7 @@ export default function ApplicationList() {
               <Button
                 variant="secondary"
                 onClick={() => navigate('/freelancer/application-stats')}
-                className="border-2 border-white/30 text-white bg-white/10 hover:bg-white/20 hover:border-white/50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-4 sm:px-6 py-3 font-semibold w-full sm:w-auto"
+                className="border-2 border-violet/30 bg-violet/10 text-violet hover:bg-violet hover:text-white hover:border-violet transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 px-4 sm:px-6 py-3 font-semibold w-full sm:w-auto rounded-[1.5rem]"
               >
                 <div className="flex items-center justify-center space-x-2">
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -220,7 +220,7 @@ export default function ApplicationList() {
         )}
 
         {/* Filters */}
-        <div className="card p-4 sm:p-6 bg-white/95 mb-6">
+        <div className="bg-white/95 rounded-[2rem] p-4 sm:p-6 mb-6 shadow-lg border border-gray-200">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-graphite mb-2">Status</label>
@@ -284,7 +284,7 @@ export default function ApplicationList() {
         </div>
 
         {/* Applications List */}
-        <div className="card bg-white/95">
+        <div className="bg-white/95 rounded-[2rem] shadow-lg border border-gray-200">
           {loading ? (
             <div className="p-8 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-mint mx-auto"></div>

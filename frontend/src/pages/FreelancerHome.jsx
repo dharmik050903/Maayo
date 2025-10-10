@@ -431,13 +431,13 @@ export default function FreelancerHome() {
       
       {/* Upgrade Banner - Show only if user doesn't have active subscription */}
       {userData && needsUpgrade(userData) && (
-        <div className="px-6 pt-20">
+        <div className="px-6 pt-24 sm:pt-28 lg:pt-32 pb-4 sm:pb-6">
           <UpgradeBanner userType="freelancer" />
         </div>
       )}
       
       {/* Hero Section */}
-      <section className="flex-1 flex items-center justify-center px-4 sm:px-6 py-12 sm:py-16 lg:py-20">
+      <section className="flex-1 flex items-center justify-center px-4 sm:px-6 pt-8 sm:pt-12 lg:pt-16 pb-12 sm:pb-16 lg:pb-20">
         <div className="max-w-6xl mx-auto text-center">
           {/* Personalized Welcome */}
           {userData && (
@@ -478,26 +478,26 @@ export default function FreelancerHome() {
               className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg border-white text-white hover:bg-white hover:text-graphite w-full sm:w-auto"
               onClick={() => setActiveView(activeView === 'bids' ? null : 'bids')}
             >
-              {activeView === 'bids' ? t('hideMyBids') : t('myBids')}
+              {activeView === 'bids' ? t('hideMyBids') : t('My Bids')}
             </Button>
           </div>
 
           {/* Profile Quick Stats */}
           {profileData && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto mb-8 sm:mb-12">
-              <div className="card p-6 bg-white/95 text-center">
+              <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
                 <div className="text-2xl font-bold text-mint mb-1">{formatHourlyRate(profileData.hourly_rate || 0, false)}</div>
                 <div className="text-sm text-coolgray">Hourly Rate</div>
               </div>
-              <div className="card p-6 bg-white/95 text-center">
+              <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
                 <div className="text-2xl font-bold text-coral mb-1">{profileData.skills?.length || 0}</div>
                 <div className="text-sm text-coolgray">Skills</div>
               </div>
-              <div className="card p-6 bg-white/95 text-center">
+              <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
                 <div className="text-2xl font-bold text-violet mb-1">{profileData.certification?.length || 0}</div>
                 <div className="text-sm text-coolgray">Certifications</div>
               </div>
-              <div className="card p-6 bg-white/95 text-center">
+              <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
                 <div className="text-2xl font-bold text-mint mb-1 capitalize">{profileData.availability || 'Not Set'}</div>
                 <div className="text-sm text-coolgray">Availability</div>
               </div>
@@ -506,7 +506,7 @@ export default function FreelancerHome() {
 
           {/* Bank Details Section */}
           <div className="max-w-4xl mx-auto mb-12">
-            <div className="card p-6 bg-white/95 backdrop-blur-sm">
+            <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
               <h3 className="text-xl font-semibold text-graphite mb-4">Payment Setup</h3>
               <p className="text-coolgray mb-4">Manage your bank details to receive payments from completed projects</p>
               <BankDetailsList />
@@ -519,7 +519,7 @@ export default function FreelancerHome() {
               <h3 className="text-xl font-semibold text-graphite mb-6 text-center">📋 Active Project Milestones</h3>
               <div className="space-y-6">
                 {activeProjects.map((project) => (
-                  <div key={project._id} className="card p-6 bg-white/95 backdrop-blur-sm">
+                  <div key={project._id} className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="text-lg font-semibold text-graphite">{project.title}</h4>
                       <div className="text-sm text-coolgray">
@@ -536,7 +536,7 @@ export default function FreelancerHome() {
             </div>
           ) : (
             <div className="max-w-4xl mx-auto mb-12">
-              <div className="card p-8 bg-white/95 backdrop-blur-sm text-center">
+              <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
                 <div className="text-6xl mb-4">📋</div>
                 <h3 className="text-xl font-semibold text-graphite mb-4">No Active Projects</h3>
                 <p className="text-coolgray mb-6">
@@ -909,7 +909,14 @@ export default function FreelancerHome() {
                           </span>
                         ))}
                         {project.skills_required.length > 3 && (
-                          <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs border border-gray-200 shadow-sm">
+                          <span 
+                            className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs border border-gray-200 shadow-sm cursor-pointer hover:bg-gray-200 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation(); // Prevent card click
+                              handleProjectTitleClick(project);
+                            }}
+                            title="Click to see all skills"
+                          >
                             +{project.skills_required.length - 3} more
                           </span>
                         )}
@@ -1063,7 +1070,7 @@ export default function FreelancerHome() {
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Link to="/freelancer-dashboard" className="card p-6 bg-white/95 hover:bg-white transition-colors group">
+            <Link to="/freelancer-dashboard" className="bg-white/95 hover:bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20 group">
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 bg-mint/20 rounded-lg flex items-center justify-center group-hover:bg-mint/30 transition-colors">
                   <svg className="w-6 h-6 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1078,7 +1085,7 @@ export default function FreelancerHome() {
             </Link>
             
             <div 
-              className="card p-6 bg-white/95 hover:bg-white transition-colors group cursor-pointer"
+              className="bg-white/95 hover:bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20 group cursor-pointer"
               onClick={() => setActiveView(activeView === 'projects' ? null : 'projects')}
             >
               <div className="flex items-center space-x-4">
@@ -1094,7 +1101,7 @@ export default function FreelancerHome() {
               </div>
             </div>
             
-            <div className="card p-6 bg-white/95 hover:bg-white transition-colors group cursor-pointer"
+            <div className="bg-white/95 hover:bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20 group cursor-pointer"
              onClick={() => setActiveView(activeView === 'bids' ? null : 'bids')}
              >
               <div className="flex items-center space-x-4">
@@ -1122,7 +1129,7 @@ export default function FreelancerHome() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Feature 1 */}
-            <div className="card p-8 bg-white/95 text-center">
+            <div className="bg-white/95 rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
               <div className="w-16 h-16 bg-mint/20 rounded-full mx-auto mb-6 flex items-center justify-center">
                 <svg className="w-8 h-8 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -1135,7 +1142,7 @@ export default function FreelancerHome() {
             </div>
 
             {/* Feature 2 */}
-            <div className="card p-8 bg-white/95 text-center">
+            <div className="bg-white/95 rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
               <div className="w-16 h-16 bg-coral/20 rounded-full mx-auto mb-6 flex items-center justify-center">
                 <svg className="w-8 h-8 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
@@ -1148,7 +1155,7 @@ export default function FreelancerHome() {
             </div>
 
             {/* Feature 3 */}
-            <div className="card p-8 bg-white/95 text-center">
+            <div className="bg-white/95 rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
               <div className="w-16 h-16 bg-violet/20 rounded-full mx-auto mb-6 flex items-center justify-center">
                 <svg className="w-8 h-8 text-violet" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />

@@ -18,7 +18,7 @@ export default function Input({
   const [isFocused, setIsFocused] = useState(false)
   
   const getInputClasses = () => {
-    const baseClasses = 'w-full border transition-all duration-300 focus:outline-none'
+    const baseClasses = 'w-full border transition-all duration-300 focus:outline-none rounded-xl'
     
     // Size classes
     const sizeClasses = {
@@ -27,11 +27,13 @@ export default function Input({
       lg: 'px-5 py-4 text-lg'
     }
     
-    // Variant classes
+    // Variant classes - Enhanced styling with curved borders
     const variantClasses = {
-      default: error ? 'input-error' : 'input',
-      success: 'input-success',
-      error: 'input-error'
+      default: error 
+        ? 'border-coral/50 bg-white text-graphite placeholder-gray-400 focus:border-coral focus:ring-2 focus:ring-coral/20' 
+        : 'border-gray-200 bg-white text-graphite placeholder-gray-400 focus:border-violet focus:ring-2 focus:ring-violet/20 hover:border-gray-300',
+      success: 'border-mint/50 bg-white text-graphite placeholder-gray-400 focus:border-mint focus:ring-2 focus:ring-mint/20',
+      error: 'border-coral/50 bg-white text-graphite placeholder-gray-400 focus:border-coral focus:ring-2 focus:ring-coral/20'
     }
     
     // Icon padding

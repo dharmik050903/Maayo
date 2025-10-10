@@ -1169,8 +1169,9 @@ export default function Login() {
                        <div className="flex gap-2">
                          <Button
                            type="submit"
+                           variant="accent"
                            loading={otpLoading}
-                           className="flex-1"
+                           className="flex-1 py-3 font-bold shadow-lg hover:shadow-xl"
                          >
                            {otpLoading ? 'Verifying...' : 'Verify OTP'}
                          </Button>
@@ -1200,7 +1201,7 @@ export default function Login() {
         )}
 
         <div className="flex items-center justify-between pt-4">
-          <Link to="/signup" className="link-accent text-sm">
+          <Link to="/signup" className="text-sm text-violet hover:text-violet/80 hover:underline transition-all duration-200 font-medium">
             Create account
           </Link>
           <div className="flex flex-col items-end gap-2">
@@ -1257,7 +1258,7 @@ export default function Login() {
                 variant="accent" 
                 loading={loading}
                 size="lg"
-                className="w-full"
+                className="w-full py-4 text-lg font-bold shadow-lg hover:shadow-xl"
               >
                 {loading ? 'Signing in...' : 'Login'}
               </Button>
@@ -1428,8 +1429,9 @@ export default function Login() {
                 </Button>
                 <Button
                   type="submit"
+                  variant="accent"
                   loading={otpLoading}
-                  className="flex-1"
+                  className="flex-1 py-3 font-bold shadow-lg hover:shadow-xl"
                 >
                   {otpLoading ? 'Resetting...' : 'Reset Password'}
                 </Button>
