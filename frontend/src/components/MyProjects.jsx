@@ -5,13 +5,13 @@ import RatingComponent from './RatingComponent'
 import ConfirmationModal from './ConfirmationModal'
 import NotificationModal from './NotificationModal'
 import { useConfirmation, useNotification } from '../hooks/useModal'
-import { projectService } from '../services/projectService'
-import { skillsService } from '../services/skillsService'
+import { getSkillsCached, getClientProjectsCached, clearCache } from '../services/cachedApiService'
 import { reviewService } from '../services/reviewService'
 import { bidService } from '../services/bidService'
 import { getSafeUrl } from '../utils/urlValidation'
 import { formatBudget } from '../utils/currency'
 import confirmationService from '../services/confirmationService.jsx'
+import ProjectDetailsModal from './ProjectDetailsModal'
 import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 
 export default function MyProjects() {
@@ -28,6 +28,8 @@ export default function MyProjects() {
   const [statusFilter, setStatusFilter] = useState('all')
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedProject, setSelectedProject] = useState(null)
+  const [showProjectDetailsModal, setShowProjectDetailsModal] = useState(false)
+  const [selectedProjectDetails, setSelectedProjectDetails] = useState(null)
 
   const [editForm, setEditForm] = useState({
     title: '',
@@ -72,7 +74,7 @@ export default function MyProjects() {
 
   const loadSkills = async () => {
     try {
-      const response = await skillsService.getSkills()
+      const response = await getSkillsCached()
       if (response.data && Array.isArray(response.data)) {
         setAvailableSkills(response.data)
       }
@@ -92,7 +94,7 @@ export default function MyProjects() {
       })
       
       // Get projects for the current client
-      const response = await projectService.getClientProjects()
+      const response = await getClientProjectsCached()
       console.log('📊 MyProjects: API Response:', response)
       
       if (response.status && response.data) {
@@ -174,6 +176,12 @@ export default function MyProjects() {
 
   const handleCreateProject = () => {
     navigate('/project/create')
+  }
+
+  const handleProjectClick = (project) => {
+    console.log('Project clicked:', project)
+    setSelectedProjectDetails(project)
+    setShowProjectDetailsModal(true)
   }
 
   const handleEditProject = (project) => {
@@ -668,7 +676,11 @@ const handleCloseBidRequest = () => {
       ) : (
         <div className="space-y-6">
           {filteredProjects.map((project) => (
-            <div key={project._id} className="bg-white/95 rounded-[2rem] p-6 hover:bg-white transition-all duration-300 hover:shadow-xl border border-white/20">
+            <div 
+              key={project._id} 
+              className="bg-white/95 rounded-[2rem] p-6 hover:bg-white transition-all duration-300 hover:shadow-xl border border-white/20 cursor-pointer"
+              onClick={() => handleProjectClick(project)}
+            >
               <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
                 <div className="flex-1">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
@@ -755,7 +767,7 @@ const handleCloseBidRequest = () => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-wrap gap-2 min-w-[200px]">
+                <div className="flex flex-wrap gap-2 min-w-[200px]" onClick={(e) => e.stopPropagation()}>
                   
                   {/* Always show Edit button for all projects */}
                   <Button variant="outline" size="sm" onClick={() => handleEditProject(project)} className="flex-1 min-w-[120px] !border-violet !text-violet hover:!bg-violet hover:!text-white transition-all duration-200">
@@ -1358,6 +1370,16 @@ const handleCloseBidRequest = () => {
         projectId={selectedProjectForRating?._id}
         freelancerId={selectedProjectForRating?.freelancerid}
         onRatingSubmitted={handleRatingSubmitted}
+      />
+
+      {/* Project Details Modal */}
+      <ProjectDetailsModal
+        isOpen={showProjectDetailsModal}
+        onClose={() => {
+          setShowProjectDetailsModal(false)
+          setSelectedProjectDetails(null)
+        }}
+        project={selectedProjectDetails}
       />
 
       {/* Confirmation Modal */}

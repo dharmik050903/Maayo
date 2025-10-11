@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react"
 import { Link, useSearchParams, useNavigate } from "react-router-dom"
 import Header from "../components/Header"
 import Button from "../components/Button"
-import { projectService } from "../services/projectService"
+import { getAllProjectsCached } from '../services/cachedApiService'
 import { formatBudget } from "../utils/currency"
 import { isAuthenticated, getCurrentUser, clearAuth } from "../utils/api"
 import { useComprehensiveTranslation } from "../hooks/useComprehensiveTranslation"
@@ -57,7 +57,7 @@ export default function Home() {
   const fetchProjects = async () => {
     try {
       setLoading(true)
-      const response = await projectService.getBrowseProjects()
+      const response = await getAllProjectsCached()
       setProjects(response.data || [])
     } catch (err) {
       console.error('Error fetching projects:', err)

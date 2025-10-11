@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import Button from '../components/Button'
-import { projectService } from '../services/projectService'
+import { getAllProjectsCached } from '../services/cachedApiService'
 import { skillsService } from '../services/skillsService'
 import { getCurrentUser } from '../utils/api'
 import { formatBudget } from '../utils/currency'
@@ -46,7 +46,7 @@ export default function FindWork() {
     try {
       setLoading(true)
       setError(null)
-      const response = await projectService.getAllProjects()
+      const response = await getAllProjectsCached()
       if (response.status) {
         setProjects(response.data || [])
       } else {

@@ -5,9 +5,7 @@ import Button from '../components/Button'
 import UpgradeBanner from '../components/UpgradeBanner'
 import AnimatedCounter from '../components/AnimatedCounter'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
-import { projectService } from '../services/projectService'
-import { bidService } from '../services/bidService'
-import { skillsService } from '../services/skillsService'
+import { getAllProjectsCached, getSkillsCached, getFreelancerBidsCached, clearCache } from '../services/cachedApiService'
 import { formatBudget, formatHourlyRate } from '../utils/currency'
 import { needsUpgrade } from '../utils/subscription'
 import MyBids from '../components/MyBids'
@@ -92,7 +90,7 @@ export default function FreelancerHome() {
 
   const loadSkills = async () => {
     try {
-      const response = await skillsService.getSkills()
+      const response = await getSkillsCached()
       if (response.data && Array.isArray(response.data)) {
         setAvailableSkills(response.data)
       }
@@ -103,8 +101,7 @@ export default function FreelancerHome() {
 
   const loadUserBids = async () => {
     try {
-      const { bidService } = await import('../services/bidService')
-      const response = await bidService.getFreelancerBids()
+      const response = await getFreelancerBidsCached()
       
       if (response.status && response.data) {
         const bidProjectIds = response.data.map(bid => bid.project_id)
@@ -123,7 +120,7 @@ export default function FreelancerHome() {
       setError(null)
       
       // Fetch all projects (not restricted to freelancer bids for browsing)
-      const response = await projectService.getAllProjects()
+      const response = await getAllProjectsCached()
       console.log('📊 FreelancerHome: Projects Response:', response)
       
       if (response.status && response.data) {
@@ -183,7 +180,7 @@ export default function FreelancerHome() {
     try {
       console.log('🔄 FreelancerHome: Fetching active projects for milestone tracking...')
       
-      const bidsResponse = await bidService.getFreelancerBids()
+      const bidsResponse = await getFreelancerBidsCached()
       
       if (bidsResponse.status && bidsResponse.data) {
         console.log('📊 FreelancerHome: All freelancer bids:', bidsResponse.data.length)

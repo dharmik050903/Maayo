@@ -5,14 +5,13 @@ import Button from '../components/Button'
 import UpgradeBanner from '../components/UpgradeBanner'
 import AnimatedCounter from '../components/AnimatedCounter'
 import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
-import { getFreelancers } from '../utils/api'
+import { getFreelancersCached, clearCache } from '../services/cachedApiService'
 import { formatHourlyRate } from '../utils/currency'
 import { needsUpgrade } from '../utils/subscription'
 import { getSafeUrl } from '../utils/urlValidation'
 import confirmationService from '../services/confirmationService.jsx'
 import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 // Escrow components
-import BankDetailsList from '../components/BankDetailsList'
 import CreateEscrowPayment from '../components/CreateEscrowPayment'
 import EscrowStatus from '../components/EscrowStatus'
 import MilestoneManagement from '../components/MilestoneManagement'
@@ -99,7 +98,7 @@ export default function ClientHome() {
       console.log('🔍 ClientHome: API Base URL:', import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api')
       setLoading(true)
       
-      const { response, data } = await getFreelancers({ 
+      const { response, data } = await getFreelancersCached({ 
         limit: freelancersPerPage,
         page: page,
         search: searchTerm
@@ -925,12 +924,6 @@ export default function ClientHome() {
             </h2>
             
             <div className="space-y-8">
-              {/* Bank Details Management */}
-              <div className="bg-white/95 backdrop-blur-sm rounded-lg p-6">
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Bank Details</h3>
-                <BankDetailsList />
-              </div>
-
               {/* Project Selection for Escrow */}
               <div className="bg-white/95 backdrop-blur-sm rounded-lg p-6">
                 <h3 className="text-xl font-semibold text-gray-800 mb-4">{t('projectEscrowManagement')}</h3>

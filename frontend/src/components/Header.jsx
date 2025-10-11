@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom'
 import Logo from './Logo'
 import Button from './Button'
 import { projectService } from '../services/projectService'
-import { getFreelancers } from '../utils/api'
+import { getFreelancersCached } from '../services/cachedApiService'
 import { formatBudget, formatHourlyRate } from '../utils/currency'
 import { getSafeUrl } from '../utils/urlValidation'
 import messagingService from '../services/messagingService.jsx'
@@ -92,7 +92,7 @@ export default function Header({ userType, onLogout, userData }) {
         // Only fetch freelancers if user is authenticated (for search functionality)
         if (isAuthenticated) {
           try {
-            const freelancersResponse = await getFreelancers({})
+            const freelancersResponse = await getFreelancersCached({})
             if (freelancersResponse.response.ok && freelancersResponse.data.status) {
               setFreelancers(freelancersResponse.data.data || [])
             }

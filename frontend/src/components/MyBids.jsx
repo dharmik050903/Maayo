@@ -165,21 +165,21 @@ const MyBids = () => {
   return (
     <div className="space-y-6">
       {/* Header and Filters */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6 mb-8">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
             My <span className="text-mint">Bids</span>
           </h2>
-          <p className="text-white/80 text-sm sm:text-base">
+          <p className="text-white/80 text-lg">
             {bids.length} bid{bids.length !== 1 ? 's' : ''} found
           </p>
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 sm:px-4 py-2 bg-white text-graphite rounded-lg focus:ring-2 focus:ring-mint focus:border-transparent border border-gray-300 text-sm sm:text-base w-full sm:w-auto"
+            className="px-4 sm:px-6 py-3 bg-white text-graphite rounded-2xl focus:ring-2 focus:ring-mint focus:border-transparent border border-gray-300 text-sm sm:text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200 w-full sm:w-auto"
             style={{ color: '#374151' }}
           >
             <option value="all" style={{ color: '#374151', backgroundColor: 'white' }}>All Status</option>
@@ -193,8 +193,11 @@ const MyBids = () => {
             variant="outline"
             size="sm"
             onClick={fetchMyBids}
-            className="border-white text-white hover:bg-white hover:text-graphite w-full sm:w-auto text-sm sm:text-base px-3 sm:px-4 py-2"
+            className="border-white text-white hover:bg-white hover:text-graphite w-full sm:w-auto text-sm sm:text-base px-6 py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
           >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
             Refresh
           </Button>
         </div>
@@ -219,53 +222,53 @@ const MyBids = () => {
           </div>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-8">
           {bids.map((bid) => (
-            <div key={bid._id} className="card p-6 bg-white/95 hover:bg-white transition-colors rounded-3xl shadow-lg">
+            <div key={bid._id} className="card p-8 bg-white/95 hover:bg-white transition-all duration-300 rounded-3xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 border border-white/20">
               <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
                 {/* Bid Info */}
                 <div className="flex-1">
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-                    <h4 className="text-xl font-semibold text-graphite">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+                    <h4 className="text-2xl font-bold text-graphite">
                       {bid.project_id?.title || 'Project Title Not Available'}
                     </h4>
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(bid.status)}`}>
+                    <span className={`px-4 py-2 rounded-2xl text-sm font-semibold shadow-sm ${getStatusColor(bid.status)}`}>
                       {getStatusIcon(bid.status)} {bid.status.charAt(0).toUpperCase() + bid.status.slice(1)}
                     </span>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 bg-mint/20 rounded-lg flex items-center justify-center">
-                        <svg className="w-4 h-4 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+                    <div className="flex items-center bg-gradient-to-r from-green-50 to-mint/10 p-4 rounded-2xl">
+                      <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mr-4">
+                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                         </svg>
                       </div>
                       <div>
-                        <p className="text-sm text-coolgray">Your Bid</p>
-                        <p className="font-semibold text-mint">{formatBudget(bid.bid_amount)}</p>
+                        <p className="text-sm text-gray-600 font-medium">Your Bid</p>
+                        <p className="font-bold text-lg text-gray-800">{formatBudget(bid.bid_amount)}</p>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 bg-coral/20 rounded-lg flex items-center justify-center">
-                        <svg className="w-4 h-4 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="flex items-center bg-gradient-to-r from-orange-50 to-coral/10 p-4 rounded-2xl">
+                      <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mr-4">
+                        <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       </div>
                       <div>
-                        <p className="text-sm text-coolgray">Duration</p>
-                        <p className="font-semibold text-coral">{bid.proposed_duration} days</p>
+                        <p className="text-sm text-gray-600 font-medium">Duration</p>
+                        <p className="font-bold text-lg text-gray-800">{bid.proposed_duration} days</p>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 bg-violet/20 rounded-lg flex items-center justify-center">
-                        <svg className="w-4 h-4 text-violet" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="flex items-center bg-gradient-to-r from-purple-50 to-violet/10 p-4 rounded-2xl">
+                      <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mr-4">
+                        <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
                       </div>
                       <div>
-                        <p className="text-sm text-coolgray">Availability</p>
-                        <p className="font-semibold text-violet">{bid.availability_hours}h/week</p>
+                        <p className="text-sm text-gray-600 font-medium">Availability</p>
+                        <p className="font-bold text-lg text-gray-800">{bid.availability_hours}h/week</p>
                       </div>
                     </div>
                   </div>
@@ -347,21 +350,27 @@ const MyBids = () => {
 
                 {/* Action Buttons */}
                 {bid.status === 'pending' && (
-                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:min-w-[200px]">
+                  <div className="flex flex-col sm:flex-row gap-4 w-full sm:min-w-[250px]">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleUpdateBid(bid)}
-                      className="flex-1 min-w-[120px] w-full sm:w-auto px-4 py-3 text-sm font-semibold border-violet text-violet hover:bg-violet hover:text-white transition-all duration-200 rounded-xl"
+                      className="flex-1 min-w-[140px] w-full sm:w-auto px-6 py-4 text-sm font-semibold border-2 border-violet text-violet hover:bg-violet hover:text-white transition-all duration-200 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                     >
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
                       Update Bid
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleWithdrawBid(bid._id)}
-                      className="flex-1 min-w-[120px] border-coral text-coral hover:bg-coral hover:text-white w-full sm:w-auto px-4 py-3 text-sm font-semibold transition-all duration-200 rounded-xl"
+                      className="flex-1 min-w-[140px] border-2 border-coral text-coral hover:bg-coral hover:text-white w-full sm:w-auto px-6 py-4 text-sm font-semibold transition-all duration-200 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                     >
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
                       Withdraw Bid
                     </Button>
                   </div>
@@ -381,7 +390,7 @@ const MyBids = () => {
                     <Button
                       variant="accent"
                       size="sm"
-                      className="w-full bg-mint text-white hover:bg-mint/90 rounded-xl"
+                      className="w-full bg-mint text-white hover:bg-mint/90 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 px-6 py-4"
                       onClick={() => {
                         console.log('MyBids: Message button clicked for bid:', bid)
                         console.log('MyBids: Client info:', {
@@ -434,7 +443,7 @@ const MyBids = () => {
       {/* Update Modal */}
       {showUpdateModal && selectedBid && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto scrollbar-hide">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-graphite">Update Bid</h3>
               <button

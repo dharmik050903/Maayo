@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { bidService } from '../services/bidService'
+import { getFreelancerBidsCached } from '../services/cachedApiService'
 import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 import Button from './Button'
 import ClientMilestoneReview from './ClientMilestoneReview'
@@ -23,7 +23,7 @@ export default function FreelancerProjects() {
       setLoading(true)
       setError(null)
       
-      const response = await bidService.getFreelancerBids()
+      const response = await getFreelancerBidsCached()
       console.log('📊 FreelancerProjects: Bids response:', response)
       
       if (response.status && response.data) {
@@ -111,12 +111,12 @@ export default function FreelancerProjects() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-white mb-2">
+          <h2 className="text-3xl font-bold text-white mb-3">
             My Accepted Projects ({acceptedProjects.length})
           </h2>
-          <p className="text-white/70">
+          <p className="text-white/80 text-lg">
             Projects where your bid was accepted and you're currently working
           </p>
         </div>
@@ -124,8 +124,11 @@ export default function FreelancerProjects() {
           variant="outline"
           onClick={fetchAcceptedProjects}
           disabled={loading}
-          className="px-6 py-3 border-white text-white hover:bg-white hover:text-graphite rounded-xl"
+          className="px-8 py-4 border-white text-white hover:bg-white hover:text-graphite rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
         >
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
           Refresh
         </Button>
       </div>
@@ -149,38 +152,53 @@ export default function FreelancerProjects() {
           </div>
         </div>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {acceptedProjects.map((project) => (
-            <div key={project._id} className="card p-6 bg-white/95 hover:bg-white transition-all cursor-pointer rounded-3xl shadow-lg">
-              <div className="flex justify-between items-start mb-4">
-                <h4 className="text-xl font-semibold text-graphite flex-1 mr-2">
+            <div key={project._id} className="card p-8 bg-white/95 hover:bg-white transition-all duration-300 cursor-pointer rounded-3xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 border border-white/20">
+              <div className="flex justify-between items-start mb-6">
+                <h4 className="text-2xl font-bold text-graphite flex-1 mr-3">
                   {project.title}
                 </h4>
-                <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium whitespace-nowrap">
+                <span className="px-4 py-2 bg-gradient-to-r from-green-100 to-green-200 text-green-800 rounded-2xl text-sm font-semibold whitespace-nowrap shadow-sm">
                   ✅ Active
                 </span>
               </div>
 
-              <div className="space-y-3 mb-4">
-                <div className="flex items-center text-coolgray">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                  </svg>
-                  <span className="font-semibold">{formatCurrency(project.budget)}</span>
+              <div className="space-y-4 mb-6">
+                <div className="flex items-center text-gray-700 bg-gradient-to-r from-green-50 to-mint/10 p-3 rounded-2xl">
+                  <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center mr-3">
+                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Budget</p>
+                    <p className="font-bold text-lg text-gray-800">{formatCurrency(project.budget)}</p>
+                  </div>
                 </div>
                 
-                <div className="flex items-center text-coolgray">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7h.01M20 7h.01m.01 0v6l-8-3.5L4 13V7h.01z" />
-                  </svg>
-                  <span>{project.client_name}</span>
+                <div className="flex items-center text-gray-700 bg-gradient-to-r from-blue-50 to-violet/10 p-3 rounded-2xl">
+                  <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mr-3">
+                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7h.01M20 7h.01m.01 0v6l-8-3.5L4 13V7h.01z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Client</p>
+                    <p className="font-semibold text-gray-800">{project.client_name}</p>
+                  </div>
                 </div>
                 
-                <div className="flex items-center text-coolgray">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a4 4 0 118 0v4m-4 0h4m-4 0H8m4 0h4m-4 8v4m0-8v8" />
-                  </svg>
-                  <span>{project.milestones?.length || 0} milestones</span>
+                <div className="flex items-center text-gray-700 bg-gradient-to-r from-purple-50 to-coral/10 p-3 rounded-2xl">
+                  <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center mr-3">
+                    <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a4 4 0 118 0v4m-4 0h4m-4 0H8m4 0h4m-4 8v4m0-8v8" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Milestones</p>
+                    <p className="font-semibold text-gray-800">{project.milestones?.length || 0} milestones</p>
+                  </div>
                 </div>
               </div>
 
@@ -193,13 +211,13 @@ export default function FreelancerProjects() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-3">
+              <div className="flex gap-4">
                 <Button
                   variant="outline"
-                  className="flex-1 px-4 py-3 border-mint text-mint hover:bg-mint hover:text-white rounded-xl"
+                  className="flex-1 px-6 py-4 border-2 border-mint text-mint hover:bg-mint hover:text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
                   onClick={() => handleProjectClick(project)}
                 >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.269-2.943-9.542-7z" />
                   </svg>
@@ -208,8 +226,11 @@ export default function FreelancerProjects() {
                 <Button
                   variant="outline"
                   onClick={() => handleProjectClick(project)}
-                  className="px-4 py-3 border-mint text-mint hover:bg-mint hover:text-white rounded-xl"
+                  className="px-6 py-4 border-2 border-violet text-violet hover:bg-violet hover:text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
                 >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
                   Update Progress
                 </Button>
               </div>
@@ -222,7 +243,7 @@ export default function FreelancerProjects() {
       {showProjectDetail && selectedProject && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="fixed inset-0 bg-black bg-opacity-50 bg-blur-sm" onClick={closeProjectDetail}></div>
-          <div className="relative bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="relative bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto scrollbar-hide">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-graphite">
                 {selectedProject.title}

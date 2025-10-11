@@ -325,6 +325,52 @@ export const escrowService = {
   },
 
   /**
+   * Reset escrow status for failed payments
+   * @param {string} projectId - Project ID
+   * @returns {Promise<Object>} Reset response
+   */
+  async resetEscrowStatus(projectId) {
+    try {
+      console.log('Resetting escrow status for project:', projectId)
+      
+      const response = await authenticatedFetch(`${API_BASE_URL}/escrow/reset`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ project_id: projectId })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        const errorMessage = errorData.message || `HTTP error! status: ${response.status}`
+        console.error('❌ EscrowService: Reset escrow status failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorMessage,
+          projectId
+        })
+        throw new Error(errorMessage)
+      }
+
+      const result = await response.json()
+      console.log('✅ EscrowService: Escrow status reset successfully:', result)
+      
+      return {
+        status: true,
+        message: result.message || 'Escrow status reset successfully'
+      }
+    } catch (error) {
+      console.error('❌ EscrowService: Error resetting escrow status:', error)
+      return {
+        status: false,
+        message: error.message || 'Failed to reset escrow status',
+        error: error.message
+      }
+    }
+  },
+
+  /**
    * Cancel existing escrow payment
    * @param {string} projectId - Project ID
    * @returns {Promise<Object>} Cancellation response

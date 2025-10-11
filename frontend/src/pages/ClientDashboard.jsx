@@ -5,7 +5,8 @@ import Button from '../components/Button'
 import AnimatedCounter from '../components/AnimatedCounter'
 import MyProjects from '../components/MyProjects'
 import FreelancerProfileModal from '../components/FreelancerProfileModal'
-import { authenticatedFetch, isAuthenticated, getCurrentUser, clearAuth, getFreelancers } from '../utils/api'
+import { authenticatedFetch, isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
+import { getFreelancersCached, clearCache } from '../services/cachedApiService'
 import { projectService } from '../services/projectService'
 import { formatBudget, formatHourlyRate } from '../utils/currency'
 import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
@@ -183,7 +184,7 @@ export default function ClientDashboard() {
       setFreelancersLoading(true)
       setFreelancerError(null)
       
-      const { response, data } = await getFreelancers({ 
+      const { response, data } = await getFreelancersCached({ 
         limit: freelancersPerPage,
         page: page,
         search: searchTerm

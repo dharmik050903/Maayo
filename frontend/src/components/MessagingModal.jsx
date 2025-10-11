@@ -268,7 +268,10 @@ export default function MessagingModal({ isOpen, onClose, currentUser, otherUser
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-graphite">
-                  {currentUser?.name || 'You'} ↔ {otherUser?.name || 'User'}
+                  {getCurrentUser()?.first_name && getCurrentUser()?.last_name 
+                    ? `${getCurrentUser().first_name} ${getCurrentUser().last_name}` 
+                    : getCurrentUser()?.name || 'You'
+                  } ↔ {otherUser?.name || 'User'}
                 </h3>
                 <p className="text-sm text-coolgray">
                   Project: {project?.title || 'Unknown Project'}
@@ -333,7 +336,12 @@ export default function MessagingModal({ isOpen, onClose, currentUser, otherUser
                     <p className={`text-xs mb-1 ${
                       isOwnMessage ? 'text-right text-mint' : 'text-left text-coolgray'
                     }`}>
-                      {message.from_person_name || (isOwnMessage ? 'You' : 'Other')}
+                      {isOwnMessage 
+                        ? (getCurrentUser()?.first_name && getCurrentUser()?.last_name 
+                            ? `${getCurrentUser().first_name} ${getCurrentUser().last_name}` 
+                            : getCurrentUser()?.name || 'You')
+                        : (message.from_person_name || otherUser?.name || 'Other')
+                      }
                     </p>
                     <div
                       className={`px-4 py-2 rounded-lg ${

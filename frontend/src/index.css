@@ -48,6 +48,15 @@ header {
   @apply transform hover:-translate-y-1 transition-all duration-300;
 }
 
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar { 
+  display: none;  /* Safari and Chrome */
+}
+
 .custom-button-text {
   color: #374151 !important;
 }

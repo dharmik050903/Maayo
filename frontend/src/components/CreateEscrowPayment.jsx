@@ -13,14 +13,24 @@ const CreateEscrowPayment = ({ projectId, onSuccess }) => {
     setError('')
     
     try {
-      await escrowService.cancelEscrowPayment(projectId)
-      setShowExistingEscrowOptions(false)
-      setError('')
-      // Now try to create the new escrow
-      await handleCreateEscrow()
+      console.log('🔄 CreateEscrowPayment: Resetting escrow status...')
+      
+      const resetResponse = await escrowService.resetEscrowStatus(projectId)
+      
+      if (resetResponse.status) {
+        console.log('✅ CreateEscrowPayment: Escrow status reset successfully')
+        setShowExistingEscrowOptions(false)
+        setError('')
+        
+        // Now try to create the new escrow
+        await handleCreateEscrow()
+      } else {
+        setError('Failed to reset escrow status: ' + resetResponse.message)
+      }
     } catch (error) {
-      console.error('Error cancelling existing escrow:', error)
-      setError('Failed to cancel existing escrow. Please contact support.')
+      console.error('Error resetting escrow:', error)
+      setError('Failed to reset escrow status. Please contact support.')
+    } finally {
       setLoading(false)
     }
   }

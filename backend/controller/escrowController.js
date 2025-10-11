@@ -64,12 +64,17 @@ export default class EscrowController {
                 });
             }
 
-            // Check if escrow already exists
-            if (project.escrow_amount) {
+            // Check if escrow already exists and is active/completed
+            if (project.escrow_amount && (project.escrow_status === 'pending' || project.escrow_status === 'completed')) {
                 return res.status(400).json({ 
                     status: false, 
                     message: "Escrow payment already exists for this project" 
                 });
+            }
+
+            // If escrow exists but failed/cancelled, allow recreation
+            if (project.escrow_amount && (project.escrow_status === 'failed' || project.escrow_status === 'not_created')) {
+                console.log('Previous escrow was failed/cancelled, allowing recreation');
             }
 
             // Get freelancer's bank details
@@ -100,7 +105,7 @@ export default class EscrowController {
 
             const order = await razorpay.orders.create(orderOptions);
 
-            // Update project with escrow information
+            // Update project with escrow information ONLY after successful order creation
             await projectinfo.findByIdAndUpdate(project_id, {
                 escrow_amount: final_amount,
                 escrow_order_id: order.id,
@@ -455,6 +460,73 @@ export default class EscrowController {
             return res.status(500).json({ 
                 status: false, 
                 message: "Failed to fetch escrow status", 
+                error: error.message 
+            });
+        }
+    }
+
+    // Reset escrow status (for failed payments)
+    async resetEscrowStatus(req, res) {
+        try {
+            const userRole = req.headers.user_role;
+            const userId = req.headers.id;
+
+            if (userRole !== 'client') {
+                return res.status(403).json({ 
+                    status: false, 
+                    message: "Access denied. Only clients can reset escrow status." 
+                });
+            }
+
+            const { project_id } = req.body;
+
+            if (!project_id) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "project_id is required" 
+                });
+            }
+
+            // Get project and verify ownership
+            const project = await projectinfo.findById(project_id);
+            
+            if (!project) {
+                return res.status(404).json({ 
+                    status: false, 
+                    message: "Project not found" 
+                });
+            }
+
+            if (project.personid.toString() !== userId) {
+                return res.status(403).json({ 
+                    status: false, 
+                    message: "You can only reset escrow status for your own projects" 
+                });
+            }
+
+            // Only reset if status is pending (payment failed/cancelled)
+            if (project.escrow_status === 'pending') {
+                await projectinfo.findByIdAndUpdate(project_id, {
+                    escrow_status: 'failed',
+                    updatedAt: new Date().toISOString()
+                });
+
+                return res.status(200).json({
+                    status: true,
+                    message: "Escrow status reset successfully"
+                });
+            } else {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Cannot reset escrow status. Current status: " + project.escrow_status 
+                });
+            }
+
+        } catch (error) {
+            console.error("Error resetting escrow status:", error);
+            return res.status(500).json({ 
+                status: false, 
+                message: "Failed to reset escrow status", 
                 error: error.message 
             });
         }

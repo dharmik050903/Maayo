@@ -126,7 +126,7 @@ router.post("/bank-details/delete", auth, bankDetailsController.deleteBankDetail
 router.post("/escrow/create", auth, escrowController.createEscrowPayment);
 router.post("/escrow/verify", auth, escrowController.verifyEscrowPayment);
 router.post("/escrow/release-milestone", auth, escrowController.releaseMilestonePayment);
-router.post("/escrow/status", auth, escrowController.getEscrowStatus);
+router.post("/escrow/reset", auth, escrowController.resetEscrowStatus);
 
 // Milestone Management routes
 router.post("/milestone/complete", auth, milestoneController.completeMilestone);

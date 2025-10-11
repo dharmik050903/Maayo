@@ -156,7 +156,97 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
           
         } else {
           // Escrow is pending, need to complete it first
-          throw new Error('Escrow payment is pending. Please complete the escrow payment first before releasing milestones.')
+          console.log('🔄 ClientMilestoneReview: Escrow is pending, attempting to reset...')
+          
+          // Try to reset the escrow status first
+          const resetResponse = await escrowService.resetEscrowStatus(projectId)
+          
+          if (resetResponse.status) {
+            console.log('✅ ClientMilestoneReview: Escrow status reset, retrying payment...')
+            
+            // Retry creating escrow payment
+            const createResponse = await escrowService.createEscrowPayment(projectId, escrowStatus.final_project_amount)
+            
+            if (!createResponse.status) {
+              throw new Error('Failed to create escrow after reset: ' + createResponse.message)
+            }
+            
+            console.log('✅ ClientMilestoneReview: Escrow created after reset, now processing payment...')
+            
+            // Process the Razorpay payment for escrow creation
+            const razorpayOptions = {
+              amount: createResponse.data.amount,
+              currency: createResponse.data.currency || 'INR',
+              order_id: createResponse.data.order_id,
+              name: 'Maayo Platform',
+              description: `Escrow Payment for Project: ${projectTitle}`,
+              image: '/favicon.ico',
+              
+              prefill: {
+                name: 'Client',
+                email: 'client@example.com',
+              },
+              
+              handler: async (response) => {
+                console.log('✅ ClientMilestoneReview: Escrow payment completed:', response)
+                
+                try {
+                  // Verify the escrow payment
+                  const verifyResponse = await escrowService.verifyEscrowPayment(
+                    projectId,
+                    response.razorpay_payment_id,
+                    response.razorpay_signature
+                  )
+                  
+                  if (verifyResponse.status) {
+                    console.log('✅ ClientMilestoneReview: Escrow verified, now releasing milestone...')
+                    
+                    // Now release the milestone payment
+                    const releaseResponse = await escrowService.releaseMilestonePayment(
+                      projectId,
+                      milestone.index
+                    )
+                    
+                    if (releaseResponse.status) {
+                      alert('Payment processed successfully! Milestone approved and payment released to freelancer.')
+                      fetchMilestones() // Refresh milestones
+                    } else {
+                      alert('Escrow created but milestone release failed: ' + releaseResponse.message)
+                    }
+                  } else {
+                    alert('Escrow payment verification failed: ' + verifyResponse.message)
+                  }
+                } catch (verifyError) {
+                  console.error('❌ ClientMilestoneReview: Escrow verification error:', verifyError)
+                  alert('Escrow payment successful but verification failed. Please contact support.')
+                }
+              },
+              
+              modal: {
+                ondismiss: () => {
+                  console.log('❌ ClientMilestoneReview: Escrow payment cancelled by user')
+                  setPayingMilestone(null)
+                }
+              },
+              
+              notes: {
+                project_id: projectId,
+                type: 'escrow_payment',
+                milestone_index: milestone.index
+              }
+            }
+            
+            const razorpay = await initializeRazorpay(razorpayOptions)
+            
+            if (!razorpay) {
+              throw new Error('Failed to initialize Razorpay payment')
+            }
+            
+            razorpay.open()
+            
+          } else {
+            throw new Error('Failed to reset escrow status: ' + resetResponse.message)
+          }
         }
         
       } else if (escrowStatus.escrow_status === 'completed') {
