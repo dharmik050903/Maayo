@@ -76,11 +76,23 @@ export default class Project {
             // Build filter for list
             const filter = {};
             const userRole = req.headers.user_role;
-            // If requester is a freelancer, force pending-only listings (not active and not completed)
+            const userId = req.headers._id; // Get the user ID from headers
+            
+            // If requester is a freelancer, they can see:
+            // 1. Pending projects (to bid on)
+            // 2. Projects where they are the assigned freelancer (accepted projects)
             if (userRole === 'freelancer') {
-                filter.ispending = 1;
-                filter.isactive = 0;
-                filter.iscompleted = 0;
+                // Check if freelancer is requesting their own projects (accepted projects)
+                if (personid && personid === userId) {
+                    // Freelancer is requesting their own projects - show active/completed projects where they are assigned
+                    filter.freelancerid = { $elemMatch: { freelancerid: userId } };
+                    // Don't force pending-only for their own projects
+                } else {
+                    // Freelancer is browsing for new projects - show only pending projects
+                    filter.ispending = 1;
+                    filter.isactive = 0;
+                    filter.iscompleted = 0;
+                }
             }
             if (personid) filter.personid = personid;
             if (status) filter.status = status;

@@ -50,7 +50,9 @@ const checkFreelancerProfileExists = async (userId) => {
         }
       })
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
-      const response = await fetch(`${API_BASE_URL}/freelancer/info/list`, {
+      
+      // Try to find freelancer profile by personId using the list endpoint
+      const response = await fetch(`${API_BASE_URL}/freelancer/list`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -60,7 +62,7 @@ const checkFreelancerProfileExists = async (userId) => {
           'user_email': authHeaders.userEmail
         },
         body: JSON.stringify({ 
-          id: userId,
+          id: userId, // This will be used to find by personId in the backend
           user_role: "freelancer"
         })
       })
@@ -68,18 +70,25 @@ const checkFreelancerProfileExists = async (userId) => {
       console.log('🔍 API response:', {
         status: response.status,
         statusText: response.statusText,
-        ok: response.ok
+        ok: response.ok,
+        url: `${API_BASE_URL}/freelancer/list`
       })
       
       if (response.ok) {
         const data = await response.json()
         console.log('✅ Profile exists in database:', data)
+        console.log('✅ Profile data structure:', {
+          hasData: !!data.data,
+          dataKeys: data.data ? Object.keys(data.data) : 'no data',
+          profileId: data.data?._id
+        })
         
         // Store profile data in localStorage for future quick access
         localStorage.setItem('freelancer_profile_completed', 'true')
         localStorage.setItem('freelancer_profile_data', JSON.stringify(data.data))
         if (data.data && data.data._id) {
           localStorage.setItem('freelancer_profile_id', data.data._id)
+          console.log('✅ Stored profile ID:', data.data._id)
         }
         
         return true
@@ -87,6 +96,7 @@ const checkFreelancerProfileExists = async (userId) => {
         const errorData = await response.json()
         console.log('❌ Profile not found in database:', {
           status: response.status,
+          statusText: response.statusText,
           error: errorData
         })
         return false
@@ -124,6 +134,10 @@ const checkClientProfileExists = async (userId) => {
     // Check database directly for profile existence
     console.log('🔍 Checking database for client profile...')
     try {
+      // Get auth headers from localStorage
+      const authHeaders = JSON.parse(localStorage.getItem('authHeaders') || '{}')
+      
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
       const response = await authenticatedFetch(`${API_BASE_URL}/client/info/update`, {
         method: 'POST',
         body: JSON.stringify({ personId: userId })
@@ -343,8 +357,10 @@ export default function Login() {
       try {
         if (user.user_type === 'freelancer') {
           console.log('🔍 Checking freelancer profile...')
+          console.log('🔍 User ID for profile check:', user._id)
           const profileExists = await checkFreelancerProfileExists(user._id)
           console.log('📋 Freelancer profile exists:', profileExists)
+          console.log('📋 Profile check result type:', typeof profileExists)
           if (profileExists) {
             console.log('✅ Redirecting to freelancer-home')
             window.location.href = "/freelancer-home"

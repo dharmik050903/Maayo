@@ -20,6 +20,21 @@ export default function FreelancerProjects() {
   const fetchAcceptedProjects = async () => {
     try {
       console.log('🔄 FreelancerProjects: Fetching accepted projects...')
+      console.log('🔍 FreelancerProjects: Checking authentication...')
+      
+      // Check authentication before making API call
+      const authHeaders = JSON.parse(localStorage.getItem('authHeaders') || '{}')
+      console.log('🔍 FreelancerProjects: Auth headers:', {
+        hasToken: !!authHeaders.token,
+        userId: authHeaders._id,
+        userRole: authHeaders.userRole,
+        userEmail: authHeaders.userEmail
+      })
+      
+      if (!authHeaders.token) {
+        throw new Error('No authentication found. Please log in again.')
+      }
+      
       setLoading(true)
       setError(null)
       
@@ -100,8 +115,11 @@ export default function FreelancerProjects() {
         </div>
         <button
           onClick={fetchAcceptedProjects}
-          className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          className="mt-3 px-6 py-3 bg-violet text-white rounded-[1.5rem] hover:bg-violet/90 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
         >
+          <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
           Try Again
         </button>
       </div>
@@ -124,12 +142,17 @@ export default function FreelancerProjects() {
           variant="outline"
           onClick={fetchAcceptedProjects}
           disabled={loading}
-          className="px-8 py-4 border-white text-white hover:bg-white hover:text-graphite rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+          className="px-8 py-4 border-2 border-violet/30 bg-violet/10 text-violet hover:bg-violet hover:text-white hover:border-violet rounded-[1.5rem] font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm"
         >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg 
+            className={`w-5 h-5 mr-2 transition-transform duration-300 ${loading ? 'animate-spin' : ''}`} 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
-          Refresh
+          {loading ? 'Refreshing...' : 'Refresh'}
         </Button>
       </div>
 

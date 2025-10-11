@@ -39,9 +39,18 @@ export default class FreelancerInfo {
             // Build filter object
             const filter = {};
 
-            // Single freelancer by ID
+            // Single freelancer by ID (profile ID) or personId (user ID)
             if (id) {
-                const freelancer = await freelancerInfo.findById(id).populate('personId', 'email contact_number country');
+                let freelancer;
+                
+                // First try to find by profile ID
+                freelancer = await freelancerInfo.findById(id).populate('personId', 'email contact_number country');
+                
+                // If not found by profile ID, try to find by personId (user ID)
+                if (!freelancer) {
+                    freelancer = await freelancerInfo.findOne({ personId: id }).populate('personId', 'email contact_number country');
+                }
+                
                 if (!freelancer) {
                     return res.status(404).json({
                         status: false,

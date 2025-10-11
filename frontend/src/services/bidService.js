@@ -33,11 +33,15 @@ export const bidService = {
       // Create debug version of authenticatedFetch call to see what's being sent
       console.log('🔐 BidService: Call authenticatedFetch with debug headers...')
       
+      // Get user role from auth headers
+      const userRole = authData.userRole || 'freelancer'
+      console.log('🔍 BidService: Using user role from auth headers:', userRole)
+      
       const response = await authenticatedFetch(`${API_BASE_URL}/bid/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'user_role': 'freelancer'
+          'user_role': userRole
         },
         body: JSON.stringify(bidData)
       })
@@ -283,18 +287,46 @@ export const bidService = {
     try {
       console.log('Fetching freelancer bids:', freelancerId)
       
+      // Get user role from auth headers
+      const authHeaders = JSON.parse(localStorage.getItem('authHeaders') || '{}')
+      const userRole = authHeaders.userRole || 'freelancer'
+      
+      console.log('🔍 BidService: Using user role from auth headers:', userRole)
+      
+      console.log('🔍 BidService: Request details:', {
+        url: `${API_BASE_URL}/bid/freelancer`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'user_role': userRole
+        },
+        body: {
+          // Don't send freelancer_id - let backend use current user's ID
+          status: status,
+          page: page,
+          limit: limit
+        },
+        authHeaders: authHeaders
+      })
+      
       const response = await authenticatedFetch(`${API_BASE_URL}/bid/freelancer`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'user_role': 'freelancer'
+          'user_role': userRole
         },
         body: JSON.stringify({
-          freelancer_id: freelancerId,
+          // Don't send freelancer_id - let backend use current user's ID
           status: status,
           page: page,
           limit: limit
         })
+      })
+      
+      console.log('📡 BidService: Response details:', {
+        status: response.status,
+        ok: response.ok,
+        statusText: response.statusText
       })
       
       if (!response.ok) {
@@ -302,14 +334,33 @@ export const bidService = {
         try {
           const errorData = await response.json()
           errorMessage = errorData.message || errorMessage
+          console.log('❌ BidService: Error response data:', errorData)
+          console.log('❌ BidService: Response status:', response.status)
         } catch (parseError) {
           errorMessage = `Server error: ${response.status} ${response.statusText}`
+          console.log('❌ BidService: Could not parse error response')
         }
+        
+        // Special handling for 403 Forbidden
+        if (response.status === 403) {
+          errorMessage = 'Access denied. You can only view your own bids.'
+          console.log('🚫 BidService: 403 Forbidden - Check user authentication and role')
+          console.log('🚫 BidService: Auth headers:', authHeaders)
+        }
+        
         throw new Error(errorMessage)
       }
       
       const data = await response.json()
-      console.log('Freelancer bids fetched successfully:', data.data?.length || 0)
+      console.log('📊 BidService: Response data:', data)
+      
+      // Check if the response contains an error message even with 200 status
+      if (data.status === false) {
+        console.log('❌ BidService: Backend returned error in response body:', data.message)
+        throw new Error(data.message || 'Failed to fetch freelancer bids')
+      }
+      
+      console.log('✅ Freelancer bids fetched successfully:', data.data?.length || 0)
       
       return {
         status: true,
@@ -724,11 +775,15 @@ SUGGESTION: Contact backend developer to verify project ownership data.`)
     try {
       console.log('Withdrawing bid:', bidId)
       
+      // Get user role from auth headers
+      const authHeaders = JSON.parse(localStorage.getItem('authHeaders') || '{}')
+      const userRole = authHeaders.userRole || 'freelancer'
+      
       const response = await authenticatedFetch(`${API_BASE_URL}/bid/withdraw`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'user_role': 'freelancer'
+          'user_role': userRole
         },
         body: JSON.stringify({
           bid_id: bidId
@@ -768,11 +823,15 @@ SUGGESTION: Contact backend developer to verify project ownership data.`)
     try {
       console.log('Updating bid:', bidId, updateData)
       
+      // Get user role from auth headers
+      const authHeaders = JSON.parse(localStorage.getItem('authHeaders') || '{}')
+      const userRole = authHeaders.userRole || 'freelancer'
+      
       const response = await authenticatedFetch(`${API_BASE_URL}/bid/update`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'user_role': 'freelancer'
+          'user_role': userRole
         },
         body: JSON.stringify({
           bid_id: bidId,
