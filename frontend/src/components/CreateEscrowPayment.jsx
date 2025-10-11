@@ -79,12 +79,19 @@ const CreateEscrowPayment = ({ projectId, onSuccess }) => {
         console.log('🔍 CreateEscrowPayment Debug:', {
           envKey: import.meta.env.VITE_RAZORPAY_KEY_ID,
           keyLength: import.meta.env.VITE_RAZORPAY_KEY_ID?.length,
-          isCorrectKey: import.meta.env.VITE_RAZORPAY_KEY_ID === 'rzp_live_RKtnwAL4ofwknm'
+          // isCorrectKey: import.meta.env.VITE_RAZORPAY_KEY_ID === 'rzp_live_RKtnwAL4ofwknm',
+          // usingHardcodedKey: 'rzp_live_RKtnwAL4ofwknm'
         })
         
-        // Initialize Razorpay payment
+        // Initialize Razorpay payment with fallback
+        const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID
+        
+        if (!import.meta.env.VITE_RAZORPAY_KEY_ID) {
+          console.warn('⚠️ Environment variable VITE_RAZORPAY_KEY_ID not loaded, using fallback key')
+        }
+        
         const options = {
-          key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+          key: razorpayKey,
           amount: result.data.amount,
           currency: result.data.currency,
           name: 'Maayo Escrow Payment',

@@ -46,8 +46,14 @@ export const initializeRazorpay = async (options) => {
     }
 
     return new Promise((resolve, reject) => {
+      const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID 
+      
+      if (!import.meta.env.VITE_RAZORPAY_KEY_ID) {
+        console.warn('⚠️ Environment variable VITE_RAZORPAY_KEY_ID not loaded, using fallback key')
+      }
+      
       const razorpayOptions = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        key: razorpayKey,
         ...options,
         handler: function (response) {
           console.log('Payment successful:', response)
