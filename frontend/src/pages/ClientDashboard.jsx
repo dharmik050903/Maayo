@@ -4,6 +4,7 @@ import Header from '../components/Header'
 import Button from '../components/Button'
 import AnimatedCounter from '../components/AnimatedCounter'
 import MyProjects from '../components/MyProjects'
+import FreelancerProfileModal from '../components/FreelancerProfileModal'
 import { authenticatedFetch, isAuthenticated, getCurrentUser, clearAuth, getFreelancers } from '../utils/api'
 import { projectService } from '../services/projectService'
 import { formatBudget, formatHourlyRate } from '../utils/currency'
@@ -30,6 +31,10 @@ export default function ClientDashboard() {
   const [totalPages, setTotalPages] = useState(1)
   const [totalFreelancers, setTotalFreelancers] = useState(0)
   const freelancersPerPage = 12
+  
+  // Freelancer profile modal state
+  const [showFreelancerModal, setShowFreelancerModal] = useState(false)
+  const [selectedFreelancer, setSelectedFreelancer] = useState(null)
   
   const hasInitialized = useRef(false)
 
@@ -399,6 +404,13 @@ export default function ClientDashboard() {
     window.location.href = '/'
   }
 
+  // Handle freelancer profile view
+  const handleViewFreelancerProfile = (freelancer) => {
+    console.log('Viewing freelancer profile:', freelancer)
+    setSelectedFreelancer(freelancer)
+    setShowFreelancerModal(true)
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
@@ -419,7 +431,7 @@ export default function ClientDashboard() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 md:px-6 pt-20 pb-8">
+      <main className="flex-1 max-w-7xl mx-auto px-4 md:px-6 pt-24 sm:pt-28 pb-8">
         {/* Welcome Section */}
         <div className="mb-6 md:mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 md:gap-6">
@@ -433,17 +445,17 @@ export default function ClientDashboard() {
             </div>
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <Button
-                variant="accent"
-                onClick={() => navigate('/create-project')}
-                className="border-mint text-mint hover:bg-mint hover:text-white w-full sm:w-auto"
+                variant="outline"
+                onClick={() => navigate('/project/create')}
+                className="!border-violet !text-violet hover:!bg-violet hover:!text-white w-full sm:w-auto backdrop-blur-sm bg-violet/10 transition-all duration-200"
                 size="lg"
               >
                 Create Project
               </Button>
               <Button
-                variant="accent"
+                variant="outline"
                 onClick={() => navigate('/client/jobs')}
-                className="border-mint text-mint hover:bg-mint hover:text-white w-full sm:w-auto"
+                className="!border-violet !text-violet hover:!bg-violet hover:!text-white w-full sm:w-auto backdrop-blur-sm bg-violet/10 transition-all duration-200"
                 size="lg"
               >
                 Manage Jobs
@@ -459,7 +471,7 @@ export default function ClientDashboard() {
               onClick={() => setActiveSection('overview')}
               className={`px-3 sm:px-6 py-2 sm:py-3 rounded-md font-medium transition-all duration-300 text-sm ${
                 activeSection === 'overview'
-                  ? 'bg-white text-graphite shadow-sm'
+                  ? 'bg-white text-gray-800 shadow-sm'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
@@ -469,7 +481,7 @@ export default function ClientDashboard() {
               onClick={() => setActiveSection('projects')}
               className={`px-3 sm:px-6 py-2 sm:py-3 rounded-md font-medium transition-all duration-300 text-sm ${
                 activeSection === 'projects'
-                  ? 'bg-white text-graphite shadow-sm'
+                  ? 'bg-white text-gray-800 shadow-sm'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
@@ -479,7 +491,7 @@ export default function ClientDashboard() {
               onClick={() => setActiveSection('freelancers')}
               className={`px-3 sm:px-6 py-2 sm:py-3 rounded-md font-medium transition-all duration-300 text-sm ${
                 activeSection === 'freelancers'
-                  ? 'bg-white text-graphite shadow-sm'
+                  ? 'bg-white text-gray-800 shadow-sm'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
@@ -493,7 +505,7 @@ export default function ClientDashboard() {
           <>
             {/* Stats Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
-              <div className="card p-4 md:p-6 bg-white/95">
+              <div className="bg-white/95 rounded-[2rem] p-4 md:p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
                 <div className="flex items-center">
                   <div className="p-3 bg-mint/20 rounded-lg">
                     <svg className="w-6 h-6 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -502,14 +514,14 @@ export default function ClientDashboard() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-coolgray">Total Spend</p>
-                    <p className="text-2xl font-bold text-graphite">
+                    <p className="text-2xl font-bold text-gray-800">
                       {formatBudget(clientInfo?.total_spend || 0)}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="card p-4 md:p-6 bg-white/95">
+              <div className="bg-white/95 rounded-[2rem] p-4 md:p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
                 <div className="flex items-center">
                   <div className="p-3 bg-violet/20 rounded-lg">
                     <svg className="w-6 h-6 text-violet" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -518,7 +530,7 @@ export default function ClientDashboard() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-coolgray">Total Projects</p>
-                    <p className="text-2xl font-bold text-graphite">
+                    <p className="text-2xl font-bold text-gray-800">
                       {projectsLoading ? (
                         <div className="flex items-center justify-center">
                           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-graphite"></div>
@@ -531,7 +543,7 @@ export default function ClientDashboard() {
                 </div>
               </div>
 
-              <div className="card p-4 md:p-6 bg-white/95">
+              <div className="bg-white/95 rounded-[2rem] p-4 md:p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
                 <div className="flex items-center">
                   <div className="p-3 bg-coral/20 rounded-lg">
                     <svg className="w-6 h-6 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -540,14 +552,14 @@ export default function ClientDashboard() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-coolgray">Completed Projects</p>
-                    <p className="text-2xl font-bold text-graphite">
+                    <p className="text-2xl font-bold text-gray-800">
                       {clientInfo?.completed_project || '0'}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="card p-4 md:p-6 bg-white/95">
+              <div className="bg-white/95 rounded-[2rem] p-4 md:p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
                 <div className="flex items-center">
                   <div className="p-3 bg-primary/20 rounded-lg">
                     <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -556,7 +568,7 @@ export default function ClientDashboard() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-coolgray">Pending Reviews</p>
-                    <p className="text-2xl font-bold text-graphite">
+                    <p className="text-2xl font-bold text-gray-800">
                       {clientInfo?.pending_reviews || '0'}
                     </p>
                   </div>
@@ -568,14 +580,14 @@ export default function ClientDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
               {/* Profile Card */}
               <div className="lg:col-span-1">
-                <div className="card p-4 md:p-6 bg-white/95">
+                <div className="bg-white/95 rounded-[2rem] p-4 md:p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
                   <div className="text-center">
                     <div className="w-24 h-24 bg-mint/20 rounded-full mx-auto mb-4 flex items-center justify-center">
                       <span className="text-2xl font-bold text-mint uppercase">
                         {userData?.first_name?.[0]}{userData?.last_name?.[0]}
                       </span>
                     </div>
-                    <h3 className="text-xl font-semibold text-graphite uppercase">
+                    <h3 className="text-xl font-semibold text-gray-800 uppercase">
                       {userData?.first_name} {userData?.last_name}
                     </h3>
                     <p className="text-coolgray">{userData?.country}</p>
@@ -584,17 +596,17 @@ export default function ClientDashboard() {
                   
                   <div className="mt-6 space-y-4">
                     <div>
-                      <h4 className="font-medium text-graphite">User Type</h4>
+                      <h4 className="font-medium text-gray-800">User Type</h4>
                       <p className="text-coolgray capitalize">Client</p>
                     </div>
                     <div>
-                      <h4 className="font-medium text-graphite">Member Since</h4>
+                      <h4 className="font-medium text-gray-800">Member Since</h4>
                       <p className="text-coolgray">
                         {userData?.createdAt ? new Date(userData.createdAt).toLocaleDateString() : 'N/A'}
                       </p>
                     </div>
                     <div>
-                      <h4 className="font-medium text-graphite">Last Login</h4>
+                      <h4 className="font-medium text-gray-800">Last Login</h4>
                       <p className="text-coolgray">
                         {userData?.last_login ? new Date(userData.last_login).toLocaleDateString() : 'N/A'}
                       </p>
@@ -606,52 +618,52 @@ export default function ClientDashboard() {
               {/* Main Content */}
               <div className="lg:col-span-2 space-y-8">
                 {/* Quick Actions */}
-                <div className="card p-4 md:p-6 bg-white/95">
-                  <h3 className="text-lg font-semibold text-graphite mb-4">Quick Actions</h3>
+                <div className="bg-white/95 rounded-[2rem] p-4 md:p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-                    <Link to="/create-project" className="w-full">
-                      <Button variant="accent" className="w-full border-mint text-mint hover:bg-mint hover:text-white">
+                    <Link to="/project/create" className="w-full">
+                      <Button variant="outline" className="w-full !border-violet !text-violet hover:!bg-violet hover:!text-white backdrop-blur-sm bg-violet/10 transition-all duration-200">
                         Post a New Project
                       </Button>
                     </Link>
                     <Link to="/client/jobs/create" className="w-full">
-                      <Button variant="accent" className="w-full border-mint text-mint hover:bg-mint hover:text-white">
+                      <Button variant="outline" className="w-full !border-violet !text-violet hover:!bg-violet hover:!text-white backdrop-blur-sm bg-violet/10 transition-all duration-200">
                         Post a New Job
                       </Button>
                     </Link>
                     <Button 
-                      variant="accent" 
-                      className="w-full border-mint text-mint hover:bg-mint hover:text-white"
+                      variant="outline" 
+                      className="w-full !border-violet !text-violet hover:!bg-violet hover:!text-white backdrop-blur-sm bg-violet/10 transition-all duration-200"
                       onClick={() => setActiveSection('freelancers')}
                     >
                       Browse Freelancers
                     </Button>
                     <Button 
-                      variant="accent" 
-                      className="w-full border-mint text-mint hover:bg-mint hover:text-white"
+                      variant="outline" 
+                      className="w-full !border-violet !text-violet hover:!bg-violet hover:!text-white backdrop-blur-sm bg-violet/10 transition-all duration-200"
                       onClick={() => navigate('/messages')}
                     >
                       View Messages
                     </Button>
                     <Button 
-                      variant="accent" 
-                      className="w-full border-mint text-mint hover:bg-mint hover:text-white"
+                      variant="outline" 
+                      className="w-full !border-violet !text-violet hover:!bg-violet hover:!text-white backdrop-blur-sm bg-violet/10 transition-all duration-200"
                       onClick={() => setActiveSection('projects')}
                     >
                       Manage Projects
                     </Button>
                     <Link to="/client/jobs">
                       <Button 
-                        variant="accent" 
-                        className="w-full border-mint text-mint hover:bg-mint hover:text-white"
+                        variant="outline" 
+                        className="w-full !border-violet !text-violet hover:!bg-violet hover:!text-white backdrop-blur-sm bg-violet/10 transition-all duration-200"
                       >
                         Manage Jobs
                       </Button>
                     </Link>
                     <Link to="/client/my-projects">
                       <Button 
-                        variant="accent" 
-                        className="w-full border-mint text-mint hover:bg-mint hover:text-white"
+                        variant="outline" 
+                        className="w-full !border-violet !text-violet hover:!bg-violet hover:!text-white backdrop-blur-sm bg-violet/10 transition-all duration-200"
                       >
                         View All Projects
                       </Button>
@@ -660,8 +672,8 @@ export default function ClientDashboard() {
                 </div>
 
                 {/* Project Statistics */}
-                <div className="card p-6 bg-white/95">
-                  <h3 className="text-lg font-semibold text-graphite mb-4">Project Statistics</h3>
+                <div className="bg-white/95 rounded-[2rem] p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Project Statistics</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="text-center">
                       <div className="text-3xl font-bold text-violet">
@@ -702,8 +714,8 @@ export default function ClientDashboard() {
                 </div>
 
                 {/* Recent Projects */}
-                <div className="card p-6 bg-white/95">
-                  <h3 className="text-lg font-semibold text-graphite mb-4">Recent Projects</h3>
+                <div className="bg-white/95 rounded-[2rem] p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Recent Projects</h3>
                   {recentProjectsLoading ? (
                     <div className="flex items-center justify-center py-8">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet"></div>
@@ -724,7 +736,7 @@ export default function ClientDashboard() {
                         
                         return (
                           <div key={project._id} className={`border-l-4 ${color} pl-4`}>
-                            <h4 className="font-medium text-graphite">{project.title}</h4>
+                            <h4 className="font-medium text-gray-800">{project.title}</h4>
                             <p className="text-sm text-coolgray">
                               Created: {new Date(project.createdAt).toLocaleDateString()}
                             </p>
@@ -759,8 +771,8 @@ export default function ClientDashboard() {
         {activeSection === 'freelancers' && (
           <div className="space-y-8">
             {/* Freelancer Search Section */}
-            <div className="card p-4 md:p-6 bg-white/95">
-              <h2 className="text-xl md:text-2xl font-bold text-graphite mb-4 md:mb-6">
+                <div className="bg-white/95 rounded-[2rem] p-4 md:p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6">
                 Browse <span className="text-coral">Freelancers</span>
               </h2>
               
@@ -773,7 +785,7 @@ export default function ClientDashboard() {
                     value={freelancerSearchTerm}
                     onChange={(e) => setFreelancerSearchTerm(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleFreelancerSearch()}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-graphite bg-white focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral text-sm"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral text-sm"
                   />
                   <button
                     onClick={handleFreelancerSearch}
@@ -811,7 +823,7 @@ export default function ClientDashboard() {
                   {freelancers.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                       {freelancers.map((freelancer, index) => (
-                        <div key={freelancer._id} className="card p-4 md:p-6 bg-white hover:shadow-lg transition-all duration-300 cursor-pointer">
+                        <div key={freelancer._id} className="bg-white rounded-[2rem] p-4 md:p-6 hover:shadow-xl transition-all duration-300 cursor-pointer border border-white/20">
                           <div className="flex items-start space-x-4 mb-4">
                             <div className="w-16 h-16 bg-coral/20 rounded-full flex items-center justify-center">
                               <svg className="w-8 h-8 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -819,7 +831,7 @@ export default function ClientDashboard() {
                               </svg>
                             </div>
                             <div className="flex-1">
-                              <h3 className="text-lg font-semibold text-graphite">{freelancer.name}</h3>
+                              <h3 className="text-lg font-semibold text-gray-800">{freelancer.name}</h3>
                               <p className="text-coral font-medium">{freelancer.title}</p>
                               <p className="text-sm text-coolgray">{freelancer.location}</p>
                               <p className="text-xs text-coolgray">{freelancer.years_experience} years experience</p>
@@ -854,7 +866,7 @@ export default function ClientDashboard() {
                               <span className="text-xs text-coolgray">({freelancer.completed_projects} projects)</span>
                             </div>
                             <div className="flex justify-between text-sm text-coolgray">
-                              <span className="font-semibold text-graphite">{formatHourlyRate(freelancer.hourly_rate)}</span>
+                              <span className="font-semibold text-gray-800">{formatHourlyRate(freelancer.hourly_rate)}</span>
                               <span>Responds in {freelancer.response_time}</span>
                             </div>
                           </div>
@@ -882,7 +894,8 @@ export default function ClientDashboard() {
                               <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className="px-3 py-1 text-xs"
+                                className="px-3 py-1 text-xs !border-violet !text-violet hover:!bg-violet hover:!text-white transition-all duration-200"
+                                onClick={() => handleViewFreelancerProfile(freelancer)}
                               >
                                 View Profile
                               </Button>
@@ -935,7 +948,7 @@ export default function ClientDashboard() {
                       
                       <div className="flex items-center space-x-2">
                         <span className="text-coolgray">Page</span>
-                        <span className="px-3 py-1 bg-gray-100 text-graphite rounded-lg font-medium">
+                        <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-lg font-medium">
                           {currentPage} of {totalPages}
                         </span>
                         <span className="text-coolgray">
@@ -967,7 +980,16 @@ export default function ClientDashboard() {
           </div>
         )}
       </main>
+      
+      {/* Freelancer Profile Modal */}
+      <FreelancerProfileModal
+        freelancer={selectedFreelancer}
+        isOpen={showFreelancerModal}
+        onClose={() => {
+          setShowFreelancerModal(false)
+          setSelectedFreelancer(null)
+        }}
+      />
     </div>
   )
 }
-0

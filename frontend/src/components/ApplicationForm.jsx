@@ -1,7 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { applicationService } from '../services/applicationService'
 import Button from './Button'
 import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
+import { authenticatedFetch, getCurrentUser } from '../utils/api'
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
 
 export default function ApplicationForm({ job, onSuccess, onCancel }) {
   const { t } = useComprehensiveTranslation()
@@ -34,6 +37,67 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
     url: '',
     description: ''
   })
+
+  // Fetch freelancer's resume link on component mount
+  useEffect(() => {
+    const fetchFreelancerResumeLink = async () => {
+      try {
+        // First try to get from localStorage
+        const savedProfile = localStorage.getItem('freelancer_profile_data')
+        if (savedProfile) {
+          const profileData = JSON.parse(savedProfile)
+          if (profileData.resume_link) {
+            setFormData(prev => ({
+              ...prev,
+              resume_link: {
+                ...prev.resume_link,
+                url: profileData.resume_link,
+                title: 'Resume',
+                description: 'Resume from profile'
+              }
+            }))
+            return
+          }
+        }
+
+        // If not in localStorage, try to fetch from database
+        const userData = getCurrentUser()
+        if (userData && userData._id) {
+          const response = await authenticatedFetch(`${API_BASE_URL}/freelancer/info`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'user_role': 'freelancer'
+            },
+            body: JSON.stringify({
+              id: userData._id,
+              user_role: 'freelancer'
+            })
+          })
+
+          if (response.ok) {
+            const data = await response.json()
+            if (data.status && data.data && data.data.resume_link) {
+              setFormData(prev => ({
+                ...prev,
+                resume_link: {
+                  ...prev.resume_link,
+                  url: data.data.resume_link,
+                  title: 'Resume',
+                  description: 'Resume from profile'
+                }
+              }))
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching freelancer resume link:', error)
+        // Silently fail - user can still manually enter resume link
+      }
+    }
+
+    fetchFreelancerResumeLink()
+  }, [])
 
   const handleInputChange = (field, value) => {
     if (field.includes('.')) {
@@ -275,29 +339,79 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Resume Link *
             </label>
-            <div className="space-y-3">
-              <input
-                type="url"
-                value={formData.resume_link.url}
-                onChange={(e) => handleInputChange('resume_link.url', e.target.value)}
-                placeholder="https://drive.google.com/file/d/your-resume/view"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <input
-                type="text"
-                value={formData.resume_link.title}
-                onChange={(e) => handleInputChange('resume_link.title', e.target.value)}
-                placeholder="Resume Title"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <textarea
-                value={formData.resume_link.description}
-                onChange={(e) => handleInputChange('resume_link.description', e.target.value)}
-                placeholder="Brief description of your resume"
-                rows={2}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+            
+            {/* Show auto-populated resume link if available */}
+            {formData.resume_link.url ? (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="text-sm text-green-800 font-medium mb-1">
+                      ✓ Resume link automatically loaded from your profile
+                    </p>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-gray-600">Title:</span>
+                      <span className="text-sm font-medium text-gray-800">{formData.resume_link.title}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 mt-1">
+                      <span className="text-sm text-gray-600">URL:</span>
+                      <a 
+                        href={formData.resume_link.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 hover:text-blue-800 underline"
+                      >
+                        {formData.resume_link.url.length > 50 ? 
+                          `${formData.resume_link.url.substring(0, 50)}...` : 
+                          formData.resume_link.url
+                        }
+                      </a>
+                    </div>
+                    {formData.resume_link.description && (
+                      <div className="flex items-center space-x-2 mt-1">
+                        <span className="text-sm text-gray-600">Description:</span>
+                        <span className="text-sm text-gray-700">{formData.resume_link.description}</span>
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({
+                      ...prev,
+                      resume_link: { url: '', title: 'Resume', description: '' }
+                    }))}
+                    className="text-sm text-gray-500 hover:text-gray-700 underline"
+                  >
+                    Change
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* Show input fields only if no resume link is available */
+              <div className="space-y-3">
+                <input
+                  type="url"
+                  value={formData.resume_link.url}
+                  onChange={(e) => handleInputChange('resume_link.url', e.target.value)}
+                  placeholder="https://drive.google.com/file/d/your-resume/view"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <input
+                  type="text"
+                  value={formData.resume_link.title}
+                  onChange={(e) => handleInputChange('resume_link.title', e.target.value)}
+                  placeholder="Resume Title"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <textarea
+                  value={formData.resume_link.description}
+                  onChange={(e) => handleInputChange('resume_link.description', e.target.value)}
+                  placeholder="Brief description of your resume"
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            )}
+            
             {errors.resume_url && (
               <p className="text-red-500 text-sm mt-1">{errors.resume_url}</p>
             )}

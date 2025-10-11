@@ -30,16 +30,19 @@ export default function Input({
     // Variant classes - Enhanced styling with curved borders
     const variantClasses = {
       default: error 
-        ? 'border-coral/50 bg-white text-graphite placeholder-gray-400 focus:border-coral focus:ring-2 focus:ring-coral/20' 
-        : 'border-gray-200 bg-white text-graphite placeholder-gray-400 focus:border-violet focus:ring-2 focus:ring-violet/20 hover:border-gray-300',
-      success: 'border-mint/50 bg-white text-graphite placeholder-gray-400 focus:border-mint focus:ring-2 focus:ring-mint/20',
-      error: 'border-coral/50 bg-white text-graphite placeholder-gray-400 focus:border-coral focus:ring-2 focus:ring-coral/20'
+        ? 'border-coral/50 bg-white text-graphite placeholder-gray-300 focus:border-coral focus:ring-2 focus:ring-coral/20' 
+        : 'border-gray-200 bg-white text-graphite placeholder-gray-300 focus:border-violet focus:ring-2 focus:ring-violet/20 hover:border-gray-300',
+      success: 'border-mint/50 bg-white text-graphite placeholder-gray-300 focus:border-mint focus:ring-2 focus:ring-mint/20',
+      error: 'border-coral/50 bg-white text-graphite placeholder-gray-300 focus:border-coral focus:ring-2 focus:ring-coral/20'
     }
     
     // Icon padding
     const iconClasses = icon ? (iconPosition === 'left' ? 'pl-10' : 'pr-10') : ''
     
-    return `${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${iconClasses} ${className}`
+    // Add custom class for password inputs with icons to hide browser toggles
+    const passwordToggleClass = (type === 'password' && icon) ? 'hide-browser-password-toggle' : ''
+    
+    return `${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${iconClasses} ${passwordToggleClass} ${className}`
   }
 
   const getLabelClasses = () => {
@@ -72,7 +75,7 @@ export default function Input({
         />
         
         {icon && iconPosition === 'right' && (
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+          <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
             <span className="text-gray-400">{icon}</span>
           </div>
         )}

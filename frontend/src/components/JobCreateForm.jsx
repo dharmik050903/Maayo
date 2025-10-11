@@ -338,7 +338,7 @@ export default function JobCreateForm() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-4xl mx-auto px-4 md:px-6 pt-20 pb-8">
+      <main className="flex-1 max-w-4xl mx-auto px-4 md:px-6 pt-24 sm:pt-28 pb-8">
         <div className="card bg-white/95 rounded-lg shadow-sm p-4 md:p-8">
           <div className="mb-6 md:mb-8 text-center">
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-graphite mb-2">

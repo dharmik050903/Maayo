@@ -441,7 +441,7 @@ export default function ClientHome() {
           <p className="text-xl text-red-300 mb-4">Error: {error}</p>
           <button 
             onClick={() => window.location.reload()} 
-            className="px-4 py-2 bg-white text-graphite rounded-lg hover:bg-gray-100"
+            className="px-4 py-2 bg-white text-gray-800 rounded-lg hover:bg-gray-100"
           >
             Reload Page
           </button>
@@ -460,7 +460,7 @@ export default function ClientHome() {
       
       {/* Upgrade Banner - Show only if user doesn't have active subscription */}
       {userData && needsUpgrade(userData) && (
-        <div className="px-6 pt-20">
+        <div className="px-6 pt-24 sm:pt-28">
           <UpgradeBanner userType="client" />
         </div>
       )}
@@ -484,7 +484,7 @@ export default function ClientHome() {
             <Button 
               variant="outline" 
               size="lg" 
-              className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg border-white text-white hover:bg-white hover:text-graphite w-full sm:w-auto"
+              className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg border-white text-white hover:bg-white hover:text-gray-800 w-full sm:w-auto"
               onClick={() => setActiveTab('freelancers')}
             >
               Find Freelancers
@@ -492,13 +492,13 @@ export default function ClientHome() {
             <Button 
               variant="outline" 
               size="lg" 
-              className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg border-white text-white hover:bg-white hover:text-graphite w-full sm:w-auto"
+              className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg border-white text-white hover:bg-white hover:text-gray-800 w-full sm:w-auto"
               onClick={() => setActiveTab('escrow')}
             >
                 {t('escrowManagement')}
             </Button>
-            <Link to="/create-project">
-              <Button variant="outline" size="lg" className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg border-white text-white hover:bg-white hover:text-graphite w-full sm:w-auto">
+            <Link to="/project/create">
+              <Button variant="outline" size="lg" className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg border-white text-white hover:bg-white hover:text-gray-800 w-full sm:w-auto">
                 {t('postAProject')}
               </Button>
             </Link>
@@ -548,7 +548,7 @@ export default function ClientHome() {
               onClick={() => setActiveTab('freelancers')}
               className={`px-6 py-3 rounded-md font-medium transition-colors ${
                 activeTab === 'freelancers'
-                  ? 'bg-white text-graphite shadow-sm'
+                  ? 'bg-white text-gray-800 shadow-sm'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
@@ -563,7 +563,7 @@ export default function ClientHome() {
               onClick={() => setActiveTab('escrow')}
               className={`px-6 py-3 rounded-md font-medium transition-colors ${
                 activeTab === 'escrow'
-                  ? 'bg-white text-graphite shadow-sm'
+                  ? 'bg-white text-gray-800 shadow-sm'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
@@ -598,7 +598,7 @@ export default function ClientHome() {
                     value={freelancerSearchTerm}
                     onChange={(e) => setFreelancerSearchTerm(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                    className="w-full px-3 md:px-4 py-2 md:py-3 border border-white/20 rounded-lg text-graphite bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral text-sm md:text-base"
+                    className="w-full px-3 md:px-4 py-2 md:py-3 border border-white/20 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral text-sm md:text-base"
                   />
                   <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-1">
                     <button
@@ -613,14 +613,14 @@ export default function ClientHome() {
                   <Button
                     variant="outline"
                     onClick={() => setShowFilters(!showFilters)}
-                    className="border-white text-white hover:bg-white hover:text-graphite w-full sm:w-auto text-sm md:text-base"
+                    className="border-white text-white hover:bg-white hover:text-gray-800 w-full sm:w-auto text-sm md:text-base"
                   >
                     {showFilters ? 'Hide Filters' : 'Show Filters'}
                   </Button>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="px-3 md:px-4 py-2 md:py-3 border border-white/20 rounded-lg text-graphite bg-white focus:outline-none focus:ring-2 focus:ring-coral/50 text-sm md:text-base w-full sm:w-auto"
+                    className="px-3 md:px-4 py-2 md:py-3 border border-white/20 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-coral/50 text-sm md:text-base w-full sm:w-auto"
                     style={{ color: '#374151' }}
                   >
                     <option value="rating" style={{ color: '#374151', backgroundColor: 'white' }}>Sort by Rating</option>
@@ -641,7 +641,7 @@ export default function ClientHome() {
                       <select
                         value={filters.experience_level}
                         onChange={(e) => handleFilterChange('experience_level', e.target.value)}
-                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-graphite bg-white focus:outline-none focus:ring-2 focus:ring-coral/50"
+                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-coral/50"
                         style={{ color: '#374151' }}
                       >
                         <option value="" style={{ color: '#374151', backgroundColor: 'white' }}>{t('allLevels')}</option>
@@ -658,7 +658,7 @@ export default function ClientHome() {
                         placeholder="Min years"
                         value={filters.years_experience_min}
                         onChange={(e) => handleFilterChange('years_experience_min', e.target.value)}
-                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-graphite bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50"
+                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50"
                         min="0"
                         max="50"
                       />
@@ -671,7 +671,7 @@ export default function ClientHome() {
                         placeholder="Max years"
                         value={filters.years_experience_max}
                         onChange={(e) => handleFilterChange('years_experience_max', e.target.value)}
-                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-graphite bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50"
+                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50"
                         min="0"
                         max="50"
                       />
@@ -682,7 +682,7 @@ export default function ClientHome() {
                       <select
                         value={filters.availability}
                         onChange={(e) => handleFilterChange('availability', e.target.value)}
-                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-graphite bg-white focus:outline-none focus:ring-2 focus:ring-coral/50"
+                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-coral/50"
                         style={{ color: '#374151' }}
                       >
                         <option value="" style={{ color: '#374151', backgroundColor: 'white' }}>All Availability</option>
@@ -698,7 +698,7 @@ export default function ClientHome() {
                         placeholder="Min rate"
                         value={filters.hourly_rate_min}
                         onChange={(e) => handleFilterChange('hourly_rate_min', e.target.value)}
-                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-graphite bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50"
+                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50"
                       />
                     </div>
                     
@@ -709,7 +709,7 @@ export default function ClientHome() {
                         placeholder="Max rate"
                         value={filters.hourly_rate_max}
                         onChange={(e) => handleFilterChange('hourly_rate_max', e.target.value)}
-                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-graphite bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50"
+                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50"
                       />
                     </div>
                   </div>
@@ -733,7 +733,7 @@ export default function ClientHome() {
             {/* Freelancers List */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {getFilteredAndSortedFreelancers().map((freelancer, index) => (
-                <div key={freelancer._id} className="card p-4 md:p-6 bg-white/95 hover:bg-white transition-all duration-300 hover:shadow-lg cursor-pointer slide-in-up" style={{animationDelay: `${index * 0.1}s`}} onClick={() => handleFreelancerClick(freelancer)}>
+                <div key={freelancer._id} className="bg-white/95 rounded-[2rem] p-4 md:p-6 hover:bg-white transition-all duration-300 hover:shadow-xl cursor-pointer slide-in-up border border-white/20" style={{animationDelay: `${index * 0.1}s`}} onClick={() => handleFreelancerClick(freelancer)}>
                   <div className="flex items-start space-x-4 mb-4">
                     <div className="w-16 h-16 bg-coral/20 rounded-full flex items-center justify-center">
                       <svg className="w-8 h-8 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -741,7 +741,7 @@ export default function ClientHome() {
                       </svg>
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-graphite">{freelancer.name}</h3>
+                      <h3 className="text-lg font-semibold text-gray-800">{freelancer.name}</h3>
                       <p className="text-coral font-medium">{freelancer.title}</p>
                       <p className="text-sm text-coolgray">{freelancer.location}</p>
                       <p className="text-xs text-coolgray">{freelancer.years_experience} years experience</p>
@@ -776,7 +776,7 @@ export default function ClientHome() {
                       <span className="text-xs text-coolgray">({freelancer.completed_projects} projects)</span>
                     </div>
                     <div className="flex justify-between text-sm text-coolgray">
-                      <span className="font-semibold text-graphite">{formatHourlyRate(freelancer.hourly_rate)}</span>
+                      <span className="font-semibold text-gray-800">{formatHourlyRate(freelancer.hourly_rate)}</span>
                       <span>Responds in {freelancer.response_time}</span>
                     </div>
                   </div>
@@ -833,7 +833,7 @@ export default function ClientHome() {
                   </p>
                   {freelancers.length === 0 ? (
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Link to="/create-project">
+                    <Link to="/project/create">
                       <Button variant="accent" className="px-6 py-3">
                         Post Your Project Instead
                       </Button>
@@ -845,7 +845,7 @@ export default function ClientHome() {
                         setError(null)
                         fetchAvailableFreelancers(1, '')
                       }}
-                      className="px-6 py-3 border-white text-white hover:bg-white hover:text-graphite"
+                      className="px-6 py-3 border-white text-white hover:bg-white hover:text-gray-800"
                     >
                           Try Again
                     </Button>
@@ -855,7 +855,7 @@ export default function ClientHome() {
                     <Button 
                       variant="outline" 
                       onClick={clearFilters}
-                      className="px-6 py-3 border-white text-white hover:bg-white hover:text-graphite"
+                      className="px-6 py-3 border-white text-white hover:bg-white hover:text-gray-800"
                     >
                       Clear All Filters
                     </Button>
@@ -927,13 +927,13 @@ export default function ClientHome() {
             <div className="space-y-8">
               {/* Bank Details Management */}
               <div className="bg-white/95 backdrop-blur-sm rounded-lg p-6">
-                <h3 className="text-xl font-semibold text-graphite mb-4">Bank Details</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Bank Details</h3>
                 <BankDetailsList />
               </div>
 
               {/* Project Selection for Escrow */}
               <div className="bg-white/95 backdrop-blur-sm rounded-lg p-6">
-                <h3 className="text-xl font-semibold text-graphite mb-4">{t('projectEscrowManagement')}</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">{t('projectEscrowManagement')}</h3>
                 <p className="text-coolgray mb-4">Select a project to manage escrow payments and milestones</p>
                 
                 {/* Active Projects with Milestones for Payment */}
@@ -946,16 +946,16 @@ export default function ClientHome() {
 
       {/* Escrow Modal */}
       {showEscrowModal && selectedProject && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1100] p-4">
           <div className="bg-white rounded-lg p-6 max-w-6xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-graphite">{t('escrowManagement')} - {selectedProject.title}</h3>
+              <h3 className="text-2xl font-bold text-gray-800">{t('escrowManagement')} - {selectedProject.title}</h3>
               <button 
                 onClick={() => {
                   setShowEscrowModal(false);
                   setSelectedProject(null);
                 }}
-                className="text-coolgray hover:text-graphite transition-colors"
+                className="text-coolgray hover:text-gray-800 transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1017,39 +1017,39 @@ export default function ClientHome() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Feature 1 */}
-            <div className="card p-8 bg-white/95 text-center">
+            <div className="bg-white/95 rounded-[2rem] p-8 text-center shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
               <div className="w-16 h-16 bg-coral/20 rounded-full mx-auto mb-6 flex items-center justify-center">
                 <svg className="w-8 h-8 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-graphite mb-4">Smart Matching</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Smart Matching</h3>
               <p className="text-coolgray">
                 Our AI finds the perfect freelancer for your project based on skills, experience, and budget.
               </p>
             </div>
 
             {/* Feature 2 */}
-            <div className="card p-8 bg-white/95 text-center">
+            <div className="bg-white/95 rounded-[2rem] p-8 text-center shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
               <div className="w-16 h-16 bg-mint/20 rounded-full mx-auto mb-6 flex items-center justify-center">
                 <svg className="w-8 h-8 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-graphite mb-4">Quality Assurance</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Quality Assurance</h3>
               <p className="text-coolgray">
                 All freelancers are vetted and verified. Get high-quality work with milestone-based payments.
               </p>
             </div>
 
             {/* Feature 3 */}
-            <div className="card p-8 bg-white/95 text-center">
+            <div className="bg-white/95 rounded-[2rem] p-8 text-center shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
               <div className="w-16 h-16 bg-violet/20 rounded-full mx-auto mb-6 flex items-center justify-center">
                 <svg className="w-8 h-8 text-violet" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-graphite mb-4">AI Project Management</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">AI Project Management</h3>
               <p className="text-coolgray">
                 Streamline your workflow with AI-powered project management and communication tools.
               </p>
@@ -1111,13 +1111,13 @@ export default function ClientHome() {
             {t('joinThousandsClients')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/create-project">
+            <Link to="/project/create">
               <Button variant="accent" size="lg" className="px-12 py-4 text-xl">
                 Post a Project
               </Button>
             </Link>
             <Link to="/client-dashboard">
-              <Button variant="outline" size="lg" className="px-12 py-4 text-xl border-white text-white hover:bg-white hover:text-graphite">
+              <Button variant="outline" size="lg" className="px-12 py-4 text-xl border-white text-white hover:bg-white hover:text-gray-800">
                 Go to Dashboard
               </Button>
             </Link>
@@ -1127,7 +1127,7 @@ export default function ClientHome() {
 
       {/* Freelancer Profile Modal */}
       {showFreelancerModal && selectedFreelancer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1100] p-4">
           <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               {/* Modal Header */}
@@ -1139,7 +1139,7 @@ export default function ClientHome() {
                     </svg>
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-graphite">{selectedFreelancer.name}</h2>
+                    <h2 className="text-2xl font-bold text-gray-800">{selectedFreelancer.name}</h2>
                     <p className="text-coral font-medium text-lg">{selectedFreelancer.title}</p>
                     <p className="text-coolgray">{selectedFreelancer.location}</p>
                     <p className="text-sm text-coolgray">{selectedFreelancer.years_experience} years experience</p>
@@ -1161,7 +1161,7 @@ export default function ClientHome() {
                 </div>
                 <button
                   onClick={closeFreelancerModal}
-                  className="text-coolgray hover:text-graphite transition-colors"
+                  className="text-coolgray hover:text-gray-800 transition-colors"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1179,28 +1179,28 @@ export default function ClientHome() {
                       </svg>
                     ))}
                   </div>
-                  <p className="text-2xl font-bold text-graphite">{selectedFreelancer.rating}/5</p>
+                  <p className="text-2xl font-bold text-gray-800">{selectedFreelancer.rating}/5</p>
                   <p className="text-sm text-coolgray">Rating</p>
                 </div>
                 <div className="text-center p-4 bg-violet/10 rounded-lg">
-                  <p className="text-2xl font-bold text-graphite">{selectedFreelancer.completed_projects}</p>
+                  <p className="text-2xl font-bold text-gray-800">{selectedFreelancer.completed_projects}</p>
                   <p className="text-sm text-coolgray">Projects Completed</p>
                 </div>
                 <div className="text-center p-4 bg-coral/10 rounded-lg">
-                  <p className="text-2xl font-bold text-graphite">{formatHourlyRate(selectedFreelancer.hourly_rate, false)}</p>
+                  <p className="text-2xl font-bold text-gray-800">{formatHourlyRate(selectedFreelancer.hourly_rate, false)}</p>
                   <p className="text-sm text-coolgray">Per Hour</p>
                 </div>
               </div>
 
               {/* About Section */}
               <div className="mb-6">
-                <h3 className="text-xl font-semibold text-graphite mb-3">About</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-3">About</h3>
                 <p className="text-coolgray leading-relaxed">{selectedFreelancer.bio || selectedFreelancer.overview}</p>
               </div>
 
               {/* Skills Section */}
               <div className="mb-6">
-                <h3 className="text-xl font-semibold text-graphite mb-3">Skills</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-3">Skills</h3>
                 <div className="flex flex-wrap gap-2">
                   {selectedFreelancer.skills.map((skill, index) => (
                     <span key={index} className="px-3 py-1 bg-coral/10 text-coral rounded-full text-sm">
@@ -1213,22 +1213,22 @@ export default function ClientHome() {
               {/* Additional Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <h4 className="font-semibold text-graphite mb-2">Response Time</h4>
+                  <h4 className="font-semibold text-gray-800 mb-2">Response Time</h4>
                   <p className="text-coolgray">{selectedFreelancer.response_time}</p>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-graphite mb-2">English Level</h4>
+                  <h4 className="font-semibold text-gray-800 mb-2">English Level</h4>
                   <p className="text-coolgray capitalize">{selectedFreelancer.english_level}</p>
                 </div>
                 {selectedFreelancer.highest_education && (
                   <div>
-                    <h4 className="font-semibold text-graphite mb-2">Education</h4>
+                    <h4 className="font-semibold text-gray-800 mb-2">Education</h4>
                     <p className="text-coolgray">{selectedFreelancer.highest_education}</p>
                   </div>
                 )}
                 {selectedFreelancer.certification && selectedFreelancer.certification.length > 0 && (
                   <div>
-                    <h4 className="font-semibold text-graphite mb-2">Certifications</h4>
+                    <h4 className="font-semibold text-gray-800 mb-2">Certifications</h4>
                     <div className="space-y-1">
                       {selectedFreelancer.certification.map((cert, index) => (
                         <p key={index} className="text-coolgray text-sm">• {cert}</p>
@@ -1240,11 +1240,11 @@ export default function ClientHome() {
 
               {/* Resume and Portfolio Links */}
               <div className="mb-6">
-                <h3 className="text-xl font-semibold text-graphite mb-3">Documents & Links</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-3">Documents & Links</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {selectedFreelancer.resume_link && (
                     <div className="bg-gray-50 p-4 rounded-lg">
-                      <h4 className="font-semibold text-graphite mb-2 flex items-center">
+                      <h4 className="font-semibold text-gray-800 mb-2 flex items-center">
                         <svg className="w-4 h-4 mr-2 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
@@ -1262,7 +1262,7 @@ export default function ClientHome() {
                   )}
                   {selectedFreelancer.github_link && (
                     <div className="bg-gray-50 p-4 rounded-lg">
-                      <h4 className="font-semibold text-graphite mb-2 flex items-center">
+                      <h4 className="font-semibold text-gray-800 mb-2 flex items-center">
                         <svg className="w-4 h-4 mr-2 text-gray-800" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                         </svg>

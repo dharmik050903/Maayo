@@ -173,7 +173,7 @@ export default function MyProjects() {
   }
 
   const handleCreateProject = () => {
-    navigate('/create-project')
+    navigate('/project/create')
   }
 
   const handleEditProject = (project) => {
@@ -668,7 +668,7 @@ const handleCloseBidRequest = () => {
       ) : (
         <div className="space-y-6">
           {filteredProjects.map((project) => (
-            <div key={project._id} className="card p-6 bg-white/95 hover:bg-white transition-colors">
+            <div key={project._id} className="bg-white/95 rounded-[2rem] p-6 hover:bg-white transition-all duration-300 hover:shadow-xl border border-white/20">
               <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
                 <div className="flex-1">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
@@ -758,29 +758,29 @@ const handleCloseBidRequest = () => {
                 <div className="flex flex-wrap gap-2 min-w-[200px]">
                   
                   {/* Always show Edit button for all projects */}
-                  <Button variant="accent" size="sm" onClick={() => handleEditProject(project)} className="flex-1 min-w-[120px] border-mint text-mint hover:bg-mint hover:text-white">
+                  <Button variant="outline" size="sm" onClick={() => handleEditProject(project)} className="flex-1 min-w-[120px] !border-violet !text-violet hover:!bg-violet hover:!text-white transition-all duration-200">
                     {t('editProject')}
                   </Button>
                   
                   {getProjectStatus(project) === 'open' && (
                     <>
-                      <Button variant="outline" size="sm" onClick={() => handleViewBidRequests(project)} className="flex-1 min-w-[120px] border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white">
+                      <Button variant="outline" size="sm" onClick={() => handleViewBidRequests(project)} className="flex-1 min-w-[120px] !border-blue-500 !text-blue-500 hover:!bg-blue-500 hover:!text-white transition-all duration-200">
                         {t('viewBids')} ({project.bid_count || 0})
                       </Button>
-                      <Button variant="success" size="sm" onClick={() => handleActivateProject(project._id)} className="flex-1 min-w-[120px]">
+                      <Button variant="outline" size="sm" onClick={() => handleActivateProject(project._id)} className="flex-1 min-w-[120px] !bg-green-500 !text-white hover:!bg-green-600 !border-green-500 hover:!border-green-600 transition-all duration-200">
                         {t('activateProject')}
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => handleDeleteProject(project._id)} className="flex-1 min-w-[120px] border-coral text-coral hover:bg-coral hover:text-white">
+                      <Button variant="outline" size="sm" onClick={() => handleDeleteProject(project._id)} className="flex-1 min-w-[120px] !border-red-500 !text-red-500 hover:!bg-red-500 hover:!text-white transition-all duration-200">
                         {t('deleteProject')}
                       </Button>
                     </>
                   )}
                   {getProjectStatus(project) === 'in_progress' && (
                     <>
-                      <Button variant="accent" size="sm" onClick={() => handleCompleteProject(project._id)} className="flex-1 min-w-[120px] border-mint text-mint hover:bg-mint hover:text-white">
+                      <Button variant="outline" size="sm" onClick={() => handleCompleteProject(project._id)} className="flex-1 min-w-[120px] !border-emerald-500 !text-emerald-500 hover:!bg-emerald-500 hover:!text-white transition-all duration-200">
                         {t('markComplete')}
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => handleDeactivateProject(project._id)} className="flex-1 min-w-[120px] border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white">
+                      <Button variant="outline" size="sm" onClick={() => handleDeactivateProject(project._id)} className="flex-1 min-w-[120px] !border-orange-500 !text-orange-500 hover:!bg-orange-500 hover:!text-white transition-all duration-200">
                         {t('deactivateProject')}
                       </Button>
                     </>

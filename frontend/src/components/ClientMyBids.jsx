@@ -484,7 +484,7 @@ export default function ClientMyBids() {
       ) : (
         <div className="space-y-6">
           {filteredBids.map((bid) => (
-            <div key={bid._id} className="card p-6 bg-white/95 hover:bg-white transition-colors">
+            <div key={bid._id} className="bg-white/95 rounded-[2rem] p-6 hover:bg-white transition-all duration-300 hover:shadow-xl border border-white/20">
               <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
                 <div className="flex-1">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">

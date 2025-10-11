@@ -55,7 +55,7 @@ export default function ProjectCreate() {
   return (
     <div className="min-h-screen flex flex-col bg-brand-gradient text-white">
       <Header userType={userData?.user_type} userData={userData} onLogout={clearAuth} />
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pt-16 sm:pt-20">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 pt-24 sm:pt-28">
         <ProjectForm
           onSuccess={handleSuccess}
           onCancel={handleCancel}

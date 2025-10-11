@@ -99,6 +99,76 @@ header {
   margin-bottom: 1rem;
 }
 
+/* Global search input text visibility fixes - exclude header search */
+input[type="text"]:not(.search-input) {
+  color: #374151 !important;
+  background-color: white !important;
+  -webkit-text-fill-color: #374151 !important;
+}
+
+input[type="text"]:not(.search-input)::placeholder {
+  color: #9CA3AF !important;
+  opacity: 1 !important;
+}
+
+/* Input placeholder styling for login/signup forms */
+input::placeholder {
+  font-weight: normal !important;
+  color: #D1D5DB !important;
+  opacity: 1 !important;
+}
+
+/* Force project description text visibility */
+.project-description {
+  color: #000000 !important;
+  font-weight: normal !important;
+  opacity: 1 !important;
+}
+
+/* Additional CSS to ensure text visibility in project cards */
+.card-elevated p {
+  color: #000000 !important;
+  opacity: 1 !important;
+}
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  display: none !important;
+}
+
+input[type="password"]::-webkit-textfield-decoration-container {
+  display: none !important;
+}
+
+/* Additional CSS to hide all browser password toggles */
+input[type="password"]::-webkit-strong-password-auto-fill-button {
+  display: none !important;
+}
+
+input[type="password"]::-webkit-strong-password-auto-fill-button:hover {
+  display: none !important;
+}
+
+/* Hide password reveal button in Edge/Chrome */
+input[type="password"]::-ms-reveal {
+  display: none !important;
+}
+
+input[type="password"]::-ms-clear {
+  display: none !important;
+}
+
+/* Hide browser password toggles for inputs with custom icons */
+.hide-browser-password-toggle::-webkit-credentials-auto-fill-button,
+.hide-browser-password-toggle::-webkit-textfield-decoration-container,
+.hide-browser-password-toggle::-webkit-strong-password-auto-fill-button,
+.hide-browser-password-toggle::-ms-reveal,
+.hide-browser-password-toggle::-ms-clear {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 .JobCreateForm label {
   display: block;
   font-weight: 500;
@@ -201,6 +271,18 @@ header {
   input, textarea, select {
     min-height: 44px !important; /* iOS touch target */
     font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+  
+  /* Search input text visibility fixes */
+  input[type="text"] {
+    color: #374151 !important;
+    background-color: white !important;
+    -webkit-text-fill-color: #374151 !important;
+  }
+  
+  input[type="text"]::placeholder {
+    color: #9CA3AF !important;
+    opacity: 1 !important;
   }
   
   /* Grid improvements */

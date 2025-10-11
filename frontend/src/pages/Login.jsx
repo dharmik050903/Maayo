@@ -1370,7 +1370,7 @@ export default function Login() {
 
       {/* Password Reset Modal */}
       {showPasswordReset && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1100] p-4">
           <div className="bg-white rounded-xl p-6 w-full max-w-md">
             <div className="mb-6">
               <h2 className="text-2xl font-semibold text-graphite mb-2">Reset Password</h2>

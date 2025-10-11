@@ -158,7 +158,7 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-xl md:text-2xl font-bold text-graphite mb-3 md:mb-4">{t('trustedTalent')}</h3>
-              <p className="text-sm md:text-base text-coolgray leading-relaxed">{t('trustedTalentDesc')}</p>
+              <p className="text-sm md:text-base text-gray-600 leading-relaxed">{t('trustedTalentDesc')}</p>
             </div>
             <div className="card-elevated p-6 md:p-8 text-center slide-in-up group" style={{animationDelay: '0.1s'}}>
               <div className="w-12 h-12 md:w-16 md:h-16 bg-violet/20 rounded-2xl mx-auto mb-4 md:mb-6 flex items-center justify-center group-hover:bg-violet/30 transition-colors">
@@ -167,7 +167,7 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-xl md:text-2xl font-bold text-graphite mb-3 md:mb-4">{t('securePayments')}</h3>
-              <p className="text-sm md:text-base text-coolgray leading-relaxed">{t('securePaymentsDesc')}</p>
+              <p className="text-sm md:text-base text-gray-600 leading-relaxed">{t('securePaymentsDesc')}</p>
             </div>
             <div className="card-elevated p-6 md:p-8 text-center slide-in-up group" style={{animationDelay: '0.2s'}}>
               <div className="w-12 h-12 md:w-16 md:h-16 bg-coral/20 rounded-2xl mx-auto mb-4 md:mb-6 flex items-center justify-center group-hover:bg-coral/30 transition-colors">
@@ -176,7 +176,7 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-xl md:text-2xl font-bold text-graphite mb-3 md:mb-4">{t('fastHiring')}</h3>
-              <p className="text-sm md:text-base text-coolgray leading-relaxed">{t('fastHiringDesc')}</p>
+              <p className="text-sm md:text-base text-gray-600 leading-relaxed">{t('fastHiringDesc')}</p>
           </div>
           </div>
         </div>
@@ -232,17 +232,20 @@ export default function Home() {
                       <h3 className="text-xl md:text-2xl font-bold text-graphite mb-3 md:mb-4 line-clamp-2 group-hover:text-mint transition-colors">
                         {project.title}
                       </h3>
-                      <p className="text-coolgray text-sm md:text-base mb-4 md:mb-6 line-clamp-3 leading-relaxed">
+                      <p 
+                        className="project-description text-sm md:text-base mb-4 md:mb-6 line-clamp-3 leading-relaxed"
+                        style={{ color: '#000000 !important', fontWeight: 'normal !important' }}
+                      >
                         {project.description}
                       </p>
                       
                       <div className="grid grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
                         <div className="p-3 md:p-4 bg-mint/10 rounded-xl">
-                          <p className="text-xs md:text-sm text-coolgray uppercase tracking-wide font-semibold mb-1 md:mb-2">Budget</p>
+                          <p className="text-xs md:text-sm text-gray-700 uppercase tracking-wide font-semibold mb-1 md:mb-2">Budget</p>
                           <p className="text-lg md:text-xl font-bold text-mint">{formatBudget(project.budget)}</p>
                         </div>
                         <div className="p-3 md:p-4 bg-coral/10 rounded-xl">
-                          <p className="text-xs md:text-sm text-coolgray uppercase tracking-wide font-semibold mb-1 md:mb-2">Duration</p>
+                          <p className="text-xs md:text-sm text-gray-700 uppercase tracking-wide font-semibold mb-1 md:mb-2">Duration</p>
                           <p className="text-lg md:text-xl font-bold text-coral">{project.duration} days</p>
                         </div>
                       </div>
@@ -250,7 +253,7 @@ export default function Home() {
                       {/* Skills */}
                       {project.skills_required && project.skills_required.length > 0 && (
                         <div className="mb-4 md:mb-6">
-                          <p className="text-xs md:text-sm text-coolgray uppercase tracking-wide font-semibold mb-2 md:mb-3">Skills Required</p>
+                          <p className="text-xs md:text-sm text-gray-700 uppercase tracking-wide font-semibold mb-2 md:mb-3">Skills Required</p>
                           <div className="flex flex-wrap gap-2">
                             {project.skills_required.slice(0, 4).map((skill, index) => (
                               <span
@@ -277,7 +280,7 @@ export default function Home() {
                       )}
 
                       {/* Project Details */}
-                      <div className="space-y-2 md:space-y-3 text-xs md:text-sm text-coolgray mb-4 md:mb-6">
+                      <div className="space-y-2 md:space-y-3 text-xs md:text-sm text-gray-700 mb-4 md:mb-6">
                         {project.location && (
                           <div className="flex items-center gap-2 md:gap-3">
                             <div className="w-6 h-6 md:w-8 md:h-8 bg-gray-100 rounded-lg flex items-center justify-center">
@@ -316,7 +319,7 @@ export default function Home() {
 
                     {/* Posted Date */}
                     <div className="mt-3 md:mt-4 pt-3 md:pt-4 border-t border-gray-200">
-                      <p className="text-xs text-coolgray">
+                      <p className="text-xs text-gray-700">
                         Posted {new Date(project.createdAt).toLocaleDateString()}
                       </p>
                     </div>

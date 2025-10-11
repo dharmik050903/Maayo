@@ -188,7 +188,7 @@ export default function ClientJobs() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 md:px-6 pt-20 pb-8">
+      <main className="flex-1 max-w-7xl mx-auto px-4 md:px-6 pt-24 sm:pt-28 pb-8">
         {/* Header Section */}
         <div className="mb-8 md:mb-12">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 md:gap-6">
@@ -227,7 +227,7 @@ export default function ClientJobs() {
         )}
 
         {/* Filters */}
-        <div className="card p-4 md:p-6 bg-white/95 mb-6">
+        <div className="bg-white/95 rounded-[2rem] p-4 md:p-6 mb-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-graphite mb-2">Status</label>
@@ -290,7 +290,7 @@ export default function ClientJobs() {
         </div>
 
         {/* Jobs List */}
-        <div className="card bg-white/95">
+        <div className="bg-white/95 rounded-[2rem] shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
           {loading ? (
             <div className="p-8 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-mint mx-auto"></div>

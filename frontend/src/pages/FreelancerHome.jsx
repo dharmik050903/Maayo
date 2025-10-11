@@ -467,7 +467,7 @@ export default function FreelancerHome() {
             <Button 
               variant="outline" 
               size="lg" 
-              className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg border-white text-white hover:bg-white hover:text-graphite w-full sm:w-auto"
+              className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg border-white text-white hover:bg-white hover:text-gray-800 w-full sm:w-auto"
               onClick={() => setActiveView(activeView === 'projects' ? null : 'projects')}
             >
               {activeView === 'projects' ? t('hideProjects') : t('browseProjects')}
@@ -475,7 +475,7 @@ export default function FreelancerHome() {
             <Button 
               variant="outline" 
               size="lg" 
-              className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg border-white text-white hover:bg-white hover:text-graphite w-full sm:w-auto"
+              className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg border-white text-white hover:bg-white hover:text-gray-800 w-full sm:w-auto"
               onClick={() => setActiveView(activeView === 'bids' ? null : 'bids')}
             >
               {activeView === 'bids' ? t('hideMyBids') : t('My Bids')}
@@ -507,7 +507,7 @@ export default function FreelancerHome() {
           {/* Bank Details Section */}
           <div className="max-w-4xl mx-auto mb-12">
             <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
-              <h3 className="text-xl font-semibold text-graphite mb-4">Payment Setup</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Payment Setup</h3>
               <p className="text-coolgray mb-4">Manage your bank details to receive payments from completed projects</p>
               <BankDetailsList />
             </div>
@@ -516,12 +516,12 @@ export default function FreelancerHome() {
           {/* Active Projects with Milestones */}
           {activeProjects.length > 0 ? (
             <div className="max-w-4xl mx-auto mb-12">
-              <h3 className="text-xl font-semibold text-graphite mb-6 text-center">📋 Active Project Milestones</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-6 text-center">📋 Active Project Milestones</h3>
               <div className="space-y-6">
                 {activeProjects.map((project) => (
                   <div key={project._id} className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
                     <div className="flex items-center justify-between mb-4">
-                      <h4 className="text-lg font-semibold text-graphite">{project.title}</h4>
+                      <h4 className="text-lg font-semibold text-gray-800">{project.title}</h4>
                       <div className="text-sm text-coolgray">
                         Budget: {formatBudget(project.budget)}
                       </div>
@@ -538,7 +538,7 @@ export default function FreelancerHome() {
             <div className="max-w-4xl mx-auto mb-12">
               <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
                 <div className="text-6xl mb-4">📋</div>
-                <h3 className="text-xl font-semibold text-graphite mb-4">No Active Projects</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">No Active Projects</h3>
                 <p className="text-coolgray mb-6">
                   You don't have any active projects with milestones yet. When clients accept your bids, they will appear here for milestone tracking.
                 </p>
@@ -609,7 +609,7 @@ export default function FreelancerHome() {
                       resetPagination() // Reset to first page when typing
                     }}
                     onKeyPress={(e) => e.key === 'Enter' && handleProjectSearch()}
-                    className="w-full px-4 py-3 border border-white/20 rounded-xl text-graphite bg-white/95 focus:outline-none focus:ring-2 focus:ring-mint/50 focus:border-mint text-sm sm:text-base"
+                    className="w-full px-4 py-3 border border-white/20 rounded-xl text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-mint/50 focus:border-mint text-sm sm:text-base"
                   />
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
@@ -659,7 +659,7 @@ export default function FreelancerHome() {
                         placeholder="Search skills..."
                         value={skillSearchTerm}
                         onChange={(e) => setSkillSearchTerm(e.target.value)}
-                        className="w-full px-3 py-2 pr-8 border border-white/20 rounded-lg text-graphite bg-white/95 focus:outline-none focus:ring-2 focus:ring-mint/50 focus:border-mint text-sm"
+                        className="w-full px-3 py-2 pr-8 border border-white/20 rounded-lg text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-mint/50 focus:border-mint text-sm"
                       />
                       {skillSearchTerm && (
                         <button
@@ -745,7 +745,7 @@ export default function FreelancerHome() {
                         placeholder="Enter max budget (e.g., 5000)"
                         value={maxBudget}
                         onChange={(e) => handleMaxBudgetChange(e.target.value)}
-                        className="w-full px-4 py-2 border border-white/20 rounded-lg text-graphite bg-white/95 focus:outline-none focus:ring-2 focus:ring-mint/50 focus:border-mint"
+                        className="w-full px-4 py-2 border border-white/20 rounded-lg text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-mint/50 focus:border-mint"
                       />
                       <div className="flex gap-2">
                         <button
@@ -864,7 +864,7 @@ export default function FreelancerHome() {
                   <div className="flex flex-col h-full">
                     {/* Header with title and status */}
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-3 mb-3">
-                      <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-graphite hover:text-violet transition-colors flex items-center gap-2 flex-1">
+                      <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-800 hover:text-violet transition-colors flex items-center gap-2 flex-1">
                         {project.title}
                         <svg className="w-3 h-3 sm:w-4 sm:h-4 text-coolgray group-hover:text-violet transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -1078,7 +1078,7 @@ export default function FreelancerHome() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-graphite">Update Profile</h3>
+                  <h3 className="font-semibold text-gray-800">Update Profile</h3>
                   <p className="text-sm text-coolgray">Manage your skills and rates</p>
                 </div>
               </div>
@@ -1095,7 +1095,7 @@ export default function FreelancerHome() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-graphite">Find Projects</h3>
+                  <h3 className="font-semibold text-gray-800">Find Projects</h3>
                   <p className="text-sm text-coolgray">Browse available opportunities</p>
                 </div>
               </div>
@@ -1111,7 +1111,7 @@ export default function FreelancerHome() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-graphite">View Analytics</h3>
+                  <h3 className="font-semibold text-gray-800">View Analytics</h3>
                   <p className="text-sm text-coolgray">Track your performance</p>
                 </div>
               </div>
@@ -1135,7 +1135,7 @@ export default function FreelancerHome() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-graphite mb-4">Smart Matching</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Smart Matching</h3>
               <p className="text-coolgray">
                 Our AI-powered system matches you with projects that fit your skills and preferences perfectly.
               </p>
@@ -1148,7 +1148,7 @@ export default function FreelancerHome() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-graphite mb-4">Secure Payments</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Secure Payments</h3>
               <p className="text-coolgray">
                 Get paid securely with milestone-based payments and escrow protection for every project.
               </p>
@@ -1161,7 +1161,7 @@ export default function FreelancerHome() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-graphite mb-4">AI Tools</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">AI Tools</h3>
               <p className="text-coolgray">
                 Access AI-powered proposal writing, project management, and productivity tools to boost your success.
               </p>
@@ -1250,10 +1250,10 @@ export default function FreelancerHome() {
             <div className="p-6">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-graphite">Project Details</h2>
+                <h2 className="text-2xl font-bold text-gray-800">Project Details</h2>
                 <button
                   onClick={handleProjectDetailClose}
-                  className="text-coolgray hover:text-graphite transition-colors p-2"
+                  className="text-coolgray hover:text-gray-800 transition-colors p-2"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1265,7 +1265,7 @@ export default function FreelancerHome() {
               <div className="space-y-6">
                 {/* Title and Status */}
                 <div className="flex items-start justify-between">
-                  <h3 className="text-2xl font-bold text-graphite pr-4">{selectedProjectDetail.title}</h3>
+                  <h3 className="text-2xl font-bold text-gray-800 pr-4">{selectedProjectDetail.title}</h3>
                   <div className="flex items-center space-x-3 flex-shrink-0">
                     <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
                       {selectedProjectDetail.status.charAt(0).toUpperCase() + selectedProjectDetail.status.slice(1)}
@@ -1281,7 +1281,11 @@ export default function FreelancerHome() {
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
-                  <span>Posted by {selectedProjectDetail.client_name}</span>
+                  <span>Posted by {
+                    selectedProjectDetail.personid?.first_name && selectedProjectDetail.personid?.last_name 
+                      ? `${selectedProjectDetail.personid.first_name} ${selectedProjectDetail.personid.last_name}`
+                      : selectedProjectDetail.client_name || 'Client'
+                  }</span>
                   <span>•</span>
                   <span>Posted: {new Date(selectedProjectDetail.createdAt).toLocaleDateString()}</span>
                 </div>
@@ -1304,13 +1308,13 @@ export default function FreelancerHome() {
 
                 {/* Description */}
                 <div>
-                  <h4 className="text-lg font-semibold text-graphite mb-3">Description</h4>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-3">Description</h4>
                   <p className="text-coolgray leading-relaxed whitespace-pre-wrap">{selectedProjectDetail.description}</p>
                 </div>
 
                 {/* Skills */}
                 <div>
-                  <h4 className="text-lg font-semibold text-graphite mb-3">Required Skills</h4>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-3">Required Skills</h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedProjectDetail.skills_required.map((skill, index) => (
                       <span key={index} className="px-3 py-1 bg-mint/10 text-mint rounded-full text-sm font-medium">

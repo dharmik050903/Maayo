@@ -202,18 +202,26 @@ const MyBids = () => {
 
       {/* Bids List */}
       {bids.length === 0 ? (
-        <div className="text-center py-12 text-white/70">
-          <svg className="w-16 h-16 mx-auto mb-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-8 md:p-12 text-center">
+          <svg className="w-20 h-20 mx-auto mb-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          <h3 className="text-xl font-semibold text-white mb-2">No Bids Yet</h3>
-          <p className="text-white/80 mb-4">You haven't submitted any bids yet.</p>
-          <p className="text-sm text-white/60">Browse projects and submit your first bid to get started!</p>
+          <h3 className="text-2xl font-bold text-gray-800 mb-4">No Bids Yet</h3>
+          <p className="text-gray-600 mb-4 text-lg">You haven't submitted any bids yet.</p>
+          <p className="text-gray-500 mb-8">Browse projects and submit your first bid to get started!</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button variant="accent" className="px-8 py-3 rounded-xl">
+              Browse Projects
+            </Button>
+            <Button variant="outline" className="px-8 py-3 border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl">
+              Submit New Bid
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="space-y-6">
           {bids.map((bid) => (
-            <div key={bid._id} className="card p-6 bg-white/95 hover:bg-white transition-colors">
+            <div key={bid._id} className="card p-6 bg-white/95 hover:bg-white transition-colors rounded-3xl shadow-lg">
               <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
                 {/* Bid Info */}
                 <div className="flex-1">
@@ -344,7 +352,7 @@ const MyBids = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => handleUpdateBid(bid)}
-                      className="flex-1 min-w-[120px] w-full sm:w-auto px-4 py-2 text-sm font-semibold border-violet text-violet hover:bg-violet hover:text-white transition-all duration-200"
+                      className="flex-1 min-w-[120px] w-full sm:w-auto px-4 py-3 text-sm font-semibold border-violet text-violet hover:bg-violet hover:text-white transition-all duration-200 rounded-xl"
                     >
                       Update Bid
                     </Button>
@@ -352,7 +360,7 @@ const MyBids = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => handleWithdrawBid(bid._id)}
-                      className="flex-1 min-w-[120px] border-coral text-coral hover:bg-coral hover:text-white w-full sm:w-auto px-4 py-2 text-sm font-semibold transition-all duration-200"
+                      className="flex-1 min-w-[120px] border-coral text-coral hover:bg-coral hover:text-white w-full sm:w-auto px-4 py-3 text-sm font-semibold transition-all duration-200 rounded-xl"
                     >
                       Withdraw Bid
                     </Button>
@@ -373,7 +381,7 @@ const MyBids = () => {
                     <Button
                       variant="accent"
                       size="sm"
-                      className="w-full bg-mint text-white hover:bg-mint/90"
+                      className="w-full bg-mint text-white hover:bg-mint/90 rounded-xl"
                       onClick={() => {
                         console.log('MyBids: Message button clicked for bid:', bid)
                         console.log('MyBids: Client info:', {

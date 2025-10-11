@@ -329,7 +329,7 @@ export default function JobEditForm() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-4xl mx-auto px-6 pt-20 pb-8">
+      <main className="flex-1 max-w-4xl mx-auto px-6 pt-24 sm:pt-28 pb-8">
         <div className="card bg-white/95 rounded-lg shadow-sm p-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-graphite mb-2">Edit Job</h1>

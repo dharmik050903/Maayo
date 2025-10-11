@@ -679,7 +679,12 @@ export default function FindWork() {
                     </div>
                     <div>
                       <p className="text-sm text-coolgray">Client</p>
-                      <p className="text-lg font-semibold text-violet">{selectedProjectDetail.client_name || 'Unknown'}</p>
+                      <p className="text-lg font-semibold text-violet">
+                        {selectedProjectDetail.personid?.first_name && selectedProjectDetail.personid?.last_name 
+                          ? `${selectedProjectDetail.personid.first_name} ${selectedProjectDetail.personid.last_name}`
+                          : selectedProjectDetail.client_name || 'Client Information Not Available'
+                        }
+                      </p>
                     </div>
                   </div>
                 </div>

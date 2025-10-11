@@ -259,7 +259,7 @@ export default function ProjectForm({ project = null, onSuccess, onCancel }) {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6">
-      <div className="card p-4 sm:p-6 lg:p-8 bg-white/95 backdrop-blur-sm text-gray-900">
+      <div className="card p-4 sm:p-6 lg:p-8 bg-white/95 backdrop-blur-sm text-gray-900 rounded-3xl shadow-xl">
         <div className="mb-8">
           <h2 className="text-2xl sm:text-3xl font-bold text-graphite">
             {project ? 'Edit Project' : 'Create New Project'}

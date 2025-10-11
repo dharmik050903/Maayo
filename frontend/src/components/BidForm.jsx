@@ -266,7 +266,9 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
               </div>
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-coral rounded-full"></div>
-                <span className="text-graphite font-medium">Skills: <span className="text-coral font-bold">{project.skills_required?.join(', ') || 'N/A'}</span></span>
+                <span className="text-graphite font-medium">Skills: <span className="text-coral font-bold">
+                  {project.skills_required?.map(skill => skill.skill || skill).join(', ') || 'N/A'}
+                </span></span>
               </div>
             </div>
           </div>

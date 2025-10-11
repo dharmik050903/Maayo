@@ -52,7 +52,6 @@ const router = createBrowserRouter([
       { path: '/signup', element: <Signup /> },
       { path: '/freelancer-dashboard', element: <FreelancerDashboard /> },
       { path: '/client-dashboard', element: <ClientDashboard /> },
-      { path: '/create-project', element: <ProjectCreate /> },
       { path: '/project/create', element: <ProjectCreate /> },
       { path: '/projects', element: <ProjectList /> },
       { path: '/project/:id', element: <ProjectDetail /> },

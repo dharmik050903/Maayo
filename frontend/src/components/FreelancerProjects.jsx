@@ -111,7 +111,7 @@ export default function FreelancerProjects() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
           <h2 className="text-2xl font-bold text-white mb-2">
             My Accepted Projects ({acceptedProjects.length})
@@ -124,7 +124,7 @@ export default function FreelancerProjects() {
           variant="outline"
           onClick={fetchAcceptedProjects}
           disabled={loading}
-          className="px-4 py-2 border-white text-white hover:bg-white hover:text-graphite"
+          className="px-6 py-3 border-white text-white hover:bg-white hover:text-graphite rounded-xl"
         >
           Refresh
         </Button>
@@ -132,18 +132,18 @@ export default function FreelancerProjects() {
 
       {/* Projects List */}
       {acceptedProjects.length === 0 ? (
-        <div className="text-center py-12 text-white/70">
-          <svg className="w-16 h-16 mx-auto mb-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-8 md:p-12 text-center">
+          <svg className="w-20 h-20 mx-auto mb-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
           </svg>
-          <h3 className="text-xl font-semibold text-white mb-2">No Accepted Projects Yet</h3>
-          <p className="text-white/80 mb-4">You haven't been accepted for any projects yet.</p>
-          <p className="text-sm text-white/60 mb-6">Keep bidding on projects to get accepted!</p>
-          <div className="space-x-4">
-            <Button variant="accent" className="px-8 mr-4">
+          <h3 className="text-2xl font-bold text-gray-800 mb-4">No Accepted Projects Yet</h3>
+          <p className="text-gray-600 mb-4 text-lg">You haven't been accepted for any projects yet.</p>
+          <p className="text-gray-500 mb-8">Keep bidding on projects to get accepted!</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button variant="accent" className="px-8 py-3 rounded-xl">
               Browse Projects
             </Button>
-            <Button variant="outline" className="px-8 border-white text-white hover:bg-white hover:text-graphite">
+            <Button variant="outline" className="px-8 py-3 border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl">
               Submit New Bid
             </Button>
           </div>
@@ -151,7 +151,7 @@ export default function FreelancerProjects() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {acceptedProjects.map((project) => (
-            <div key={project._id} className="card p-6 bg-white/95 hover:bg-white transition-all cursor-pointer">
+            <div key={project._id} className="card p-6 bg-white/95 hover:bg-white transition-all cursor-pointer rounded-3xl shadow-lg">
               <div className="flex justify-between items-start mb-4">
                 <h4 className="text-xl font-semibold text-graphite flex-1 mr-2">
                   {project.title}
@@ -196,7 +196,7 @@ export default function FreelancerProjects() {
               <div className="flex gap-3">
                 <Button
                   variant="outline"
-                  className="flex-1 px-4 border-mint text-mint hover:bg-mint hover:text-white"
+                  className="flex-1 px-4 py-3 border-mint text-mint hover:bg-mint hover:text-white rounded-xl"
                   onClick={() => handleProjectClick(project)}
                 >
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -208,7 +208,7 @@ export default function FreelancerProjects() {
                 <Button
                   variant="outline"
                   onClick={() => handleProjectClick(project)}
-                  className="px-4 border-mint text-mint hover:bg-mint hover:text-white"
+                  className="px-4 py-3 border-mint text-mint hover:bg-mint hover:text-white rounded-xl"
                 >
                   Update Progress
                 </Button>

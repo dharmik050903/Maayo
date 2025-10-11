@@ -173,7 +173,7 @@ export default function JobDetail() {
         <Header userData={userData} onLogout={handleLogout} />
         <main className="py-8 pt-24">
           <div className="max-w-6xl mx-auto px-4">
-            <div className="card p-8 bg-white/95">
+            <div className="card p-8 bg-white/95 rounded-3xl shadow-xl">
               <div className="animate-pulse">
                 <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
                 <div className="h-4 bg-gray-200 rounded w-1/2 mb-8"></div>
@@ -224,7 +224,7 @@ export default function JobDetail() {
             <Button
               onClick={() => navigate('/freelancer/jobs')}
               variant="secondary"
-              className="flex items-center gap-2 text-graphite border-gray-300 hover:bg-gray-50"
+              className="flex items-center gap-2 bg-white text-gray-800 border-gray-300 hover:bg-purple-600 hover:text-white hover:border-purple-600 rounded-xl px-6 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -233,7 +233,7 @@ export default function JobDetail() {
             </Button>
           </div>
 
-          <div className="card bg-white/95">
+          <div className="card bg-white/95 rounded-3xl shadow-xl">
             {/* Header */}
             <div className="p-8 border-b border-gray-200">
               <div className="flex items-start justify-between mb-4">
