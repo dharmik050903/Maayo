@@ -1,7 +1,16 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { escrowService } from '../services/escrowService'
 
 const CreateEscrowPayment = ({ projectId, onSuccess }) => {
+  // Debug: Log environment variables on component mount
+  useEffect(() => {
+    console.log('🔍 Environment Variables Debug:', {
+      VITE_RAZORPAY_KEY_ID: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
+      NODE_ENV: import.meta.env.NODE_ENV,
+      MODE: import.meta.env.MODE
+    })
+  }, [])
   const [finalAmount, setFinalAmount] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -66,6 +75,13 @@ const CreateEscrowPayment = ({ projectId, onSuccess }) => {
       const result = await escrowService.createEscrowPayment(projectId, finalAmount)
       
       if (result.status) {
+        // Debug: Log the Razorpay key being used
+        console.log('🔍 CreateEscrowPayment Debug:', {
+          envKey: import.meta.env.VITE_RAZORPAY_KEY_ID,
+          keyLength: import.meta.env.VITE_RAZORPAY_KEY_ID?.length,
+          isCorrectKey: import.meta.env.VITE_RAZORPAY_KEY_ID === 'rzp_live_RKtnwAL4ofwknm'
+        })
+        
         // Initialize Razorpay payment
         const options = {
           key: import.meta.env.VITE_RAZORPAY_KEY_ID,
