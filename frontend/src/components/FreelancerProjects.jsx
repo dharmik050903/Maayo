@@ -293,23 +293,16 @@ export default function FreelancerProjects() {
               <div className="flex gap-4">
                 <Button
                   variant="outline"
-                  className="flex-1 px-6 py-4 border-2 border-mint text-mint hover:bg-mint hover:text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
+                  className="flex-1 border-violet text-violet hover:bg-violet hover:text-white"
                   onClick={() => handleProjectClick(project)}
                 >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.269-2.943-9.542-7z" />
-                  </svg>
                   View Details
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => handleProjectClick(project)}
-                  className="px-6 py-4 border-2 border-violet text-violet hover:bg-violet hover:text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
+                  className="flex-1 border-mint text-mint hover:bg-mint hover:text-white"
                 >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
                   Update Progress
                 </Button>
               </div>

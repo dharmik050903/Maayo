@@ -1272,9 +1272,9 @@ const handleCloseBidRequest = () => {
                           <div className="flex flex-col sm:flex-row lg:flex-col gap-2 w-full sm:w-auto lg:w-[200px]">
                     <Button 
                       variant="outline" 
-                              size="sm" 
-                              className="w-full sm:w-auto lg:w-full text-xs sm:text-sm border-green-500 text-green-500 hover:bg-green-500 hover:text-white"
-                              onClick={async () => {
+                      size="sm" 
+                      className="w-full sm:w-auto lg:w-full text-xs sm:text-sm border-green-500 text-green-500 hover:bg-green-500 hover:text-white"
+                      onClick={async () => {
                                 try {
                                   const response = await bidService.acceptBid(bid._id);
                                   if (response.status) {
@@ -1301,14 +1301,13 @@ const handleCloseBidRequest = () => {
                                   });
                                 }
                               }}
-                              className="w-full sm:w-auto lg:w-full text-xs sm:text-sm"
                     >
                       Accept Bid
                     </Button>
                     <Button 
                       variant="outline" 
-                              size="sm" 
-                              onClick={async () => {
+                      size="sm" 
+                      onClick={async () => {
                                 try {
                                   const rejectMessage = prompt('Enter rejection reason (optional):');
                                   const response = await bidService.rejectBid(bid._id, rejectMessage || '');
@@ -1336,7 +1335,7 @@ const handleCloseBidRequest = () => {
                                   });
                                 }
                               }}
-                              className="w-full sm:w-auto lg:w-full text-xs sm:text-sm border-red-300 text-red-700 hover:bg-red-50"
+                              className="w-full sm:w-auto lg:w-full text-xs sm:text-sm border-coral text-coral hover:bg-coral hover:text-white"
                     >
                       Reject Bid
                     </Button>

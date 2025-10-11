@@ -264,166 +264,155 @@ const MyBids = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-mint/5 to-violet/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               
               <div className="relative z-10 p-8">
-                <div className="flex flex-col lg:flex-row justify-between items-start gap-6">
-                  {/* Bid Info */}
+                {/* Header Section */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                   <div className="flex-1">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
-                      <div className="flex-1">
-                        <h4 className="text-2xl font-bold text-graphite mb-2 group-hover:text-mint transition-colors duration-300">
-                          {bid.project_id?.title || 'Project Title Not Available'}
-                        </h4>
-                        <div className="flex items-center gap-2 text-sm text-gray-500">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <span>Submitted {formatDate(bid.createdAt)}</span>
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-end gap-2">
-                        <span className={`px-4 py-2 rounded-2xl text-sm font-semibold shadow-sm flex items-center gap-2 ${getStatusColor(bid.status)}`}>
-                          {getStatusIcon(bid.status)} {bid.status.charAt(0).toUpperCase() + bid.status.slice(1)}
-                        </span>
-                      </div>
+                    <h4 className="text-2xl font-bold text-graphite mb-3 group-hover:text-mint transition-colors duration-300">
+                      {bid.project_id?.title || 'Project Title Not Available'}
+                    </h4>
+                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>Submitted {formatDate(bid.createdAt)}</span>
                     </div>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-                    <div className="flex items-center bg-gradient-to-r from-green-50 to-mint/10 p-4 rounded-2xl">
-                      <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mr-4">
-                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  </div>
+                  <div className="flex flex-col items-end gap-3">
+                    <span className={`px-4 py-2 rounded-2xl text-sm font-semibold shadow-sm flex items-center gap-2 ${getStatusColor(bid.status)}`}>
+                      {getStatusIcon(bid.status)} {bid.status.charAt(0).toUpperCase() + bid.status.slice(1)}
+                    </span>
+                    
+                    {/* Action Buttons */}
+                    {bid.status === 'pending' && (
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleUpdateBid(bid)}
+                          className="min-w-[140px] border-violet text-violet hover:bg-violet hover:text-white"
+                        >
+                          Update Bid
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleWithdrawBid(bid._id)}
+                          className="min-w-[140px] border-coral text-coral hover:bg-coral hover:text-white"
+                        >
+                          Withdraw Bid
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {/* Bid Information Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+                  <div className="bg-gradient-to-r from-green-50 to-mint/10 p-6 rounded-2xl border border-green-100">
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center mr-4">
+                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                         </svg>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600 font-medium">Your Bid</p>
-                        <p className="font-bold text-lg text-gray-800">{formatBudget(bid.bid_amount)}</p>
+                        <p className="font-bold text-xl text-gray-800">{formatBudget(bid.bid_amount)}</p>
                       </div>
                     </div>
-                    <div className="flex items-center bg-gradient-to-r from-orange-50 to-coral/10 p-4 rounded-2xl">
-                      <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mr-4">
-                        <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-orange-50 to-coral/10 p-6 rounded-2xl border border-orange-100">
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center mr-4">
+                        <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600 font-medium">Duration</p>
-                        <p className="font-bold text-lg text-gray-800">{bid.proposed_duration} days</p>
+                        <p className="font-bold text-xl text-gray-800">{bid.proposed_duration} days</p>
                       </div>
                     </div>
-                    <div className="flex items-center bg-gradient-to-r from-purple-50 to-violet/10 p-4 rounded-2xl">
-                      <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mr-4">
-                        <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-purple-50 to-violet/10 p-6 rounded-2xl border border-purple-100">
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center mr-4">
+                        <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600 font-medium">Availability</p>
-                        <p className="font-bold text-lg text-gray-800">{bid.availability_hours}h/week</p>
+                        <p className="font-bold text-xl text-gray-800">{bid.availability_hours}h/week</p>
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="mb-6">
-                    <h5 className="font-semibold text-graphite mb-3 flex items-center">
-                      <svg className="w-4 h-4 mr-2 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                </div>
+                {/* Content Sections */}
+                <div className="space-y-8">
+                  {/* Cover Letter Section */}
+                  <div>
+                    <h5 className="font-semibold text-graphite mb-4 flex items-center text-lg">
+                      <svg className="w-5 h-5 mr-3 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
                       Your Cover Letter
                     </h5>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-coolgray text-sm leading-relaxed line-clamp-3">{bid.cover_letter}</p>
+                    <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                      <p className="text-gray-700 leading-relaxed">{bid.cover_letter}</p>
                     </div>
                   </div>
                   
+                  {/* Project Description Section */}
                   {bid.project_id?.description && (
-                    <div className="mb-6">
-                      <h5 className="font-semibold text-graphite mb-3 flex items-center">
-                        <svg className="w-4 h-4 mr-2 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div>
+                      <h5 className="font-semibold text-graphite mb-4 flex items-center text-lg">
+                        <svg className="w-5 h-5 mr-3 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                         </svg>
                         Project Description
                       </h5>
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <p className="text-coolgray text-sm leading-relaxed line-clamp-2">
+                      <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        <p className="text-gray-700 leading-relaxed">
                           {bid.project_id.description}
                         </p>
                       </div>
                     </div>
                   )}
                   
+                  {/* Milestones Section */}
                   {bid.milestones && bid.milestones.length > 0 && (
-                    <div className="mb-6">
-                      <h5 className="font-semibold text-graphite mb-3 flex items-center">
-                        <svg className="w-4 h-4 mr-2 text-violet" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div>
+                      <h5 className="font-semibold text-graphite mb-4 flex items-center text-lg">
+                        <svg className="w-5 h-5 mr-3 text-violet" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                         </svg>
                         Your Proposed Milestones
                       </h5>
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         {bid.milestones.slice(0, 2).map((milestone, index) => (
-                          <div key={index} className="bg-gradient-to-r from-violet/10 to-mint/10 p-4 rounded-lg border border-violet/20">
+                          <div key={index} className="bg-gradient-to-r from-violet/10 to-mint/10 p-6 rounded-xl border border-violet/20">
                             <div className="flex justify-between items-start">
                               <div>
-                                <h6 className="font-semibold text-graphite">{milestone.title}</h6>
+                                <h6 className="font-semibold text-graphite text-lg">{milestone.title}</h6>
                                 {milestone.description && (
-                                  <p className="text-sm text-coolgray mt-1">{milestone.description}</p>
+                                  <p className="text-gray-600 mt-2">{milestone.description}</p>
                                 )}
                               </div>
-                              <span className="font-bold text-mint text-lg">{formatBudget(milestone.amount)}</span>
+                              <span className="font-bold text-mint text-xl">{formatBudget(milestone.amount)}</span>
                             </div>
                           </div>
                         ))}
                         {bid.milestones.length > 2 && (
-                          <p className="text-sm text-coolgray text-center py-2">
+                          <p className="text-gray-500 text-center py-3 bg-gray-50 rounded-lg">
                             +{bid.milestones.length - 2} more milestone{bid.milestones.length - 2 !== 1 ? 's' : ''}
                           </p>
                         )}
                       </div>
                     </div>
                   )}
-                  
-                  <div className="flex items-center text-xs text-coolgray bg-gray-50 p-3 rounded-lg">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>Submitted: {formatDate(bid.createdAt)}</span>
-                    {bid.client_decision_date && (
-                      <span className="ml-4 flex items-center">
-                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Decision: {formatDate(bid.client_decision_date)}
-                      </span>
-                    )}
-                  </div>
                 </div>
-
-                {/* Action Buttons */}
-                {bid.status === 'pending' && (
-                  <div className="flex flex-col sm:flex-row gap-4 w-full sm:min-w-[250px]">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleUpdateBid(bid)}
-                      className="flex-1 min-w-[140px] w-full sm:w-auto px-6 py-4 text-sm font-semibold border-2 border-violet text-violet hover:bg-violet hover:text-white transition-all duration-200 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                    >
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                      Update Bid
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleWithdrawBid(bid._id)}
-                      className="flex-1 min-w-[140px] border-2 border-coral text-coral hover:bg-coral hover:text-white w-full sm:w-auto px-6 py-4 text-sm font-semibold transition-all duration-200 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                    >
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                      Withdraw Bid
-                    </Button>
-                  </div>
-                )}
 
                 {bid.status === 'accepted' && (
                   <div className="w-full sm:min-w-[200px]">
@@ -483,7 +472,6 @@ const MyBids = () => {
                     </div>
                   </div>
                 )}
-                </div>
               </div>
             </div>
           ))}
