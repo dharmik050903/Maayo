@@ -236,25 +236,60 @@ export const escrowService = {
     try {
       console.log('Creating escrow payment:', { projectId, finalAmount })
       
+      // Validate inputs
+      if (!projectId) {
+        throw new Error('Project ID is required')
+      }
+      
+      const amount = parseFloat(finalAmount)
+      if (isNaN(amount) || amount <= 0) {
+        throw new Error('Valid amount is required')
+      }
+      
+      // Get current user data for additional context
+      const userData = JSON.parse(localStorage.getItem('userData') || '{}')
+      const authHeaders = JSON.parse(localStorage.getItem('authHeaders') || '{}')
+      
+      const requestBody = {
+        project_id: projectId,
+        final_amount: amount,
+        user_id: authHeaders._id || userData._id,
+        user_role: authHeaders.userRole || userData.userRole
+      }
+      
+      console.log('Escrow request body:', requestBody)
+      
       const response = await authenticatedFetch(`${API_BASE_URL}/escrow/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          project_id: projectId,
-          final_amount: parseFloat(finalAmount)
-        })
+        body: JSON.stringify(requestBody)
       })
 
       if (!response.ok) {
         let errorMessage = 'Failed to create escrow payment'
+        let errorDetails = null
+        
         try {
           const errorData = await response.json()
           errorMessage = errorData.message || errorMessage
+          errorDetails = errorData
+          console.error('Escrow creation error details:', errorData)
         } catch (parseError) {
           errorMessage = `Server error: ${response.status} ${response.statusText}`
+          console.error('Failed to parse error response:', parseError)
         }
+        
+        // Log detailed error information
+        console.error('Escrow creation failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorMessage,
+          errorDetails,
+          requestBody
+        })
+        
         throw new Error(errorMessage)
       }
 

@@ -12,10 +12,22 @@ const CreateEscrowPayment = ({ projectId, onSuccess }) => {
       return
     }
 
+    if (!projectId) {
+      setError('Project ID is missing')
+      return
+    }
+
     setLoading(true)
     setError('')
     
     try {
+      console.log('Creating escrow payment with:', {
+        projectId,
+        finalAmount,
+        amountType: typeof finalAmount,
+        parsedAmount: parseFloat(finalAmount)
+      })
+      
       const result = await escrowService.createEscrowPayment(projectId, finalAmount)
       
       if (result.status) {
@@ -49,7 +61,25 @@ const CreateEscrowPayment = ({ projectId, onSuccess }) => {
       }
     } catch (error) {
       console.error('Error creating escrow payment:', error)
-      setError(error.message || 'Failed to create escrow payment')
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      })
+      
+      // More specific error messages
+      let errorMessage = 'Failed to create escrow payment'
+      if (error.message.includes('Project ID is required')) {
+        errorMessage = 'Project ID is missing. Please refresh the page and try again.'
+      } else if (error.message.includes('Valid amount is required')) {
+        errorMessage = 'Please enter a valid amount greater than 0.'
+      } else if (error.message.includes('Unable to connect to server')) {
+        errorMessage = 'Server connection failed. Please check your internet connection and try again.'
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
+      setError(errorMessage)
       setLoading(false)
     }
   }
@@ -153,6 +183,21 @@ const CreateEscrowPayment = ({ projectId, onSuccess }) => {
           )}
         </button>
       </div>
+
+      {/* Debug Information - Remove in production */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h4 className="text-sm font-medium text-blue-800 mb-2">Debug Information</h4>
+          <div className="text-xs text-blue-700 space-y-1">
+            <p><strong>Project ID:</strong> {projectId || 'Not provided'}</p>
+            <p><strong>Final Amount:</strong> {finalAmount || 'Not set'}</p>
+            <p><strong>Amount Type:</strong> {typeof finalAmount}</p>
+            <p><strong>Parsed Amount:</strong> {parseFloat(finalAmount) || 'Invalid'}</p>
+            <p><strong>Razorpay Key:</strong> {import.meta.env.VITE_RAZORPAY_KEY_ID ? 'Set' : 'Not set'}</p>
+            <p><strong>API Base URL:</strong> {import.meta.env.VITE_API_BASE_URL || 'Not set'}</p>
+          </div>
+        </div>
+      )}
 
       {/* Razorpay Script Loading Check */}
       {!window.Razorpay && (
