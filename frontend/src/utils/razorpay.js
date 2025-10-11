@@ -47,7 +47,7 @@ export const initializeRazorpay = async (options) => {
 
     return new Promise((resolve, reject) => {
       const razorpayOptions = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_live_RKtnwAL4ofwknm', // Use your actual key as fallback
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         ...options,
         handler: function (response) {
           console.log('Payment successful:', response)
