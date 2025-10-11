@@ -1271,8 +1271,9 @@ const handleCloseBidRequest = () => {
                         {bid.status === 'pending' && (
                           <div className="flex flex-col sm:flex-row lg:flex-col gap-2 w-full sm:w-auto lg:w-[200px]">
                     <Button 
-                      variant="success" 
+                      variant="outline" 
                               size="sm" 
+                              className="w-full sm:w-auto lg:w-full text-xs sm:text-sm border-green-500 text-green-500 hover:bg-green-500 hover:text-white"
                               onClick={async () => {
                                 try {
                                   const response = await bidService.acceptBid(bid._id);

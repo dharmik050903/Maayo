@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { getMilestonesCached } from '../services/cachedApiService'
 import { escrowService } from '../services/escrowService'
 import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 import { initializeRazorpay } from '../utils/razorpay'
@@ -14,14 +15,6 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
   useEffect(() => {
     if (projectId) {
       fetchMilestones()
-      
-      // Set up periodic refresh every 30 seconds to catch milestone updates
-      const refreshInterval = setInterval(() => {
-        console.log('🔄 ClientMilestoneReview: Auto-refreshing milestones...')
-        fetchMilestones()
-      }, 30000) // 30 seconds
-      
-      return () => clearInterval(refreshInterval)
     }
   }, [projectId])
 
@@ -31,7 +24,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
       setLoading(true)
       setError(null)
       
-      const result = await escrowService.getMilestones(projectId)
+      const result = await getMilestonesCached(projectId)
       console.log('📊 ClientMilestoneReview: Milestone fetch result:', result)
       
       if (result.status) {

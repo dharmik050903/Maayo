@@ -8,6 +8,7 @@ import { getFreelancers as originalGetFreelancers } from '../utils/api.js'
 import { projectService } from './projectService.js'
 import { skillsService } from './skillsService.js'
 import { bidService } from './bidService.js'
+import { escrowService } from './escrowService.js'
 
 /**
  * Cached freelancers API
@@ -87,6 +88,47 @@ export const getAllProjectsCached = async (filters = {}) => {
     return result
   } catch (error) {
     console.error('❌ ApiCache: Projects API error:', error)
+    throw error
+  }
+}
+
+/**
+ * Cached milestones API
+ */
+export const getMilestonesCached = async (projectId) => {
+  const cacheKey = apiCache.generateKey('milestones', { projectId })
+  
+  // Check cache first
+  const cachedData = apiCache.get(cacheKey)
+  if (cachedData) {
+    return cachedData
+  }
+
+  // Check if request is already pending
+  const pendingRequest = apiCache.getPending(cacheKey)
+  if (pendingRequest) {
+    console.log('⏳ ApiCache: Waiting for pending milestones request')
+    return pendingRequest
+  }
+
+  // Make new request
+  console.log('🌐 ApiCache: Fetching milestones from API')
+  const requestPromise = escrowService.getMilestones(projectId)
+  
+  // Add to pending requests
+  apiCache.addPending(cacheKey, requestPromise)
+  
+  try {
+    const result = await requestPromise
+    
+    // Cache successful response
+    if (result.status) {
+      apiCache.set(cacheKey, result, 'milestones')
+    }
+    
+    return result
+  } catch (error) {
+    console.error('❌ ApiCache: Milestones API error:', error)
     throw error
   }
 }

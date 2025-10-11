@@ -28,6 +28,10 @@ const project = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'tblbid' 
     },
+    bid_count: { 
+        type: Number, 
+        default: 0 
+    }, // Total number of bids received
     bid_deadline: { 
         type: String 
     }, // Deadline for submitting bids

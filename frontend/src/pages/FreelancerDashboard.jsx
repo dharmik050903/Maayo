@@ -415,7 +415,7 @@ export default function FreelancerDashboard() {
         experience_level: profileData.experience_level,
         availability: availability,
         resume_link: resumeLink,
-        github_link: githubLink,
+        github_link: githubLink || "",
         certification: certifications.filter(cert => cert.name.trim() !== ''),
         employement_history: hasExperience ? employmentHistory.filter(emp => emp.compayname.trim() !== '') : [],
         highest_education: profileData.education
@@ -485,11 +485,15 @@ export default function FreelancerDashboard() {
         experience_level: profileData.experience_level,
         availability: availability,
         resume_link: resumeLink,
-        github_link: githubLink,
+        github_link: githubLink || "",
         certification: certifications.filter(cert => cert.name.trim() !== ''),
         employement_history: hasExperience ? employmentHistory.filter(emp => emp.compayname.trim() !== '') : [],
         highest_education: profileData.education
       }
+
+      console.log('🔍 Profile payload being sent:', profilePayload)
+      console.log('🔍 GitHub link value:', githubLink)
+      console.log('🔍 GitHub link in payload:', profilePayload.github_link)
 
       let response
       let apiEndpoint

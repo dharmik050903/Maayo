@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { getMilestonesCached } from '../services/cachedApiService'
 import { escrowService } from '../services/escrowService'
 
 const MilestoneManagement = ({ projectId, userRole }) => {
@@ -25,7 +26,7 @@ const MilestoneManagement = ({ projectId, userRole }) => {
     try {
       setLoading(true)
       setError(null)
-      const result = await escrowService.getMilestones(projectId)
+      const result = await getMilestonesCached(projectId)
       
       if (result.status) {
         setMilestones(result.data.milestones || [])

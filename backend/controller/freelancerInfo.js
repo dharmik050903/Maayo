@@ -204,7 +204,7 @@ export default class FreelancerInfo {
                 availability,
                 portfolio,
                 resume_link,
-                github_link,
+                github_link: github_link && github_link.trim() !== "" ? github_link : undefined,
                 certification: req.body.certification || [],
                 employement_history: req.body.employement_history || [],
                 highest_education: req.body.highest_education || "",
@@ -221,8 +221,15 @@ export default class FreelancerInfo {
     async updateFreelancerInfo(req, res) {
         try {
             const id = req.body._id;
-            req.body.updateAt = new Date().toISOString()
-            const update = await freelancerInfo.findByIdAndUpdate(id, req.body, { new: true });
+            const updateData = { ...req.body };
+            updateData.updateAt = new Date().toISOString();
+            
+            // Handle github_link properly
+            if (updateData.github_link && updateData.github_link.trim() === "") {
+                updateData.github_link = undefined;
+            }
+            
+            const update = await freelancerInfo.findByIdAndUpdate(id, updateData, { new: true });
             if(update){
                 res.status(200).json({ message: "Freelancer info updated successfully", data: update });
             }

@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Header from '../components/Header'
-import { getFreelancers, isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
+import { getFreelancersCached } from '../services/cachedApiService'
+import { isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
 import { formatHourlyRate } from '../utils/currency'
 import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 
@@ -85,7 +86,7 @@ export default function Freelancers() {
       setLoading(true)
       console.log('🔄 Freelancers: Starting to fetch freelancers from database...')
       
-      const { response, data } = await getFreelancers({ 
+      const { response, data } = await getFreelancersCached({ 
         limit: 50,  // Request more freelancers per page
         page: 1     // Start from first page
       })

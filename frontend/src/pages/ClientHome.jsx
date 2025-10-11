@@ -342,7 +342,7 @@ export default function ClientHome() {
       setLoading(true)
       console.log('Searching freelancers with term:', freelancerSearchTerm)
       
-      const { response, data } = await getFreelancers({ 
+      const { response, data } = await getFreelancersCached({ 
         search: freelancerSearchTerm,
         limit: freelancersPerPage,
         page: 1

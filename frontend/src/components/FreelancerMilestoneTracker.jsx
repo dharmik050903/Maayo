@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { getMilestonesCached } from '../services/cachedApiService'
 import { escrowService } from '../services/escrowService'
 import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 
@@ -29,7 +30,7 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
       setLoading(true)
       setError(null)
       
-      const result = await escrowService.getMilestones(projectId)
+      const result = await getMilestonesCached(projectId)
       console.log('📊 FreelancerMilestoneTracker: Milestone fetch result:', result)
       
       if (result.status) {

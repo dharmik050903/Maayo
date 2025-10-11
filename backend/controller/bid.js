@@ -109,6 +109,11 @@ export default class BidController {
 
             await newBid.save();
 
+            // Increment bid count for the project
+            await projectinfo.findByIdAndUpdate(project_id, {
+                $inc: { bid_count: 1 }
+            });
+
             return res.status(201).json({ 
                 status: true, 
                 message: "Bid created successfully", 
@@ -716,6 +721,11 @@ export default class BidController {
 
             // Delete the bid
             await Bid.findByIdAndDelete(bid_id);
+
+            // Decrement bid count for the project
+            await projectinfo.findByIdAndUpdate(bid.project_id._id, {
+                $inc: { bid_count: -1 }
+            });
 
             return res.status(200).json({
                 status: true,

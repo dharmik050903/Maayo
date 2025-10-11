@@ -301,7 +301,7 @@ export default function ClientDashboard() {
       setFreelancersLoading(true)
       setFreelancerError(null)
       
-      const { response, data } = await getFreelancers({ 
+      const { response, data } = await getFreelancersCached({ 
         search: freelancerSearchTerm.trim(),
         limit: freelancersPerPage,
         page: 1

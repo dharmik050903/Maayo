@@ -557,9 +557,9 @@ export default function ClientMyBids() {
                   {bid.status === 'pending' && (
                     <>
                       <Button 
-                        variant="success" 
+                        variant="outline" 
                         size="sm" 
-                        className="flex-1 min-w-[120px] border-mint text-mint hover:bg-mint hover:text-white"
+                        className="flex-1 min-w-[120px] border-green-500 text-green-500 hover:bg-green-500 hover:text-white"
                         onClick={() => handleAcceptBid(bid._id)}
                         disabled={actionLoading}
                       >
