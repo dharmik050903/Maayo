@@ -126,6 +126,7 @@ router.post("/bank-details/delete", auth, bankDetailsController.deleteBankDetail
 router.post("/escrow/create", auth, escrowController.createEscrowPayment);
 router.post("/escrow/verify", auth, escrowController.verifyEscrowPayment);
 router.post("/escrow/release-milestone", auth, escrowController.releaseMilestonePayment);
+router.post("/escrow/status", auth, escrowController.getEscrowStatus);
 router.post("/escrow/reset", auth, escrowController.resetEscrowStatus);
 
 // Milestone Management routes
@@ -361,6 +362,24 @@ router.post("/payment/test-order", async (req, res) => {
             details: error.response?.data || error
         });
     }
+});
+
+// Health check endpoint
+router.get("/health", (req, res) => {
+    res.json({ 
+        status: true, 
+        message: "Server is running",
+        timestamp: new Date().toISOString(),
+        endpoints: {
+            escrow: [
+                "POST /api/escrow/create",
+                "POST /api/escrow/verify", 
+                "POST /api/escrow/release-milestone",
+                "POST /api/escrow/status",
+                "POST /api/escrow/reset"
+            ]
+        }
+    });
 });
 
 // Health check for chat endpoints
