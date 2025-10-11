@@ -90,7 +90,7 @@ export default class EscrowController {
             const orderOptions = {
                 amount: Math.round(final_amount * 100), // Convert to paise
                 currency: 'INR',
-                receipt: `escrow_${project_id}_${Date.now()}`,
+                receipt: `escrow_${project_id.slice(-8)}_${Date.now().toString().slice(-8)}`, // Shortened receipt
                 notes: {
                     project_id: project_id,
                     freelancer_id: project.accepted_bid_id.freelancer_id,
