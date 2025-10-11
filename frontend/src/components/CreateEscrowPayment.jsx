@@ -5,6 +5,31 @@ const CreateEscrowPayment = ({ projectId, onSuccess }) => {
   const [finalAmount, setFinalAmount] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [existingEscrow, setExistingEscrow] = useState(null)
+  const [showExistingEscrowOptions, setShowExistingEscrowOptions] = useState(false)
+
+  const handleCancelExistingEscrow = async () => {
+    setLoading(true)
+    setError('')
+    
+    try {
+      await escrowService.cancelEscrowPayment(projectId)
+      setShowExistingEscrowOptions(false)
+      setError('')
+      // Now try to create the new escrow
+      await handleCreateEscrow()
+    } catch (error) {
+      console.error('Error cancelling existing escrow:', error)
+      setError('Failed to cancel existing escrow. Please contact support.')
+      setLoading(false)
+    }
+  }
+
+  const handleViewExistingEscrow = () => {
+    // Navigate to escrow management or show existing escrow details
+    setShowExistingEscrowOptions(false)
+    setError('Please check the escrow management section to view your existing escrow payment.')
+  }
 
   const handleCreateEscrow = async () => {
     if (!finalAmount || finalAmount <= 0) {
@@ -75,6 +100,11 @@ const CreateEscrowPayment = ({ projectId, onSuccess }) => {
         errorMessage = 'Please enter a valid amount greater than 0.'
       } else if (error.message.includes('Unable to connect to server')) {
         errorMessage = 'Server connection failed. Please check your internet connection and try again.'
+      } else if (error.message.includes('already exists')) {
+        // Handle existing escrow case
+        setError('')
+        setShowExistingEscrowOptions(true)
+        return
       } else if (error.message) {
         errorMessage = error.message
       }
@@ -106,10 +136,10 @@ const CreateEscrowPayment = ({ projectId, onSuccess }) => {
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Create Escrow Payment</h3>
-        <p className="text-gray-600">
+    <div className="bg-white p-8 rounded-3xl shadow-2xl border border-gray-100">
+      <div className="mb-8">
+        <h3 className="text-2xl font-bold text-gray-900 mb-3">Create Escrow Payment</h3>
+        <p className="text-gray-600 text-lg leading-relaxed">
           Create an escrow payment to secure funds for this project. The amount will be held in escrow until milestones are completed.
         </p>
       </div>
@@ -126,7 +156,7 @@ const CreateEscrowPayment = ({ projectId, onSuccess }) => {
               setFinalAmount(e.target.value)
               setError('')
             }}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+            className={`w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 ${
               error ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="Enter final project amount"
@@ -137,27 +167,82 @@ const CreateEscrowPayment = ({ projectId, onSuccess }) => {
           {error && (
             <p className="text-red-500 text-sm mt-1">{error}</p>
           )}
+          
+          {/* Existing Escrow Options */}
+          {showExistingEscrowOptions && (
+            <div className="mt-6 bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-2xl p-6 shadow-lg">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-2xl flex items-center justify-center">
+                    <svg className="h-6 w-6 text-white" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="ml-4 flex-1">
+                  <h3 className="text-lg font-bold text-yellow-800 mb-2">Existing Escrow Payment Found</h3>
+                  <div className="text-yellow-700">
+                    <p className="mb-4 text-base">An escrow payment already exists for this project. What would you like to do?</p>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <button
+                        onClick={handleViewExistingEscrow}
+                        className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-sm font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                      >
+                        👁️ View Existing Escrow
+                      </button>
+                      <button
+                        onClick={handleCancelExistingEscrow}
+                        disabled={loading}
+                        className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-2xl hover:from-red-600 hover:to-red-700 transition-all duration-200 text-sm font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                      >
+                        {loading ? '⏳ Cancelling...' : '🔄 Cancel & Create New'}
+                      </button>
+                      <button
+                        onClick={() => setShowExistingEscrowOptions(false)}
+                        className="px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-2xl hover:from-gray-600 hover:to-gray-700 transition-all duration-200 text-sm font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                      >
+                        ❌ Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <p className="text-sm text-gray-500 mt-1">
             This amount will be held in escrow and released based on milestone completion.
           </p>
         </div>
 
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-200 rounded-2xl p-6 shadow-lg">
           <div className="flex">
             <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
+              <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-amber-400 rounded-2xl flex items-center justify-center">
+                <svg className="h-6 w-6 text-white" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
             </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-yellow-800">Important Information</h3>
-              <div className="mt-2 text-sm text-yellow-700">
-                <ul className="list-disc list-inside space-y-1">
-                  <li>Payment will be processed through Razorpay</li>
-                  <li>Funds will be held in escrow until milestones are completed</li>
-                  <li>You can release payments manually after milestone completion</li>
-                  <li>Make sure you have sufficient balance in your account</li>
-                </ul>
+            <div className="ml-4">
+              <h3 className="text-lg font-bold text-yellow-800 mb-2">Important Information</h3>
+              <div className="text-yellow-700 space-y-2">
+                <div className="flex items-center">
+                  <span className="w-2 h-2 bg-yellow-500 rounded-full mr-3"></span>
+                  <span className="text-base">Payment will be processed through Razorpay</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="w-2 h-2 bg-yellow-500 rounded-full mr-3"></span>
+                  <span className="text-base">Funds will be held in escrow until milestones are completed</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="w-2 h-2 bg-yellow-500 rounded-full mr-3"></span>
+                  <span className="text-base">You can release payments manually after milestone completion</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="w-2 h-2 bg-yellow-500 rounded-full mr-3"></span>
+                  <span className="text-base">Make sure you have sufficient balance in your account</span>
+                </div>
               </div>
             </div>
           </div>
@@ -165,20 +250,20 @@ const CreateEscrowPayment = ({ projectId, onSuccess }) => {
 
         <button
           onClick={handleCreateEscrow}
-          disabled={loading || !finalAmount}
-          className="w-full bg-purple-600 text-white py-3 px-4 rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          disabled={loading || !finalAmount || showExistingEscrowOptions}
+          className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-4 px-6 rounded-2xl hover:from-purple-700 hover:to-purple-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg font-semibold shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-200 disabled:transform-none"
         >
           {loading ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              Processing...
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+              <span className="text-lg">Processing...</span>
             </>
           ) : (
             <>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
               </svg>
-              Create Escrow Payment
+              <span className="text-lg">💰 Create Escrow Payment</span>
             </>
           )}
         </button>
@@ -201,17 +286,19 @@ const CreateEscrowPayment = ({ projectId, onSuccess }) => {
 
       {/* Razorpay Script Loading Check */}
       {!window.Razorpay && (
-        <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="mt-6 bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-200 rounded-2xl p-6 shadow-lg">
           <div className="flex">
             <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
+              <div className="w-12 h-12 bg-gradient-to-r from-red-400 to-pink-400 rounded-2xl flex items-center justify-center">
+                <svg className="h-6 w-6 text-white" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
             </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Razorpay Not Loaded</h3>
-              <div className="mt-2 text-sm text-red-700">
-                <p>Please ensure the Razorpay script is loaded on this page.</p>
+            <div className="ml-4">
+              <h3 className="text-lg font-bold text-red-800 mb-2">Razorpay Not Loaded</h3>
+              <div className="text-red-700">
+                <p className="text-base">Please ensure the Razorpay script is loaded on this page.</p>
               </div>
             </div>
           </div>

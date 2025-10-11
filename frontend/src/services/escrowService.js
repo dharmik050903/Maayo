@@ -246,6 +246,27 @@ export const escrowService = {
         throw new Error('Valid amount is required')
       }
       
+      // First check if escrow already exists for this project
+      try {
+        const existingEscrowResponse = await this.getEscrowStatus(projectId)
+        if (existingEscrowResponse.status && existingEscrowResponse.data) {
+          console.log('Existing escrow found:', existingEscrowResponse.data)
+          
+          // Check if escrow is already active/completed
+          if (existingEscrowResponse.data.status === 'active' || existingEscrowResponse.data.status === 'completed') {
+            throw new Error('Escrow payment already exists for this project. Please check the escrow management section.')
+          }
+          
+          // If escrow exists but is cancelled/failed, allow recreation
+          if (existingEscrowResponse.data.status === 'cancelled' || existingEscrowResponse.data.status === 'failed') {
+            console.log('Previous escrow was cancelled/failed, allowing recreation')
+          }
+        }
+      } catch (statusError) {
+        console.log('No existing escrow found or error checking status:', statusError.message)
+        // Continue with creation if no existing escrow
+      }
+      
       // Get current user data for additional context
       const userData = JSON.parse(localStorage.getItem('userData') || '{}')
       const authHeaders = JSON.parse(localStorage.getItem('authHeaders') || '{}')
@@ -276,6 +297,13 @@ export const escrowService = {
           errorMessage = errorData.message || errorMessage
           errorDetails = errorData
           console.error('Escrow creation error details:', errorData)
+          
+          // Handle specific error cases
+          if (errorMessage.includes('already exists')) {
+            errorMessage = 'An escrow payment already exists for this project. Please check the escrow management section or contact support if you believe this is an error.'
+          } else if (errorMessage.includes('duplicate')) {
+            errorMessage = 'Duplicate escrow payment detected. Please refresh the page and try again.'
+          }
         } catch (parseError) {
           errorMessage = `Server error: ${response.status} ${response.statusText}`
           console.error('Failed to parse error response:', parseError)
@@ -303,6 +331,51 @@ export const escrowService = {
       }
     } catch (error) {
       console.error('Error creating escrow payment:', error)
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        throw new Error('Unable to connect to server. Please check if the backend is running.')
+      }
+      throw error
+    }
+  },
+
+  /**
+   * Cancel existing escrow payment
+   * @param {string} projectId - Project ID
+   * @returns {Promise<Object>} Cancellation response
+   */
+  async cancelEscrowPayment(projectId) {
+    try {
+      console.log('Cancelling escrow payment for project:', projectId)
+      
+      const response = await authenticatedFetch(`${API_BASE_URL}/escrow/cancel`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ project_id: projectId })
+      })
+
+      if (!response.ok) {
+        let errorMessage = 'Failed to cancel escrow payment'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.message || errorMessage
+        } catch (parseError) {
+          errorMessage = `Server error: ${response.status} ${response.statusText}`
+        }
+        throw new Error(errorMessage)
+      }
+
+      const data = await response.json()
+      console.log('Escrow payment cancelled successfully:', data)
+      
+      return {
+        status: true,
+        message: "Escrow payment cancelled successfully",
+        data: data.data
+      }
+    } catch (error) {
+      console.error('Error cancelling escrow payment:', error)
       if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
         throw new Error('Unable to connect to server. Please check if the backend is running.')
       }
