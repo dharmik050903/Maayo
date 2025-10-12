@@ -766,55 +766,93 @@ const handleCloseBidRequest = () => {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex flex-wrap gap-2 min-w-[200px]" onClick={(e) => e.stopPropagation()}>
+                {/* Action Buttons - Properly Centered and Styled */}
+                <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-center items-center w-full max-w-2xl mx-auto" onClick={(e) => e.stopPropagation()}>
                   
                   {/* Always show Edit button for all projects */}
-                  <Button variant="outline" size="sm" onClick={() => handleEditProject(project)} className="flex-1 min-w-[120px] !border-violet !text-violet hover:!bg-violet hover:!text-white transition-all duration-200">
+                  <button 
+                    onClick={() => handleEditProject(project)} 
+                    className="w-full sm:w-auto sm:min-w-[140px] px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 border-2 border-violet text-violet hover:bg-violet hover:text-white bg-white text-center"
+                  >
+                    <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
                     {t('editProject')}
-                  </Button>
+                  </button>
                   
                   {getProjectStatus(project) === 'open' && (
                     <>
-                      <Button variant="outline" size="sm" onClick={() => handleViewBidRequests(project)} className="flex-1 min-w-[120px] !border-blue-500 !text-blue-500 hover:!bg-blue-500 hover:!text-white transition-all duration-200">
+                      <button 
+                        onClick={() => handleViewBidRequests(project)} 
+                        className="w-full sm:w-auto sm:min-w-[140px] px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white bg-white text-center"
+                      >
+                        <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
                         {t('viewBids')} ({project.bid_count || 0})
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => handleActivateProject(project._id)} className="flex-1 min-w-[120px] !bg-green-500 !text-white hover:!bg-green-600 !border-green-500 hover:!border-green-600 transition-all duration-200">
+                      </button>
+                      <button 
+                        onClick={() => handleActivateProject(project._id)} 
+                        className="w-full sm:w-auto sm:min-w-[140px] px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 bg-green-500 text-white hover:bg-green-600 border-2 border-green-500 hover:border-green-600 text-center"
+                      >
+                        <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
                         {t('activateProject')}
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => handleDeleteProject(project._id)} className="flex-1 min-w-[120px] !border-red-500 !text-red-500 hover:!bg-red-500 hover:!text-white transition-all duration-200">
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteProject(project._id)} 
+                        className="w-full sm:w-auto sm:min-w-[140px] px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white bg-white text-center"
+                      >
+                        <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
                         {t('deleteProject')}
-                      </Button>
+                      </button>
                     </>
                   )}
                   {getProjectStatus(project) === 'in_progress' && (
                     <>
-                      <Button variant="outline" size="sm" onClick={() => handleCompleteProject(project._id)} className="flex-1 min-w-[120px] !border-emerald-500 !text-emerald-500 hover:!bg-emerald-500 hover:!text-white transition-all duration-200">
+                      <button 
+                        onClick={() => handleCompleteProject(project._id)} 
+                        className="w-full sm:w-auto sm:min-w-[140px] px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 border-2 border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white bg-white text-center"
+                      >
+                        <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                         {t('markComplete')}
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => handleDeactivateProject(project._id)} className="flex-1 min-w-[120px] !border-orange-500 !text-orange-500 hover:!bg-orange-500 hover:!text-white transition-all duration-200">
+                      </button>
+                      <button 
+                        onClick={() => handleDeactivateProject(project._id)} 
+                        className="w-full sm:w-auto sm:min-w-[140px] px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 border-2 border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white bg-white text-center"
+                      >
+                        <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728" />
+                        </svg>
                         {t('deactivateProject')}
-                      </Button>
+                      </button>
                     </>
                   )}
                   {getProjectStatus(project) === 'completed' && (
-                    <div className="flex flex-wrap gap-2 w-full">
-                      <div className="bg-gradient-to-r from-green-50 to-mint/10 border border-green-200 rounded-lg p-3 w-full mb-2">
-                        <div className="flex items-center">
-                          <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-2">
-                            <span className="text-green-600 text-sm">🎉</span>
+                    <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full justify-center">
+                      <div className="bg-gradient-to-r from-green-50 to-mint/10 border border-green-200 rounded-xl p-4 w-full mb-3">
+                        <div className="flex items-center justify-center sm:justify-start">
+                          <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                            <span className="text-green-600 text-lg">🎉</span>
                           </div>
-                          <p className="text-green-800 font-semibold text-xs">Project Completed!</p>
+                          <p className="text-green-800 font-semibold text-sm">Project Completed!</p>
                         </div>
                       </div>
-                      <Button 
-                        variant="accent" 
-                        size="sm" 
+                      <button 
                         onClick={() => handleRateProject(project)} 
-                        className="flex-1 min-w-[120px]"
+                        className="w-full sm:w-auto sm:min-w-[140px] px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 bg-gradient-to-r from-violet to-purple text-white hover:from-violet/90 hover:to-purple/90 border-0 text-center"
                       >
-                        ⭐ Rate Project
-                      </Button>
+                        <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                        </svg>
+                        Rate Project
+                      </button>
                     </div>
                   )}
                 </div>

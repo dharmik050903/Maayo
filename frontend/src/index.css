@@ -169,6 +169,8 @@ input[type="password"]::-ms-clear {
 .hide-browser-password-toggle::-webkit-credentials-auto-fill-button,
 .hide-browser-password-toggle::-webkit-textfield-decoration-container,
 .hide-browser-password-toggle::-webkit-strong-password-auto-fill-button,
+.hide-browser-password-toggle::-webkit-caps-lock-indicator,
+.hide-browser-password-toggle::-webkit-input-placeholder,
 .hide-browser-password-toggle::-ms-reveal,
 .hide-browser-password-toggle::-ms-clear {
   display: none !important;
@@ -176,6 +178,42 @@ input[type="password"]::-ms-clear {
   opacity: 0 !important;
   width: 0 !important;
   height: 0 !important;
+}
+
+/* Additional mobile-specific password toggle hiding */
+@media (max-width: 768px) {
+  .hide-browser-password-toggle::-webkit-credentials-auto-fill-button,
+  .hide-browser-password-toggle::-webkit-textfield-decoration-container,
+  .hide-browser-password-toggle::-webkit-strong-password-auto-fill-button,
+  .hide-browser-password-toggle::-webkit-caps-lock-indicator {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
+  }
+  
+  /* Force hide password toggle on mobile Safari */
+  .hide-browser-password-toggle[type="password"] {
+    -webkit-text-security: disc !important;
+  }
+  
+  /* Hide password toggle specifically on iOS */
+  @supports (-webkit-touch-callout: none) {
+    .hide-browser-password-toggle::-webkit-credentials-auto-fill-button,
+    .hide-browser-password-toggle::-webkit-textfield-decoration-container,
+    .hide-browser-password-toggle::-webkit-strong-password-auto-fill-button {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      width: 0 !important;
+      height: 0 !important;
+      position: absolute !important;
+      left: -9999px !important;
+    }
+  }
 }
 
 .JobCreateForm label {

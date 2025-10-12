@@ -12,6 +12,25 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
   const [error, setError] = useState(null)
   const [payingMilestone, setPayingMilestone] = useState(null)
 
+  // Helper function to format currency
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR'
+    }).format(amount)
+  }
+
+  // Helper function to format date
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A'
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
+  }
+
   useEffect(() => {
     if (projectId) {
       fetchMilestones()
@@ -309,13 +328,6 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
         }
   }
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR'
-    }).format(amount)
-  }
-
   if (loading) {
     return (
       <div className="text-center py-4">
@@ -352,7 +364,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="w-full max-w-4xl mx-auto space-y-6">
       {milestones.map((milestone, index) => {
         const status = getMilestoneStatus(milestone)
         const statusColor = getStatusColor(status)
@@ -366,66 +378,147 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
         })
         
         return (
-          <div key={`milestone-${milestone.index || index}`} className="border border-gray-200 rounded-lg p-4 bg-white">
-            <div className="flex justify-between items-start mb-3">
-              <div className="flex-1">
-                <h4 className="font-semibold text-graphite text-lg">
-                  Milestone {milestone.index + 1}
-                </h4>
-                <p className="text-coolgray text-sm mt-1">{milestone.description}</p>
-              </div>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusColor}`}>
-                {statusIcon} {status.replace('_', ' ')}
-              </span>
-            </div>
-            
-            <div className="flex justify-between items-center">
-              <div className="text-lg font-bold text-graphite">
-                Amount: {formatCurrency(milestone.amount)}
-              </div>
-              
-              {status === 'pending_approval' && (
-                <Button
-                  variant="accent"
-                  size="sm"
-                  onClick={() => handlePayMilestone(milestone)}
-                  disabled={payingMilestone === milestone.index}
-                  className="px-6"
-                >
-                  {payingMilestone === milestone.index ? (
-                    <div className="flex items-center">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Processing...
-                    </div>
-                  ) : (
-                    'Pay Now'
-                  )}
-                </Button>
-              )}
-              
-              {status === 'completed' && (
-                <div className="text-green-600 font-medium">
-                  ✅ Payment Released
-                </div>
-              )}
-              
-              {status === 'pending' && (
-                <div className="text-gray-500 text-sm">
-                  Waiting for freelancer to complete
-                </div>
-              )}
-            </div>
-            
-            {milestone.status === 'pending_approval' && milestone.completion_notes && (
-              <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <h5 className="font-medium text-blue-900 mb-1">Freelancer's Completion Notes:</h5>
-                <p className="text-blue-800 text-sm">{milestone.completion_notes}</p>
-                {milestone.evidence && (
-                  <div className="mt-2">
-                    <h6 className="font-medium text-blue-900 mb-1">Evidence:</h6>
-                    <p className="text-blue-800 text-sm">{milestone.evidence}</p>
+          <div key={`milestone-${milestone.index || index}`} className="group relative overflow-hidden border-2 rounded-2xl p-4 sm:p-6 bg-gradient-to-r from-white to-gray-50/50 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 border-gray-200 w-full">
+            {/* Status indicator bar */}
+            <div className={`absolute top-0 left-0 right-0 h-2 ${
+              status === 'completed' 
+                ? 'bg-gradient-to-r from-green-400 to-green-600' 
+                : status === 'pending_approval'
+                ? 'bg-gradient-to-r from-yellow-400 to-yellow-600'
+                : 'bg-gradient-to-r from-gray-300 to-gray-400'
+            }`}></div>
+
+            <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
+              <div className="flex-1 w-full">
+                {/* Enhanced Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+                  <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center shadow-lg ${
+                    status === 'completed' 
+                      ? 'bg-gradient-to-r from-green-100 to-green-200' 
+                      : status === 'pending_approval'
+                      ? 'bg-gradient-to-r from-yellow-100 to-yellow-200'
+                      : 'bg-gradient-to-r from-gray-100 to-gray-200'
+                  }`}>
+                    <span className="text-xl sm:text-2xl">{statusIcon}</span>
                   </div>
+                  <div className="flex-1">
+                    <h4 className="text-lg sm:text-xl font-bold text-graphite mb-1">
+                      {milestone.title || `Milestone ${milestone.index + 1}`}
+                    </h4>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColor}`}>
+                        {status.replace('_', ' ')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Description */}
+                <p className="text-sm sm:text-base text-coolgray mb-4 leading-relaxed">{milestone.description}</p>
+                
+                {/* Enhanced Info Cards - Vertical Stack for Better Spacing */}
+                <div className="space-y-3 mb-4">
+                  <div className="flex items-center p-3 sm:p-4 rounded-xl bg-gradient-to-r from-gray-100/50 to-gray-200/50 border border-gray-200 w-full">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg flex items-center justify-center mr-3 sm:mr-4">
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs sm:text-sm text-gray-600 font-medium">Amount</p>
+                      <p className="font-bold text-base sm:text-lg text-gray-800">{formatCurrency(milestone.amount)}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center p-3 sm:p-4 rounded-xl bg-gradient-to-r from-blue-100/50 to-blue-200/50 border border-blue-200 w-full">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-200 to-blue-300 rounded-lg flex items-center justify-center mr-3 sm:mr-4">
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a4 4 0 118 0v4m-4 0h4m-4 0H8m4 0h4m-4 8v4m0-8v8" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs sm:text-sm text-gray-600 font-medium">Due Date</p>
+                      <p className="font-bold text-base sm:text-lg text-gray-800">{formatDate(milestone.due_date)}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Enhanced Action Section */}
+              <div className="flex flex-col sm:flex-row lg:flex-col gap-4 w-full lg:w-auto lg:min-w-[200px]">
+                <div className="flex-1 lg:flex-none">
+                  {status === 'pending_approval' && (
+                    <div className="flex items-center gap-3 text-yellow-700 p-4 rounded-2xl bg-gradient-to-r from-yellow-50 to-yellow-100/50 border border-yellow-200">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-sm font-medium">Waiting for your approval</span>
+                    </div>
+                  )}
+                  
+                  {status === 'completed' && (
+                    <div className="flex items-center gap-3 text-green-700 p-4 rounded-2xl bg-gradient-to-r from-green-50 to-green-100/50 border border-green-200">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-sm font-medium">Payment Released</span>
+                    </div>
+                  )}
+                  
+                  {status === 'pending' && (
+                    <div className="flex items-center gap-3 text-gray-600 p-4 rounded-2xl bg-gradient-to-r from-gray-50 to-gray-100/50 border border-gray-200">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-sm font-medium">Waiting for freelancer to complete</span>
+                    </div>
+                  )}
+                </div>
+                
+                {status === 'pending_approval' && (
+                  <Button
+                    variant="accent"
+                    size="lg"
+                    onClick={() => handlePayMilestone(milestone)}
+                    disabled={payingMilestone === milestone.index}
+                    className="w-full lg:w-auto px-8 py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  >
+                    {payingMilestone === milestone.index ? (
+                      <div className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                        Processing...
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center gap-2">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                        </svg>
+                        Pay Now
+                      </div>
+                    )}
+                  </Button>
                 )}
+              </div>
+            </div>
+            
+            {/* Enhanced Completion Notes */}
+            {milestone.status === 'pending_approval' && milestone.completion_notes && (
+              <div className="mt-6 p-6 bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-2xl border border-blue-200">
+                <div className="flex items-start gap-3">
+                  <svg className="w-6 h-6 text-blue-600 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <div>
+                    <h5 className="font-bold text-blue-900 mb-2 text-lg">Freelancer's Completion Notes:</h5>
+                    <p className="text-blue-800 text-base mb-3 leading-relaxed">{milestone.completion_notes}</p>
+                    {milestone.evidence && (
+                      <div>
+                        <h6 className="font-semibold text-blue-900 mb-1">Evidence:</h6>
+                        <p className="text-blue-800 text-sm">{milestone.evidence}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
           </div>

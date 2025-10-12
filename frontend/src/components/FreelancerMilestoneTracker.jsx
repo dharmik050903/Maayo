@@ -205,7 +205,7 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
   }
 
   return (
-    <div className="card p-6 bg-white/95">
+    <div className="w-full">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold text-graphite">📋 Project Milestones</h3>
         <div className="text-sm text-coolgray">
@@ -226,76 +226,136 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
           })
           
           return (
-            <div 
-              key={index}
-              className={`border rounded-lg p-4 transition-all duration-200 ${
+        <div
+          key={index}
+          className={`group relative overflow-hidden border-2 rounded-2xl p-3 sm:p-4 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 ${
+            status === 'completed'
+              ? 'border-green-200 bg-gradient-to-r from-green-50 to-green-100/50'
+              : status === 'pending_approval'
+              ? 'border-yellow-200 bg-gradient-to-r from-yellow-50 to-yellow-100/50'
+              : 'border-gray-200 bg-gradient-to-r from-white to-gray-50/50'
+          }`}
+        >
+              {/* Status indicator bar */}
+              <div className={`absolute top-0 left-0 right-0 h-1 ${
                 status === 'completed' 
-                  ? 'border-green-200 bg-green-50' 
+                  ? 'bg-gradient-to-r from-green-400 to-green-600' 
                   : status === 'pending_approval'
-                  ? 'border-yellow-200 bg-yellow-50'
-                  : 'border-gray-200 bg-white'
-              }`}
-            >
-              <div className="flex items-start justify-between">
+                  ? 'bg-gradient-to-r from-yellow-400 to-yellow-600'
+                  : 'bg-gradient-to-r from-gray-300 to-gray-400'
+              }`}></div>
+
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+            <div className="flex-1">
+              {/* Enhanced Header - Mobile Optimized */}
+              <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shadow-sm ${
+                  status === 'completed'
+                    ? 'bg-gradient-to-r from-green-100 to-green-200'
+                    : status === 'pending_approval'
+                    ? 'bg-gradient-to-r from-yellow-100 to-yellow-200'
+                    : 'bg-gradient-to-r from-gray-100 to-gray-200'
+                }`}>
+                  <span className="text-lg sm:text-xl">{getStatusIcon(status)}</span>
+                </div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-lg">{getStatusIcon(status)}</span>
-                    <h4 className="font-medium text-graphite">{milestone.title}</h4>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
+                  <h4 className="text-sm sm:text-base font-bold text-graphite mb-1">{milestone.title}</h4>
+                  <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(status)}`}>
                       {status.replace('_', ' ')}
                     </span>
                     {overdue && (
-                      <span className="px-2 py-1 rounded-full text-xs font-medium text-red-600 bg-red-100">
-                        Overdue
+                      <span className="px-2 py-1 rounded-full text-xs font-semibold text-red-600 bg-red-100 border border-red-200">
+                        ⚠️ Overdue
                       </span>
                     )}
                   </div>
+                </div>
+              </div>
                   
-                  <p className="text-sm text-coolgray mb-3">{milestone.description}</p>
-                  
-                  <div className="flex items-center gap-4 text-sm">
-                    <div className="flex items-center gap-1">
-                      <span className="text-coolgray">💰</span>
-                      <span className="font-medium text-graphite">{formatCurrency(milestone.amount)}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-coolgray">📅</span>
-                      <span className={`${overdue ? 'text-red-600' : 'text-coolgray'}`}>
-                        Due: {formatDate(milestone.due_date)}
-                      </span>
-                    </div>
+              {/* Description - Mobile Optimized */}
+              <p className="text-xs sm:text-sm text-coolgray mb-2 sm:mb-3 leading-relaxed">{milestone.description}</p>
+              
+              {/* Enhanced Info Cards - Mobile Optimized */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 mb-2 sm:mb-3">
+                <div className="flex items-center p-2 sm:p-4 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100/50 border border-gray-200">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 rounded-lg flex items-center justify-center mr-2 sm:mr-3">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                    </svg>
                   </div>
+                  <div>
+                    <p className="text-xs text-gray-600 font-medium">Amount</p>
+                    <p className="font-bold text-sm sm:text-lg text-gray-800">{formatCurrency(milestone.amount)}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center p-2 sm:p-4 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100/50 border border-gray-200">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 rounded-lg flex items-center justify-center mr-2 sm:mr-3">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a4 4 0 118 0v4m-4 0h4m-4 0H8m4 0h4m-4 8v4m0-8v8" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-600 font-medium">Due Date</p>
+                    <p className={`font-semibold text-sm sm:text-lg ${overdue ? 'text-red-600' : 'text-gray-800'}`}>
+                      {formatDate(milestone.due_date)}
+                    </p>
+                  </div>
+                </div>
+              </div>
 
+                  {/* Completion Notes */}
                   {milestone.completion_notes && (
-                    <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-coolgray">
-                        <strong>Completion Notes:</strong> {milestone.completion_notes}
-                      </p>
+                    <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-xl border border-blue-200">
+                      <div className="flex items-start gap-2">
+                        <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <div>
+                          <p className="text-sm font-semibold text-blue-800 mb-1">Completion Notes</p>
+                          <p className="text-sm text-blue-700">{milestone.completion_notes}</p>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
 
-                <div className="ml-4">
+                {/* Enhanced Action Section */}
+                <div className="ml-4 flex-shrink-0">
                   {status === 'pending' && (
                     <button
                       onClick={() => handleCompleteMilestone({ ...milestone, index })}
-                      className="px-4 py-2 bg-violet text-white rounded-lg hover:bg-violet/80 transition-colors text-sm font-medium"
+                      className="px-6 py-3 bg-gradient-to-r from-violet to-purple text-white rounded-xl hover:from-violet/90 hover:to-purple/90 transition-all duration-300 text-sm font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2"
                     >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
                       Complete Milestone
                     </button>
                   )}
                   
                   {status === 'pending_approval' && (
-                    <div className="text-center">
-                      <div className="text-yellow-600 text-sm font-medium mb-1">Pending Approval</div>
-                      <div className="text-xs text-coolgray">Waiting for client review</div>
+                    <div className="text-center p-4 bg-gradient-to-r from-yellow-50 to-yellow-100/50 rounded-xl border border-yellow-200">
+                      <div className="w-12 h-12 bg-gradient-to-r from-yellow-200 to-yellow-300 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg className="w-6 h-6 text-yellow-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div className="text-yellow-700 text-sm font-semibold mb-1">Pending Approval</div>
+                      <div className="text-xs text-yellow-600">Waiting for client review</div>
                     </div>
                   )}
                   
                   {status === 'completed' && (
-                    <div className="text-center">
-                      <div className="text-green-600 text-sm font-medium mb-1">Completed</div>
-                      <div className="text-xs text-coolgray">Payment processed</div>
+                    <div className="text-center p-4 bg-gradient-to-r from-green-50 to-green-100/50 rounded-xl border border-green-200">
+                      <div className="w-12 h-12 bg-gradient-to-r from-green-200 to-green-300 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg className="w-6 h-6 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div className="text-green-700 text-sm font-semibold mb-1">Completed</div>
+                      <div className="text-xs text-green-600">Payment processed</div>
                     </div>
                   )}
                 </div>

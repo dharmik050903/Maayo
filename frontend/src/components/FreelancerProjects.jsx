@@ -215,97 +215,140 @@ export default function FreelancerProjects() {
           </div>
         </div>
       ) : (
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {acceptedProjects.map((project) => (
-            <div key={project._id} className="group relative overflow-hidden bg-white/95 hover:bg-white transition-all duration-500 cursor-pointer rounded-3xl shadow-xl hover:shadow-2xl transform hover:-translate-y-2 border border-white/20 backdrop-blur-sm">
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-violet/5 to-mint/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        <div className="space-y-6">
+          {acceptedProjects.map((project, index) => (
+            <div 
+              key={project._id} 
+              className="group relative overflow-hidden bg-white/95 hover:bg-white transition-all duration-500 cursor-pointer rounded-3xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 border border-white/20 backdrop-blur-sm w-full"
+              style={{ animationDelay: `${index * 0.1}s` }}
+              onClick={() => handleProjectClick(project)}
+            >
+              {/* Enhanced gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-violet/5 via-purple/5 to-mint/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               
-              <div className="relative z-10 p-8">
-                {/* Header */}
-                <div className="flex justify-between items-start mb-6">
-                  <div className="flex-1 mr-4">
-                    <h4 className="text-2xl font-bold text-graphite mb-2 group-hover:text-violet transition-colors duration-300">
-                      {project.title}
-                    </h4>
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span>Accepted {new Date(project.accepted_at).toLocaleDateString()}</span>
+              {/* Status indicator bar */}
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-400 via-green-500 to-green-600"></div>
+              
+              <div className="relative z-10 p-6 md:p-8">
+                {/* Horizontal Layout */}
+                <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
+                  {/* Left Side - Project Info */}
+                  <div className="flex-1 lg:max-w-sm xl:max-w-md">
+                    {/* Enhanced Header - Mobile Optimized */}
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-violet to-mint rounded-2xl flex items-center justify-center shadow-lg">
+                          <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                          </svg>
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="text-lg sm:text-xl md:text-2xl font-bold text-graphite mb-1 group-hover:text-violet transition-colors duration-300">
+                            {project.title}
+                          </h4>
+                          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
+                            <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Accepted {new Date(project.accepted_at).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <span className="px-2 py-1 sm:px-3 sm:py-1.5 bg-gradient-to-r from-green-100 to-green-200 text-green-800 rounded-2xl text-xs font-semibold whitespace-nowrap shadow-sm flex items-center gap-1 sm:gap-1.5 self-start sm:self-auto">
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        Active
+                      </span>
+                    </div>
+
+                    {/* Enhanced Project Info Cards - Mobile Optimized */}
+                    <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
+                      <div className="flex items-center text-gray-700 bg-gradient-to-r from-green-50 to-mint/10 p-2 sm:p-3 rounded-xl border border-green-100">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-green-100 to-green-200 rounded-lg flex items-center justify-center mr-2 sm:mr-3 shadow-sm">
+                          <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-600 font-medium">Budget</p>
+                          <p className="font-bold text-sm sm:text-base text-gray-800">{formatCurrency(project.budget)}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center text-gray-700 bg-gradient-to-r from-blue-50 to-violet/10 p-2 sm:p-3 rounded-xl border border-blue-100">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-100 to-blue-200 rounded-lg flex items-center justify-center mr-2 sm:mr-3 shadow-sm">
+                          <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7h.01M20 7h.01m.01 0v6l-8-3.5L4 13V7h.01z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-600 font-medium">Client</p>
+                          <p className="font-semibold text-sm sm:text-base text-gray-800">{project.client_name}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center text-gray-700 bg-gradient-to-r from-purple-50 to-coral/10 p-2 sm:p-3 rounded-xl border border-purple-100">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-purple-100 to-purple-200 rounded-lg flex items-center justify-center mr-2 sm:mr-3 shadow-sm">
+                          <svg className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a4 4 0 118 0v4m-4 0h4m-4 0H8m4 0h4m-4 8v4m0-8v8" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-600 font-medium">Milestones</p>
+                          <p className="font-semibold text-sm sm:text-base text-gray-800">{project.milestones?.length || 0} milestones</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons - Mobile Optimized */}
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                      <Button
+                        variant="outline"
+                        className="flex-1 border-2 border-violet text-violet hover:bg-violet hover:text-white rounded-xl font-semibold py-2 transition-all duration-300 transform hover:scale-105 text-xs sm:text-sm"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleProjectClick(project)
+                        }}
+                      >
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        View Details
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleProjectClick(project)
+                        }}
+                        className="flex-1 border-2 border-mint text-mint hover:bg-mint hover:text-white rounded-xl font-semibold py-2 transition-all duration-300 transform hover:scale-105 text-xs sm:text-sm"
+                      >
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        Update Progress
+                      </Button>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <span className="px-4 py-2 bg-gradient-to-r from-green-100 to-green-200 text-green-800 rounded-2xl text-sm font-semibold whitespace-nowrap shadow-sm flex items-center gap-1">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      Active
-                    </span>
-                  </div>
-                </div>
 
-              <div className="space-y-4 mb-6">
-                <div className="flex items-center text-gray-700 bg-gradient-to-r from-green-50 to-mint/10 p-3 rounded-2xl">
-                  <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center mr-3">
-                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Budget</p>
-                    <p className="font-bold text-lg text-gray-800">{formatCurrency(project.budget)}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center text-gray-700 bg-gradient-to-r from-blue-50 to-violet/10 p-3 rounded-2xl">
-                  <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mr-3">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7h.01M20 7h.01m.01 0v6l-8-3.5L4 13V7h.01z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Client</p>
-                    <p className="font-semibold text-gray-800">{project.client_name}</p>
+                  {/* Right Side - Milestone Progress - Mobile Optimized */}
+                  <div className="flex-1 lg:min-w-[400px] xl:min-w-[500px]">
+                    <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-4 sm:p-6 border border-gray-200 h-full">
+                      <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-violet" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h5 className="text-base sm:text-lg font-bold text-gray-800">Milestone Progress</h5>
+                      </div>
+                      <div className="space-y-3 sm:space-y-4">
+                        <FreelancerMilestoneTracker 
+                          projectId={project._id}
+                          projectTitle={project.title}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
-                
-                <div className="flex items-center text-gray-700 bg-gradient-to-r from-purple-50 to-coral/10 p-3 rounded-2xl">
-                  <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center mr-3">
-                    <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a4 4 0 118 0v4m-4 0h4m-4 0H8m4 0h4m-4 8v4m0-8v8" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Milestones</p>
-                    <p className="font-semibold text-gray-800">{project.milestones?.length || 0} milestones</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick Milestone Preview */}
-              <div className="bg-gray-50 rounded-lg p-3 mb-4">
-                <FreelancerMilestoneTracker 
-                  projectId={project._id}
-                  projectTitle={project.title}
-                />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-4">
-                <Button
-                  variant="outline"
-                  className="flex-1 border-violet text-violet hover:bg-violet hover:text-white"
-                  onClick={() => handleProjectClick(project)}
-                >
-                  View Details
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => handleProjectClick(project)}
-                  className="flex-1 border-mint text-mint hover:bg-mint hover:text-white"
-                >
-                  Update Progress
-                </Button>
-              </div>
               </div>
             </div>
           ))}

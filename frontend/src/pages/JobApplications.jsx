@@ -191,25 +191,27 @@ export default function JobApplications() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 pt-20 pb-8">
+      <main className="flex-1 max-w-7xl mx-auto px-3 sm:px-6 pt-16 sm:pt-20 pb-6 sm:pb-8">
         {/* Header Section */}
-        <div className="mb-6 sm:mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="mb-4 sm:mb-6 lg:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             <div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
                 Job <span className="text-mint">Applications</span>
               </h1>
-              <p className="text-base sm:text-lg text-white/80 mt-2 sm:mt-4">
+              <p className="text-sm sm:text-base lg:text-lg text-white/80 mt-1 sm:mt-2 lg:mt-4">
                 {job ? `Applications for "${job.job_title}"` : 'Manage job applications'}
               </p>
             </div>
-            <Button
-              variant="secondary"
+            <button
               onClick={() => navigate('/client/jobs')}
-              className="border-gray-300 text-graphite hover:bg-gray-50 w-full sm:w-auto"
+              className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 rounded-xl sm:rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 bg-gradient-to-r from-violet to-purple text-white hover:from-violet/90 hover:to-purple/90 border-0 flex items-center justify-center gap-2 text-sm sm:text-base"
             >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
               Back to Jobs
-            </Button>
+            </button>
           </div>
         </div>
 
@@ -225,34 +227,41 @@ export default function JobApplications() {
 
         {/* Job Info */}
         {job && (
-          <div className="card p-4 sm:p-6 bg-white/95 mb-6">
+          <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-4 sm:p-6 lg:p-8 mb-4 sm:mb-6 border border-white/20">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
               <div className="flex-1">
-                <h2 className="text-lg sm:text-xl font-semibold text-graphite mb-2">{job.job_title}</h2>
-                <div className="text-sm text-coolgray mb-3">
-                  <span>{job.location.city}, {job.location.country}</span>
-                  <span className="mx-2">•</span>
-                  <span className="capitalize">{job.work_mode}</span>
-                  <span className="mx-2">•</span>
-                  <span className="capitalize">{job.job_type}</span>
+                <h2 className="text-xl sm:text-2xl font-bold text-graphite mb-3">{job.job_title}</h2>
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                  <span className="px-3 py-1 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 rounded-xl text-sm font-medium">
+                    {job.location.city}, {job.location.country}
+                  </span>
+                  <span className="px-3 py-1 bg-gradient-to-r from-green-100 to-green-200 text-green-800 rounded-xl text-sm font-medium capitalize">
+                    {job.work_mode}
+                  </span>
+                  <span className="px-3 py-1 bg-gradient-to-r from-purple-100 to-purple-200 text-purple-800 rounded-xl text-sm font-medium capitalize">
+                    {job.job_type}
+                  </span>
                 </div>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6 space-y-2 sm:space-y-0 text-sm text-coolgray">
-                  <span>
-                    <strong className="text-graphite">{job.analytics.total_applications}</strong> total applications
-                  </span>
-                  <span>
-                    <strong className="text-graphite">{job.analytics.total_views}</strong> views
-                  </span>
-                  <span>
-                    Deadline: {formatDate(job.application_deadline)}
-                  </span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-3 border border-gray-200">
+                    <div className="text-graphite font-semibold text-lg">{job.analytics.total_applications}</div>
+                    <div className="text-coolgray">Total Applications</div>
+                  </div>
+                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-3 border border-gray-200">
+                    <div className="text-graphite font-semibold text-lg">{job.analytics.total_views}</div>
+                    <div className="text-coolgray">Views</div>
+                  </div>
+                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-3 border border-gray-200">
+                    <div className="text-graphite font-semibold text-lg">{formatDate(job.application_deadline)}</div>
+                    <div className="text-coolgray">Deadline</div>
+                  </div>
                 </div>
               </div>
-              <div className="sm:ml-6">
-                <span className={`px-3 py-1 text-sm rounded-full ${
-                  job.status === 'active' ? 'bg-green-100 text-green-800' :
-                  job.status === 'closed' ? 'bg-red-100 text-red-800' :
-                  'bg-gray-100 text-gray-800'
+              <div className="sm:ml-6 flex-shrink-0">
+                <span className={`px-4 py-2 text-sm font-semibold rounded-2xl ${
+                  job.status === 'active' ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-800 border border-green-300' :
+                  job.status === 'closed' ? 'bg-gradient-to-r from-red-100 to-red-200 text-red-800 border border-red-300' :
+                  'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 border border-gray-300'
                 }`}>
                   {job.status}
                 </span>
@@ -262,14 +271,14 @@ export default function JobApplications() {
         )}
 
         {/* Filters */}
-        <div className="card p-4 sm:p-6 bg-white/95 mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-4 sm:p-6 lg:p-8 mb-4 sm:mb-6 border border-white/20">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <div>
-              <label className="block text-sm font-medium text-graphite mb-2">Status</label>
+              <label className="block text-sm font-semibold text-graphite mb-3">Status</label>
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-mint text-graphite bg-white"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-mint focus:border-mint text-graphite bg-white shadow-sm hover:shadow-md transition-all duration-200"
               >
                 <option value="">All Status</option>
                 <option value="applied">Applied</option>
@@ -283,11 +292,11 @@ export default function JobApplications() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-graphite mb-2">Sort By</label>
+              <label className="block text-sm font-semibold text-graphite mb-3">Sort By</label>
               <select
                 value={filters.sort_by}
                 onChange={(e) => handleFilterChange('sort_by', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-mint text-graphite bg-white"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-mint focus:border-mint text-graphite bg-white shadow-sm hover:shadow-md transition-all duration-200"
               >
                 <option value="created_at">Date Applied</option>
                 <option value="application_status">Status</option>
@@ -296,11 +305,11 @@ export default function JobApplications() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-graphite mb-2">Order</label>
+              <label className="block text-sm font-semibold text-graphite mb-3">Order</label>
               <select
                 value={filters.sort_order}
                 onChange={(e) => handleFilterChange('sort_order', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-mint text-graphite bg-white"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-mint focus:border-mint text-graphite bg-white shadow-sm hover:shadow-md transition-all duration-200"
               >
                 <option value="desc">Newest First</option>
                 <option value="asc">Oldest First</option>
@@ -308,7 +317,7 @@ export default function JobApplications() {
             </div>
             
             <div className="flex items-end">
-              <Button
+              <button
                 onClick={() => setFilters({
                   page: 1,
                   limit: 20,
@@ -316,32 +325,31 @@ export default function JobApplications() {
                   sort_by: 'created_at',
                   sort_order: 'desc'
                 })}
-                variant="secondary"
-                className="w-full border-gray-300 text-graphite hover:bg-gray-50"
+                className="w-full px-4 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
               >
                 Clear Filters
-              </Button>
+              </button>
             </div>
           </div>
         </div>
 
         {/* Applications List */}
-        <div className="card bg-white/95">
+        <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 overflow-hidden min-h-[400px]">
           {loading ? (
-            <div className="p-8 text-center">
+            <div className="p-6 sm:p-8 text-center min-h-[300px] flex flex-col justify-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-mint mx-auto"></div>
               <p className="mt-2 text-coolgray">Loading applications...</p>
             </div>
           ) : applications.length === 0 ? (
-            <div className="p-8 text-center">
-              <div className="w-16 h-16 bg-mint/20 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <div className="p-6 sm:p-8 text-center min-h-[300px] flex flex-col justify-center">
+              <div className="w-16 h-16 bg-gradient-to-r from-mint/20 to-mint/30 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <svg className="w-8 h-8 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
               <h3 className="text-lg font-semibold text-graphite mb-2">No applications found</h3>
               <p className="text-coolgray mb-6">No applications match your current filter criteria.</p>
-              <Button
+              <button
                 onClick={() => setFilters({
                   page: 1,
                   limit: 20,
@@ -349,90 +357,106 @@ export default function JobApplications() {
                   sort_by: 'created_at',
                   sort_order: 'desc'
                 })}
-                variant="secondary"
-                className="border-gray-300 text-graphite hover:bg-gray-50"
+                className="px-6 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
               >
                 Clear Filters
-              </Button>
+              </button>
             </div>
           ) : (
-            <div className="divide-y divide-gray-200">
+            <div className="divide-y divide-gray-100">
               {applications.map((application) => (
-                <div key={application._id} className="p-4 sm:p-6 hover:bg-gray-50 transition-colors">
-                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                <div key={application._id} className="p-4 sm:p-6 lg:p-8 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 transition-all duration-300">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-6">
                     <div className="flex-1">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-2 sm:space-y-0 mb-2">
-                        <h3 className="text-base sm:text-lg font-semibold text-graphite">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-2 sm:space-y-0 mb-3">
+                        <h3 className="text-lg sm:text-xl font-bold text-graphite">
                           {application.freelancer_info?.name || 'Anonymous Freelancer'}
                         </h3>
                         <div className="flex flex-wrap gap-2">
-                          <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(application.application_status)}`}>
+                          <span className={`px-3 py-1 text-xs font-semibold rounded-xl ${getStatusColor(application.application_status)}`}>
                             {application.application_status}
                           </span>
                           {application.skills_match?.match_percentage && (
-                            <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                            <span className="px-3 py-1 text-xs font-semibold rounded-xl bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800">
                               {application.skills_match.match_percentage}% match
                             </span>
                           )}
                         </div>
                       </div>
 
-                      <div className="text-sm text-coolgray mb-3">
+                      <div className="text-sm text-coolgray mb-4">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-1 sm:space-y-0">
-                          <span>Applied {formatDate(application.application_tracking?.applied_at)}</span>
-                          <span className="hidden sm:inline">•</span>
-                          <span>{getDaysSinceApplication(application.application_tracking?.applied_at)} days ago</span>
+                          <span className="flex items-center">
+                            <svg className="w-4 h-4 mr-1 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Applied {formatDate(application.application_tracking?.applied_at)}
+                          </span>
+                          <span className="hidden sm:inline text-gray-400">•</span>
+                          <span className="flex items-center">
+                            <svg className="w-4 h-4 mr-1 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {getDaysSinceApplication(application.application_tracking?.applied_at)} days ago
+                          </span>
                           {application.expected_salary?.amount && (
                             <>
-                              <span className="hidden sm:inline">•</span>
-                              <span>Expected: ₹{application.expected_salary.amount.toLocaleString()} {application.expected_salary.salary_type}</span>
+                              <span className="hidden sm:inline text-gray-400">•</span>
+                              <span className="flex items-center">
+                                <svg className="w-4 h-4 mr-1 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                                </svg>
+                                Expected: ₹{application.expected_salary.amount.toLocaleString()} {application.expected_salary.salary_type}
+                              </span>
                             </>
                           )}
                         </div>
                       </div>
 
                       {application.cover_letter && (
-                        <div className="mb-3">
-                          <p className="text-sm text-graphite font-medium mb-1">Cover Letter:</p>
-                          <p className="text-sm text-coolgray line-clamp-2">{application.cover_letter}</p>
+                        <div className="mb-4">
+                          <p className="text-sm text-graphite font-semibold mb-2">Cover Letter:</p>
+                          <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4 border border-gray-200">
+                            <p className="text-sm text-coolgray line-clamp-3">{application.cover_letter}</p>
+                          </div>
                         </div>
                       )}
 
-                      <div className="flex items-center space-x-4 text-sm text-coolgray">
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-coolgray">
                         {application.resume_link?.url && (
                           <a
                             href={application.resume_link.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-mint hover:text-mint/80 flex items-center"
+                            className="text-mint hover:text-mint/80 flex items-center bg-gradient-to-r from-mint/10 to-mint/20 px-3 py-2 rounded-xl border border-mint/20 hover:border-mint/40 transition-all duration-200"
                           >
-                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                             View Resume
                           </a>
                         )}
                         {application.portfolio_links && application.portfolio_links.length > 0 && (
-                          <span className="text-coolgray">
+                          <span className="bg-gradient-to-r from-purple-100 to-purple-200 text-purple-800 px-3 py-2 rounded-xl border border-purple-200">
                             {application.portfolio_links.length} portfolio link{application.portfolio_links.length > 1 ? 's' : ''}
                           </span>
                         )}
                         {application.availability?.start_date && (
-                          <span className="text-coolgray">
+                          <span className="bg-gradient-to-r from-green-100 to-green-200 text-green-800 px-3 py-2 rounded-xl border border-green-200">
                             Available: {formatDate(application.availability.start_date)}
                           </span>
                         )}
                       </div>
                     </div>
 
-                    <div className="flex flex-col space-y-3 lg:ml-6 lg:min-w-[200px]">
+                    <div className="flex flex-col space-y-3 sm:space-y-4 lg:ml-6 lg:min-w-[250px] mt-4 lg:mt-0">
                       {/* Status Selector */}
                       <div>
-                        <label className="block text-sm font-medium text-graphite mb-2">Status</label>
+                        <label className="block text-sm font-semibold text-graphite mb-2">Status</label>
                         <select
                           value={application.application_status}
                           onChange={(e) => handleStatusUpdate(application._id, e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-mint text-graphite bg-white text-sm"
+                          className="w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-mint focus:border-mint text-graphite bg-white shadow-sm hover:shadow-md transition-all duration-200 text-sm"
                         >
                           <option value="applied">Applied</option>
                           <option value="viewed">Viewed</option>
@@ -446,11 +470,11 @@ export default function JobApplications() {
 
                       {/* Notes Section */}
                       <div>
-                        <label className="block text-sm font-medium text-graphite mb-2">Notes</label>
+                        <label className="block text-sm font-semibold text-graphite mb-2">Notes</label>
                         <textarea
                           placeholder="Add notes about this application..."
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-mint text-graphite bg-white text-sm resize-none"
-                          rows="3"
+                          className="w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-mint focus:border-mint text-graphite bg-white text-sm resize-none shadow-sm hover:shadow-md transition-all duration-200"
+                          rows="2"
                           value={applicationNotes[application._id] || ''}
                           onChange={(e) => {
                             setApplicationNotes(prev => ({
@@ -462,25 +486,21 @@ export default function JobApplications() {
                       </div>
 
                       {/* Quick Actions */}
-                      <div className="flex flex-col space-y-2">
-                        <div className="text-xs text-coolgray font-medium">Quick Actions:</div>
+                      <div className="flex flex-col space-y-2 sm:space-y-3">
+                        <div className="text-xs text-coolgray font-semibold">Quick Actions:</div>
                         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                          <Button
-                            size="sm"
-                            variant="primary"
+                          <button
                             onClick={() => handleStatusUpdate(application._id, 'selected')}
-                            className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1 w-full sm:w-auto"
+                            className="px-3 sm:px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 border-0 text-xs sm:text-sm"
                           >
                             Accept
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="secondary"
+                          </button>
+                          <button
                             onClick={() => handleStatusUpdate(application._id, 'rejected')}
-                            className="border-red-300 text-red-600 hover:bg-red-50 text-xs px-3 py-1 w-full sm:w-auto"
+                            className="px-3 sm:px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 border-2 border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 bg-white text-xs sm:text-sm"
                           >
                             Reject
-                          </Button>
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -492,38 +512,34 @@ export default function JobApplications() {
 
           {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <div className="px-4 sm:px-6 py-4 border-t border-gray-200">
+            <div className="px-6 sm:px-8 py-6 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-gray-100">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="text-sm text-coolgray text-center sm:text-left">
+                <div className="text-sm text-coolgray text-center sm:text-left font-medium">
                   Showing {((pagination.currentPage - 1) * pagination.limit) + 1} to{' '}
                   {Math.min(pagination.currentPage * pagination.limit, pagination.totalItems)} of{' '}
                   {pagination.totalItems} results
                 </div>
                 
-                <div className="flex items-center justify-center space-x-2">
-                  <Button
+                <div className="flex items-center justify-center space-x-3">
+                  <button
                     onClick={() => setFilters(prev => ({ ...prev, page: prev.page - 1 }))}
                     disabled={pagination.currentPage === 1}
-                    variant="secondary"
-                    size="sm"
-                    className="border-gray-300 text-graphite hover:bg-gray-50"
+                    className="px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:shadow-md"
                   >
                     Previous
-                  </Button>
+                  </button>
                   
-                  <span className="px-3 py-2 text-sm text-coolgray">
+                  <span className="px-4 py-2 bg-gradient-to-r from-mint/10 to-mint/20 text-mint font-semibold rounded-xl border border-mint/20">
                     Page {pagination.currentPage} of {pagination.totalPages}
                   </span>
                   
-                  <Button
+                  <button
                     onClick={() => setFilters(prev => ({ ...prev, page: prev.page + 1 }))}
                     disabled={pagination.currentPage === pagination.totalPages}
-                    variant="secondary"
-                    size="sm"
-                    className="border-gray-300 text-graphite hover:bg-gray-50"
+                    className="px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:shadow-md"
                   >
                     Next
-                  </Button>
+                  </button>
                 </div>
               </div>
             </div>

@@ -465,7 +465,7 @@ export default function ClientHome() {
       )}
       
       {/* Hero Section */}
-      <section className="flex-1 flex items-center justify-center px-4 md:px-6 py-12 md:py-20">
+      <section className="flex-1 flex items-center justify-center px-4 md:px-6 py-8 md:py-20">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-4 md:mb-6">
             Find the Perfect <span className="text-coral">Freelancer</span>
@@ -481,23 +481,23 @@ export default function ClientHome() {
               </Button>
             </Link>
             <Button 
-              variant="outline" 
+              variant="accent" 
               size="lg" 
-              className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg border-white text-white hover:bg-white hover:text-gray-800 w-full sm:w-auto"
+              className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg w-full sm:w-auto"
               onClick={() => setActiveTab('freelancers')}
             >
               Find Freelancers
             </Button>
             <Button 
-              variant="outline" 
+              variant="accent" 
               size="lg" 
-              className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg border-white text-white hover:bg-white hover:text-gray-800 w-full sm:w-auto"
+              className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg w-full sm:w-auto"
               onClick={() => setActiveTab('escrow')}
             >
                 {t('escrowManagement')}
             </Button>
             <Link to="/project/create">
-              <Button variant="outline" size="lg" className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg border-white text-white hover:bg-white hover:text-gray-800 w-full sm:w-auto">
+              <Button variant="accent" size="lg" className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg w-full sm:w-auto">
                 {t('postAProject')}
               </Button>
             </Link>
@@ -540,37 +540,37 @@ export default function ClientHome() {
       </section>
 
       {/* Tab Navigation */}
-      <section className="py-6 md:py-8 px-4 md:px-6 bg-white/5">
+      <section className="py-4 md:py-6 lg:py-8 px-4 md:px-6 bg-white/5">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-1 bg-white/10 p-1 rounded-lg w-full sm:w-fit mx-auto">
             <button
               onClick={() => setActiveTab('freelancers')}
-              className={`px-6 py-3 rounded-md font-medium transition-colors ${
+              className={`px-4 md:px-6 py-2 md:py-3 rounded-md font-medium transition-colors text-sm md:text-base ${
                 activeTab === 'freelancers'
-                  ? 'bg-white text-gray-800 shadow-sm'
+                  ? 'bg-violet text-white shadow-sm'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
-              <div className="flex items-center space-x-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-center justify-center space-x-2">
+                <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
-                <span>Find Freelancers</span>
+                <span className="whitespace-nowrap">Find Freelancers</span>
               </div>
             </button>
             <button
               onClick={() => setActiveTab('escrow')}
-              className={`px-6 py-3 rounded-md font-medium transition-colors ${
+              className={`px-4 md:px-6 py-2 md:py-3 rounded-md font-medium transition-colors text-sm md:text-base ${
                 activeTab === 'escrow'
-                  ? 'bg-white text-gray-800 shadow-sm'
+                  ? 'bg-violet text-white shadow-sm'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
-              <div className="flex items-center space-x-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-center justify-center space-x-2">
+                <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                 </svg>
-                <span>{t('escrowManagement')}</span>
+                <span className="whitespace-nowrap">{t('escrowManagement')}</span>
               </div>
             </button>
           </div>
@@ -587,39 +587,39 @@ export default function ClientHome() {
             
             
             {/* Search and Filter Controls */}
-            <div className="mb-6 md:mb-8 space-y-4">
+            <div className="mb-4 md:mb-6 lg:mb-8 space-y-3 md:space-y-4">
               {/* Search Input */}
-              <div className="flex flex-col md:flex-row gap-3 md:gap-4 items-center">
+              <div className="flex flex-col md:flex-row gap-2 md:gap-3 lg:gap-4 items-stretch md:items-center">
                 <div className="flex-1 relative">
                   <input
                     type="text"
-                    placeholder="Search freelancers by name, skills, location, or expertise..."
+                    placeholder="Search freelancers by name, skills, location..."
                     value={freelancerSearchTerm}
                     onChange={(e) => setFreelancerSearchTerm(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                    className="w-full px-3 md:px-4 py-2 md:py-3 border border-white/20 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral text-sm md:text-base"
+                    className="w-full px-3 md:px-4 py-2 md:py-3 border border-white/20 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral text-sm md:text-base pr-20 md:pr-24"
                   />
-                  <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-1">
+                  <div className="absolute right-1 md:right-2 top-1/2 transform -translate-y-1/2 flex gap-1">
                     <button
                       onClick={handleSearch}
-                      className="px-2 md:px-3 py-1 bg-coral text-white rounded text-xs md:text-sm hover:bg-coral/90"
+                      className="px-2 md:px-3 py-1 bg-coral text-white rounded text-xs md:text-sm hover:bg-coral/90 whitespace-nowrap"
                     >
                       Search
                     </button>
                   </div>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
                   <Button
                     variant="outline"
                     onClick={() => setShowFilters(!showFilters)}
-                    className="border-white text-white hover:bg-white hover:text-gray-800 w-full sm:w-auto text-sm md:text-base"
+                    className="border-white text-white hover:bg-white hover:text-gray-800 w-full sm:w-auto text-xs md:text-sm lg:text-base py-2 md:py-3"
                   >
                     {showFilters ? 'Hide Filters' : 'Show Filters'}
                   </Button>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="px-3 md:px-4 py-2 md:py-3 border border-white/20 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-coral/50 text-sm md:text-base w-full sm:w-auto"
+                    className="px-3 md:px-4 py-2 md:py-3 border border-white/20 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-coral/50 text-xs md:text-sm lg:text-base w-full sm:w-auto"
                     style={{ color: '#374151' }}
                   >
                     <option value="rating" style={{ color: '#374151', backgroundColor: 'white' }}>Sort by Rating</option>
@@ -633,14 +633,14 @@ export default function ClientHome() {
 
               {/* Advanced Filters */}
               {showFilters && (
-                <div className="bg-white/10 p-6 rounded-lg border border-white/20">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-4">
+                <div className="bg-white/10 p-3 md:p-4 lg:p-6 rounded-lg border border-white/20">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-3 md:mb-4">
                     <div>
-                      <label className="block text-sm font-medium text-white/90 mb-2">Experience Level</label>
+                      <label className="block text-xs md:text-sm font-medium text-white/90 mb-1 md:mb-2">Experience Level</label>
                       <select
                         value={filters.experience_level}
                         onChange={(e) => handleFilterChange('experience_level', e.target.value)}
-                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-coral/50"
+                        className="w-full px-2 md:px-3 py-1.5 md:py-2 border border-white/20 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-coral/50 text-xs md:text-sm"
                         style={{ color: '#374151' }}
                       >
                         <option value="" style={{ color: '#374151', backgroundColor: 'white' }}>{t('allLevels')}</option>
@@ -651,37 +651,37 @@ export default function ClientHome() {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-white/90 mb-2">Min Years Experience</label>
+                      <label className="block text-xs md:text-sm font-medium text-white/90 mb-1 md:mb-2">Min Years Experience</label>
                       <input
                         type="number"
                         placeholder="Min years"
                         value={filters.years_experience_min}
                         onChange={(e) => handleFilterChange('years_experience_min', e.target.value)}
-                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50"
+                        className="w-full px-2 md:px-3 py-1.5 md:py-2 border border-white/20 rounded-lg text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50 text-xs md:text-sm"
                         min="0"
                         max="50"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-white/90 mb-2">Max Years Experience</label>
+                      <label className="block text-xs md:text-sm font-medium text-white/90 mb-1 md:mb-2">Max Years Experience</label>
                       <input
                         type="number"
                         placeholder="Max years"
                         value={filters.years_experience_max}
                         onChange={(e) => handleFilterChange('years_experience_max', e.target.value)}
-                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50"
+                        className="w-full px-2 md:px-3 py-1.5 md:py-2 border border-white/20 rounded-lg text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50 text-xs md:text-sm"
                         min="0"
                         max="50"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-white/90 mb-2">Availability</label>
+                      <label className="block text-xs md:text-sm font-medium text-white/90 mb-1 md:mb-2">Availability</label>
                       <select
                         value={filters.availability}
                         onChange={(e) => handleFilterChange('availability', e.target.value)}
-                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-coral/50"
+                        className="w-full px-2 md:px-3 py-1.5 md:py-2 border border-white/20 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-coral/50 text-xs md:text-sm"
                         style={{ color: '#374151' }}
                       >
                         <option value="" style={{ color: '#374151', backgroundColor: 'white' }}>All Availability</option>
@@ -691,36 +691,36 @@ export default function ClientHome() {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-white/90 mb-2">Min Rate ($/hr)</label>
+                      <label className="block text-xs md:text-sm font-medium text-white/90 mb-1 md:mb-2">Min Rate ($/hr)</label>
                       <input
                         type="number"
                         placeholder="Min rate"
                         value={filters.hourly_rate_min}
                         onChange={(e) => handleFilterChange('hourly_rate_min', e.target.value)}
-                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50"
+                        className="w-full px-2 md:px-3 py-1.5 md:py-2 border border-white/20 rounded-lg text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50 text-xs md:text-sm"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-white/90 mb-2">Max Rate ($/hr)</label>
+                      <label className="block text-xs md:text-sm font-medium text-white/90 mb-1 md:mb-2">Max Rate ($/hr)</label>
                       <input
                         type="number"
                         placeholder="Max rate"
                         value={filters.hourly_rate_max}
                         onChange={(e) => handleFilterChange('hourly_rate_max', e.target.value)}
-                        className="w-full px-3 py-2 border border-white/20 rounded-lg text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50"
+                        className="w-full px-2 md:px-3 py-1.5 md:py-2 border border-white/20 rounded-lg text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-coral/50 text-xs md:text-sm"
                       />
                     </div>
                   </div>
                   
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-white/70">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
+                    <span className="text-xs md:text-sm text-white/70">
                       {getFilteredAndSortedFreelancers().length} freelancers found
                     </span>
                     <Button
                       variant="outline"
                       onClick={clearFilters}
-                      className="border-white/50 text-white/80 hover:bg-white/10 text-sm"
+                      className="border-white/50 text-white/80 hover:bg-white/10 text-xs md:text-sm px-3 py-1.5 md:py-2"
                     >
                       Clear Filters
                     </Button>
@@ -730,29 +730,29 @@ export default function ClientHome() {
             </div>
 
             {/* Freelancers List */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 lg:gap-6">
               {getFilteredAndSortedFreelancers().map((freelancer, index) => (
-                <div key={freelancer._id} className="bg-white/95 rounded-[2rem] p-4 md:p-6 hover:bg-white transition-all duration-300 hover:shadow-xl cursor-pointer slide-in-up border border-white/20" style={{animationDelay: `${index * 0.1}s`}} onClick={() => handleFreelancerClick(freelancer)}>
-                  <div className="flex items-start space-x-4 mb-4">
-                    <div className="w-16 h-16 bg-coral/20 rounded-full flex items-center justify-center">
-                      <svg className="w-8 h-8 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div key={freelancer._id} className="bg-white/95 rounded-xl md:rounded-[2rem] p-3 md:p-4 lg:p-6 hover:bg-white transition-all duration-300 hover:shadow-xl cursor-pointer slide-in-up border border-white/20" style={{animationDelay: `${index * 0.1}s`}} onClick={() => handleFreelancerClick(freelancer)}>
+                  <div className="flex items-start space-x-3 md:space-x-4 mb-3 md:mb-4">
+                    <div className="w-12 h-12 md:w-16 md:h-16 bg-coral/20 rounded-full flex items-center justify-center flex-shrink-0">
+                      <svg className="w-6 h-6 md:w-8 md:h-8 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-800">{freelancer.name}</h3>
-                      <p className="text-coral font-medium">{freelancer.title}</p>
-                      <p className="text-sm text-coolgray">{freelancer.location}</p>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base md:text-lg font-semibold text-gray-800 truncate">{freelancer.name}</h3>
+                      <p className="text-coral font-medium text-sm md:text-base truncate">{freelancer.title}</p>
+                      <p className="text-xs md:text-sm text-coolgray truncate">{freelancer.location}</p>
                       <p className="text-xs text-coolgray">{freelancer.years_experience} years experience</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      <div className="flex items-center gap-1 md:gap-2 mt-1 flex-wrap">
+                        <span className={`px-1.5 md:px-2 py-0.5 md:py-1 rounded-full text-xs font-medium ${
                           freelancer.experience_level === 'Expert' ? 'bg-green-100 text-green-800' :
                           freelancer.experience_level === 'Intermediate' ? 'bg-yellow-100 text-yellow-800' :
                           'bg-blue-100 text-blue-800'
                         }`}>
                           {freelancer.experience_level}
                         </span>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        <span className={`px-1.5 md:px-2 py-0.5 md:py-1 rounded-full text-xs font-medium ${
                           freelancer.availability === 'full-time' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
                         }`}>
                           {freelancer.availability}
@@ -761,49 +761,49 @@ export default function ClientHome() {
                     </div>
                   </div>
                   
-                  <div className="mb-4">
-                    <p className="text-sm text-coolgray line-clamp-2 mb-3">{freelancer.overview}</p>
-                    <div className="flex items-center space-x-2 mb-2">
+                  <div className="mb-3 md:mb-4">
+                    <p className="text-xs md:text-sm text-coolgray line-clamp-2 mb-2 md:mb-3">{freelancer.overview}</p>
+                    <div className="flex items-center space-x-1 md:space-x-2 mb-2">
                       <div className="flex items-center">
                         {[...Array(5)].map((_, i) => (
-                          <svg key={i} className={`w-4 h-4 ${i < Math.floor(freelancer.rating) ? 'text-yellow-400' : 'text-gray-300'}`} fill="currentColor" viewBox="0 0 20 20">
+                          <svg key={i} className={`w-3 h-3 md:w-4 md:h-4 ${i < Math.floor(freelancer.rating) ? 'text-yellow-400' : 'text-gray-300'}`} fill="currentColor" viewBox="0 0 20 20">
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                           </svg>
                         ))}
                       </div>
-                      <span className="text-sm text-coolgray">{freelancer.rating}</span>
+                      <span className="text-xs md:text-sm text-coolgray">{freelancer.rating}</span>
                       <span className="text-xs text-coolgray">({freelancer.completed_projects} projects)</span>
                     </div>
-                    <div className="flex justify-between text-sm text-coolgray">
+                    <div className="flex justify-between text-xs md:text-sm text-coolgray">
                       <span className="font-semibold text-gray-800">{formatHourlyRate(freelancer.hourly_rate)}</span>
-                      <span>Responds in {freelancer.response_time}</span>
+                      <span className="truncate ml-2">Responds in {freelancer.response_time}</span>
                     </div>
                   </div>
                   
-                  <div className="mb-4">
+                  <div className="mb-3 md:mb-4">
                     <div className="flex flex-wrap gap-1">
-                      {freelancer.skills.slice(0, 4).map((skill, index) => (
-                        <span key={index} className="px-2 py-1 bg-coral/10 text-coral rounded text-xs">
+                      {freelancer.skills.slice(0, 3).map((skill, index) => (
+                        <span key={index} className="px-1.5 md:px-2 py-0.5 md:py-1 bg-coral/10 text-coral rounded text-xs">
                           {skill}
                         </span>
                       ))}
-                      {freelancer.skills.length > 4 && (
-                        <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
-                          +{freelancer.skills.length - 4} more
+                      {freelancer.skills.length > 3 && (
+                        <span className="px-1.5 md:px-2 py-0.5 md:py-1 bg-gray-100 text-gray-600 rounded text-xs">
+                          +{freelancer.skills.length - 3} more
                         </span>
                       )}
                     </div>
                   </div>
                   
                   <div className="flex justify-between items-center">
-                    <div className="text-sm text-coolgray">
+                    <div className="text-xs md:text-sm text-coolgray">
                       <span className="capitalize">{freelancer.english_level} English</span>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-1 md:gap-2">
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="px-3 py-1 text-xs"
+                        className="px-2 md:px-3 py-1 text-xs"
                         onClick={(e) => {
                           e.stopPropagation()
                           handleFreelancerClick(freelancer)
@@ -865,7 +865,7 @@ export default function ClientHome() {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="mt-8 flex justify-center items-center space-x-4">
+              <div className="mt-6 md:mt-8 flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-4">
                 <button
                   onClick={() => {
                     const newPage = currentPage - 1
@@ -874,7 +874,7 @@ export default function ClientHome() {
                     }
                   }}
                   disabled={currentPage === 1}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  className={`px-3 md:px-4 py-2 rounded-lg font-medium transition-colors text-sm md:text-base w-full sm:w-auto ${
                     currentPage === 1
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : 'bg-coral text-white hover:bg-coral/90'
@@ -883,12 +883,12 @@ export default function ClientHome() {
                   Previous
                 </button>
                 
-                <div className="flex items-center space-x-2">
-                  <span className="text-white/80">Page</span>
-                  <span className="px-3 py-1 bg-white/20 text-white rounded-lg font-medium">
+                <div className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                  <span className="text-xs md:text-sm text-white/80">Page</span>
+                  <span className="px-2 md:px-3 py-1 bg-white/20 text-white rounded-lg font-medium text-sm md:text-base">
                     {currentPage} of {totalPages}
                   </span>
-                  <span className="text-white/80">
+                  <span className="text-xs md:text-sm text-white/80 text-center sm:text-left">
                     ({totalFreelancers} freelancers total)
                   </span>
                 </div>
@@ -901,7 +901,7 @@ export default function ClientHome() {
                     }
                   }}
                   disabled={currentPage === totalPages}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  className={`px-3 md:px-4 py-2 rounded-lg font-medium transition-colors text-sm md:text-base w-full sm:w-auto ${
                     currentPage === totalPages
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : 'bg-coral text-white hover:bg-coral/90'
