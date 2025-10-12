@@ -574,8 +574,13 @@ export default function Signup() {
                   icon={
                     <button
                       type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="text-gray-400 hover:text-gray-600"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        setShowPassword(!showPassword)
+                      }}
+                      className="text-gray-400 hover:text-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-violet/20 rounded-md p-1"
+                      style={{ touchAction: 'manipulation' }}
                     >
                       {showPassword ? (
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

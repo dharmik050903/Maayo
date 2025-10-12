@@ -207,8 +207,8 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-graphite">📋 Project Milestones</h3>
-        <div className="text-sm text-coolgray">
+        <h3 className="text-lg font-semibold text-black">📋 Project Milestones</h3>
+        <div className="text-sm text-black font-semibold">
           {milestones.filter(m => getMilestoneStatus(m) === 'completed').length} / {milestones.length} completed
         </div>
       </div>
@@ -259,7 +259,7 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
                   <span className="text-lg sm:text-xl">{getStatusIcon(status)}</span>
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-sm sm:text-base font-bold text-graphite mb-1">{milestone.title}</h4>
+                  <h4 className="text-sm sm:text-base font-bold text-black mb-1" style={{ color: '#000000' }}>{milestone.title}</h4>
                   <div className="flex flex-wrap items-center gap-1 sm:gap-2">
                     <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(status)}`}>
                       {status.replace('_', ' ')}
@@ -274,7 +274,7 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
               </div>
                   
               {/* Description - Mobile Optimized */}
-              <p className="text-xs sm:text-sm text-coolgray mb-2 sm:mb-3 leading-relaxed">{milestone.description}</p>
+              <p className="text-xs sm:text-sm text-black mb-2 sm:mb-3 leading-relaxed font-bold" style={{ color: '#000000' }}>{milestone.description}</p>
               
               {/* Enhanced Info Cards - Mobile Optimized */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 mb-2 sm:mb-3">
@@ -285,8 +285,8 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-600 font-medium">Amount</p>
-                    <p className="font-bold text-sm sm:text-lg text-gray-800">{formatCurrency(milestone.amount)}</p>
+                    <p className="text-xs text-black font-bold" style={{ color: '#000000' }}>Amount</p>
+                    <p className="font-bold text-sm sm:text-lg text-black" style={{ color: '#000000' }}>{formatCurrency(milestone.amount)}</p>
                   </div>
                 </div>
                 
@@ -297,8 +297,8 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-600 font-medium">Due Date</p>
-                    <p className={`font-semibold text-sm sm:text-lg ${overdue ? 'text-red-600' : 'text-gray-800'}`}>
+                    <p className="text-xs text-black font-bold" style={{ color: '#000000' }}>Due Date</p>
+                    <p className={`font-bold text-sm sm:text-lg ${overdue ? 'text-red-600' : 'text-black'}`} style={{ color: overdue ? '#dc2626' : '#000000' }}>
                       {formatDate(milestone.due_date)}
                     </p>
                   </div>

@@ -678,73 +678,79 @@ const handleCloseBidRequest = () => {
           {filteredProjects.map((project) => (
             <div 
               key={project._id} 
-              className="bg-white/95 rounded-[2rem] p-6 hover:bg-white transition-all duration-300 hover:shadow-xl border border-white/20 cursor-pointer"
+              className="bg-white/95 rounded-3xl p-8 hover:bg-white transition-all duration-300 hover:shadow-xl border border-white/20 cursor-pointer"
               onClick={() => handleProjectClick(project)}
             >
-              <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
+              <div className="flex flex-col lg:flex-row justify-between items-start gap-6">
                 <div className="flex-1">
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-                    <h4 className="text-xl font-semibold text-graphite">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+                    <h4 className="text-2xl font-bold text-gray-900">
                       {project.title}
                     </h4>
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(getProjectStatus(project))}`}>
+                    <span className={`px-4 py-2 rounded-xl text-sm font-semibold ${getStatusColor(getProjectStatus(project))}`}>
                       {getStatusIcon(getProjectStatus(project))} {getProjectStatus(project).charAt(0).toUpperCase() + getProjectStatus(project).slice(1)}
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                    <div className="flex items-center">
-                      <svg className="w-4 h-4 mr-2 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                      </svg>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+                    <div className="flex items-center p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-xl border border-green-200">
+                      <div className="w-12 h-12 bg-gradient-to-r from-green-100 to-green-200 rounded-xl flex items-center justify-center mr-4">
+                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                        </svg>
+                      </div>
                       <div>
-                        <p className="text-sm text-coolgray">Budget</p>
-                        <p className="font-semibold text-graphite">{formatCurrency(project.budget)}</p>
+                        <p className="text-sm text-gray-700 font-medium">Budget</p>
+                        <p className="text-lg font-bold text-gray-900">{formatCurrency(project.budget)}</p>
                       </div>
                     </div>
-                    <div className="flex items-center">
-                      <svg className="w-4 h-4 mr-2 text-violet" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                    <div className="flex items-center p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+                      <div className="w-12 h-12 bg-gradient-to-r from-blue-100 to-blue-200 rounded-xl flex items-center justify-center mr-4">
+                        <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
                       <div>
-                        <p className="text-sm text-coolgray">Duration</p>
-                        <p className="font-semibold text-graphite">{project.duration} days</p>
+                        <p className="text-sm text-gray-700 font-medium">Duration</p>
+                        <p className="text-lg font-bold text-gray-900">{project.duration} days</p>
                       </div>
                     </div>
-                    <div className="flex items-center">
-                      <svg className="w-4 h-4 mr-2 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
+                    <div className="flex items-center p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl border border-purple-200">
+                      <div className="w-12 h-12 bg-gradient-to-r from-purple-100 to-purple-200 rounded-xl flex items-center justify-center mr-4">
+                        <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                      </div>
                       <div>
-                        <p className="text-sm text-coolgray">Bids</p>
-                        <p className="font-semibold text-graphite">{project.bid_count || 0}</p>
+                        <p className="text-sm text-gray-700 font-medium">Bids</p>
+                        <p className="text-lg font-bold text-gray-900">{project.bid_count || 0}</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mb-6">
-                    <h5 className="font-semibold text-graphite mb-3 flex items-center">
-                      <svg className="w-4 h-4 mr-2 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="mb-8">
+                    <h5 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                      <svg className="w-5 h-5 mr-3 text-violet" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
                       Project Description
                     </h5>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-coolgray text-sm leading-relaxed line-clamp-3">{project.description}</p>
+                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                      <p className="text-gray-800 leading-relaxed">{project.description}</p>
                     </div>
                   </div>
 
                   {project.skills_required && project.skills_required.length > 0 && (
-                    <div className="mb-6">
-                      <h5 className="font-semibold text-graphite mb-3 flex items-center">
-                        <svg className="w-4 h-4 mr-2 text-violet" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="mb-8">
+                      <h5 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <svg className="w-5 h-5 mr-3 text-violet" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                         </svg>
                         Required Skills
                       </h5>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-3">
                         {project.skills_required.map((skill, index) => (
-                          <span key={index} className="px-3 py-1 bg-violet/10 text-violet rounded-full text-sm">
+                          <span key={index} className="px-4 py-2 bg-gradient-to-r from-violet/10 to-violet/20 text-violet rounded-xl text-sm font-medium border border-violet/20">
                             {skill.skill}
                           </span>
                         ))}
@@ -752,27 +758,29 @@ const handleCloseBidRequest = () => {
                     </div>
                   )}
 
-                  <div className="flex items-center text-xs text-coolgray bg-gray-50 p-3 rounded-lg">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex items-center p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+                    <svg className="w-5 h-5 mr-3 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span>Created: {formatDate(project.createdAt)}</span>
-                    {project.completed_at && (
-                      <>
-                        <span className="mx-2">•</span>
-                        <span>Completed: {formatDate(project.completed_at)}</span>
-                      </>
-                    )}
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-700">
+                      <span className="font-medium">Created: {formatDate(project.createdAt)}</span>
+                      {project.completed_at && (
+                        <>
+                          <span className="hidden sm:inline">•</span>
+                          <span className="font-medium">Completed: {formatDate(project.completed_at)}</span>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                {/* Action Buttons - Properly Centered and Styled */}
-                <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-center items-center w-full max-w-2xl mx-auto" onClick={(e) => e.stopPropagation()}>
+                {/* Action Buttons - Clean and Organized */}
+                <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-center items-center w-full lg:w-auto lg:min-w-[300px]" onClick={(e) => e.stopPropagation()}>
                   
                   {/* Always show Edit button for all projects */}
                   <button 
                     onClick={() => handleEditProject(project)} 
-                    className="w-full sm:w-auto sm:min-w-[140px] px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 border-2 border-violet text-violet hover:bg-violet hover:text-white bg-white text-center"
+                    className="w-full sm:w-auto sm:min-w-[160px] px-6 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 border-2 border-violet text-violet hover:bg-violet hover:text-white bg-white text-center"
                   >
                     <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

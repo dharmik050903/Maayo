@@ -239,7 +239,8 @@ export default class BidController {
 
             const [bids, total] = await Promise.all([
                 Bid.find(filter)
-                    .populate('project_id', 'title description budget status')
+                    .populate('project_id', 'title description budget status personid')
+                    .populate('project_id.personid', 'first_name last_name email')
                     .skip(skipNum)
                     .limit(limitNum)
                     .sort({ createdAt: -1 }),

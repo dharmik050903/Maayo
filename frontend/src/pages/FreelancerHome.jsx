@@ -462,17 +462,17 @@ export default function FreelancerHome() {
               </Button>
             </Link>
             <Button 
-              variant="outline" 
+              variant="accent" 
               size="lg" 
-              className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg border-white text-white hover:bg-white hover:text-gray-800 w-full sm:w-auto"
+              className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg w-full sm:w-auto"
               onClick={() => setActiveView(activeView === 'projects' ? null : 'projects')}
             >
               {activeView === 'projects' ? t('hideProjects') : t('browseProjects')}
             </Button>
             <Button 
-              variant="outline" 
+              variant="accent" 
               size="lg" 
-              className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg border-white text-white hover:bg-white hover:text-gray-800 w-full sm:w-auto"
+              className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg w-full sm:w-auto"
               onClick={() => setActiveView(activeView === 'bids' ? null : 'bids')}
             >
               {activeView === 'bids' ? t('hideMyBids') : t('My Bids')}

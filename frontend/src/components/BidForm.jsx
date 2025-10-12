@@ -254,7 +254,7 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
           <h2 className="text-2xl sm:text-3xl font-bold text-graphite mb-3 sm:mb-4">Submit a Bid</h2>
           <div className="bg-gradient-to-r from-violet/5 to-mint/5 border border-violet/20 rounded-2xl p-4 sm:p-6">
             <h3 className="font-bold text-graphite text-lg sm:text-xl mb-2 sm:mb-3">Project: {project.title}</h3>
-            <p className="text-gray-800 mb-3 sm:mb-4 leading-relaxed text-sm sm:text-base" style={{ color: '#000000 !important', fontWeight: 'normal !important' }}>{project.description}</p>
+            <p className="text-black font-medium mb-3 sm:mb-4 leading-relaxed text-sm sm:text-base" style={{ color: '#000000' }}>{project.description}</p>
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-6 text-xs sm:text-sm">
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-violet rounded-full"></div>

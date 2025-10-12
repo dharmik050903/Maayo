@@ -28,6 +28,8 @@ export default function ClientHome() {
   const [showFreelancerSearch, setShowFreelancerSearch] = useState(false)
   const [selectedFreelancer, setSelectedFreelancer] = useState(null)
   const [showFreelancerModal, setShowFreelancerModal] = useState(false)
+  // Project search state
+  const [projectSearchTerm, setProjectSearchTerm] = useState('')
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
@@ -923,14 +925,40 @@ export default function ClientHome() {
               <span className="text-mint">{t('escrowManagement')}</span>
             </h2>
             
-            <div className="space-y-8">
+            {/* Search Bar for Projects */}
+            <div className="mb-6">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-4xl mx-auto">
+                <div className="flex-1">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search projects by name, freelancer, or status..."
+                      value={projectSearchTerm}
+                      onChange={(e) => setProjectSearchTerm(e.target.value)}
+                      className="w-full px-4 py-3 pl-12 pr-4 bg-white/95 backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-mint focus:border-mint text-gray-800 placeholder-gray-500 shadow-sm hover:shadow-md transition-all duration-200"
+                    />
+                    <svg className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setProjectSearchTerm('')}
+                  className="px-6 py-3 bg-gradient-to-r from-mint to-teal-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 hover:from-mint/90 hover:to-teal-500/90"
+                >
+                  Clear Search
+                </button>
+              </div>
+            </div>
+            
+            <div className="space-y-6">
               {/* Project Selection for Escrow */}
-              <div className="bg-white/95 backdrop-blur-sm rounded-lg p-6">
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">{t('projectEscrowManagement')}</h3>
-                <p className="text-coolgray mb-4">Select a project to manage escrow payments and milestones</p>
+              <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-4 sm:p-6">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3">{t('projectEscrowManagement')}</h3>
+                  <p className="text-gray-700 mb-4 text-sm sm:text-base">Select a project to manage escrow payments and milestones</p>
                 
                 {/* Active Projects with Milestones for Payment */}
-                <ActiveEscrowProjects />
+                <ActiveEscrowProjects searchTerm={projectSearchTerm} />
               </div>
             </div>
           </div>
@@ -1110,7 +1138,7 @@ export default function ClientHome() {
               </Button>
             </Link>
             <Link to="/client-dashboard">
-              <Button variant="outline" size="lg" className="px-12 py-4 text-xl border-white text-white hover:bg-white hover:text-gray-800">
+              <Button variant="accent" size="lg" className="px-12 py-4 text-xl">
                 Go to Dashboard
               </Button>
             </Link>
