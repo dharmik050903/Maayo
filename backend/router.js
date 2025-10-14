@@ -114,6 +114,7 @@ router.post("/bid/reject", auth, bidController.rejectBid);
 router.post("/bid/withdraw", auth, bidController.withdrawBid);
 router.post("/bid/update", auth, bidController.updateBid);
 router.post("/bid/update-price", auth, bidController.updateProjectPrice);
+router.post("/bid/update-payment", auth, bidController.updateProjectPayment);
 
 // Bank Details routes
 router.post("/bank-details/add", auth, bankDetailsController.addBankDetails);

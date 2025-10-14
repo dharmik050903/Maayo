@@ -73,6 +73,23 @@ export default class MilestoneController {
             
             await bid.save();
 
+            // Trigger automatic payment release for completed milestone
+            try {
+                const EscrowController = (await import('./escrowController.js')).default;
+                const escrowController = new EscrowController();
+                
+                const autoReleaseResult = await escrowController.autoReleaseMilestonePayment(project_id, milestone_index);
+                
+                if (autoReleaseResult.success) {
+                    console.log(`✅ Auto-released payment for milestone ${milestone_index} in project ${project_id}`);
+                } else {
+                    console.log(`⚠️ Auto-release failed for milestone ${milestone_index} in project ${project_id}: ${autoReleaseResult.message}`);
+                }
+            } catch (autoReleaseError) {
+                console.error(`❌ Error in auto-release for milestone ${milestone_index} in project ${project_id}:`, autoReleaseError);
+                // Don't fail the milestone completion if auto-release fails
+            }
+
             return res.status(200).json({
                 status: true,
                 message: "Milestone completed successfully",

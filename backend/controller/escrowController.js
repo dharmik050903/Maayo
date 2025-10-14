@@ -21,20 +21,12 @@ export default class EscrowController {
                 });
             }
 
-            const { project_id, final_amount } = req.body;
+            const { project_id } = req.body;
 
-            if (!project_id || !final_amount) {
+            if (!project_id) {
                 return res.status(400).json({ 
                     status: false, 
-                    message: "project_id and final_amount are required" 
-                });
-            }
-
-            // Validate final amount
-            if (final_amount <= 0) {
-                return res.status(400).json({ 
-                    status: false, 
-                    message: "Final amount must be greater than 0" 
+                    message: "project_id is required" 
                 });
             }
 
@@ -61,6 +53,23 @@ export default class EscrowController {
                 return res.status(400).json({ 
                     status: false, 
                     message: "Project must have an accepted bid to create escrow payment" 
+                });
+            }
+
+            // Check if bid is in pending_payment status
+            if (project.accepted_bid_id.status !== 'pending_payment') {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Bid must be in pending payment status to create escrow" 
+                });
+            }
+
+            // Use final_amount from project (set during bid acceptance)
+            const final_amount = project.final_project_amount;
+            if (!final_amount || final_amount <= 0) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Project final amount not set or invalid" 
                 });
             }
 
@@ -186,12 +195,20 @@ export default class EscrowController {
                 });
             }
 
-            // Update project escrow status
+            // Update project escrow status and activate project
             await projectinfo.findByIdAndUpdate(project_id, {
                 escrow_status: 'completed',
                 escrow_payment_id: payment_id,
                 escrow_verified_at: new Date().toISOString(),
+                status: 'in_progress', // Activate project
+                ispending: 0, // Mark as no longer pending
                 updatedAt: new Date().toISOString()
+            });
+
+            // Update bid status to accepted (from pending_payment)
+            await Bid.findByIdAndUpdate(project.accepted_bid_id._id, {
+                status: 'accepted',
+                payment_completed_at: new Date().toISOString()
             });
 
             // Create payment history record
@@ -205,9 +222,21 @@ export default class EscrowController {
                 createdAt: new Date()
             });
 
+            // Notify client and freelancer that chat is enabled for this bid
+            try {
+                const { getIO } = await import('../services/socket.js');
+                const io = getIO();
+                const clientId = project.personid?.toString();
+                const freelancerId = project.accepted_bid_id.freelancer_id?.toString();
+                io.to(`user:${clientId}`).emit('chat:enabled', { bid_id: project.accepted_bid_id._id, project_id: project_id });
+                io.to(`user:${freelancerId}`).emit('chat:enabled', { bid_id: project.accepted_bid_id._id, project_id: project_id });
+            } catch (_) {
+                // Socket may not be initialized in some environments; ignore
+            }
+
             return res.status(200).json({
                 status: true,
-                message: "Escrow payment verified successfully"
+                message: "Escrow payment verified successfully. Project is now active!"
             });
 
         } catch (error) {
@@ -294,33 +323,15 @@ export default class EscrowController {
                 });
             }
 
-            // Calculate payment amount based on milestone completion
-            let paymentAmount = 0;
-            const totalMilestones = bid.milestones.length;
-            const completedMilestones = bid.milestones.filter(m => m.is_completed === 1).length;
-
-            if (totalMilestones === 1) {
-                // Single milestone - release 100%
-                paymentAmount = project.final_project_amount;
-            } else if (totalMilestones === 2) {
-                // Two milestones - 30% for first, 70% for second
-                if (milestone_index === 0) {
-                    paymentAmount = project.final_project_amount * 0.3;
-                } else {
-                    paymentAmount = project.final_project_amount * 0.7;
-                }
-            } else if (totalMilestones === 3) {
-                // Three milestones - 30% for first, 30% for second, 40% for third
-                if (milestone_index === 0) {
-                    paymentAmount = project.final_project_amount * 0.3;
-                } else if (milestone_index === 1) {
-                    paymentAmount = project.final_project_amount * 0.3;
-                } else {
-                    paymentAmount = project.final_project_amount * 0.4;
-                }
-            } else {
-                // More than 3 milestones - equal distribution
-                paymentAmount = project.final_project_amount / totalMilestones;
+            // Use the milestone amount calculated during bid acceptance
+            const paymentAmount = milestone.amount;
+            
+            // Validate payment amount
+            if (!paymentAmount || paymentAmount <= 0) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Invalid milestone amount" 
+                });
             }
 
             // Get freelancer's bank details
@@ -529,6 +540,131 @@ export default class EscrowController {
                 message: "Failed to reset escrow status", 
                 error: error.message 
             });
+        }
+    }
+
+    // Automatic milestone payment release (called when milestone is completed)
+    async autoReleaseMilestonePayment(projectId, milestoneIndex) {
+        try {
+            console.log(`🔄 Auto-releasing payment for project ${projectId}, milestone ${milestoneIndex}`);
+
+            // Get project with accepted bid
+            const project = await projectinfo.findById(projectId)
+                .populate('accepted_bid_id');
+            
+            if (!project) {
+                console.error(`❌ Project ${projectId} not found for auto-release`);
+                return { success: false, message: "Project not found" };
+            }
+
+            // Check if escrow is completed
+            if (project.escrow_status !== 'completed') {
+                console.error(`❌ Escrow not completed for project ${projectId}`);
+                return { success: false, message: "Escrow payment not completed" };
+            }
+
+            const bid = project.accepted_bid_id;
+            if (!bid || !bid.milestones || milestoneIndex >= bid.milestones.length) {
+                console.error(`❌ Invalid milestone index ${milestoneIndex} for project ${projectId}`);
+                return { success: false, message: "Invalid milestone index" };
+            }
+
+            const milestone = bid.milestones[milestoneIndex];
+            
+            // Check if milestone is completed
+            if (milestone.is_completed !== 1) {
+                console.error(`❌ Milestone ${milestoneIndex} not completed for project ${projectId}`);
+                return { success: false, message: "Milestone not completed" };
+            }
+
+            // Check if payment already released
+            if (milestone.payment_released === 1) {
+                console.log(`ℹ️ Payment already released for milestone ${milestoneIndex} in project ${projectId}`);
+                return { success: true, message: "Payment already released" };
+            }
+
+            // Use the milestone amount calculated during bid acceptance
+            const paymentAmount = milestone.amount;
+            
+            // Validate payment amount
+            if (!paymentAmount || paymentAmount <= 0) {
+                console.error(`❌ Invalid milestone amount ${paymentAmount} for project ${projectId}`);
+                return { success: false, message: "Invalid milestone amount" };
+            }
+
+            // Get freelancer's bank details
+            const freelancerBankDetails = await BankDetails.findOne({
+                user_id: bid.freelancer_id,
+                is_active: 1,
+                is_primary: 1
+            });
+
+            if (!freelancerBankDetails) {
+                console.error(`❌ Freelancer bank details not found for project ${projectId}`);
+                return { success: false, message: "Freelancer bank details not found" };
+            }
+
+            // Create payout to freelancer (using Razorpay Payouts API)
+            const payoutData = {
+                account_number: freelancerBankDetails.account_number,
+                fund_account: {
+                    account_type: "bank_account",
+                    bank_account: {
+                        name: freelancerBankDetails.account_holder_name,
+                        ifsc: freelancerBankDetails.ifsc_code,
+                        account_number: freelancerBankDetails.account_number
+                    }
+                },
+                amount: Math.round(paymentAmount * 100), // Convert to paise
+                currency: "INR",
+                mode: "IMPS",
+                purpose: "payout",
+                queue_if_low_balance: true,
+                reference_id: `auto_milestone_${projectId}_${milestoneIndex}_${Date.now()}`,
+                narration: `Auto milestone payment for project: ${project.title}`
+            };
+
+            const payout = await razorpay.payouts.create(payoutData);
+
+            // Update milestone with payment information
+            bid.milestones[milestoneIndex].payment_released = 1;
+            bid.milestones[milestoneIndex].payment_amount = paymentAmount;
+            bid.milestones[milestoneIndex].payment_id = payout.id;
+            bid.milestones[milestoneIndex].payment_released_at = new Date().toISOString();
+            bid.milestones[milestoneIndex].auto_released = true; // Mark as auto-released
+            
+            await bid.save();
+
+            // Create payment history record
+            await PaymentHistory.create({
+                userId: bid.freelancer_id,
+                orderId: payout.reference_id,
+                paymentId: payout.id,
+                amount: paymentAmount,
+                currency: 'INR',
+                status: 'paid',
+                createdAt: new Date()
+            });
+
+            console.log(`✅ Auto-released payment for milestone ${milestoneIndex} in project ${projectId}: ₹${paymentAmount}`);
+
+            return {
+                success: true,
+                message: "Milestone payment auto-released successfully",
+                data: {
+                    payout_id: payout.id,
+                    amount: paymentAmount,
+                    milestone_title: milestone.title
+                }
+            };
+
+        } catch (error) {
+            console.error(`❌ Error auto-releasing milestone payment for project ${projectId}, milestone ${milestoneIndex}:`, error);
+            return { 
+                success: false, 
+                message: "Failed to auto-release milestone payment", 
+                error: error.message 
+            };
         }
     }
 }

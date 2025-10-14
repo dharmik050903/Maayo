@@ -264,7 +264,7 @@ export default class BidController {
         }
     }
 
-    // Accept a bid (only by project owner)
+    // Accept a bid (only by project owner) - Now requires upfront payment
     async acceptBid(req, res) {
         try {
             const userRole = req.headers.user_role;
@@ -278,12 +278,20 @@ export default class BidController {
                 });
             }
 
-            const { bid_id } = req.body;
+            const { bid_id, final_amount } = req.body;
 
             if (!bid_id) {
                 return res.status(400).json({ 
                     status: false, 
                     message: "bid_id is required" 
+                });
+            }
+
+            // Validate final amount
+            if (!final_amount || final_amount <= 0) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "final_amount is required and must be greater than 0" 
                 });
             }
 
@@ -319,6 +327,34 @@ export default class BidController {
                 });
             }
 
+            // Calculate platform commission (5%)
+            const platformCommission = Math.round(final_amount * 0.05 * 100) / 100; // Round to 2 decimal places
+            const freelancerAmount = final_amount - platformCommission;
+
+            // Validate milestones exist for payment distribution
+            if (!bid.milestones || bid.milestones.length === 0) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Bid must have milestones defined for payment distribution" 
+                });
+            }
+
+            // Calculate milestone amounts based on final amount
+            const totalMilestoneAmount = bid.milestones.reduce((sum, milestone) => sum + milestone.amount, 0);
+            if (totalMilestoneAmount <= 0) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Total milestone amount must be greater than 0" 
+                });
+            }
+
+            // Update milestone amounts proportionally
+            const updatedMilestones = bid.milestones.map(milestone => ({
+                ...milestone.toObject(),
+                amount: Math.round((milestone.amount / totalMilestoneAmount) * freelancerAmount * 100) / 100,
+                original_amount: milestone.amount // Keep original for reference
+            }));
+
             // Reject all other pending bids for this project
             await Bid.updateMany(
                 { 
@@ -332,40 +368,42 @@ export default class BidController {
                 }
             );
 
-            // Accept the selected bid
+            // Update bid with new milestone amounts and mark as pending payment
             await Bid.findByIdAndUpdate(bid_id, {
-                status: 'accepted',
+                status: 'pending_payment', // New status for payment required
+                milestones: updatedMilestones,
+                final_amount: final_amount,
+                platform_commission: platformCommission,
+                freelancer_amount: freelancerAmount,
                 client_decision_date: new Date().toISOString()
             });
 
             // Update project with accepted bid and freelancer
             await projectinfo.findByIdAndUpdate(bid.project_id._id, {
-                status: 'in_progress',
+                status: 'pending_payment', // Project status until payment is made
                 isactive: 1,
-                ispending: 0,
+                ispending: 1, // Keep as pending until payment
                 accepted_bid_id: bid_id,
                 freelancerid: [{
                     freelancerid: bid.freelancer_id,
                     freelancername: '' // Will be populated when needed
                 }],
-                // Set initial final amount as bid amount (can be customized later)
-                final_project_amount: bid.bid_amount
+                final_project_amount: final_amount,
+                platform_commission: platformCommission
             });
-
-            // Notify client and freelancer that chat is enabled for this bid
-            try {
-                const io = getIO();
-                const clientId = bid.project_id.personid?.toString();
-                const freelancerId = bid.freelancer_id?.toString();
-                io.to(`user:${clientId}`).emit('chat:enabled', { bid_id, project_id: bid.project_id._id });
-                io.to(`user:${freelancerId}`).emit('chat:enabled', { bid_id, project_id: bid.project_id._id });
-            } catch (_) {
-                // Socket may not be initialized in some environments; ignore
-            }
 
             return res.status(200).json({
                 status: true,
-                message: "Bid accepted successfully"
+                message: "Bid accepted successfully. Payment required to complete the process.",
+                data: {
+                    bid_id: bid_id,
+                    project_id: bid.project_id._id,
+                    final_amount: final_amount,
+                    platform_commission: platformCommission,
+                    freelancer_amount: freelancerAmount,
+                    milestones_count: updatedMilestones.length,
+                    payment_required: true
+                }
             });
 
         } catch (error) {
@@ -738,6 +776,129 @@ export default class BidController {
             return res.status(500).json({ 
                 status: false, 
                 message: "Failed to delete bid", 
+                error: error.message 
+            });
+        }
+    }
+
+    // Update project payment amount (Client only)
+    async updateProjectPayment(req, res) {
+        try {
+            const userRole = req.headers.user_role;
+            const userId = req.headers.id;
+
+            // Only clients can update project payment
+            if (userRole !== 'client') {
+                return res.status(403).json({ 
+                    status: false, 
+                    message: "Access denied. Only clients can update project payment." 
+                });
+            }
+
+            const { project_id, new_amount } = req.body;
+
+            if (!project_id || !new_amount) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "project_id and new_amount are required" 
+                });
+            }
+
+            // Validate new amount
+            if (new_amount <= 0) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "New amount must be greater than 0" 
+                });
+            }
+
+            // Get project and verify ownership
+            const project = await projectinfo.findById(project_id)
+                .populate('accepted_bid_id');
+            
+            if (!project) {
+                return res.status(404).json({ 
+                    status: false, 
+                    message: "Project not found" 
+                });
+            }
+
+            if (project.personid.toString() !== userId) {
+                return res.status(403).json({ 
+                    status: false, 
+                    message: "You can only update payment for your own projects" 
+                });
+            }
+
+            // Check if project has accepted bid
+            if (!project.accepted_bid_id) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Project must have an accepted bid to update payment" 
+                });
+            }
+
+            // Check if project is in pending_payment status (can only update before payment)
+            if (project.accepted_bid_id.status !== 'pending_payment') {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Payment can only be updated before initial payment is made" 
+                });
+            }
+
+            // Calculate new platform commission (5%)
+            const newPlatformCommission = Math.round(new_amount * 0.05 * 100) / 100;
+            const newFreelancerAmount = new_amount - newPlatformCommission;
+
+            // Update milestone amounts proportionally
+            const bid = project.accepted_bid_id;
+            const totalOriginalAmount = bid.milestones.reduce((sum, milestone) => sum + (milestone.original_amount || milestone.amount), 0);
+            
+            if (totalOriginalAmount <= 0) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Invalid milestone amounts" 
+                });
+            }
+
+            const updatedMilestones = bid.milestones.map(milestone => ({
+                ...milestone.toObject(),
+                amount: Math.round(((milestone.original_amount || milestone.amount) / totalOriginalAmount) * newFreelancerAmount * 100) / 100
+            }));
+
+            // Update bid with new amounts
+            await Bid.findByIdAndUpdate(bid._id, {
+                milestones: updatedMilestones,
+                final_amount: new_amount,
+                platform_commission: newPlatformCommission,
+                freelancer_amount: newFreelancerAmount,
+                updatedAt: new Date().toISOString()
+            });
+
+            // Update project with new amounts
+            await projectinfo.findByIdAndUpdate(project_id, {
+                final_project_amount: new_amount,
+                platform_commission: newPlatformCommission,
+                updatedAt: new Date().toISOString()
+            });
+
+            return res.status(200).json({
+                status: true,
+                message: "Project payment updated successfully",
+                data: {
+                    project_id: project_id,
+                    new_amount: new_amount,
+                    platform_commission: newPlatformCommission,
+                    freelancer_amount: newFreelancerAmount,
+                    milestones_count: updatedMilestones.length
+                }
+            });
+
+        } catch (error) {
+            console.error("Error updating project payment:", error);
+            return res.status(500).json({ 
+                status: false, 
+                message: "Failed to update project payment", 
                 error: error.message 
             });
         }
