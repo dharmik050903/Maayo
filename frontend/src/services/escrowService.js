@@ -229,21 +229,15 @@ export const escrowService = {
   /**
    * Create escrow payment
    * @param {string} projectId - Project ID
-   * @param {number} finalAmount - Final project amount
    * @returns {Promise<Object>} Escrow creation response
    */
-  async createEscrowPayment(projectId, finalAmount) {
+  async createEscrowPayment(projectId) {
     try {
-      console.log('Creating escrow payment:', { projectId, finalAmount })
+      console.log('Creating escrow payment:', { projectId })
       
       // Validate inputs
       if (!projectId) {
         throw new Error('Project ID is required')
-      }
-      
-      const amount = parseFloat(finalAmount)
-      if (isNaN(amount) || amount <= 0) {
-        throw new Error('Valid amount is required')
       }
       
       // Backend will handle escrow existence check
@@ -253,10 +247,8 @@ export const escrowService = {
       const authHeaders = JSON.parse(localStorage.getItem('authHeaders') || '{}')
       
       const requestBody = {
-        project_id: projectId,
-        final_amount: amount,
-        user_id: authHeaders._id || userData._id,
-        user_role: authHeaders.userRole || userData.userRole
+        project_id: projectId
+        // final_amount is now taken from project data
       }
       
       console.log('Escrow request body:', requestBody)

@@ -377,10 +377,19 @@ export const bidService = {
     }
   },
 
-  // Accept a bid (client only)
-  async acceptBid(bidId) {
+  // Accept a bid (client only) - Updated for new payment flow
+  async acceptBid(bidId, finalAmount) {
     try {
-      console.log('🔄 BidService: Accepting bid:', bidId)
+      console.log('🔄 BidService: Accepting bid:', { bidId, finalAmount })
+      
+      // Validate inputs
+      if (!bidId) {
+        throw new Error('Bid ID is required')
+      }
+      
+      if (!finalAmount || finalAmount <= 0) {
+        throw new Error('Final amount is required and must be greater than 0')
+      }
       
       // Get user ID for debugging
       const authHeaders = localStorage.getItem('authHeaders')
@@ -423,7 +432,8 @@ export const bidService = {
           'last_name': acceptAuthData.last_name || ''
         },
         body: JSON.stringify({
-          bid_id: bidId
+          bid_id: bidId,
+          final_amount: finalAmount
         })
       })
       
@@ -459,6 +469,19 @@ export const bidService = {
         console.log('   User ID from auth:', userId)
         console.log('   User Role from auth:', acceptAuthData.userRole)
         
+        if (response.status === 400) {
+          console.log('🔍 BidService: Analyzing 400 Bad Request Response...')
+          console.log('❌ Error Data:', errorData)
+          
+          if (errorData.message?.includes('final_amount')) {
+            throw new Error('Final amount is required and must be greater than 0')
+          } else if (errorData.message?.includes('bid_id')) {
+            throw new Error('Bid ID is required')
+          } else {
+            throw new Error(errorData.message || 'Invalid request data')
+          }
+        }
+        
         if (response.status === 403) {
           console.log('🔍 BidService: Analyzing 403 Forbidden Response...')
           
@@ -482,7 +505,10 @@ export const bidService = {
                   'first_name': acceptAuthData.first_name || '',
                   'last_name': acceptAuthData.last_name || ''
                 },
-                body: JSON.stringify({ bid_id: bidId })
+                body: JSON.stringify({ 
+                  bid_id: bidId,
+                  final_amount: finalAmount
+                })
               })
               
               console.log('📊 Solution 1 Result:', solution1Response.status, solution1Response.ok)
@@ -528,7 +554,10 @@ export const bidService = {
                       'user_role': 'client',
                       'project_id': targetBid.project_id._id
                     },
-                    body: JSON.stringify({ bid_id: bidId })
+                    body: JSON.stringify({ 
+                  bid_id: bidId,
+                  final_amount: finalAmount
+                })
                   })
                   
                   console.log('📊 Solution 2 Result:', solution2Response.status, solution2Response.ok)
@@ -863,6 +892,53 @@ SUGGESTION: Contact backend developer to verify project ownership data.`)
       if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
         throw new Error('Unable to connect to server. Please check if the backend is running.')
       }
+      throw error
+    }
+  },
+
+  // Update project payment amount (Client only) - New method for payment flow
+  async updateProjectPayment(projectId, newAmount) {
+    try {
+      console.log('Updating project payment:', { projectId, newAmount })
+      
+      const response = await authenticatedFetch(`${API_BASE_URL}/bid/update-payment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          project_id: projectId,
+          new_amount: newAmount
+        })
+      })
+
+      if (!response.ok) {
+        // Check if response is HTML (error page) instead of JSON
+        const contentType = response.headers.get('content-type')
+        if (contentType && contentType.includes('text/html')) {
+          throw new Error('Backend server returned HTML instead of JSON. Please check if the server is running.')
+        }
+        
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Failed to update project payment')
+      }
+
+      const data = await response.json()
+      console.log('Project payment updated successfully:', data)
+      
+      return {
+        status: true,
+        message: "Project payment updated successfully",
+        data: data.data
+      }
+    } catch (error) {
+      console.error('Error updating project payment:', error)
+      
+      // Handle JSON parsing errors
+      if (error.message.includes('Unexpected token') || error.message.includes('<!DOCTYPE')) {
+        throw new Error('Backend server error: Received HTML instead of JSON response')
+      }
+      
       throw error
     }
   }

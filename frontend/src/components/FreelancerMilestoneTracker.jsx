@@ -128,7 +128,12 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
     if (milestone.is_completed === 1) {
       // Check if payment has been released
       if (milestone.payment_released === 1) {
-        return 'completed' // Payment released
+        // Check if payment was auto-released
+        if (milestone.auto_released) {
+          return 'auto_paid' // Auto-released payment
+        } else {
+          return 'completed' // Manual payment release
+        }
       } else {
         return 'pending_approval' // Completed but payment not released yet
       }
@@ -144,6 +149,7 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
 
   const getStatusColor = (status) => {
     switch (status) {
+      case 'auto_paid': return 'text-green-700 bg-green-200' // Different color for auto-payments
       case 'completed': return 'text-green-600 bg-green-100'
       case 'pending_approval': return 'text-yellow-600 bg-yellow-100'
       case 'in_progress': return 'text-blue-600 bg-blue-100'
@@ -153,6 +159,7 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
 
   const getStatusIcon = (status) => {
     switch (status) {
+      case 'auto_paid': return '🤖' // Auto-payment icon
       case 'completed': return '✅'
       case 'pending_approval': return '⏳'
       case 'in_progress': return '🔄'

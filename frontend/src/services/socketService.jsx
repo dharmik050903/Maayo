@@ -124,6 +124,22 @@ class SocketService {
     }
   }
 
+  // Listen for bid count updates
+  onBidCountUpdate(callback) {
+    if (this.socket) {
+      this.socket.on('bid:count-update', callback)
+      this.listeners.set('bid:count-update', callback)
+    }
+  }
+
+  // Remove bid count update listener
+  offBidCountUpdate(callback) {
+    if (this.socket) {
+      this.socket.off('bid:count-update', callback)
+      this.listeners.delete('bid:count-update')
+    }
+  }
+
   // Remove all listeners
   removeAllListeners() {
     if (this.socket) {

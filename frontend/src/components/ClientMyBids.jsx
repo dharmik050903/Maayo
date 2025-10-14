@@ -5,6 +5,7 @@ import Button from './Button'
 import messagingService from '../services/messagingService'
 import ConfirmationModal from './ConfirmationModal'
 import NotificationModal from './NotificationModal'
+import AcceptBidModal from './AcceptBidModal'
 import { useConfirmation, useNotification } from '../hooks/useModal'
 import { getSafeUrl } from '../utils/urlValidation'
 
@@ -22,6 +23,8 @@ export default function ClientMyBids() {
   const [rejectMessage, setRejectMessage] = useState('')
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
+  const [showAcceptModal, setShowAcceptModal] = useState(false)
+  const [bidToAccept, setBidToAccept] = useState(null)
   // Removed local messaging state - using messagingService instead
   const dropdownRef = useRef(null)
   const hasInitialized = useRef(false)
@@ -206,58 +209,23 @@ export default function ClientMyBids() {
   }
 
   const handleAcceptBid = async (bidId) => {
-    showConfirmation({
-      title: 'Accept Bid',
-      message: 'Are you sure you want to accept this bid? This action cannot be undone.',
-      type: 'warning',
-      confirmText: 'Accept',
-      onConfirm: async () => {
-        try {
-          setConfirmationLoading(true)
-      const response = await bidService.acceptBid(bidId)
-      if (response.status) {
-        // Find the accepted bid to open messaging
-        const acceptedBid = bids.find(bid => bid._id === bidId)
-        if (acceptedBid) {
-          messagingService.show(
-            {
-              id: acceptedBid.freelancer_id?._id || acceptedBid.freelancer_id,
-              name: acceptedBid.freelancer_name || 'Freelancer'
-            },
-            {
-              id: acceptedBid.project_id,
-              title: acceptedBid.project_title || 'Project'
-            },
-            acceptedBid._id
-          )
-        } else {
-              showNotification({
-                title: 'Success',
-                message: 'Bid accepted successfully!',
-                type: 'success'
-              })
-        }
-        fetchBids() // Refresh the list
-            hideConfirmation()
-      } else {
-            showNotification({
-              title: 'Error',
-              message: response.message || 'Failed to accept bid',
-              type: 'error'
-            })
-      }
-    } catch (error) {
-      console.error('Error accepting bid:', error)
-          showNotification({
-            title: 'Error',
-            message: error.message || 'Failed to accept bid',
-            type: 'error'
-          })
-    } finally {
-          setConfirmationLoading(false)
+    const bid = bids.find(b => b._id === bidId)
+    const project = projects.find(p => p._id === bid?.project_id)
+    if (bid && project) {
+      setBidToAccept(bid)
+      setShowAcceptModal(true)
     }
-      }
+  }
+
+  const handleAcceptSuccess = () => {
+    setShowAcceptModal(false)
+    setBidToAccept(null)
+    showNotification({
+      title: 'Success',
+      message: 'Bid accepted and payment completed successfully!',
+      type: 'success'
     })
+    fetchBids() // Refresh the list
   }
 
   const handleRejectBid = (bid) => {
@@ -312,6 +280,8 @@ export default function ClientMyBids() {
         return 'bg-green-100 text-green-800'
       case 'rejected':
         return 'bg-red-100 text-red-800'
+      case 'pending_payment':
+        return 'bg-orange-100 text-orange-800'
       case 'pending':
       default:
         return 'bg-yellow-100 text-yellow-800'
@@ -576,6 +546,17 @@ export default function ClientMyBids() {
                       </Button>
                     </>
                   )}
+                  {bid.status === 'pending_payment' && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1 min-w-[140px] border-green-500 text-green-500 hover:bg-green-500 hover:text-white font-semibold"
+                      onClick={() => handleAcceptBid(bid._id)}
+                      disabled={actionLoading}
+                    >
+                      {actionLoading ? 'Processing...' : '💳 Complete Payment'}
+                    </Button>
+                  )}
                   <Button 
                     variant="outline" 
                     size="sm" 
@@ -626,7 +607,7 @@ export default function ClientMyBids() {
 
       {/* Reject Bid Modal */}
       {showRejectModal && selectedBid && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-graphite">Reject Bid</h3>
@@ -697,7 +678,7 @@ export default function ClientMyBids() {
 
       {/* View Details Modal */}
       {showDetailsModal && selectedBid && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-graphite">Bid Details</h3>
@@ -892,6 +873,19 @@ export default function ClientMyBids() {
         autoClose={notification.autoClose}
         autoCloseDelay={notification.autoCloseDelay}
       />
+
+      {/* Accept Bid Modal */}
+      {showAcceptModal && bidToAccept && (
+        <AcceptBidModal
+          bid={bidToAccept}
+          project={projects.find(p => p._id === bidToAccept.project_id)}
+          onClose={() => {
+            setShowAcceptModal(false)
+            setBidToAccept(null)
+          }}
+          onSuccess={handleAcceptSuccess}
+        />
+      )}
     </div>
   )
 }

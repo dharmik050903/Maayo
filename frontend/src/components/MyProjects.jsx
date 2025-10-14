@@ -13,6 +13,8 @@ import { formatBudget } from '../utils/currency'
 import confirmationService from '../services/confirmationService.jsx'
 import ProjectDetailsModal from './ProjectDetailsModal'
 import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
+import socketService from '../services/socketService'
+import { getCurrentUser } from '../utils/api'
 
 export default function MyProjects() {
   const navigate = useNavigate()
@@ -63,12 +65,92 @@ export default function MyProjects() {
     freelancer_id: ''
   })
   const [hoveredStar, setHoveredStar] = useState(0)
+  const [bidCountUpdating, setBidCountUpdating] = useState(false)
 
   useEffect(() => {
     if (!hasInitialized.current) {
       hasInitialized.current = true
-    fetchMyProjects()
-    loadSkills()
+      fetchMyProjects()
+      loadSkills()
+      
+      // Initialize socket connection for real-time bid count updates
+      const user = getCurrentUser()
+      if (user?._id) {
+        console.log('🔌 MyProjects: Initializing socket connection for user:', user._id)
+        socketService.connect(user._id)
+      }
+    }
+  }, [])
+
+  // Set up real-time bid count update listener
+  useEffect(() => {
+    const handleBidCountUpdate = (data) => {
+      console.log('📊 MyProjects: Received bid count update:', data)
+      
+      if (data.project_id && data.bid_count !== undefined) {
+        setBidCountUpdating(true)
+        
+        setProjects(prevProjects => {
+          return prevProjects.map(project => {
+            if (project._id === data.project_id) {
+              console.log(`🔄 MyProjects: Updating bid count for project ${project.title}: ${project.bid_count || 0} → ${data.bid_count}`)
+              return {
+                ...project,
+                bid_count: data.bid_count
+              }
+            }
+            return project
+          })
+        })
+        
+        // Show notification for new bid
+        if (data.bid_count > 0) {
+          const updatedProject = projects.find(p => p._id === data.project_id)
+          if (updatedProject) {
+            showNotification({
+              title: 'New Bid Received! 🎉',
+              message: `You received a new bid on "${updatedProject.title}"`,
+              type: 'success'
+            })
+          }
+        }
+        
+        // Reset updating state after a short delay
+        setTimeout(() => {
+          setBidCountUpdating(false)
+        }, 1000)
+      }
+    }
+
+    // Set up bid count update listener
+    socketService.onBidCountUpdate(handleBidCountUpdate)
+
+    return () => {
+      socketService.offBidCountUpdate(handleBidCountUpdate)
+    }
+  }, [projects, showNotification])
+
+  // Manual refresh function for bid counts
+  const refreshBidCounts = async () => {
+    try {
+      setBidCountUpdating(true)
+      console.log('🔄 MyProjects: Manually refreshing bid counts...')
+      await fetchMyProjects()
+      console.log('✅ MyProjects: Bid counts refreshed successfully')
+    } catch (error) {
+      console.error('❌ MyProjects: Error refreshing bid counts:', error)
+    } finally {
+      setTimeout(() => {
+        setBidCountUpdating(false)
+      }, 1000)
+    }
+  }
+
+  // Cleanup socket connection on component unmount
+  useEffect(() => {
+    return () => {
+      console.log('🔌 MyProjects: Cleaning up socket connection')
+      socketService.disconnect()
     }
   }, [])
 
@@ -123,6 +205,7 @@ export default function MyProjects() {
   const getProjectStatus = (project) => {
     if (project.iscompleted === 1) return 'completed'
     if (project.isactive === 1) return 'in_progress'
+    if (project.status === 'pending_payment') return 'pending_payment'
     if (project.ispending === 1) return 'open'
     if (project.status === 'cancelled') return 'cancelled'
     return 'open' // default
@@ -132,6 +215,8 @@ export default function MyProjects() {
     switch (status) {
       case 'open':
         return 'bg-green-100 text-green-800'
+      case 'pending_payment':
+        return 'bg-orange-100 text-orange-800'
       case 'in_progress':
         return 'bg-blue-100 text-blue-800'
       case 'completed':
@@ -147,6 +232,8 @@ export default function MyProjects() {
     switch (status) {
       case 'open':
         return '🔓'
+      case 'pending_payment':
+        return '💳'
       case 'in_progress':
         return '⚡'
       case 'completed':
@@ -619,12 +706,31 @@ const handleCloseBidRequest = () => {
         <div>
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">
             My <span className="text-mint">Projects</span>
+            {bidCountUpdating && (
+              <span className="ml-2 text-sm text-mint animate-pulse">🔄 Updating...</span>
+            )}
           </h2>
           <p className="text-white/80 text-sm sm:text-base">
             {projects.length} project{projects.length !== 1 ? 's' : ''} found
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+          <button
+            onClick={refreshBidCounts}
+            disabled={bidCountUpdating}
+            className="px-3 py-2 bg-mint/20 hover:bg-mint/30 text-mint rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm sm:text-base"
+            title="Refresh bid counts"
+          >
+            <svg 
+              className={`w-4 h-4 ${bidCountUpdating ? 'animate-spin' : ''}`} 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Refresh
+          </button>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -723,7 +829,14 @@ const handleCloseBidRequest = () => {
                       </div>
                       <div>
                         <p className="text-sm text-gray-700 font-medium">Bids</p>
-                        <p className="text-lg font-bold text-gray-900">{project.bid_count || 0}</p>
+                        <p className="text-lg font-bold text-gray-900 flex items-center gap-1">
+                          {project.bid_count || 0}
+                          {bidCountUpdating && (
+                            <svg className="w-4 h-4 text-mint animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                          )}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -799,6 +912,11 @@ const handleCloseBidRequest = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                         {t('viewBids')} ({project.bid_count || 0})
+                        {bidCountUpdating && (
+                          <svg className="w-3 h-3 text-mint animate-spin ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                        )}
                       </button>
                       <button 
                         onClick={() => handleActivateProject(project._id)} 
@@ -873,7 +991,7 @@ const handleCloseBidRequest = () => {
 
       {/* Edit Project Modal */}
       {showEditModal && selectedProject && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-graphite">Edit Project</h3>
@@ -1027,7 +1145,7 @@ const handleCloseBidRequest = () => {
 
       {/* Review Modal */}
       {showReviewModal && selectedProjectForReview && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-graphite">Write Review</h3>
@@ -1125,7 +1243,7 @@ const handleCloseBidRequest = () => {
 
       {/* Bid Request Modal */}
       {showBidRequest && selectedBid && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-2 sm:p-4">
           <div className="bg-white rounded-lg p-4 sm:p-6 max-w-6xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-graphite pr-2">Bid Requests for "{selectedBid.title}"</h3>

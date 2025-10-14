@@ -3,8 +3,9 @@ import { bidService } from '../services/bidService'
 import { formatBudget } from '../utils/currency'
 import { getSafeUrl } from '../utils/urlValidation'
 import confirmationService from '../services/confirmationService.jsx'
+import AcceptBidModal from './AcceptBidModal'
 
-const BidList = ({ projectId, userRole, onBidAction }) => {
+const BidList = ({ projectId, userRole, onBidAction, project }) => {
   const [bids, setBids] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -12,6 +13,8 @@ const BidList = ({ projectId, userRole, onBidAction }) => {
   const [showRejectModal, setShowRejectModal] = useState(false)
   const [selectedBid, setSelectedBid] = useState(null)
   const [rejectMessage, setRejectMessage] = useState('')
+  const [showAcceptModal, setShowAcceptModal] = useState(false)
+  const [bidToAccept, setBidToAccept] = useState(null)
   const hasInitialized = useRef(false)
 
   useEffect(() => {
@@ -46,26 +49,18 @@ const BidList = ({ projectId, userRole, onBidAction }) => {
   }
 
   const handleAcceptBid = async (bidId) => {
-    const confirmed = await confirmationService.confirm(
-      'Are you sure you want to accept this bid? This will reject all other pending bids for this project.',
-      'Accept Bid'
-    )
-    if (!confirmed) {
-      return
+    const bid = bids.find(b => b._id === bidId)
+    if (bid) {
+      setBidToAccept(bid)
+      setShowAcceptModal(true)
     }
+  }
 
-    try {
-      const response = await bidService.acceptBid(bidId)
-      if (response.status) {
-        onBidAction?.('accepted', response.message)
-        fetchBids() // Refresh the list
-      } else {
-        setError(response.message || 'Failed to accept bid')
-      }
-    } catch (error) {
-      console.error('Error accepting bid:', error)
-      setError(error.message || 'Failed to accept bid')
-    }
+  const handleAcceptSuccess = () => {
+    setShowAcceptModal(false)
+    setBidToAccept(null)
+    onBidAction?.('accepted', 'Bid accepted and payment completed successfully!')
+    fetchBids() // Refresh the list
   }
 
   const handleRejectBid = async (bidId, message = '') => {
@@ -115,6 +110,7 @@ const BidList = ({ projectId, userRole, onBidAction }) => {
       case 'pending': return 'bg-yellow-100 text-yellow-800'
       case 'accepted': return 'bg-green-100 text-green-800'
       case 'rejected': return 'bg-red-100 text-red-800'
+      case 'pending_payment': return 'bg-orange-100 text-orange-800'
       case 'withdrawn': return 'bg-gray-100 text-gray-800'
       default: return 'bg-gray-100 text-gray-800'
     }
@@ -331,6 +327,17 @@ const BidList = ({ projectId, userRole, onBidAction }) => {
                   </div>
                 )}
 
+                {userRole === 'client' && bid.status === 'pending_payment' && (
+                  <div className="flex flex-col gap-2 min-w-[200px]">
+                    <button
+                      onClick={() => handleAcceptBid(bid._id)}
+                      className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold"
+                    >
+                      💳 Complete Payment
+                    </button>
+                  </div>
+                )}
+
                 {userRole === 'freelancer' && bid.status === 'pending' && (
                   <div className="flex flex-col gap-2 min-w-[200px]">
                     <button
@@ -356,7 +363,7 @@ const BidList = ({ projectId, userRole, onBidAction }) => {
 
       {/* Reject Modal */}
       {showRejectModal && selectedBid && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold mb-4">Reject Bid</h3>
             <p className="text-gray-600 mb-4">
@@ -397,6 +404,19 @@ const BidList = ({ projectId, userRole, onBidAction }) => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Accept Bid Modal */}
+      {showAcceptModal && bidToAccept && project && (
+        <AcceptBidModal
+          bid={bidToAccept}
+          project={project}
+          onClose={() => {
+            setShowAcceptModal(false)
+            setBidToAccept(null)
+          }}
+          onSuccess={handleAcceptSuccess}
+        />
       )}
     </div>
   )
