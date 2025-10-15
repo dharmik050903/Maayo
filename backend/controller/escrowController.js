@@ -595,7 +595,7 @@ export default class EscrowController {
                 paymentId: payout.id,
                 amount: paymentAmount,
                 currency: 'INR',
-                status: transferSuccess ? 'paid' : (payout.manual_processing_required ? 'pending' : 'processed'),
+                status: transferSuccess ? 'paid' : (payout.manual_processing_required ? 'pending' : 'created'),
                 createdAt: new Date()
             });
             console.log('✅ Payment history record created');
@@ -1059,7 +1059,7 @@ export default class EscrowController {
                 paymentId: payout ? payout.id : `manual_${Date.now()}`,
                 amount: paymentAmount,
                 currency: 'INR',
-                status: payoutSuccess ? 'paid' : 'manual_processing',
+                status: payoutSuccess ? 'paid' : 'pending',
                 createdAt: new Date()
             });
 
