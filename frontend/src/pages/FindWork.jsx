@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import Button from '../components/Button'
-import { getAllProjectsCached } from '../services/cachedApiService'
+import { getAllProjectsCached, getFreelancerBidsCached } from '../services/cachedApiService'
 import { skillsService } from '../services/skillsService'
 import { getCurrentUser } from '../utils/api'
 import { formatBudget } from '../utils/currency'
@@ -35,10 +35,27 @@ export default function FindWork() {
     if (!hasInitialized.current) {
       hasInitialized.current = true
       console.log('FindWork: useEffect running (first time)')
-    fetchProjects()
-    loadSkills()
+      fetchProjects()
+      loadSkills()
+      loadUserBids()
     } else {
       console.log('FindWork: Skipping duplicate initialization due to StrictMode')
+    }
+  }, [])
+
+  // Refresh submitted bids when component becomes visible (e.g., when navigating back to this page)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        console.log('🔄 FindWork: Page became visible, refreshing submitted bids...')
+        loadUserBids()
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
   }, [])
 
@@ -68,6 +85,27 @@ export default function FindWork() {
       }
     } catch (error) {
       console.error('Error loading skills:', error)
+    }
+  }
+
+  const loadUserBids = async () => {
+    try {
+      console.log('🔄 FindWork: Loading user bids...')
+      const response = await getFreelancerBidsCached()
+      
+      console.log('📊 FindWork: User bids response:', response)
+      
+      if (response.status && response.data) {
+        const bidProjectIds = response.data.map(bid => bid.project_id)
+        setSubmittedBids(new Set(bidProjectIds))
+        console.log('✅ FindWork: Loaded user bids for projects:', bidProjectIds)
+      } else {
+        console.log('⚠️ FindWork: No bids data or failed response:', response)
+        setSubmittedBids(new Set())
+      }
+    } catch (error) {
+      console.error('❌ FindWork: Error loading user bids:', error)
+      setSubmittedBids(new Set())
     }
   }
 
@@ -166,6 +204,9 @@ export default function FindWork() {
     if (selectedProject) {
       markBidAsSubmitted(selectedProject._id)
     }
+    
+    // Refresh submitted bids from backend
+    await loadUserBids()
     
     await confirmationService.alert(
       'Bid submitted successfully! You can view it in "My Bids" section.',
@@ -646,7 +687,7 @@ export default function FindWork() {
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-10 h-10 bg-mint/20 rounded-lg flex items-center justify-center">
                       <svg className="w-5 h-5 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 6h8M7 10h8M9 14h5c1.5 0 2.5-1 2.5-2.5S15.5 9 14 9h-2" />
                       </svg>
                     </div>
                     <div>

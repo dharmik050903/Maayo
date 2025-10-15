@@ -88,6 +88,22 @@ export default function FreelancerHome() {
     }
   }, [])
 
+  // Refresh submitted bids when component becomes visible (e.g., when navigating back to this page)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && isAuthenticated()) {
+        console.log('🔄 FreelancerHome: Page became visible, refreshing submitted bids...')
+        loadUserBids()
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [])
+
   const loadSkills = async () => {
     try {
       const response = await getSkillsCached()
@@ -101,15 +117,22 @@ export default function FreelancerHome() {
 
   const loadUserBids = async () => {
     try {
+      console.log('🔄 FreelancerHome: Loading user bids...')
       const response = await getFreelancerBidsCached()
+      
+      console.log('📊 FreelancerHome: User bids response:', response)
       
       if (response.status && response.data) {
         const bidProjectIds = response.data.map(bid => bid.project_id)
         setSubmittedBids(new Set(bidProjectIds))
-        console.log('Loaded user bids for projects:', bidProjectIds)
+        console.log('✅ FreelancerHome: Loaded user bids for projects:', bidProjectIds)
+      } else {
+        console.log('⚠️ FreelancerHome: No bids data or failed response:', response)
+        setSubmittedBids(new Set())
       }
     } catch (error) {
-      console.error('Error loading user bids:', error)
+      console.error('❌ FreelancerHome: Error loading user bids:', error)
+      setSubmittedBids(new Set())
     }
   }
 
@@ -1142,7 +1165,7 @@ export default function FreelancerHome() {
             <div className="bg-white/95 rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20">
               <div className="w-16 h-16 bg-coral/20 rounded-full mx-auto mb-6 flex items-center justify-center">
                 <svg className="w-8 h-8 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 6h8M7 10h8M9 14h5c1.5 0 2.5-1 2.5-2.5S15.5 9 14 9h-2" />
                 </svg>
               </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-4">Secure Payments</h3>
