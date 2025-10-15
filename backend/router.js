@@ -131,6 +131,46 @@ router.post("/escrow/status", auth, escrowController.getEscrowStatus);
 router.post("/escrow/reset", auth, escrowController.resetEscrowStatus);
 router.post("/escrow/debug-milestone", auth, escrowController.debugMilestonePayment);
 
+// CORS test endpoint
+router.get("/cors-test", (req, res) => {
+  res.json({
+    status: true,
+    message: "CORS test successful",
+    data: {
+      origin: req.headers.origin,
+      method: req.method,
+      timestamp: new Date().toISOString(),
+      headers: {
+        origin: req.headers.origin,
+        userAgent: req.headers['user-agent'],
+        referer: req.headers.referer,
+        host: req.headers.host
+      }
+    }
+  });
+});
+
+// CORS test endpoint for POST requests
+router.post("/cors-test", (req, res) => {
+  res.json({
+    status: true,
+    message: "CORS POST test successful",
+    data: {
+      origin: req.headers.origin,
+      method: req.method,
+      body: req.body,
+      timestamp: new Date().toISOString(),
+      headers: {
+        origin: req.headers.origin,
+        userAgent: req.headers['user-agent'],
+        referer: req.headers.referer,
+        host: req.headers.host,
+        contentType: req.headers['content-type']
+      }
+    }
+  });
+});
+
 // Milestone Management routes
 router.post("/milestone/complete", auth, milestoneController.completeMilestone);
 router.post("/milestone/modify", auth, milestoneController.modifyMilestone);

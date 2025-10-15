@@ -34,12 +34,26 @@ const defaultOrigins = [
   'https://maayo-alpha.vercel.app'
 ]
 
-// Combine allowed origins with default origins
-const finalOrigins = [...new Set([...allowedOrigins, ...defaultOrigins])]
+// AWS-specific origins (add your AWS domains here)
+const awsOrigins = [
+  // Add your AWS CloudFront domains
+  // 'https://your-domain.com',
+  // 'https://www.your-domain.com',
+  // 'https://your-cloudfront-domain.cloudfront.net',
+  // 'https://your-s3-bucket.s3-website-us-east-1.amazonaws.com'
+]
+
+// Combine allowed origins with default origins and AWS origins
+const finalOrigins = [...new Set([...allowedOrigins, ...defaultOrigins, ...awsOrigins])]
 
 app.use(cors({
   origin: function(origin, callback) {
     console.log('CORS request from origin:', origin)
+    console.log('Request headers:', {
+      origin: origin,
+      userAgent: 'N/A', // We can't access req here
+      referer: 'N/A'
+    })
     
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) {
@@ -53,9 +67,21 @@ app.use(cors({
       return callback(null, true)
     }
     
+    // Allow AWS CloudFront domains
+    if (origin.includes('cloudfront.net') || origin.includes('amazonaws.com')) {
+      console.log('CORS: Allowing AWS origin:', origin)
+      return callback(null, true)
+    }
+    
     // Allow Vercel domains
     if (origin.includes('vercel.app')) {
       console.log('CORS: Allowing Vercel origin:', origin)
+      return callback(null, true)
+    }
+    
+    // Allow Render domains (for your backend)
+    if (origin.includes('render.com') || origin.includes('onrender.com')) {
+      console.log('CORS: Allowing Render origin:', origin)
       return callback(null, true)
     }
     
@@ -68,6 +94,15 @@ app.use(cors({
     // Log the blocked origin for debugging
     console.log('CORS: Blocked origin:', origin)
     console.log('Final allowed origins:', finalOrigins)
+    console.log('Available origins check:', {
+      isLocalhost: origin.includes('localhost'),
+      is127: origin.includes('127.0.0.1'),
+      isCloudfront: origin.includes('cloudfront.net'),
+      isAws: origin.includes('amazonaws.com'),
+      isVercel: origin.includes('vercel.app'),
+      isRender: origin.includes('render.com') || origin.includes('onrender.com'),
+      inFinalList: finalOrigins.includes(origin)
+    })
 
     return callback(new Error('Not allowed by CORS'))
   },
@@ -80,11 +115,31 @@ app.use(cors({
 // Handle preflight OPTIONS requests
 app.options('*', (req, res) => {
   console.log('OPTIONS request for:', req.path)
+  console.log('OPTIONS headers:', {
+    origin: req.headers.origin,
+    'access-control-request-method': req.headers['access-control-request-method'],
+    'access-control-request-headers': req.headers['access-control-request-headers']
+  })
+  
   res.header('Access-Control-Allow-Origin', req.headers.origin || '*')
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, id, user_role, user_email, first_name, last_name')
   res.header('Access-Control-Allow-Credentials', 'true')
+  res.header('Access-Control-Max-Age', '86400') // Cache preflight for 24 hours
   res.sendStatus(200)
+})
+
+// CORS debugging middleware
+app.use((req, res, next) => {
+  console.log('Request details:', {
+    method: req.method,
+    path: req.path,
+    origin: req.headers.origin,
+    userAgent: req.headers['user-agent'],
+    referer: req.headers.referer,
+    host: req.headers.host
+  })
+  next()
 })
 
 app.use(express.json());
