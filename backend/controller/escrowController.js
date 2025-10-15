@@ -579,6 +579,19 @@ export default class EscrowController {
                     console.log('✅ Payment history record created (manual processing)');
 
                     console.log('⚠️ Manual payment processing required. Please process payment manually.');
+                    
+                    // Final verification - ensure milestone is updated
+                    const updatedBid = await projectinfo.findById(project_id).populate('accepted_bid_id');
+                    if (updatedBid && updatedBid.accepted_bid_id) {
+                        const finalMilestone = updatedBid.accepted_bid_id.milestones[milestone_index];
+                        console.log('🔍 Final milestone verification (manual processing):', {
+                            title: finalMilestone.title,
+                            payment_released: finalMilestone.payment_released,
+                            payment_id: finalMilestone.payment_id,
+                            manual_processing: finalMilestone.manual_processing
+                        });
+                    }
+                    
                     return res.status(200).json({
                         status: true,
                         message: "Milestone payment request created successfully. Manual processing required.",
@@ -588,6 +601,7 @@ export default class EscrowController {
                             milestone_title: milestone.title,
                             payment_status: 'pending_manual',
                             manual_processing_required: true,
+                            payment_released: true,
                             payment_details: {
                                 freelancer: freelancerBankDetails.account_holder_name,
                                 account: freelancerBankDetails.account_number,
@@ -686,6 +700,18 @@ export default class EscrowController {
                     console.log('✅ Payment history record created (manual processing)');
                     
                     console.log('⚠️ Manual payment processing required. Please process payment manually.');
+                    
+                    // Final verification - ensure milestone is updated
+                    const updatedBid = await projectinfo.findById(project_id).populate('accepted_bid_id');
+                    if (updatedBid && updatedBid.accepted_bid_id) {
+                        const finalMilestone = updatedBid.accepted_bid_id.milestones[milestone_index];
+                        console.log('🔍 Final milestone verification (manual processing 3):', {
+                            title: finalMilestone.title,
+                            payment_released: finalMilestone.payment_released,
+                            payment_id: finalMilestone.payment_id,
+                            manual_processing: finalMilestone.manual_processing
+                        });
+                    }
                 }
                 
             } else {
@@ -726,13 +752,28 @@ export default class EscrowController {
             console.log('✅ Payment history record created');
 
             console.log('🎉 Milestone payment released successfully');
+            
+            // Final verification - ensure milestone is updated regardless of payout method
+            const updatedBid = await projectinfo.findById(project_id).populate('accepted_bid_id');
+            if (updatedBid && updatedBid.accepted_bid_id) {
+                const finalMilestone = updatedBid.accepted_bid_id.milestones[milestone_index];
+                console.log('🔍 Final milestone verification:', {
+                    title: finalMilestone.title,
+                    payment_released: finalMilestone.payment_released,
+                    payment_id: finalMilestone.payment_id,
+                    manual_processing: finalMilestone.manual_processing
+                });
+            }
+            
             return res.status(200).json({
                 status: true,
                 message: "Milestone payment released successfully",
                 data: {
                     payout_id: payout.id,
                     amount: paymentAmount,
-                    milestone_title: milestone.title
+                    milestone_title: milestone.title,
+                    payment_released: true,
+                    manual_processing: payout.status === 'pending_manual'
                 }
             });
 
@@ -747,6 +788,24 @@ export default class EscrowController {
             // Check if it's a Razorpay specific error
             if (error.error) {
                 console.error("Razorpay error details:", error.error);
+            }
+            
+            // Even if there's an error, try to update the milestone status for manual processing
+            try {
+                console.log('🔄 Attempting to update milestone status despite error...');
+                const project = await projectinfo.findById(project_id).populate('accepted_bid_id');
+                if (project && project.accepted_bid_id && project.accepted_bid_id.milestones[milestone_index]) {
+                    const milestone = project.accepted_bid_id.milestones[milestone_index];
+                    if (milestone.is_completed === 1 && milestone.payment_released !== 1) {
+                        milestone.payment_released = 1;
+                        milestone.manual_processing = true;
+                        milestone.payment_released_at = new Date().toISOString();
+                        await project.accepted_bid_id.save();
+                        console.log('✅ Milestone status updated despite payment error');
+                    }
+                }
+            } catch (updateError) {
+                console.error('❌ Failed to update milestone status:', updateError);
             }
             
             return res.status(500).json({ 
