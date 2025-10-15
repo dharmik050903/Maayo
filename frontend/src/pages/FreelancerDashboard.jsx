@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import Button from '../components/Button'
 import AnimatedCounter from '../components/AnimatedCounter'
-import { authenticatedFetch, isAuthenticated, getCurrentUser, clearAuth } from '../utils/api'
+import { authenticatedFetch, isAuthenticated, getCurrentUser, clearAuth, fetchFreelancerProfile } from '../utils/api'
 import { formatHourlyRate, formatBudget } from '../utils/currency'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
 
@@ -213,20 +213,10 @@ export default function FreelancerDashboard() {
           localStorageKey: 'freelancer_profile_id'
         })
         
-        // Try to fetch from database using update endpoint (which can also be used to get data)
-        const requestBody = { _id: profileId }
-        console.log('Making API request to fetch profile:', {
-          url: 'http://localhost:5000/api/freelancer/info/update',
-          method: 'POST',
-          body: requestBody
-        })
-        const response = await authenticatedFetch(`${API_BASE_URL}/freelancer/info/update`, {
-          method: 'POST',
-          body: JSON.stringify(requestBody)
-        })
+        // Use the new utility function to fetch freelancer info
+        const { response, data } = await fetchFreelancerProfile(profileId)
         
-        if (response.ok) {
-          const data = await response.json()
+        if (response && response.ok && data.status && data.data) {
           console.log('Profile fetched from database:', data.data)
           
           setFreelancerInfo(data.data)

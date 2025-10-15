@@ -221,6 +221,35 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
     }
   }
 
+  const handleRejectMilestone = async (milestone) => {
+    try {
+      console.log('🔄 ClientMilestoneReview: Rejecting milestone:', milestone)
+      setPayingMilestone(milestone.index)
+      
+      const rejectResponse = await escrowService.rejectMilestone(projectId, milestone.index)
+      
+      if (rejectResponse.status) {
+        addPaymentRecord(milestone.index, {
+          amount: milestone.amount,
+          milestone_title: milestone.title,
+          payment_id: 'rejected',
+          manual_processing: false,
+          status: 'rejected'
+        })
+        showAlert('warning', 'Milestone Rejected', 'Milestone has been rejected. Freelancer will be notified to make necessary changes.')
+        console.log('✅ ClientMilestoneReview: Milestone rejected')
+        fetchMilestones(true) // Force refresh milestones
+      } else {
+        showAlert('error', 'Rejection Failed', 'Failed to reject milestone: ' + rejectResponse.message)
+      }
+    } catch (error) {
+      console.error('❌ ClientMilestoneReview: Error rejecting milestone:', error)
+      showAlert('error', 'Rejection Failed', error.message || 'Failed to reject milestone')
+    } finally {
+      setPayingMilestone(null)
+    }
+  }
+
   const handlePayMilestone = async (milestone) => {
     try {
       console.log('💳 ClientMilestoneReview: Processing milestone payment for:', milestone.index)
@@ -643,20 +672,21 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
         </button>
       </div>
       
-      {milestones.map((milestone, index) => {
-        const status = getMilestoneStatus(milestone)
-        const statusColor = getStatusColor(status)
-        const statusIcon = getStatusIcon(status)
-        
-        console.log(`🔍 Client Milestone ${index + 1} Debug:`, {
-          title: milestone.title,
-          status: milestone.status,
-          computedStatus: status,
-          index: milestone.index
-        })
-        
-        return (
-          <div key={`milestone-${milestone.index || index}`} className="group relative overflow-hidden border-2 rounded-2xl p-4 sm:p-6 bg-gradient-to-r from-white to-gray-50/50 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 border-gray-200 w-full">
+      <div className="space-y-6">
+        {milestones.map((milestone, index) => {
+          const status = getMilestoneStatus(milestone)
+          const statusColor = getStatusColor(status)
+          const statusIcon = getStatusIcon(status)
+          
+          console.log(`🔍 Client Milestone ${index + 1} Debug:`, {
+            title: milestone.title,
+            status: milestone.status,
+            computedStatus: status,
+            index: milestone.index
+          })
+          
+          return (
+            <div key={`milestone-${milestone.index || index}`} className="group relative overflow-hidden border-2 rounded-2xl p-6 bg-gradient-to-r from-white to-gray-50/50 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 border-gray-200 w-full">
             {/* Status indicator bar */}
             <div className={`absolute top-0 left-0 right-0 h-2 ${
               status === 'completed' 
@@ -666,7 +696,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                 : 'bg-gradient-to-r from-gray-300 to-gray-400'
             }`}></div>
 
-            <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
+            <div className="flex flex-col gap-6">
               <div className="flex-1 w-full">
                 {/* Enhanced Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
@@ -723,35 +753,47 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
               </div>
               
               {/* Enhanced Action Section */}
-              <div className="flex flex-col sm:flex-row lg:flex-col gap-4 w-full lg:w-auto lg:min-w-[200px]">
-                <div className="flex-1 lg:flex-none">
+              <div className="flex flex-col gap-4 w-full">
+                <div className="flex-1">
                   {status === 'pending_approval' && (
-                    <div className="flex flex-col gap-3 text-yellow-700 p-4 rounded-2xl bg-gradient-to-r from-yellow-50 to-yellow-100/50 border border-yellow-200">
+                    <div className="flex flex-col gap-4 text-yellow-700 p-4 rounded-2xl bg-gradient-to-r from-yellow-50 to-yellow-100/50 border border-yellow-200">
                       <div className="flex items-center gap-3">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <span className="text-sm font-medium">Waiting for your approval</span>
                       </div>
-                      <button
-                        onClick={() => handleApproveMilestone(milestone)}
-                        disabled={payingMilestone === milestone.index}
-                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold flex items-center justify-center gap-2"
-                      >
-                        {payingMilestone === milestone.index ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                            Approving...
-                          </>
-                        ) : (
-                          <>
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Approve & Pay Milestone
-                          </>
-                        )}
-                      </button>
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <button
+                          onClick={() => handleApproveMilestone(milestone)}
+                          disabled={payingMilestone === milestone.index}
+                          className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold flex items-center justify-center gap-2"
+                        >
+                          {payingMilestone === milestone.index ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                              Approving...
+                            </>
+                          ) : (
+                            <>
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              Accept & Pay
+                            </>
+                          )}
+                        </button>
+                        <button
+                          onClick={() => handleRejectMilestone(milestone)}
+                          disabled={payingMilestone === milestone.index}
+                          className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold flex items-center justify-center gap-2"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                          Reject
+                        </button>
+                      </div>
                     </div>
                   )}
                   
@@ -845,8 +887,9 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
               </div>
             )}
           </div>
-        )
-      })}
+          )
+        })}
+      </div>
       
       {/* Payment Details Modal */}
       {showPaymentDetails && selectedPayment && (
@@ -899,14 +942,13 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                 <p className="text-gray-900 text-sm">{formatDate(selectedPayment.payment.timestamp)}</p>
               </div>
               
-              {selectedPayment.payment.manual_processing && selectedPayment.payment.payment_details && (
+              {selectedPayment.payment.manual_processing && (
                 <div className="bg-orange-50 p-4 rounded-lg">
-                  <h4 className="text-sm font-medium text-orange-800 mb-2">Payment Instructions</h4>
+                  <h4 className="text-sm font-medium text-orange-800 mb-2">Payment Status</h4>
                   <div className="text-xs text-orange-700 space-y-1">
-                    <p><strong>Freelancer:</strong> {selectedPayment.payment.payment_details.freelancer}</p>
-                    <p><strong>Account:</strong> {selectedPayment.payment.payment_details.account}</p>
-                    <p><strong>IFSC:</strong> {selectedPayment.payment.payment_details.ifsc}</p>
-                    <p><strong>Amount:</strong> {formatCurrency(selectedPayment.payment.payment_details.amount)}</p>
+                    <p><strong>Processing:</strong> Manual processing required</p>
+                    <p><strong>Amount:</strong> {formatCurrency(selectedPayment.payment.amount)}</p>
+                    <p className="text-orange-600 italic">Payment will be processed by our team within 24-48 hours</p>
                   </div>
                 </div>
               )}

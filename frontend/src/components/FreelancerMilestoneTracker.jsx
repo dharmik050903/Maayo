@@ -200,6 +200,11 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
   const getMilestoneStatus = (milestone) => {
     console.log('🔍 getMilestoneStatus input:', milestone)
     
+    // Check if milestone is rejected
+    if (milestone.rejected_at) {
+      return 'rejected'
+    }
+    
     // Backend uses is_completed: 1 for completed milestones
     if (milestone.is_completed === 1) {
       // Check if payment has been released
@@ -228,6 +233,7 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
       case 'auto_paid': return 'text-green-700 bg-green-200' // Different color for auto-payments
       case 'completed': return 'text-green-600 bg-green-100'
       case 'pending_approval': return 'text-yellow-600 bg-yellow-100'
+      case 'rejected': return 'text-red-600 bg-red-100'
       case 'in_progress': return 'text-blue-600 bg-blue-100'
       default: return 'text-gray-600 bg-gray-100'
     }
@@ -238,6 +244,7 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
       case 'auto_paid': return '🤖' // Auto-payment icon
       case 'completed': return '✅'
       case 'pending_approval': return '⏳'
+      case 'rejected': return '❌'
       case 'in_progress': return '🔄'
       default: return '📋'
     }
@@ -296,39 +303,43 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-6">
         {milestones.map((milestone, index) => {
-          const status = getMilestoneStatus(milestone)
-          const overdue = isOverdue(milestone.due_date)
-          
-          console.log(`🔍 Milestone ${index + 1} Debug:`, {
-            title: milestone.title,
-            status: milestone.status,
-            computedStatus: status,
-            index: milestone.index
-          })
-          
-          return (
-        <div
-          key={index}
-          className={`group relative overflow-hidden border-2 rounded-2xl p-3 sm:p-4 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 ${
-            status === 'completed'
-              ? 'border-green-200 bg-gradient-to-r from-green-50 to-green-100/50'
-              : status === 'pending_approval'
-              ? 'border-yellow-200 bg-gradient-to-r from-yellow-50 to-yellow-100/50'
-              : 'border-gray-200 bg-gradient-to-r from-white to-gray-50/50'
-          }`}
-        >
+            const status = getMilestoneStatus(milestone)
+            const overdue = isOverdue(milestone.due_date)
+            
+            console.log(`🔍 Milestone ${index + 1} Debug:`, {
+              title: milestone.title,
+              status: milestone.status,
+              computedStatus: status,
+              index: milestone.index
+            })
+            
+            return (
+          <div
+            key={index}
+            className={`group relative overflow-hidden border-2 rounded-2xl p-6 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 ${
+              status === 'completed'
+                ? 'border-green-200 bg-gradient-to-r from-green-50 to-green-100/50'
+                : status === 'pending_approval'
+                ? 'border-yellow-200 bg-gradient-to-r from-yellow-50 to-yellow-100/50'
+                : status === 'rejected'
+                ? 'border-red-200 bg-gradient-to-r from-red-50 to-red-100/50'
+                : 'border-gray-200 bg-gradient-to-r from-white to-gray-50/50'
+            }`}
+          >
               {/* Status indicator bar */}
               <div className={`absolute top-0 left-0 right-0 h-1 ${
                 status === 'completed' 
                   ? 'bg-gradient-to-r from-green-400 to-green-600' 
                   : status === 'pending_approval'
                   ? 'bg-gradient-to-r from-yellow-400 to-yellow-600'
+                  : status === 'rejected'
+                  ? 'bg-gradient-to-r from-red-400 to-red-600'
                   : 'bg-gradient-to-r from-gray-300 to-gray-400'
               }`}></div>
 
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+          <div className="flex flex-col gap-6">
             <div className="flex-1">
               {/* Enhanced Header - Mobile Optimized */}
               <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
@@ -337,6 +348,8 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
                     ? 'bg-gradient-to-r from-green-100 to-green-200'
                     : status === 'pending_approval'
                     ? 'bg-gradient-to-r from-yellow-100 to-yellow-200'
+                    : status === 'rejected'
+                    ? 'bg-gradient-to-r from-red-100 to-red-200'
                     : 'bg-gradient-to-r from-gray-100 to-gray-200'
                 }`}>
                   <span className="text-lg sm:text-xl">{getStatusIcon(status)}</span>
@@ -480,7 +493,7 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
                 </div>
 
                 {/* Enhanced Action Section */}
-                <div className="ml-4 flex-shrink-0">
+                <div className="w-full">
                   {status === 'pending' && (
                     <button
                       onClick={() => handleCompleteMilestone({ ...milestone, index })}
@@ -502,6 +515,27 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
                       </div>
                       <div className="text-yellow-700 text-sm font-semibold mb-1">Pending Approval</div>
                       <div className="text-xs text-yellow-600">Waiting for client review</div>
+                    </div>
+                  )}
+                  
+                  {status === 'rejected' && (
+                    <div className="text-center p-4 bg-gradient-to-r from-red-50 to-red-100/50 rounded-xl border border-red-200">
+                      <div className="w-12 h-12 bg-gradient-to-r from-red-200 to-red-300 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg className="w-6 h-6 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </div>
+                      <div className="text-red-700 text-sm font-semibold mb-1">Milestone Rejected</div>
+                      <div className="text-xs text-red-600 mb-3">Client has rejected this milestone completion</div>
+                      <button
+                        onClick={() => handleCompleteMilestone({ ...milestone, index })}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-semibold flex items-center justify-center gap-2 mx-auto"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Resubmit Milestone
+                      </button>
                     </div>
                   )}
                   

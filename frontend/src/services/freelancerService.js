@@ -42,15 +42,13 @@ export const freelancerService = {
   // Get a specific freelancer by ID using existing API
   async getFreelancerById(id) {
     try {
-      const response = await authenticatedFetch(`${API_BASE_URL}/freelancer/info`, {
+      const response = await authenticatedFetch(`${API_BASE_URL}/freelancer/list`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'user_role': 'freelancer'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          id: id,
-          user_role: 'freelancer'
+          id: id
         })
       })
       
@@ -157,15 +155,13 @@ export const freelancerService = {
   // Get freelancers by specific name search
   async getFreelancersByName(name) {
     try {
-      const response = await authenticatedFetch(`${API_BASE_URL}/freelancer/info`, {
+      const response = await authenticatedFetch(`${API_BASE_URL}/freelancer/list`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'user_role': 'freelancer'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          name: name,
-          user_role: 'freelancer'
+          search: name
         })
       })
       

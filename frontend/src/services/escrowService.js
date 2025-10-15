@@ -905,6 +905,55 @@ export const escrowService = {
   },
 
   /**
+   * Reject milestone (client only)
+   * @param {string} projectId - Project ID
+   * @param {number} milestoneIndex - Milestone index
+   * @returns {Promise<Object>} Rejection response
+   */
+  async rejectMilestone(projectId, milestoneIndex) {
+    try {
+      console.log('Rejecting milestone:', { projectId, milestoneIndex })
+      
+      const response = await authenticatedFetch(`${API_BASE_URL}/milestone/reject`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          project_id: projectId,
+          milestone_index: milestoneIndex
+        })
+      })
+
+      if (!response.ok) {
+        let errorMessage = 'Failed to reject milestone'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.message || errorMessage
+        } catch (parseError) {
+          errorMessage = `Server error: ${response.status} ${response.statusText}`
+        }
+        throw new Error(errorMessage)
+      }
+
+      const data = await response.json()
+      console.log('Milestone rejected successfully:', data)
+      
+      return {
+        status: true,
+        message: "Milestone rejected successfully",
+        data: data.data
+      }
+    } catch (error) {
+      console.error('Error rejecting milestone:', error)
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        throw new Error('Unable to connect to server. Please check if the backend is running.')
+      }
+      throw error
+    }
+  },
+
+  /**
    * Check payment status for a milestone
    * @param {string} projectId - Project ID
    * @param {number} milestoneIndex - Milestone index

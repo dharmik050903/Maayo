@@ -177,6 +177,8 @@ router.post("/milestone/modify", auth, milestoneController.modifyMilestone);
 router.post("/milestone/add", auth, milestoneController.addMilestone);
 router.post("/milestone/remove", auth, milestoneController.removeMilestone);
 router.post("/milestone/list", auth, milestoneController.getProjectMilestones);
+router.post("/milestone/approve", auth, milestoneController.approveMilestone);
+router.post("/milestone/reject", auth, milestoneController.rejectMilestone);
 router.post("/bid/delete", auth, bidController.deleteBid);
 
 // Job Posting routes (Client only)

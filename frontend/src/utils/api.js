@@ -343,20 +343,50 @@ export async function updateFreelancerProfile(profileData) {
 }
 
 /**
+ * Fetch freelancer profile by user ID
+ * @param {string} userId - User ID (personId from tblpersonmaster)
+ * @returns {Promise<Object>} Freelancer profile data
+ */
+export async function fetchFreelancerProfile(userId) {
+  try {
+    const response = await authenticatedFetch(`${API_BASE_URL}/freelancer/list`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ id: userId })
+    })
+    
+    if (response.ok) {
+      const data = await response.json()
+      return { response, data }
+    }
+    
+    return { response, data: { status: false, message: 'Failed to fetch profile' } }
+  } catch (error) {
+    console.error('Error fetching freelancer profile:', error)
+    return { response: null, data: { status: false, message: error.message } }
+  }
+}
+
+/**
  * Check if freelancer profile exists
  * @param {string} userId - User ID (personId from tblpersonmaster)
  * @returns {Promise<boolean>} True if profile exists
  */
 export async function checkFreelancerProfileExists(userId) {
   try {
-    const response = await authenticatedFetch(`${API_BASE_URL}/freelancer/info/update`, {
+    const response = await authenticatedFetch(`${API_BASE_URL}/freelancer/list`, {
       method: 'POST',
-      body: JSON.stringify({ personId: userId })
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ id: userId })
     })
     
     if (response.ok) {
       const data = await response.json()
-      return data.data && data.data.personId // Check if personId matches
+      return data.status && data.data && data.data.personId // Check if personId matches
     }
     return false
   } catch (error) {

@@ -205,6 +205,104 @@ export default class MilestoneController {
         }
     }
 
+    // Reject milestone (by client)
+    async rejectMilestone(req, res) {
+        try {
+            const userRole = req.headers.user_role;
+            const userId = req.headers.id;
+
+            // Only clients can reject milestones
+            if (userRole !== 'client') {
+                return res.status(403).json({ 
+                    status: false, 
+                    message: "Access denied. Only clients can reject milestones." 
+                });
+            }
+
+            const { project_id, milestone_index } = req.body;
+
+            if (!project_id || milestone_index === undefined) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "project_id and milestone_index are required" 
+                });
+            }
+
+            // Get project and verify client access
+            const project = await projectinfo.findById(project_id)
+                .populate('accepted_bid_id');
+            
+            if (!project) {
+                return res.status(404).json({ 
+                    status: false, 
+                    message: "Project not found" 
+                });
+            }
+
+            if (project.personid.toString() !== userId) {
+                return res.status(403).json({ 
+                    status: false, 
+                    message: "You can only reject milestones for your own projects" 
+                });
+            }
+
+            const bid = project.accepted_bid_id;
+            
+            // Validate milestone index
+            if (milestone_index >= bid.milestones.length || milestone_index < 0) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Invalid milestone index" 
+                });
+            }
+
+            const milestone = bid.milestones[milestone_index];
+
+            // Check if milestone is completed
+            if (milestone.is_completed !== 1) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Only completed milestones can be rejected" 
+                });
+            }
+
+            // Check if payment already released
+            if (milestone.payment_released === 1) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Cannot reject milestone with released payment" 
+                });
+            }
+
+            // Mark milestone as rejected (reset completion status)
+            bid.milestones[milestone_index].is_completed = 0;
+            bid.milestones[milestone_index].rejected_at = new Date().toISOString();
+            bid.milestones[milestone_index].rejection_reason = 'Client rejected the milestone completion';
+            
+            await bid.save();
+
+            console.log(`✅ Milestone ${milestone_index} rejected in project ${project_id}`);
+
+            return res.status(200).json({
+                status: true,
+                message: "Milestone rejected successfully. Freelancer will be notified to make necessary changes.",
+                data: {
+                    milestone_title: milestone.title,
+                    rejected_at: bid.milestones[milestone_index].rejected_at,
+                    status: 'rejected'
+                }
+            });
+
+        } catch (error) {
+            console.error("Error rejecting milestone:", error);
+            return res.status(500).json({ 
+                status: false, 
+                message: "Failed to reject milestone", 
+                error: error.message 
+            });
+        }
+    }
+
     // Modify milestone (by freelancer)
     async modifyMilestone(req, res) {
         try {
