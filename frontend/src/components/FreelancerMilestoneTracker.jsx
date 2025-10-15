@@ -17,9 +17,78 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
   const [showErrorModal, setShowErrorModal] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+  const [paymentStatus, setPaymentStatus] = useState(new Map())
+
+  // Helper function to get payment status key
+  const getPaymentStatusKey = () => `freelancer_payment_status_${projectId}`
+  
+  // Load payment status from localStorage
+  const loadPaymentStatus = () => {
+    try {
+      const stored = localStorage.getItem(getPaymentStatusKey())
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        setPaymentStatus(new Map(parsed))
+        console.log('📋 FreelancerMilestoneTracker: Loaded payment status:', parsed)
+      }
+    } catch (error) {
+      console.error('❌ FreelancerMilestoneTracker: Error loading payment status:', error)
+    }
+  }
+  
+  // Save payment status to localStorage
+  const savePaymentStatus = (status) => {
+    try {
+      localStorage.setItem(getPaymentStatusKey(), JSON.stringify([...status]))
+      console.log('💾 FreelancerMilestoneTracker: Saved payment status:', [...status])
+    } catch (error) {
+      console.error('❌ FreelancerMilestoneTracker: Error saving payment status:', error)
+    }
+  }
+  
+  // Update payment status for a milestone
+  const updatePaymentStatus = (milestoneIndex, status) => {
+    const newStatus = new Map(paymentStatus)
+    newStatus.set(milestoneIndex, {
+      ...status,
+      timestamp: new Date().toISOString()
+    })
+    setPaymentStatus(newStatus)
+    savePaymentStatus(newStatus)
+    console.log('✅ FreelancerMilestoneTracker: Updated payment status for milestone', milestoneIndex)
+  }
+  
+  // Get payment status for a milestone
+  const getPaymentStatus = (milestoneIndex) => {
+    return paymentStatus.get(milestoneIndex)
+  }
+  
+  // Simulate payment status check (in real app, this would be from backend)
+  const checkPaymentStatus = (milestone) => {
+    // Check if milestone is completed and payment should be processed
+    if (milestone.is_completed === 1 && milestone.payment_released === 0) {
+      // Simulate payment processing delay
+      setTimeout(() => {
+        updatePaymentStatus(milestone.index, {
+          status: 'processing',
+          message: 'Payment is being processed by the client'
+        })
+        
+        // Simulate payment completion after some time
+        setTimeout(() => {
+          updatePaymentStatus(milestone.index, {
+            status: 'completed',
+            message: 'Payment has been released to your account',
+            amount: milestone.amount
+          })
+        }, 5000) // 5 seconds delay
+      }, 2000) // 2 seconds delay
+    }
+  }
 
   useEffect(() => {
     if (projectId) {
+      loadPaymentStatus()
       fetchMilestones()
     }
   }, [projectId])
@@ -107,6 +176,10 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
         setSuccessMessage('Milestone completion submitted successfully! Waiting for client approval.')
         setShowSuccessModal(true)
         setShowCompletionModal(false)
+        
+        // Trigger payment status checking
+        checkPaymentStatus(selectedMilestone)
+        
         fetchMilestones() // Refresh milestones
       } else {
         setErrorMessage(result.message || 'Failed to complete milestone')
@@ -271,6 +344,20 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
                     <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(status)}`}>
                       {status.replace('_', ' ')}
                     </span>
+                    
+                    {/* Payment Status Display */}
+                    {getPaymentStatus(milestone.index) && (
+                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                        getPaymentStatus(milestone.index).status === 'completed'
+                          ? 'text-green-600 bg-green-100 border border-green-200'
+                          : getPaymentStatus(milestone.index).status === 'processing'
+                          ? 'text-blue-600 bg-blue-100 border border-blue-200'
+                          : 'text-gray-600 bg-gray-100 border border-gray-200'
+                      }`}>
+                        💰 {getPaymentStatus(milestone.index).status === 'completed' ? 'Paid' : 
+                             getPaymentStatus(milestone.index).status === 'processing' ? 'Processing' : 'Pending'}
+                      </span>
+                    )}
                     {overdue && (
                       <span className="px-2 py-1 rounded-full text-xs font-semibold text-red-600 bg-red-100 border border-red-200">
                         ⚠️ Overdue
@@ -322,6 +409,55 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
                         <div>
                           <p className="text-sm font-semibold text-blue-800 mb-1">Completion Notes</p>
                           <p className="text-sm text-blue-700">{milestone.completion_notes}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Payment Status Notification */}
+                  {getPaymentStatus(milestone.index) && (
+                    <div className={`mt-4 p-4 rounded-xl border ${
+                      getPaymentStatus(milestone.index).status === 'completed'
+                        ? 'bg-gradient-to-r from-green-50 to-green-100/50 border-green-200'
+                        : getPaymentStatus(milestone.index).status === 'processing'
+                        ? 'bg-gradient-to-r from-blue-50 to-blue-100/50 border-blue-200'
+                        : 'bg-gradient-to-r from-gray-50 to-gray-100/50 border-gray-200'
+                    }`}>
+                      <div className="flex items-start gap-2">
+                        <svg className={`w-5 h-5 mt-0.5 ${
+                          getPaymentStatus(milestone.index).status === 'completed'
+                            ? 'text-green-600'
+                            : getPaymentStatus(milestone.index).status === 'processing'
+                            ? 'text-blue-600'
+                            : 'text-gray-600'
+                        }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                        </svg>
+                        <div className="flex-1">
+                          <p className={`text-sm font-semibold mb-1 ${
+                            getPaymentStatus(milestone.index).status === 'completed'
+                              ? 'text-green-800'
+                              : getPaymentStatus(milestone.index).status === 'processing'
+                              ? 'text-blue-800'
+                              : 'text-gray-800'
+                          }`}>
+                            Payment Status: {getPaymentStatus(milestone.index).status === 'completed' ? 'Completed' : 
+                                           getPaymentStatus(milestone.index).status === 'processing' ? 'Processing' : 'Pending'}
+                          </p>
+                          <p className={`text-sm ${
+                            getPaymentStatus(milestone.index).status === 'completed'
+                              ? 'text-green-700'
+                              : getPaymentStatus(milestone.index).status === 'processing'
+                              ? 'text-blue-700'
+                              : 'text-gray-700'
+                          }`}>
+                            {getPaymentStatus(milestone.index).message}
+                          </p>
+                          {getPaymentStatus(milestone.index).amount && (
+                            <p className="text-sm font-semibold text-green-700 mt-1">
+                              Amount: ₹{getPaymentStatus(milestone.index).amount}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>

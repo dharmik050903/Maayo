@@ -14,6 +14,9 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
   const [payingMilestone, setPayingMilestone] = useState(null)
   const [alert, setAlert] = useState(null)
   const [submittedPayments, setSubmittedPayments] = useState(new Set())
+  const [paymentHistory, setPaymentHistory] = useState(new Map())
+  const [showPaymentDetails, setShowPaymentDetails] = useState(false)
+  const [selectedPayment, setSelectedPayment] = useState(null)
 
   // Note: This component does NOT redirect to dashboard after milestone payment success
   // Users stay on the current page (milestone management) after successful payments
@@ -54,6 +57,57 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
   const isPaymentSubmitted = (milestoneIndex) => {
     return submittedPayments.has(milestoneIndex)
   }
+  
+  const getPaymentHistoryKey = () => `payment_history_${projectId}`
+  
+  const loadPaymentHistory = () => {
+    try {
+      const stored = localStorage.getItem(getPaymentHistoryKey())
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        setPaymentHistory(new Map(parsed))
+        console.log('📋 ClientMilestoneReview: Loaded payment history:', parsed)
+      }
+    } catch (error) {
+      console.error('❌ ClientMilestoneReview: Error loading payment history:', error)
+    }
+  }
+  
+  const savePaymentHistory = (history) => {
+    try {
+      localStorage.setItem(getPaymentHistoryKey(), JSON.stringify([...history]))
+      console.log('💾 ClientMilestoneReview: Saved payment history:', [...history])
+    } catch (error) {
+      console.error('❌ ClientMilestoneReview: Error saving payment history:', error)
+    }
+  }
+  
+  const addPaymentRecord = (milestoneIndex, paymentData) => {
+    const newHistory = new Map(paymentHistory)
+    newHistory.set(milestoneIndex, {
+      ...paymentData,
+      timestamp: new Date().toISOString(),
+      status: 'submitted'
+    })
+    setPaymentHistory(newHistory)
+    savePaymentHistory(newHistory)
+    console.log('✅ ClientMilestoneReview: Added payment record for milestone', milestoneIndex)
+  }
+  
+  const getPaymentRecord = (milestoneIndex) => {
+    return paymentHistory.get(milestoneIndex)
+  }
+  
+  const showPaymentDetailsModal = (milestone) => {
+    const paymentRecord = getPaymentRecord(milestone.index)
+    if (paymentRecord) {
+      setSelectedPayment({
+        milestone: milestone,
+        payment: paymentRecord
+      })
+      setShowPaymentDetails(true)
+    }
+  }
 
   // Helper function to show custom alert
   const showAlert = (type, title, message) => {
@@ -82,6 +136,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
   useEffect(() => {
     if (projectId) {
       loadSubmittedPayments()
+      loadPaymentHistory()
       fetchMilestones()
     }
   }, [projectId])
@@ -204,9 +259,23 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                       // Check if manual processing is required
                       if (releaseResponse.data?.manual_processing_required) {
                         markPaymentAsSubmitted(milestone.index)
+                        addPaymentRecord(milestone.index, {
+                          amount: milestone.amount,
+                          milestone_title: milestone.title,
+                          payment_id: releaseResponse.data.payout_id,
+                          manual_processing: true,
+                          payment_details: releaseResponse.data.payment_details
+                        })
                         showAlert('warning', 'Payment Request Submitted', 'Your payment request has been submitted successfully. The payment will be processed manually by our team within 24-48 hours. You will receive a confirmation once the payment is completed.')
                         console.log('✅ ClientMilestoneReview: Manual processing required, payment request submitted')
                       } else {
+                        addPaymentRecord(milestone.index, {
+                          amount: milestone.amount,
+                          milestone_title: milestone.title,
+                          payment_id: releaseResponse.data.payout_id,
+                          manual_processing: false,
+                          status: 'completed'
+                        })
                         showAlert('success', 'Payment Successful', 'Payment processed successfully! Milestone approved and payment released to freelancer.')
                         console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
                       }
@@ -302,9 +371,23 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                       // Check if manual processing is required
                       if (releaseResponse.data?.manual_processing_required) {
                         markPaymentAsSubmitted(milestone.index)
+                        addPaymentRecord(milestone.index, {
+                          amount: milestone.amount,
+                          milestone_title: milestone.title,
+                          payment_id: releaseResponse.data.payout_id,
+                          manual_processing: true,
+                          payment_details: releaseResponse.data.payment_details
+                        })
                         showAlert('warning', 'Payment Request Submitted', 'Your payment request has been submitted successfully. The payment will be processed manually by our team within 24-48 hours. You will receive a confirmation once the payment is completed.')
                         console.log('✅ ClientMilestoneReview: Manual processing required, payment request submitted')
                       } else {
+                        addPaymentRecord(milestone.index, {
+                          amount: milestone.amount,
+                          milestone_title: milestone.title,
+                          payment_id: releaseResponse.data.payout_id,
+                          manual_processing: false,
+                          status: 'completed'
+                        })
                         showAlert('success', 'Payment Successful', 'Payment processed successfully! Milestone approved and payment released to freelancer.')
                         console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
                       }
@@ -361,9 +444,23 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
           // Check if manual processing is required
           if (releaseResponse.data?.manual_processing_required) {
             markPaymentAsSubmitted(milestone.index)
+            addPaymentRecord(milestone.index, {
+              amount: milestone.amount,
+              milestone_title: milestone.title,
+              payment_id: releaseResponse.data.payout_id,
+              manual_processing: true,
+              payment_details: releaseResponse.data.payment_details
+            })
             showAlert('warning', 'Payment Request Submitted', 'Your payment request has been submitted successfully. The payment will be processed manually by our team within 24-48 hours. You will receive a confirmation once the payment is completed.')
             console.log('✅ ClientMilestoneReview: Manual processing required, payment request submitted')
           } else {
+            addPaymentRecord(milestone.index, {
+              amount: milestone.amount,
+              milestone_title: milestone.title,
+              payment_id: releaseResponse.data.payout_id,
+              manual_processing: false,
+              status: 'completed'
+            })
             showAlert('success', 'Payment Released', 'Milestone payment released successfully!')
             console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
           }
@@ -622,7 +719,22 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <span className="text-sm font-medium">Payment Request Submitted - Processing Manually</span>
+                      <div className="flex-1">
+                        <span className="text-sm font-medium">Payment Request Submitted - Processing Manually</span>
+                        {getPaymentRecord(milestone.index) && (
+                          <div className="flex items-center justify-between mt-1">
+                            <div className="text-xs text-orange-600">
+                              Payment ID: {getPaymentRecord(milestone.index).payment_id}
+                            </div>
+                            <button
+                              onClick={() => showPaymentDetailsModal(milestone)}
+                              className="text-xs text-orange-700 hover:text-orange-800 underline"
+                            >
+                              View Details
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
                   
@@ -685,6 +797,82 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
           </div>
         )
       })}
+      
+      {/* Payment Details Modal */}
+      {showPaymentDetails && selectedPayment && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000] p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Payment Details</h3>
+              <button
+                onClick={() => setShowPaymentDetails(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-gray-600">Milestone</label>
+                <p className="text-gray-900">{selectedPayment.milestone.title}</p>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium text-gray-600">Amount</label>
+                <p className="text-gray-900 font-semibold">{formatCurrency(selectedPayment.payment.amount)}</p>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium text-gray-600">Payment ID</label>
+                <p className="text-gray-900 font-mono text-sm">{selectedPayment.payment.payment_id}</p>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium text-gray-600">Status</label>
+                <p className={`text-sm font-medium ${
+                  selectedPayment.payment.manual_processing 
+                    ? 'text-orange-600' 
+                    : 'text-green-600'
+                }`}>
+                  {selectedPayment.payment.manual_processing 
+                    ? 'Manual Processing Required' 
+                    : 'Payment Completed'
+                  }
+                </p>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium text-gray-600">Submitted At</label>
+                <p className="text-gray-900 text-sm">{formatDate(selectedPayment.payment.timestamp)}</p>
+              </div>
+              
+              {selectedPayment.payment.manual_processing && selectedPayment.payment.payment_details && (
+                <div className="bg-orange-50 p-4 rounded-lg">
+                  <h4 className="text-sm font-medium text-orange-800 mb-2">Payment Instructions</h4>
+                  <div className="text-xs text-orange-700 space-y-1">
+                    <p><strong>Freelancer:</strong> {selectedPayment.payment.payment_details.freelancer}</p>
+                    <p><strong>Account:</strong> {selectedPayment.payment.payment_details.account}</p>
+                    <p><strong>IFSC:</strong> {selectedPayment.payment.payment_details.ifsc}</p>
+                    <p><strong>Amount:</strong> {formatCurrency(selectedPayment.payment.payment_details.amount)}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setShowPaymentDetails(false)}
+                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
