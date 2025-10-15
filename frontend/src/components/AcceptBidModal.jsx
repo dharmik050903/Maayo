@@ -118,8 +118,9 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
         }
       }
 
-      const rzp = new window.Razorpay(razorpayOptions)
-      rzp.open()
+      // Use the proper Razorpay initialization function
+      // For custom handlers, we don't wait for a result - the handler manages the flow
+      await initializeRazorpay(razorpayOptions)
 
     } catch (error) {
       console.error('❌ Error accepting bid:', error)

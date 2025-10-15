@@ -52,10 +52,13 @@ export const initializeRazorpay = async (options) => {
         console.warn('⚠️ Environment variable VITE_RAZORPAY_KEY_ID not loaded, using fallback key')
       }
       
+      // Check if custom handler is provided
+      const hasCustomHandler = options.handler && typeof options.handler === 'function'
+      
       const razorpayOptions = {
         key: razorpayKey,
         ...options,
-        handler: function (response) {
+        handler: hasCustomHandler ? options.handler : function (response) {
           console.log('Payment successful:', response)
           resolve({
             success: true,
@@ -75,12 +78,22 @@ export const initializeRazorpay = async (options) => {
         modal: {
           ondismiss: function() {
             console.log('Payment modal dismissed')
-            resolve({
-              success: false,
-              error: 'Payment cancelled by user'
-            })
+            if (!hasCustomHandler) {
+              resolve({
+                success: false,
+                error: 'Payment cancelled by user'
+              })
+            }
           }
         }
+      }
+
+      // If custom handler is provided, don't resolve here - let the custom handler handle it
+      if (hasCustomHandler) {
+        const razorpay = new window.Razorpay(razorpayOptions)
+        razorpay.open()
+        // Don't resolve here - let the custom handler manage the flow
+        return
       }
 
       const razorpay = new window.Razorpay(razorpayOptions)
