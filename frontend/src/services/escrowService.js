@@ -495,7 +495,7 @@ export const escrowService = {
       
       return {
         status: true,
-        message: "Milestone payment released successfully",
+        message: data.message || "Milestone payment released successfully",
         data: data.data
       }
     } catch (error) {

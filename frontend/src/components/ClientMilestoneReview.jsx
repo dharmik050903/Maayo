@@ -320,8 +320,20 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                   )
                   
                     if (releaseResponse.status) {
-                      // Check if manual processing is required
-                      if (releaseResponse.data?.manual_processing_required) {
+                      // Check if automatic transfer was successful
+                      if (releaseResponse.data?.automatic_transfer) {
+                        markPaymentAsCompleted(milestone.index)
+                        addPaymentRecord(milestone.index, {
+                          amount: milestone.amount,
+                          milestone_title: milestone.title,
+                          payment_id: releaseResponse.data.payout_id,
+                          automatic_transfer: true,
+                          transfer_id: releaseResponse.data.payment_details?.transfer_id,
+                          status: 'transferred'
+                        })
+                        showAlert('success', 'Payment Transferred', 'Milestone payment has been automatically transferred to freelancer account!')
+                        console.log('✅ ClientMilestoneReview: Automatic transfer successful')
+                      } else if (releaseResponse.data?.manual_processing_required) {
                         markPaymentAsSubmitted(milestone.index)
                         addPaymentRecord(milestone.index, {
                           amount: milestone.amount,
@@ -432,8 +444,20 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                     )
                     
                     if (releaseResponse.status) {
-                      // Check if manual processing is required
-                      if (releaseResponse.data?.manual_processing_required) {
+                      // Check if automatic transfer was successful
+                      if (releaseResponse.data?.automatic_transfer) {
+                        markPaymentAsCompleted(milestone.index)
+                        addPaymentRecord(milestone.index, {
+                          amount: milestone.amount,
+                          milestone_title: milestone.title,
+                          payment_id: releaseResponse.data.payout_id,
+                          automatic_transfer: true,
+                          transfer_id: releaseResponse.data.payment_details?.transfer_id,
+                          status: 'transferred'
+                        })
+                        showAlert('success', 'Payment Transferred', 'Milestone payment has been automatically transferred to freelancer account!')
+                        console.log('✅ ClientMilestoneReview: Automatic transfer successful')
+                      } else if (releaseResponse.data?.manual_processing_required) {
                         markPaymentAsSubmitted(milestone.index)
                         addPaymentRecord(milestone.index, {
                           amount: milestone.amount,

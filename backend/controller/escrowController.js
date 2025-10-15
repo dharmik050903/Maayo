@@ -421,231 +421,153 @@ export default class EscrowController {
                 });
             }
 
-            console.log('🔍 Creating Razorpay payout...');
+            console.log('🔍 Creating automatic Razorpay transfer...');
             console.log('Razorpay instance:', razorpay);
-            console.log('Razorpay payouts:', razorpay.payouts);
+            console.log('Available Razorpay methods:', Object.keys(razorpay));
             
-            // Check if payouts API is available and try different approaches
+            // Try different approaches for automatic payment
             let payout = null;
+            let transferSuccess = false;
             
-            if (razorpay.payouts && razorpay.payouts.create) {
-                console.log('✅ Using razorpay.payouts.create');
+            // Approach 1: Try Razorpay Transfers API (Direct bank transfer)
+            if (razorpay.transfers && razorpay.transfers.create) {
+                console.log('✅ Attempting automatic transfer using Razorpay Transfers API...');
                 
-                // Since contacts API is not available, use direct fund account approach
-                console.log('🔍 Creating fund account directly (contacts API not available)...');
-                
-                const fundAccountData = {
-                    account_type: "bank_account",
-                    bank_account: {
-                        name: freelancerBankDetails.account_holder_name,
-                        ifsc: freelancerBankDetails.ifsc_code,
-                        account_number: freelancerBankDetails.account_number
-                    }
-                };
-                
-                let fundAccount = null;
                 try {
-                    fundAccount = await razorpay.fundAccount.create(fundAccountData);
-                    console.log('✅ Fund account created:', fundAccount.id);
-                } catch (fundAccountError) {
-                    console.log('⚠️ Fund account creation failed, trying to find existing:', fundAccountError.message);
-                    // Try to find existing fund account
-                    try {
-                        const fundAccounts = await razorpay.fundAccount.all();
-                        const existingFundAccount = fundAccounts.items.find(fa => 
-                            fa.bank_account && 
-                            fa.bank_account.account_number === freelancerBankDetails.account_number &&
-                            fa.bank_account.ifsc === freelancerBankDetails.ifsc_code
-                        );
-                        if (existingFundAccount) {
-                            fundAccount = existingFundAccount;
-                            console.log('✅ Found existing fund account:', fundAccount.id);
-                        } else {
-                            throw new Error('No existing fund account found');
-                        }
-                    } catch (findError) {
-                        console.log('❌ Could not find existing fund account:', findError.message);
-                        throw new Error('Failed to create or find fund account for freelancer');
-                    }
-                }
-                
-                // Create payout to freelancer (using Razorpay Payouts API)
-                const payoutData = {
-                    fund_account: {
-                        id: fundAccount.id
-                    },
-                    amount: Math.round(paymentAmount * 100), // Convert to paise
-                    currency: "INR",
-                    mode: "IMPS",
-                    purpose: "payout",
-                    queue_if_low_balance: true,
-                    reference_id: `milestone_${project_id}_${milestone_index}_${Date.now()}`,
-                    narration: `Milestone payment for project: ${project.title}`
-                };
-
-                console.log('Payout data:', {
-                    ...payoutData,
-                    fund_account: {
-                        ...payoutData.fund_account,
-                        bank_account: {
-                            ...payoutData.fund_account.bank_account,
-                            account_number: '***' + payoutData.fund_account.bank_account.account_number.slice(-4)
-                        }
-                    }
-                });
-
-                payout = await razorpay.payouts.create(payoutData);
-                
-            } else if (razorpay.fundAccount && razorpay.fundAccount.create) {
-                console.log('✅ Using razorpay.fundAccount.create (alternative approach)');
-                
-                // Alternative approach using fundAccount API
-                const fundAccountData = {
-                    account_type: "bank_account",
-                    bank_account: {
-                        name: freelancerBankDetails.account_holder_name,
-                        ifsc: freelancerBankDetails.ifsc_code,
-                        account_number: freelancerBankDetails.account_number
-                    }
-                };
-                
-                let fundAccount = null;
-                try {
-                    fundAccount = await razorpay.fundAccount.create(fundAccountData);
-                    console.log('✅ Fund account created:', fundAccount.id);
-                } catch (fundAccountError) {
-                    console.log('⚠️ Fund account creation failed:', fundAccountError.message);
-                    console.log('Fund account error details:', fundAccountError);
-                    
-                    // Since fundAccount.all() is not available, we'll proceed with manual processing
-                    console.log('❌ Cannot find existing fund accounts (API not available), proceeding with manual processing...');
-                    
-                    // Create a manual payment request for admin processing
-                    const manualPaymentRequest = {
-                        project_id: project_id,
-                        milestone_index: milestone_index,
-                        freelancer_id: bid.freelancer_id,
-                        amount: paymentAmount,
-                        bank_details: {
-                            account_holder_name: freelancerBankDetails.account_holder_name,
-                            account_number: freelancerBankDetails.account_number,
-                            ifsc_code: freelancerBankDetails.ifsc_code
-                        },
-                        status: 'pending',
-                        created_at: new Date().toISOString(),
-                        reference_id: `manual_${project_id}_${milestone_index}_${Date.now()}`
-                    };
-                    
-                    console.log('📝 Manual payment request created:', manualPaymentRequest);
-                    
-                    // Simulate a successful payout for milestone completion
-                    payout = {
-                        id: `manual_${Date.now()}`,
-                        status: 'pending_manual',
-                        amount: Math.round(paymentAmount * 100),
-                        reference_id: manualPaymentRequest.reference_id
-                    };
-                    
-                    console.log('⚠️ Manual payment processing required. Please process payment manually.');
-                    console.log('Payment details:', {
-                        freelancer: freelancerBankDetails.account_holder_name,
-                        account: freelancerBankDetails.account_number,
-                        ifsc: freelancerBankDetails.ifsc_code,
-                        amount: paymentAmount
-                    });
-                    
-                    // Skip the payout creation since we're using manual processing
-                    return res.status(200).json({
-                        status: true,
-                        message: "Milestone payment request created successfully. Manual processing required.",
-                        data: {
-                            payout_id: payout.id,
-                            amount: paymentAmount,
-                            milestone_title: milestone.title,
-                            payment_status: 'pending_manual',
-                            manual_processing_required: true,
-                            payment_details: {
-                                freelancer: freelancerBankDetails.account_holder_name,
-                                account: freelancerBankDetails.account_number,
-                                ifsc: freelancerBankDetails.ifsc_code,
-                                amount: paymentAmount
-                            }
-                        }
-                    });
-                }
-                
-                // Try different payout creation methods
-                if (razorpay.payouts && razorpay.payouts.create) {
-                    console.log('✅ Payouts API available, creating payout...');
-                    const payoutData = {
-                        fund_account: {
-                            id: fundAccount.id
-                        },
-                        amount: Math.round(paymentAmount * 100),
-                        currency: "INR",
-                        mode: "IMPS",
-                        purpose: "payout",
-                        queue_if_low_balance: true,
-                        reference_id: `milestone_${project_id}_${milestone_index}_${Date.now()}`,
-                        narration: `Milestone payment for project: ${project.title}`
-                    };
-                    
-                    payout = await razorpay.payouts.create(payoutData);
-                } else if (razorpay.transfers && razorpay.transfers.create) {
-                    console.log('✅ Using transfers API as fallback...');
                     const transferData = {
-                        amount: Math.round(paymentAmount * 100),
+                        amount: Math.round(paymentAmount * 100), // Convert to paise
                         currency: "INR",
                         account: freelancerBankDetails.account_number,
                         notes: {
                             milestone: milestone.title,
                             project: project.title,
                             milestone_index: milestone_index.toString(),
-                            project_id: project_id
+                            project_id: project_id,
+                            freelancer_name: freelancerBankDetails.account_holder_name,
+                            freelancer_ifsc: freelancerBankDetails.ifsc_code,
+                            payment_type: 'automatic_milestone_payment'
                         }
                     };
-                    
+
+                    console.log('Transfer data:', {
+                        ...transferData,
+                        account: '***' + transferData.account.slice(-4) // Hide account number
+                    });
+
                     payout = await razorpay.transfers.create(transferData);
-                } else {
-                    console.log('❌ No payout method available, creating manual payment request...');
+                    transferSuccess = true;
+                    console.log('✅ Automatic transfer created successfully:', payout.id);
                     
-                    // Create a manual payment request for admin processing
-                    const manualPaymentRequest = {
-                        project_id: project_id,
-                        milestone_index: milestone_index,
-                        freelancer_id: bid.freelancer_id,
-                        amount: paymentAmount,
-                        bank_details: {
-                            account_holder_name: freelancerBankDetails.account_holder_name,
-                            account_number: freelancerBankDetails.account_number,
-                            ifsc_code: freelancerBankDetails.ifsc_code
-                        },
-                        status: 'pending',
-                        created_at: new Date().toISOString(),
-                        reference_id: `manual_${project_id}_${milestone_index}_${Date.now()}`
-                    };
+                } catch (transferError) {
+                    console.log('⚠️ Transfer creation failed:', transferError.message);
+                    if (transferError.error) {
+                        console.log('Transfer error details:', transferError.error);
+                    }
                     
-                    // Store in database for manual processing
-                    // You can create a new collection for manual payments
-                    console.log('📝 Manual payment request created:', manualPaymentRequest);
-                    
-                    // For now, simulate a successful payout
-                    payout = {
-                        id: `manual_${Date.now()}`,
-                        status: 'pending_manual',
-                        amount: Math.round(paymentAmount * 100),
-                        reference_id: manualPaymentRequest.reference_id
-                    };
-                    
-                    console.log('⚠️ Manual payment processing required. Please process payment manually.');
+                    // If transfer fails due to feature not enabled, try alternative approach
+                    if (transferError.error && transferError.error.description && 
+                        transferError.error.description.includes('not enabled')) {
+                        console.log('🔄 Transfers not enabled, trying alternative approach...');
+                        transferSuccess = false;
+                    } else {
+                        throw transferError;
+                    }
                 }
+            }
+            
+            // Approach 2: Try Razorpay Payouts API (if transfers failed)
+            if (!transferSuccess && razorpay.payouts && razorpay.payouts.create) {
+                console.log('✅ Attempting automatic payout using Razorpay Payouts API...');
                 
-            } else {
-                console.log('❌ No suitable payout method available');
+                try {
+                    const payoutData = {
+                        account_number: freelancerBankDetails.account_number,
+                        fund_account: {
+                            account_type: "bank_account",
+                            bank_account: {
+                                name: freelancerBankDetails.account_holder_name,
+                                ifsc: freelancerBankDetails.ifsc_code,
+                                account_number: freelancerBankDetails.account_number
+                            }
+                        },
+                        amount: Math.round(paymentAmount * 100), // Convert to paise
+                        currency: "INR",
+                        mode: "IMPS",
+                        purpose: "payout",
+                        queue_if_low_balance: true,
+                        reference_id: `milestone_${project_id}_${milestone_index}_${Date.now()}`,
+                        narration: `Automatic milestone payment for project: ${project.title}`
+                    };
+
+                    console.log('Payout data:', {
+                        ...payoutData,
+                        account_number: '***' + payoutData.account_number.slice(-4)
+                    });
+
+                    payout = await razorpay.payouts.create(payoutData);
+                    transferSuccess = true;
+                    console.log('✅ Automatic payout created successfully:', payout.id);
+                    
+                } catch (payoutError) {
+                    console.log('⚠️ Payout creation failed:', payoutError.message);
+                    if (payoutError.error) {
+                        console.log('Payout error details:', payoutError.error);
+                    }
+                    transferSuccess = false;
+                }
+            }
+            
+            // Approach 3: Fallback to Orders API (if both transfers and payouts fail)
+            if (!transferSuccess && razorpay.orders && razorpay.orders.create) {
+                console.log('⚠️ Transfers/Payouts not available, using Orders API as fallback...');
+                
+                const orderData = {
+                    amount: Math.round(paymentAmount * 100), // Convert to paise
+                    currency: "INR",
+                    receipt: `milestone_${project_id}_${milestone_index}_${Date.now()}`,
+                    notes: {
+                        milestone: milestone.title,
+                        project: project.title,
+                        milestone_index: milestone_index.toString(),
+                        project_id: project_id,
+                        freelancer_name: freelancerBankDetails.account_holder_name,
+                        freelancer_account: freelancerBankDetails.account_number,
+                        freelancer_ifsc: freelancerBankDetails.ifsc_code,
+                        payment_type: 'milestone_payment_manual_required'
+                    }
+                };
+
+                console.log('Order data:', {
+                    ...orderData,
+                    notes: {
+                        ...orderData.notes,
+                        freelancer_account: '***' + orderData.notes.freelancer_account.slice(-4)
+                    }
+                });
+
+                const order = await razorpay.orders.create(orderData);
+                console.log('✅ Razorpay order created successfully:', order.id);
+                
+                // Create a simulated payout for tracking
+                payout = {
+                    id: `order_${order.id}`,
+                    status: 'pending_manual',
+                    amount: order.amount,
+                    order_id: order.id,
+                    reference_id: order.receipt,
+                    manual_processing_required: true
+                };
+
+                console.log('⚠️ Manual processing required - order created for admin processing');
+            }
+            
+            // If all approaches fail
+            if (!payout) {
+                console.log('❌ All payment methods failed');
                 console.log('Available Razorpay methods:', Object.keys(razorpay));
                 return res.status(500).json({ 
                     status: false, 
-                    message: "Payouts API not available. Please check Razorpay SDK version and configuration." 
+                    message: "Unable to process automatic payment. Please check Razorpay configuration and enable transfers/payouts." 
                 });
             }
             console.log('✅ Razorpay payout created successfully:', {
@@ -668,11 +590,11 @@ export default class EscrowController {
             console.log('🔍 Creating payment history record...');
             await PaymentHistory.create({
                 userId: bid.freelancer_id,
-                orderId: payout.reference_id,
+                orderId: payout.order_id || payout.id, // Use order ID if available
                 paymentId: payout.id,
                 amount: paymentAmount,
                 currency: 'INR',
-                status: payout.status === 'pending_manual' ? 'pending' : 'paid',
+                status: transferSuccess ? 'paid' : (payout.manual_processing_required ? 'pending' : 'processed'),
                 createdAt: new Date()
             });
             console.log('✅ Payment history record created');
@@ -680,11 +602,30 @@ export default class EscrowController {
             console.log('🎉 Milestone payment released successfully');
             return res.status(200).json({
                 status: true,
-                message: "Milestone payment released successfully",
+                message: transferSuccess ? 
+                    "Milestone payment released automatically to freelancer account" : 
+                    (payout.manual_processing_required ? 
+                        "Milestone payment request created. Manual processing required." : 
+                        "Milestone payment processed successfully"),
                 data: {
                     payout_id: payout.id,
                     amount: paymentAmount,
-                    milestone_title: milestone.title
+                    milestone_title: milestone.title,
+                    payment_status: transferSuccess ? 'transferred' : (payout.manual_processing_required ? 'pending_manual' : 'processed'),
+                    automatic_transfer: transferSuccess,
+                    payment_details: transferSuccess ? {
+                        freelancer: freelancerBankDetails.account_holder_name,
+                        account: '***' + freelancerBankDetails.account_number.slice(-4),
+                        ifsc: freelancerBankDetails.ifsc_code,
+                        amount: paymentAmount,
+                        transfer_id: payout.id
+                    } : (payout.manual_processing_required ? {
+                        freelancer: freelancerBankDetails.account_holder_name,
+                        account: freelancerBankDetails.account_number,
+                        ifsc: freelancerBankDetails.ifsc_code,
+                        amount: paymentAmount,
+                        order_id: payout.order_id
+                    } : null)
                 }
             });
 

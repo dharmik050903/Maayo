@@ -47,7 +47,14 @@ const EscrowStatus = ({ projectId }) => {
       const result = await escrowService.releaseMilestonePayment(projectId, milestoneIndex)
       
       if (result.status) {
-        showAlert('success', 'Payment Released', 'Milestone payment released successfully!')
+        // Show different messages based on payment type
+        if (result.data?.automatic_transfer) {
+          showAlert('success', 'Payment Transferred', 'Milestone payment has been automatically transferred to freelancer account!')
+        } else if (result.data?.manual_processing_required) {
+          showAlert('warning', 'Payment Submitted', 'Milestone payment request submitted. Manual processing required.')
+        } else {
+          showAlert('success', 'Payment Released', result.message || 'Milestone payment released successfully!')
+        }
         fetchEscrowStatus() // Refresh data
       }
     } catch (error) {
