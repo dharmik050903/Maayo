@@ -221,7 +221,12 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
           return 'completed' // Manual payment release
         }
       } else {
-        return 'pending_approval' // Completed but payment not released yet
+        // Check if payment has been initiated
+        if (milestone.payment_initiated === true) {
+          return 'payment_initiated' // Payment initiated but not yet released
+        } else {
+          return 'pending_approval' // Completed but payment not released yet
+        }
       }
     }
     
@@ -237,6 +242,8 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
     switch (status) {
       case 'auto_paid': return 'text-green-700 bg-green-200' // Different color for auto-payments
       case 'completed': return 'text-green-600 bg-green-100'
+      case 'manual_processing': return 'text-orange-600 bg-orange-100' // Orange for manual processing
+      case 'payment_initiated': return 'text-blue-700 bg-blue-200' // Blue for payment initiated
       case 'pending_approval': return 'text-yellow-600 bg-yellow-100'
       case 'rejected': return 'text-red-600 bg-red-100'
       case 'in_progress': return 'text-blue-600 bg-blue-100'
@@ -248,6 +255,8 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
     switch (status) {
       case 'auto_paid': return '🤖' // Auto-payment icon
       case 'completed': return '✅'
+      case 'manual_processing': return '⏳' // Clock icon for manual processing
+      case 'payment_initiated': return '💳' // Credit card icon for payment initiated
       case 'pending_approval': return '⏳'
       case 'rejected': return '❌'
       case 'in_progress': return '🔄'
@@ -350,6 +359,8 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
                   ? 'bg-gradient-to-r from-green-400 to-green-600' 
                   : status === 'pending_approval'
                   ? 'bg-gradient-to-r from-yellow-400 to-yellow-600'
+                  : status === 'payment_initiated'
+                  ? 'bg-gradient-to-r from-blue-400 to-blue-600'
                   : status === 'rejected'
                   ? 'bg-gradient-to-r from-red-400 to-red-600'
                   : 'bg-gradient-to-r from-gray-300 to-gray-400'
@@ -364,6 +375,8 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
                     ? 'bg-gradient-to-r from-green-100 to-green-200'
                     : status === 'pending_approval'
                     ? 'bg-gradient-to-r from-yellow-100 to-yellow-200'
+                    : status === 'payment_initiated'
+                    ? 'bg-gradient-to-r from-blue-100 to-blue-200'
                     : status === 'rejected'
                     ? 'bg-gradient-to-r from-red-100 to-red-200'
                     : 'bg-gradient-to-r from-gray-100 to-gray-200'
@@ -531,6 +544,21 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
                       </div>
                       <div className="text-yellow-700 text-sm font-semibold mb-1">Pending Approval</div>
                       <div className="text-xs text-yellow-600">Waiting for client review</div>
+                    </div>
+                  )}
+
+                  {status === 'payment_initiated' && (
+                    <div className="text-center p-4 bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-xl border border-blue-200">
+                      <div className="w-12 h-12 bg-gradient-to-r from-blue-200 to-blue-300 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg className="w-6 h-6 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                      </div>
+                      <div className="text-blue-700 text-sm font-semibold mb-1">Payment Initiated</div>
+                      <div className="text-xs text-blue-600 mb-2">Client has approved and initiated payment</div>
+                      <div className="text-xs text-blue-500">
+                        💳 Payment will be credited to your account within 1-2 business days
+                      </div>
                     </div>
                   )}
                   

@@ -166,6 +166,13 @@ export default class MilestoneController {
                 });
             }
 
+            // Mark milestone as payment initiated (before actual payment processing)
+            bid.milestones[milestone_index].payment_initiated = true;
+            bid.milestones[milestone_index].payment_initiated_at = new Date().toISOString();
+            await bid.save();
+
+            console.log(`🔄 Payment initiated for milestone ${milestone_index} in project ${project_id}`);
+
             // Trigger payment release for approved milestone
             let paymentResult = null;
             try {

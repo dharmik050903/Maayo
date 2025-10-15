@@ -1102,6 +1102,12 @@ export default class EscrowController {
             bid.milestones[milestoneIndex].payment_released_at = new Date().toISOString();
             bid.milestones[milestoneIndex].auto_released = payoutSuccess; // Only true if payout succeeded
             
+            // Update payment initiated status if not already set
+            if (!bid.milestones[milestoneIndex].payment_initiated) {
+                bid.milestones[milestoneIndex].payment_initiated = true;
+                bid.milestones[milestoneIndex].payment_initiated_at = new Date().toISOString();
+            }
+            
             await bid.save();
 
             // Create payment history record
