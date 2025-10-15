@@ -252,10 +252,19 @@ export default class EscrowController {
     // Release milestone payment
     async releaseMilestonePayment(req, res) {
         try {
+            console.log('🔍 Starting milestone payment release process...');
+            console.log('Request headers:', {
+                user_role: req.headers.user_role,
+                user_id: req.headers.id,
+                user_email: req.headers.user_email
+            });
+            console.log('Request body:', req.body);
+
             const userRole = req.headers.user_role;
             const userId = req.headers.id;
 
             if (userRole !== 'client') {
+                console.log('❌ Access denied: User role is not client');
                 return res.status(403).json({ 
                     status: false, 
                     message: "Access denied. Only clients can release milestone payments." 
@@ -265,24 +274,36 @@ export default class EscrowController {
             const { project_id, milestone_index } = req.body;
 
             if (!project_id || milestone_index === undefined) {
+                console.log('❌ Missing required parameters:', { project_id, milestone_index });
                 return res.status(400).json({ 
                     status: false, 
                     message: "project_id and milestone_index are required" 
                 });
             }
 
+            console.log('🔍 Fetching project with ID:', project_id);
             // Get project with accepted bid
             const project = await projectinfo.findById(project_id)
                 .populate('accepted_bid_id');
             
             if (!project) {
+                console.log('❌ Project not found:', project_id);
                 return res.status(404).json({ 
                     status: false, 
                     message: "Project not found" 
                 });
             }
 
+            console.log('✅ Project found:', {
+                project_id: project._id,
+                title: project.title,
+                escrow_status: project.escrow_status,
+                personid: project.personid,
+                userId: userId
+            });
+
             if (project.personid.toString() !== userId) {
+                console.log('❌ User not authorized for this project');
                 return res.status(403).json({ 
                     status: false, 
                     message: "You can only release payments for your own projects" 
@@ -291,6 +312,7 @@ export default class EscrowController {
 
             // Check if escrow is completed
             if (project.escrow_status !== 'completed') {
+                console.log('❌ Escrow not completed. Current status:', project.escrow_status);
                 return res.status(400).json({ 
                     status: false, 
                     message: "Escrow payment must be completed before releasing milestone payments" 
@@ -298,7 +320,26 @@ export default class EscrowController {
             }
 
             const bid = project.accepted_bid_id;
-            if (!bid || !bid.milestones || milestone_index >= bid.milestones.length) {
+            if (!bid) {
+                console.log('❌ No accepted bid found for project');
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "No accepted bid found for this project" 
+                });
+            }
+
+            console.log('✅ Accepted bid found:', {
+                bid_id: bid._id,
+                freelancer_id: bid.freelancer_id,
+                milestones_count: bid.milestones ? bid.milestones.length : 0,
+                milestone_index: milestone_index
+            });
+
+            if (!bid.milestones || milestone_index >= bid.milestones.length) {
+                console.log('❌ Invalid milestone index:', {
+                    milestone_index,
+                    milestones_length: bid.milestones ? bid.milestones.length : 0
+                });
                 return res.status(400).json({ 
                     status: false, 
                     message: "Invalid milestone index" 
@@ -306,9 +347,16 @@ export default class EscrowController {
             }
 
             const milestone = bid.milestones[milestone_index];
+            console.log('✅ Milestone found:', {
+                title: milestone.title,
+                amount: milestone.amount,
+                is_completed: milestone.is_completed,
+                payment_released: milestone.payment_released
+            });
             
             // Check if milestone is completed
             if (milestone.is_completed !== 1) {
+                console.log('❌ Milestone not completed');
                 return res.status(400).json({ 
                     status: false, 
                     message: "Milestone must be completed before releasing payment" 
@@ -317,6 +365,7 @@ export default class EscrowController {
 
             // Check if payment already released
             if (milestone.payment_released === 1) {
+                console.log('❌ Payment already released for this milestone');
                 return res.status(400).json({ 
                     status: false, 
                     message: "Payment for this milestone has already been released" 
@@ -328,12 +377,14 @@ export default class EscrowController {
             
             // Validate payment amount
             if (!paymentAmount || paymentAmount <= 0) {
+                console.log('❌ Invalid milestone amount:', paymentAmount);
                 return res.status(400).json({ 
                     status: false, 
                     message: "Invalid milestone amount" 
                 });
             }
 
+            console.log('🔍 Fetching freelancer bank details for user:', bid.freelancer_id);
             // Get freelancer's bank details
             const freelancerBankDetails = await BankDetails.findOne({
                 user_id: bid.freelancer_id,
@@ -342,12 +393,29 @@ export default class EscrowController {
             });
 
             if (!freelancerBankDetails) {
+                console.log('❌ Freelancer bank details not found for user:', bid.freelancer_id);
                 return res.status(400).json({ 
                     status: false, 
                     message: "Freelancer bank details not found" 
                 });
             }
 
+            console.log('✅ Freelancer bank details found:', {
+                account_holder_name: freelancerBankDetails.account_holder_name,
+                account_number: freelancerBankDetails.account_number,
+                ifsc_code: freelancerBankDetails.ifsc_code
+            });
+
+            // Validate Razorpay configuration
+            if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+                console.log('❌ Razorpay configuration missing');
+                return res.status(500).json({ 
+                    status: false, 
+                    message: "Payment service configuration error" 
+                });
+            }
+
+            console.log('🔍 Creating Razorpay payout...');
             // Create payout to freelancer (using Razorpay Payouts API)
             const payoutData = {
                 account_number: freelancerBankDetails.account_number,
@@ -368,7 +436,23 @@ export default class EscrowController {
                 narration: `Milestone payment for project: ${project.title}`
             };
 
+            console.log('Payout data:', {
+                ...payoutData,
+                fund_account: {
+                    ...payoutData.fund_account,
+                    bank_account: {
+                        ...payoutData.fund_account.bank_account,
+                        account_number: '***' + payoutData.fund_account.bank_account.account_number.slice(-4)
+                    }
+                }
+            });
+
             const payout = await razorpay.payouts.create(payoutData);
+            console.log('✅ Razorpay payout created successfully:', {
+                payout_id: payout.id,
+                status: payout.status,
+                amount: payout.amount
+            });
 
             // Update milestone with payment information
             bid.milestones[milestone_index].payment_released = 1;
@@ -376,9 +460,12 @@ export default class EscrowController {
             bid.milestones[milestone_index].payment_id = payout.id;
             bid.milestones[milestone_index].payment_released_at = new Date().toISOString();
             
+            console.log('🔍 Saving bid with updated milestone...');
             await bid.save();
+            console.log('✅ Bid saved successfully');
 
             // Create payment history record
+            console.log('🔍 Creating payment history record...');
             await PaymentHistory.create({
                 userId: bid.freelancer_id,
                 orderId: payout.reference_id,
@@ -388,7 +475,9 @@ export default class EscrowController {
                 status: 'paid',
                 createdAt: new Date()
             });
+            console.log('✅ Payment history record created');
 
+            console.log('🎉 Milestone payment released successfully');
             return res.status(200).json({
                 status: true,
                 message: "Milestone payment released successfully",
@@ -400,11 +489,162 @@ export default class EscrowController {
             });
 
         } catch (error) {
-            console.error("Error releasing milestone payment:", error);
+            console.error("❌ Error releasing milestone payment:", error);
+            console.error("Error details:", {
+                message: error.message,
+                stack: error.stack,
+                name: error.name
+            });
+            
+            // Check if it's a Razorpay specific error
+            if (error.error) {
+                console.error("Razorpay error details:", error.error);
+            }
+            
             return res.status(500).json({ 
                 status: false, 
                 message: "Failed to release milestone payment", 
-                error: error.message 
+                error: error.message,
+                details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+            });
+        }
+    }
+
+    // Debug endpoint for milestone payment troubleshooting
+    async debugMilestonePayment(req, res) {
+        try {
+            const { project_id, milestone_index } = req.body;
+            const userId = req.headers.id;
+            const userRole = req.headers.user_role;
+
+            console.log('🔍 Debug milestone payment request:', {
+                project_id,
+                milestone_index,
+                userId,
+                userRole
+            });
+
+            if (!project_id) {
+                return res.status(400).json({
+                    status: false,
+                    message: "project_id is required for debugging"
+                });
+            }
+
+            // Get project with accepted bid
+            const project = await projectinfo.findById(project_id)
+                .populate('accepted_bid_id')
+                .populate('personid', 'first_name last_name email');
+
+            if (!project) {
+                return res.status(404).json({
+                    status: false,
+                    message: "Project not found",
+                    debug_info: { project_id }
+                });
+            }
+
+            const bid = project.accepted_bid_id;
+            let milestone = null;
+            let milestoneError = null;
+
+            if (bid && bid.milestones && milestone_index !== undefined) {
+                if (milestone_index >= 0 && milestone_index < bid.milestones.length) {
+                    milestone = bid.milestones[milestone_index];
+                } else {
+                    milestoneError = `Invalid milestone index: ${milestone_index}. Available milestones: 0-${bid.milestones.length - 1}`;
+                }
+            }
+
+            // Get freelancer bank details
+            let bankDetails = null;
+            let bankDetailsError = null;
+            
+            if (bid && bid.freelancer_id) {
+                try {
+                    bankDetails = await BankDetails.findOne({
+                        user_id: bid.freelancer_id,
+                        is_active: 1,
+                        is_primary: 1
+                    });
+                    
+                    if (!bankDetails) {
+                        bankDetailsError = "No active primary bank details found for freelancer";
+                    }
+                } catch (error) {
+                    bankDetailsError = `Error fetching bank details: ${error.message}`;
+                }
+            }
+
+            // Check Razorpay configuration
+            const razorpayConfig = {
+                key_id: process.env.RAZORPAY_KEY_ID ? 'Set' : 'Not Set',
+                key_secret: process.env.RAZORPAY_KEY_SECRET ? 'Set' : 'Not Set',
+                key_type: process.env.RAZORPAY_KEY_ID ? 
+                    (process.env.RAZORPAY_KEY_ID.startsWith('rzp_test_') ? 'Test' : 'Live') : 'Unknown'
+            };
+
+            const debugInfo = {
+                project: {
+                    id: project._id,
+                    title: project.title,
+                    escrow_status: project.escrow_status,
+                    escrow_amount: project.escrow_amount,
+                    personid: project.personid,
+                    client_name: project.personid ? `${project.personid.first_name} ${project.personid.last_name}` : 'Unknown'
+                },
+                bid: bid ? {
+                    id: bid._id,
+                    freelancer_id: bid.freelancer_id,
+                    bid_amount: bid.bid_amount,
+                    status: bid.status,
+                    milestones_count: bid.milestones ? bid.milestones.length : 0,
+                    milestones: bid.milestones ? bid.milestones.map((m, index) => ({
+                        index,
+                        title: m.title,
+                        amount: m.amount,
+                        is_completed: m.is_completed,
+                        payment_released: m.payment_released,
+                        payment_id: m.payment_id
+                    })) : []
+                } : null,
+                milestone: milestone ? {
+                    title: milestone.title,
+                    amount: milestone.amount,
+                    is_completed: milestone.is_completed,
+                    payment_released: milestone.payment_released,
+                    payment_id: milestone.payment_id,
+                    payment_released_at: milestone.payment_released_at
+                } : null,
+                milestone_error: milestoneError,
+                bank_details: bankDetails ? {
+                    account_holder_name: bankDetails.account_holder_name,
+                    account_number: '***' + bankDetails.account_number.slice(-4),
+                    ifsc_code: bankDetails.ifsc_code,
+                    is_active: bankDetails.is_active,
+                    is_primary: bankDetails.is_primary
+                } : null,
+                bank_details_error: bankDetailsError,
+                razorpay_config: razorpayConfig,
+                user_info: {
+                    user_id: userId,
+                    user_role: userRole,
+                    is_project_owner: project.personid ? project.personid._id.toString() === userId : false
+                }
+            };
+
+            return res.status(200).json({
+                status: true,
+                message: "Debug information retrieved successfully",
+                debug_info: debugInfo
+            });
+
+        } catch (error) {
+            console.error("Error in debug endpoint:", error);
+            return res.status(500).json({
+                status: false,
+                message: "Debug endpoint error",
+                error: error.message
             });
         }
     }

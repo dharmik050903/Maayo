@@ -129,6 +129,7 @@ router.post("/escrow/verify", auth, escrowController.verifyEscrowPayment);
 router.post("/escrow/release-milestone", auth, escrowController.releaseMilestonePayment);
 router.post("/escrow/status", auth, escrowController.getEscrowStatus);
 router.post("/escrow/reset", auth, escrowController.resetEscrowStatus);
+router.post("/escrow/debug-milestone", auth, escrowController.debugMilestonePayment);
 
 // Milestone Management routes
 router.post("/milestone/complete", auth, milestoneController.completeMilestone);
