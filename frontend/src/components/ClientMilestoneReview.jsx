@@ -192,6 +192,35 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
           }
   }
 
+  const handleApproveMilestone = async (milestone) => {
+    try {
+      console.log('🔄 ClientMilestoneReview: Approving milestone:', milestone)
+      setPayingMilestone(milestone.index)
+      
+      const approveResponse = await escrowService.approveMilestone(projectId, milestone.index)
+      
+      if (approveResponse.status) {
+        addPaymentRecord(milestone.index, {
+          amount: milestone.amount,
+          milestone_title: milestone.title,
+          payment_id: approveResponse.data.payment_result?.payout_id || 'approved',
+          manual_processing: false,
+          status: 'completed'
+        })
+        showAlert('success', 'Milestone Approved & Payment Made Successfully', '🎉 Milestone approved and payment released to freelancer successfully!')
+        console.log('✅ ClientMilestoneReview: Milestone approved and payment released')
+        fetchMilestones(true) // Force refresh milestones
+      } else {
+        showAlert('error', 'Approval Failed', 'Failed to approve milestone: ' + approveResponse.message)
+      }
+    } catch (error) {
+      console.error('❌ ClientMilestoneReview: Error approving milestone:', error)
+      showAlert('error', 'Approval Failed', error.message || 'Failed to approve milestone')
+    } finally {
+      setPayingMilestone(null)
+    }
+  }
+
   const handlePayMilestone = async (milestone) => {
     try {
       console.log('💳 ClientMilestoneReview: Processing milestone payment for:', milestone.index)
@@ -276,7 +305,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                           manual_processing: false,
                           status: 'completed'
                         })
-                        showAlert('success', 'Payment Successful', 'Payment processed successfully! Milestone approved and payment released to freelancer.')
+                        showAlert('success', 'Payment Made Successfully', '🎉 Payment processed successfully! Milestone approved and payment released to freelancer.')
                         console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
                       }
                       fetchMilestones(true) // Force refresh milestones
@@ -388,7 +417,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                           manual_processing: false,
                           status: 'completed'
                         })
-                        showAlert('success', 'Payment Successful', 'Payment processed successfully! Milestone approved and payment released to freelancer.')
+                        showAlert('success', 'Payment Made Successfully', '🎉 Payment processed successfully! Milestone approved and payment released to freelancer.')
                         console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
                       }
                       fetchMilestones(true) // Force refresh milestones
@@ -461,7 +490,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
               manual_processing: false,
               status: 'completed'
             })
-            showAlert('success', 'Payment Released', 'Milestone payment released successfully!')
+            showAlert('success', 'Payment Made Successfully', '🎉 Milestone payment released successfully!')
             console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
           }
           fetchMilestones(true) // Force refresh milestones
@@ -697,11 +726,32 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
               <div className="flex flex-col sm:flex-row lg:flex-col gap-4 w-full lg:w-auto lg:min-w-[200px]">
                 <div className="flex-1 lg:flex-none">
                   {status === 'pending_approval' && (
-                    <div className="flex items-center gap-3 text-yellow-700 p-4 rounded-2xl bg-gradient-to-r from-yellow-50 to-yellow-100/50 border border-yellow-200">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span className="text-sm font-medium">Waiting for your approval</span>
+                    <div className="flex flex-col gap-3 text-yellow-700 p-4 rounded-2xl bg-gradient-to-r from-yellow-50 to-yellow-100/50 border border-yellow-200">
+                      <div className="flex items-center gap-3">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-sm font-medium">Waiting for your approval</span>
+                      </div>
+                      <button
+                        onClick={() => handleApproveMilestone(milestone)}
+                        disabled={payingMilestone === milestone.index}
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold flex items-center justify-center gap-2"
+                      >
+                        {payingMilestone === milestone.index ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                            Approving...
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Approve & Pay Milestone
+                          </>
+                        )}
+                      </button>
                     </div>
                   )}
                   

@@ -591,10 +591,17 @@ export const escrowService = {
       const data = await response.json()
       console.log('Milestone completed successfully:', data)
       
+      // Check if automatic payment release was triggered
+      const hasAutoRelease = data.auto_release_result
+      if (hasAutoRelease) {
+        console.log('🔄 Automatic payment release result:', hasAutoRelease)
+      }
+      
       return {
         status: true,
         message: "Milestone completed successfully",
-        data: data.data
+        data: data.data,
+        auto_release_result: hasAutoRelease
       }
     } catch (error) {
       console.error('Error completing milestone:', error)
@@ -841,6 +848,104 @@ export const escrowService = {
       }
     } catch (error) {
       console.error('Error updating project price:', error)
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        throw new Error('Unable to connect to server. Please check if the backend is running.')
+      }
+      throw error
+    }
+  },
+
+  /**
+   * Approve milestone and release payment (client only)
+   * @param {string} projectId - Project ID
+   * @param {number} milestoneIndex - Milestone index
+   * @returns {Promise<Object>} Approval response
+   */
+  async approveMilestone(projectId, milestoneIndex) {
+    try {
+      console.log('Approving milestone:', { projectId, milestoneIndex })
+      
+      const response = await authenticatedFetch(`${API_BASE_URL}/milestone/approve`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          project_id: projectId,
+          milestone_index: milestoneIndex
+        })
+      })
+
+      if (!response.ok) {
+        let errorMessage = 'Failed to approve milestone'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.message || errorMessage
+        } catch (parseError) {
+          errorMessage = `Server error: ${response.status} ${response.statusText}`
+        }
+        throw new Error(errorMessage)
+      }
+
+      const data = await response.json()
+      console.log('Milestone approved successfully:', data)
+      
+      return {
+        status: true,
+        message: "Milestone approved successfully",
+        data: data.data
+      }
+    } catch (error) {
+      console.error('Error approving milestone:', error)
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        throw new Error('Unable to connect to server. Please check if the backend is running.')
+      }
+      throw error
+    }
+  },
+
+  /**
+   * Check payment status for a milestone
+   * @param {string} projectId - Project ID
+   * @param {number} milestoneIndex - Milestone index
+   * @returns {Promise<Object>} Payment status data
+   */
+  async checkMilestonePaymentStatus(projectId, milestoneIndex) {
+    try {
+      console.log('Checking milestone payment status:', { projectId, milestoneIndex })
+      
+      const response = await authenticatedFetch(`${API_BASE_URL}/milestone/payment-status`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          project_id: projectId,
+          milestone_index: milestoneIndex
+        })
+      })
+
+      if (!response.ok) {
+        let errorMessage = 'Failed to check payment status'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.message || errorMessage
+        } catch (parseError) {
+          errorMessage = `Server error: ${response.status} ${response.statusText}`
+        }
+        throw new Error(errorMessage)
+      }
+
+      const data = await response.json()
+      console.log('Payment status checked successfully:', data)
+      
+      return {
+        status: true,
+        message: "Payment status checked successfully",
+        data: data.data
+      }
+    } catch (error) {
+      console.error('Error checking payment status:', error)
       if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
         throw new Error('Unable to connect to server. Please check if the backend is running.')
       }

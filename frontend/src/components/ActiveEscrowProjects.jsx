@@ -28,6 +28,9 @@ const ActiveEscrowProjects = ({ searchTerm = '' }) => {
       // Get client's projects with accepted bids
       const projectsResponse = await projectService.getClientProjects()
       console.log('📊 ActiveEscrowProjects: Projects response:', projectsResponse)
+      console.log('🔍 ActiveEscrowProjects: Projects response status:', projectsResponse?.status)
+      console.log('🔍 ActiveEscrowProjects: Projects response data:', projectsResponse?.data)
+      console.log('🔍 ActiveEscrowProjects: Number of projects:', projectsResponse?.data?.length || 0)
       
       if (projectsResponse.status && projectsResponse.data) {
         const clientProjects = projectsResponse.data
@@ -37,7 +40,9 @@ const ActiveEscrowProjects = ({ searchTerm = '' }) => {
         
         for (const project of clientProjects) {
           try {
+            console.log(`🔍 ActiveEscrowProjects: Checking project: ${project.title} (${project._id})`)
             const bidsResponse = await bidService.getProjectBids(project._id)
+            console.log(`📊 ActiveEscrowProjects: Bids response for ${project.title}:`, bidsResponse)
             if (bidsResponse.status && bidsResponse.data) {
               console.log(`🔍 ActiveEscrowProjects: Bids for project ${project._id}:`, bidsResponse.data)
               // Check if this project has any accepted bids
@@ -83,6 +88,12 @@ const ActiveEscrowProjects = ({ searchTerm = '' }) => {
         setActiveProjects(projectsWithAcceptedBids)
       } else {
         console.log('📊 ActiveEscrowProjects: No projects found or error in response')
+        console.log('🔍 ActiveEscrowProjects: Response details:', {
+          status: projectsResponse?.status,
+          hasData: !!projectsResponse?.data,
+          dataLength: projectsResponse?.data?.length,
+          message: projectsResponse?.message
+        })
         setActiveProjects([])
       }
     } catch (error) {
@@ -154,7 +165,7 @@ const ActiveEscrowProjects = ({ searchTerm = '' }) => {
           className="text-sm"
         >
           {t('tryAgain')}
-            </Button>
+        </Button>
       </div>
     )
   }
@@ -180,12 +191,21 @@ const ActiveEscrowProjects = ({ searchTerm = '' }) => {
           <h3 className="text-lg font-semibold text-graphite mb-2">
             {searchTerm ? 'No Projects Found' : 'No Active Projects'}
           </h3>
-          <p className="text-sm text-coolgray">
+          <p className="text-sm text-coolgray mb-4">
             {searchTerm 
               ? `No projects match '${searchTerm}'. Try a different search term.`
               : 'Your projects with accepted freelancer bids will appear here for milestone payment management.'
             }
           </p>
+          {!searchTerm && (
+            <Button 
+              variant="outline" 
+              onClick={fetchActiveEscrowProjects}
+              className="text-sm"
+            >
+              🔄 Refresh Projects
+            </Button>
+          )}
         </div>
       ) : (
         <div className="space-y-3">

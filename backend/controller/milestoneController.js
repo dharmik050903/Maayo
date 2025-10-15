@@ -73,29 +73,17 @@ export default class MilestoneController {
             
             await bid.save();
 
-            // Trigger automatic payment release for completed milestone
-            try {
-                const EscrowController = (await import('./escrowController.js')).default;
-                const escrowController = new EscrowController();
-                
-                const autoReleaseResult = await escrowController.autoReleaseMilestonePayment(project_id, milestone_index);
-                
-                if (autoReleaseResult.success) {
-                    console.log(`✅ Auto-released payment for milestone ${milestone_index} in project ${project_id}`);
-                } else {
-                    console.log(`⚠️ Auto-release failed for milestone ${milestone_index} in project ${project_id}: ${autoReleaseResult.message}`);
-                }
-            } catch (autoReleaseError) {
-                console.error(`❌ Error in auto-release for milestone ${milestone_index} in project ${project_id}:`, autoReleaseError);
-                // Don't fail the milestone completion if auto-release fails
-            }
+            // Milestone is now completed and waiting for client approval
+            console.log(`✅ Milestone ${milestone_index} completed and waiting for client approval in project ${project_id}`);
 
             return res.status(200).json({
                 status: true,
-                message: "Milestone completed successfully",
+                message: "Milestone completed successfully. Waiting for client approval.",
                 data: {
                     milestone_title: milestone.title,
-                    completed_at: bid.milestones[milestone_index].completed_at
+                    completed_at: bid.milestones[milestone_index].completed_at,
+                    payment_released: bid.milestones[milestone_index].payment_released === 1,
+                    status: 'pending_approval'
                 }
             });
 
@@ -104,6 +92,114 @@ export default class MilestoneController {
             return res.status(500).json({ 
                 status: false, 
                 message: "Failed to complete milestone", 
+                error: error.message 
+            });
+        }
+    }
+
+    // Approve milestone and release payment (by client)
+    async approveMilestone(req, res) {
+        try {
+            const userRole = req.headers.user_role;
+            const userId = req.headers.id;
+
+            // Only clients can approve milestones
+            if (userRole !== 'client') {
+                return res.status(403).json({ 
+                    status: false, 
+                    message: "Access denied. Only clients can approve milestones." 
+                });
+            }
+
+            const { project_id, milestone_index } = req.body;
+
+            if (!project_id || milestone_index === undefined) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "project_id and milestone_index are required" 
+                });
+            }
+
+            // Get project and verify client access
+            const project = await projectinfo.findById(project_id)
+                .populate('accepted_bid_id');
+            
+            if (!project) {
+                return res.status(404).json({ 
+                    status: false, 
+                    message: "Project not found" 
+                });
+            }
+
+            if (project.personid.toString() !== userId) {
+                return res.status(403).json({ 
+                    status: false, 
+                    message: "You can only approve milestones for your own projects" 
+                });
+            }
+
+            const bid = project.accepted_bid_id;
+            
+            // Validate milestone index
+            if (milestone_index >= bid.milestones.length || milestone_index < 0) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Invalid milestone index" 
+                });
+            }
+
+            const milestone = bid.milestones[milestone_index];
+
+            // Check if milestone is completed
+            if (milestone.is_completed !== 1) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Milestone must be completed before approval" 
+                });
+            }
+
+            // Check if payment already released
+            if (milestone.payment_released === 1) {
+                return res.status(400).json({ 
+                    status: false, 
+                    message: "Payment for this milestone has already been released" 
+                });
+            }
+
+            // Trigger payment release for approved milestone
+            let paymentResult = null;
+            try {
+                const EscrowController = (await import('./escrowController.js')).default;
+                const escrowController = new EscrowController();
+                
+                paymentResult = await escrowController.autoReleaseMilestonePayment(project_id, milestone_index);
+                
+                if (paymentResult.success) {
+                    console.log(`✅ Payment released for approved milestone ${milestone_index} in project ${project_id}`);
+                } else {
+                    console.log(`⚠️ Payment release failed for milestone ${milestone_index} in project ${project_id}: ${paymentResult.message}`);
+                }
+            } catch (paymentError) {
+                console.error(`❌ Error releasing payment for milestone ${milestone_index} in project ${project_id}:`, paymentError);
+                paymentResult = { success: false, message: paymentError.message };
+            }
+
+            return res.status(200).json({
+                status: true,
+                message: paymentResult.success ? "Milestone approved and payment released successfully" : "Milestone approved but payment release failed",
+                data: {
+                    milestone_title: milestone.title,
+                    approved_at: new Date().toISOString(),
+                    payment_released: paymentResult.success,
+                    payment_result: paymentResult
+                }
+            });
+
+        } catch (error) {
+            console.error("Error approving milestone:", error);
+            return res.status(500).json({ 
+                status: false, 
+                message: "Failed to approve milestone", 
                 error: error.message 
             });
         }

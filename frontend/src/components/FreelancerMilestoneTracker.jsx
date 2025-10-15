@@ -173,12 +173,15 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
       )
       
       if (result.status) {
-        setSuccessMessage('Milestone completion submitted successfully! Waiting for client approval.')
+        // Milestone completed and waiting for client approval
+        setSuccessMessage('✅ Milestone completed successfully! Waiting for client approval.')
+        updatePaymentStatus(selectedMilestone.index, {
+          status: 'pending_approval',
+          message: 'Waiting for client approval'
+        })
+        
         setShowSuccessModal(true)
         setShowCompletionModal(false)
-        
-        // Trigger payment status checking
-        checkPaymentStatus(selectedMilestone)
         
         fetchMilestones() // Refresh milestones
       } else {
@@ -350,11 +353,14 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                         getPaymentStatus(milestone.index).status === 'completed'
                           ? 'text-green-600 bg-green-100 border border-green-200'
+                          : getPaymentStatus(milestone.index).status === 'pending_approval'
+                          ? 'text-yellow-600 bg-yellow-100 border border-yellow-200'
                           : getPaymentStatus(milestone.index).status === 'processing'
                           ? 'text-blue-600 bg-blue-100 border border-blue-200'
                           : 'text-gray-600 bg-gray-100 border border-gray-200'
                       }`}>
                         💰 {getPaymentStatus(milestone.index).status === 'completed' ? 'Paid' : 
+                             getPaymentStatus(milestone.index).status === 'pending_approval' ? 'Waiting Approval' :
                              getPaymentStatus(milestone.index).status === 'processing' ? 'Processing' : 'Pending'}
                       </span>
                     )}
@@ -419,6 +425,8 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
                     <div className={`mt-4 p-4 rounded-xl border ${
                       getPaymentStatus(milestone.index).status === 'completed'
                         ? 'bg-gradient-to-r from-green-50 to-green-100/50 border-green-200'
+                        : getPaymentStatus(milestone.index).status === 'pending_approval'
+                        ? 'bg-gradient-to-r from-yellow-50 to-yellow-100/50 border-yellow-200'
                         : getPaymentStatus(milestone.index).status === 'processing'
                         ? 'bg-gradient-to-r from-blue-50 to-blue-100/50 border-blue-200'
                         : 'bg-gradient-to-r from-gray-50 to-gray-100/50 border-gray-200'
@@ -427,6 +435,8 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
                         <svg className={`w-5 h-5 mt-0.5 ${
                           getPaymentStatus(milestone.index).status === 'completed'
                             ? 'text-green-600'
+                            : getPaymentStatus(milestone.index).status === 'pending_approval'
+                            ? 'text-yellow-600'
                             : getPaymentStatus(milestone.index).status === 'processing'
                             ? 'text-blue-600'
                             : 'text-gray-600'
@@ -437,16 +447,21 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
                           <p className={`text-sm font-semibold mb-1 ${
                             getPaymentStatus(milestone.index).status === 'completed'
                               ? 'text-green-800'
+                              : getPaymentStatus(milestone.index).status === 'pending_approval'
+                              ? 'text-yellow-800'
                               : getPaymentStatus(milestone.index).status === 'processing'
                               ? 'text-blue-800'
                               : 'text-gray-800'
                           }`}>
                             Payment Status: {getPaymentStatus(milestone.index).status === 'completed' ? 'Completed' : 
+                                           getPaymentStatus(milestone.index).status === 'pending_approval' ? 'Waiting Approval' :
                                            getPaymentStatus(milestone.index).status === 'processing' ? 'Processing' : 'Pending'}
                           </p>
                           <p className={`text-sm ${
                             getPaymentStatus(milestone.index).status === 'completed'
                               ? 'text-green-700'
+                              : getPaymentStatus(milestone.index).status === 'pending_approval'
+                              ? 'text-yellow-700'
                               : getPaymentStatus(milestone.index).status === 'processing'
                               ? 'text-blue-700'
                               : 'text-gray-700'
