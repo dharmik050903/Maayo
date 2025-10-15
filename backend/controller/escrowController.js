@@ -554,7 +554,31 @@ export default class EscrowController {
                         amount: paymentAmount
                     });
                     
-                    // Skip the payout creation since we're using manual processing
+                    // Update milestone with manual processing information
+                    bid.milestones[milestone_index].payment_released = 1;
+                    bid.milestones[milestone_index].payment_amount = paymentAmount;
+                    bid.milestones[milestone_index].payment_id = payout.id;
+                    bid.milestones[milestone_index].payment_released_at = new Date().toISOString();
+                    bid.milestones[milestone_index].manual_processing = true; // Mark as manual processing
+                    
+                    console.log('🔍 Saving bid with updated milestone (manual processing)...');
+                    await bid.save();
+                    console.log('✅ Bid saved successfully (manual processing)');
+
+                    // Create payment history record for manual processing
+                    console.log('🔍 Creating payment history record (manual processing)...');
+                    await PaymentHistory.create({
+                        userId: bid.freelancer_id,
+                        orderId: payout.reference_id,
+                        paymentId: payout.id,
+                        amount: paymentAmount,
+                        currency: 'INR',
+                        status: 'pending',
+                        createdAt: new Date()
+                    });
+                    console.log('✅ Payment history record created (manual processing)');
+
+                    console.log('⚠️ Manual payment processing required. Please process payment manually.');
                     return res.status(200).json({
                         status: true,
                         message: "Milestone payment request created successfully. Manual processing required.",
@@ -636,6 +660,30 @@ export default class EscrowController {
                         amount: Math.round(paymentAmount * 100),
                         reference_id: manualPaymentRequest.reference_id
                     };
+                    
+                    // Update milestone with manual processing information
+                    bid.milestones[milestone_index].payment_released = 1;
+                    bid.milestones[milestone_index].payment_amount = paymentAmount;
+                    bid.milestones[milestone_index].payment_id = payout.id;
+                    bid.milestones[milestone_index].payment_released_at = new Date().toISOString();
+                    bid.milestones[milestone_index].manual_processing = true; // Mark as manual processing
+                    
+                    console.log('🔍 Saving bid with updated milestone (manual processing)...');
+                    await bid.save();
+                    console.log('✅ Bid saved successfully (manual processing)');
+
+                    // Create payment history record for manual processing
+                    console.log('🔍 Creating payment history record (manual processing)...');
+                    await PaymentHistory.create({
+                        userId: bid.freelancer_id,
+                        orderId: payout.reference_id,
+                        paymentId: payout.id,
+                        amount: paymentAmount,
+                        currency: 'INR',
+                        status: 'pending',
+                        createdAt: new Date()
+                    });
+                    console.log('✅ Payment history record created (manual processing)');
                     
                     console.log('⚠️ Manual payment processing required. Please process payment manually.');
                 }

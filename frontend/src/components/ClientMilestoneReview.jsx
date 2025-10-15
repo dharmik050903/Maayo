@@ -13,9 +13,47 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
   const [error, setError] = useState(null)
   const [payingMilestone, setPayingMilestone] = useState(null)
   const [alert, setAlert] = useState(null)
+  const [submittedPayments, setSubmittedPayments] = useState(new Set())
 
   // Note: This component does NOT redirect to dashboard after milestone payment success
   // Users stay on the current page (milestone management) after successful payments
+
+  // Helper function to manage submitted payments
+  const getSubmittedPaymentsKey = () => `submitted_payments_${projectId}`
+  
+  const loadSubmittedPayments = () => {
+    try {
+      const stored = localStorage.getItem(getSubmittedPaymentsKey())
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        setSubmittedPayments(new Set(parsed))
+        console.log('📋 ClientMilestoneReview: Loaded submitted payments:', parsed)
+      }
+    } catch (error) {
+      console.error('❌ ClientMilestoneReview: Error loading submitted payments:', error)
+    }
+  }
+  
+  const saveSubmittedPayments = (payments) => {
+    try {
+      localStorage.setItem(getSubmittedPaymentsKey(), JSON.stringify([...payments]))
+      console.log('💾 ClientMilestoneReview: Saved submitted payments:', [...payments])
+    } catch (error) {
+      console.error('❌ ClientMilestoneReview: Error saving submitted payments:', error)
+    }
+  }
+  
+  const markPaymentAsSubmitted = (milestoneIndex) => {
+    const newSubmittedPayments = new Set(submittedPayments)
+    newSubmittedPayments.add(milestoneIndex)
+    setSubmittedPayments(newSubmittedPayments)
+    saveSubmittedPayments(newSubmittedPayments)
+    console.log('✅ ClientMilestoneReview: Marked milestone', milestoneIndex, 'as payment submitted')
+  }
+  
+  const isPaymentSubmitted = (milestoneIndex) => {
+    return submittedPayments.has(milestoneIndex)
+  }
 
   // Helper function to show custom alert
   const showAlert = (type, title, message) => {
@@ -43,6 +81,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
 
   useEffect(() => {
     if (projectId) {
+      loadSubmittedPayments()
       fetchMilestones()
     }
   }, [projectId])
@@ -71,6 +110,15 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
             status: milestone.status,
             amount: milestone.amount
           })
+          
+          // Clean up submitted payments that have been processed
+          if (milestone.payment_released === 1 && isPaymentSubmitted(milestone.index)) {
+            console.log('🧹 ClientMilestoneReview: Cleaning up submitted payment for milestone', milestone.index, '- payment now processed')
+            const newSubmittedPayments = new Set(submittedPayments)
+            newSubmittedPayments.delete(milestone.index)
+            setSubmittedPayments(newSubmittedPayments)
+            saveSubmittedPayments(newSubmittedPayments)
+          }
         })
         setMilestones(milestonesData)
         
@@ -155,6 +203,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                     if (releaseResponse.status) {
                       // Check if manual processing is required
                       if (releaseResponse.data?.manual_processing_required) {
+                        markPaymentAsSubmitted(milestone.index)
                         showAlert('warning', 'Payment Request Submitted', 'Your payment request has been submitted successfully. The payment will be processed manually by our team within 24-48 hours. You will receive a confirmation once the payment is completed.')
                         console.log('✅ ClientMilestoneReview: Manual processing required, payment request submitted')
                       } else {
@@ -252,6 +301,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                     if (releaseResponse.status) {
                       // Check if manual processing is required
                       if (releaseResponse.data?.manual_processing_required) {
+                        markPaymentAsSubmitted(milestone.index)
                         showAlert('warning', 'Payment Request Submitted', 'Your payment request has been submitted successfully. The payment will be processed manually by our team within 24-48 hours. You will receive a confirmation once the payment is completed.')
                         console.log('✅ ClientMilestoneReview: Manual processing required, payment request submitted')
                       } else {
@@ -310,6 +360,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
         if (releaseResponse.status) {
           // Check if manual processing is required
           if (releaseResponse.data?.manual_processing_required) {
+            markPaymentAsSubmitted(milestone.index)
             showAlert('warning', 'Payment Request Submitted', 'Your payment request has been submitted successfully. The payment will be processed manually by our team within 24-48 hours. You will receive a confirmation once the payment is completed.')
             console.log('✅ ClientMilestoneReview: Manual processing required, payment request submitted')
           } else {
@@ -342,6 +393,12 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
       manual_processing: milestone.manual_processing,
       status: milestone.status
     })
+    
+    // Check if payment was submitted locally but not yet reflected in database
+    if (isPaymentSubmitted(milestone.index)) {
+      console.log('📋 Status: manual_processing (locally tracked payment request)')
+      return 'manual_processing'
+    }
     
     // Backend uses is_completed: 1 for completed milestones
     if (milestone.is_completed === 1) {
