@@ -8,6 +8,11 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
   const [finalAmount, setFinalAmount] = useState(bid.bid_amount)
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState('amount') // 'amount' | 'payment' | 'processing'
+  
+  // Debug step changes
+  useEffect(() => {
+    console.log('🔄 AcceptBidModal step changed to:', step)
+  }, [step])
   const [alert, setAlert] = useState({ isOpen: false, type: 'info', title: '', message: '' })
   const [showResetOption, setShowResetOption] = useState(false)
 
@@ -23,6 +28,18 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
   const closeAlert = () => {
     setAlert(prev => ({ ...prev, isOpen: false }))
   }
+
+  // Initialize final amount and handle cleanup
+  useEffect(() => {
+    if (bid && project) {
+      setFinalAmount(project.final_amount || bid.bid_amount)
+    }
+    
+    // Cleanup function
+    return () => {
+      // Any cleanup needed when component unmounts
+    }
+  }, [bid, project])
 
   const handleManualReset = async () => {
     try {
@@ -181,7 +198,18 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
             }
             
             console.log('Payment cancelled by user')
+            
+            // Reset step and loading state immediately
+            setLoading(false)
             setStep('amount')
+            
+            // Force a small delay to ensure state updates properly
+            setTimeout(() => {
+              console.log('🔄 Forcing step reset to amount after cancellation')
+              setStep('amount')
+              setLoading(false)
+            }, 100)
+            
             // Auto-reset escrow when user cancels payment
             console.log('🔄 Payment cancelled, auto-resetting escrow...')
             escrowService.resetEscrowStatus(project._id)
@@ -214,6 +242,12 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
     } catch (error) {
       console.error('❌ Error accepting bid:', error)
       
+      // Clear any pending timeout
+      if (paymentTimeout) {
+        clearTimeout(paymentTimeout)
+        console.log('✅ Payment error occurred, clearing timeout')
+      }
+      
       // Auto-reset escrow on any payment process failure
       console.log('🔄 Payment process failed, auto-resetting escrow...')
       try {
@@ -236,7 +270,9 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
         showAlert('error', 'Failed to Accept Bid', error.message)
       }
       
+      // Reset step and loading state
       setStep('amount')
+      setLoading(false)
     } finally {
       setLoading(false)
     }
@@ -424,6 +460,20 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
             <p className="text-gray-600">Opening payment gateway...</p>
             <p className="text-sm text-gray-500 mt-2">Please complete the payment to activate the project</p>
+            
+            {/* Fallback button in case user gets stuck */}
+            <div className="mt-4">
+              <button
+                onClick={() => {
+                  console.log('🔄 Manual fallback: Resetting to amount step')
+                  setStep('amount')
+                  setLoading(false)
+                }}
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm"
+              >
+                ← Back to Amount
+              </button>
+            </div>
           </div>
         )}
 
