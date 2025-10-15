@@ -153,8 +153,14 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                   )
                   
                     if (releaseResponse.status) {
-                      showAlert('success', 'Payment Successful', 'Payment processed successfully! Milestone approved and payment released to freelancer.')
-                      console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
+                      // Check if manual processing is required
+                      if (releaseResponse.data?.manual_processing_required) {
+                        showAlert('warning', 'Payment Request Submitted', 'Your payment request has been submitted successfully. The payment will be processed manually by our team within 24-48 hours. You will receive a confirmation once the payment is completed.')
+                        console.log('✅ ClientMilestoneReview: Manual processing required, payment request submitted')
+                      } else {
+                        showAlert('success', 'Payment Successful', 'Payment processed successfully! Milestone approved and payment released to freelancer.')
+                        console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
+                      }
                       fetchMilestones(true) // Force refresh milestones
                     } else {
                       showAlert('error', 'Release Failed', 'Escrow created but milestone release failed: ' + releaseResponse.message)
@@ -244,8 +250,14 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                     )
                     
                     if (releaseResponse.status) {
-                      showAlert('success', 'Payment Successful', 'Payment processed successfully! Milestone approved and payment released to freelancer.')
-                      console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
+                      // Check if manual processing is required
+                      if (releaseResponse.data?.manual_processing_required) {
+                        showAlert('warning', 'Payment Request Submitted', 'Your payment request has been submitted successfully. The payment will be processed manually by our team within 24-48 hours. You will receive a confirmation once the payment is completed.')
+                        console.log('✅ ClientMilestoneReview: Manual processing required, payment request submitted')
+                      } else {
+                        showAlert('success', 'Payment Successful', 'Payment processed successfully! Milestone approved and payment released to freelancer.')
+                        console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
+                      }
                       fetchMilestones(true) // Force refresh milestones
                     } else {
                       showAlert('error', 'Release Failed', 'Escrow created but milestone release failed: ' + releaseResponse.message)
@@ -296,8 +308,14 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
         )
         
         if (releaseResponse.status) {
-          showAlert('success', 'Payment Released', 'Milestone payment released successfully!')
-          console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
+          // Check if manual processing is required
+          if (releaseResponse.data?.manual_processing_required) {
+            showAlert('warning', 'Payment Request Submitted', 'Your payment request has been submitted successfully. The payment will be processed manually by our team within 24-48 hours. You will receive a confirmation once the payment is completed.')
+            console.log('✅ ClientMilestoneReview: Manual processing required, payment request submitted')
+          } else {
+            showAlert('success', 'Payment Released', 'Milestone payment released successfully!')
+            console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
+          }
           fetchMilestones(true) // Force refresh milestones
         } else {
           showAlert('error', 'Release Failed', 'Failed to release milestone payment: ' + releaseResponse.message)
@@ -321,6 +339,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
       is_completed: milestone.is_completed,
       payment_released: milestone.payment_released,
       auto_released: milestone.auto_released,
+      manual_processing: milestone.manual_processing,
       status: milestone.status
     })
     
@@ -332,6 +351,9 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
         if (milestone.auto_released) {
           console.log('✅ Status: auto_paid')
           return 'auto_paid' // Auto-released payment
+        } else if (milestone.manual_processing) {
+          console.log('⚠️ Status: manual_processing (payment request submitted)')
+          return 'manual_processing' // Manual processing required
         } else {
           console.log('✅ Status: completed')
           return 'completed' // Manual payment release
@@ -356,6 +378,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
     switch (status) {
       case 'auto_paid': return 'text-green-700 bg-green-200' // Different color for auto-payments
       case 'completed': return 'text-green-600 bg-green-100'
+      case 'manual_processing': return 'text-orange-600 bg-orange-100' // Orange for manual processing
       case 'pending_approval': return 'text-yellow-600 bg-yellow-100'
       case 'in_progress': return 'text-blue-600 bg-blue-100'
           default: return 'text-gray-600 bg-gray-100'
@@ -366,6 +389,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
     switch (status) {
       case 'auto_paid': return '🤖' // Auto-payment icon
       case 'completed': return '✅'
+      case 'manual_processing': return '⏳' // Clock icon for manual processing
       case 'pending_approval': return '⏳'
       case 'in_progress': return '🔄'
           default: return '📋'
@@ -533,6 +557,15 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       <span className="text-sm font-medium">Payment Done Successfully</span>
+                    </div>
+                  )}
+                  
+                  {status === 'manual_processing' && (
+                    <div className="flex items-center gap-3 text-orange-700 p-4 rounded-2xl bg-gradient-to-r from-orange-50 to-orange-100/50 border border-orange-200">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-sm font-medium">Payment Request Submitted - Processing Manually</span>
                     </div>
                   )}
                   
