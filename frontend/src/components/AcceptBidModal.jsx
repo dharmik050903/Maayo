@@ -66,7 +66,7 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
   const platformCommission = Math.round(finalAmount * 0.05 * 100) / 100
   const freelancerAmount = finalAmount - platformCommission
 
-  const handleAcceptBid = async () => {
+  const handleProcessPayment = async () => {
     try {
       setLoading(true)
       setStep('processing')
@@ -415,7 +415,7 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
                 {loading ? 'Updating...' : 'Update Amount'}
               </button>
               <button
-                onClick={handleAcceptBid}
+                onClick={handleProcessPayment}
                 disabled={loading || finalAmount <= 0}
                 className="flex-1 bg-green-500 text-white px-4 py-3 rounded-lg hover:bg-green-600 disabled:opacity-50 transition-colors font-semibold text-lg"
               >
