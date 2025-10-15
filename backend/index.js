@@ -34,8 +34,17 @@ const defaultOrigins = [
   'https://maayo-alpha.vercel.app'
 ]
 
-// Combine allowed origins with default origins
-const finalOrigins = [...new Set([...allowedOrigins, ...defaultOrigins])]
+// AWS-specific origins (add your AWS domains here)
+const awsOrigins = [
+  // Add your AWS CloudFront domains
+  // 'https://your-domain.com',
+  // 'https://www.your-domain.com',
+  // 'https://your-cloudfront-domain.cloudfront.net',
+  // 'https://your-s3-bucket.s3-website-us-east-1.amazonaws.com'
+]
+
+// Combine allowed origins with default origins and AWS origins
+const finalOrigins = [...new Set([...allowedOrigins, ...defaultOrigins, ...awsOrigins])]
 
 app.use(cors({
   origin: function(origin, callback) {

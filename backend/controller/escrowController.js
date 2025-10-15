@@ -672,7 +672,7 @@ export default class EscrowController {
                 paymentId: payout.id,
                 amount: paymentAmount,
                 currency: 'INR',
-                status: 'paid',
+                status: payout.status === 'pending_manual' ? 'pending' : 'paid',
                 createdAt: new Date()
             });
             console.log('✅ Payment history record created');
