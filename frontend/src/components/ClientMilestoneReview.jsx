@@ -4,6 +4,7 @@ import { escrowService } from '../services/escrowService'
 import { useComprehensiveTranslation } from '../hooks/useComprehensiveTranslation'
 import { initializeRazorpay } from '../utils/razorpay'
 import Button from './Button'
+import CustomAlert from './CustomAlert'
 
 const ClientMilestoneReview = ({ projectId, projectTitle }) => {
   const { t } = useComprehensiveTranslation()
@@ -11,6 +12,12 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [payingMilestone, setPayingMilestone] = useState(null)
+  const [alert, setAlert] = useState(null)
+
+  // Helper function to show custom alert
+  const showAlert = (type, title, message) => {
+    setAlert({ type, title, message })
+  }
 
   // Helper function to format currency
   const formatCurrency = (amount) => {
@@ -130,17 +137,17 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                   )
                   
                   if (releaseResponse.status) {
-                    alert('Payment processed successfully! Milestone approved and payment released to freelancer.')
+                    showAlert('success', 'Payment Successful', 'Payment processed successfully! Milestone approved and payment released to freelancer.')
                     fetchMilestones() // Refresh milestones
                   } else {
-                    alert('Escrow created but milestone release failed: ' + releaseResponse.message)
+                    showAlert('error', 'Release Failed', 'Escrow created but milestone release failed: ' + releaseResponse.message)
                   }
                 } else {
-                  alert('Escrow payment verification failed: ' + verifyResponse.message)
+                  showAlert('error', 'Verification Failed', 'Escrow payment verification failed: ' + verifyResponse.message)
                 }
               } catch (verifyError) {
                 console.error('❌ ClientMilestoneReview: Escrow verification error:', verifyError)
-                alert('Escrow payment successful but verification failed. Please contact support.')
+                showAlert('error', 'Verification Error', 'Escrow payment successful but verification failed. Please contact support.')
               }
             },
             
@@ -220,17 +227,17 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                     )
                     
                     if (releaseResponse.status) {
-                      alert('Payment processed successfully! Milestone approved and payment released to freelancer.')
+                      showAlert('success', 'Payment Successful', 'Payment processed successfully! Milestone approved and payment released to freelancer.')
                       fetchMilestones() // Refresh milestones
                     } else {
-                      alert('Escrow created but milestone release failed: ' + releaseResponse.message)
+                      showAlert('error', 'Release Failed', 'Escrow created but milestone release failed: ' + releaseResponse.message)
                     }
                   } else {
-                    alert('Escrow payment verification failed: ' + verifyResponse.message)
+                    showAlert('error', 'Verification Failed', 'Escrow payment verification failed: ' + verifyResponse.message)
                   }
                 } catch (verifyError) {
                   console.error('❌ ClientMilestoneReview: Escrow verification error:', verifyError)
-                  alert('Escrow payment successful but verification failed. Please contact support.')
+                  showAlert('error', 'Verification Error', 'Escrow payment successful but verification failed. Please contact support.')
                 }
               },
               
@@ -271,10 +278,10 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
         )
         
         if (releaseResponse.status) {
-          alert('Milestone payment released successfully!')
+          showAlert('success', 'Payment Released', 'Milestone payment released successfully!')
           fetchMilestones() // Refresh milestones
         } else {
-          alert('Failed to release milestone payment: ' + releaseResponse.message)
+          showAlert('error', 'Release Failed', 'Failed to release milestone payment: ' + releaseResponse.message)
         }
         
       } else {
@@ -283,7 +290,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
       
     } catch (error) {
       console.error('❌ ClientMilestoneReview: Milestone payment error:', error)
-      alert(error.message || 'Failed to process milestone payment')
+      showAlert('error', 'Payment Error', error.message || 'Failed to process milestone payment')
     } finally {
       setPayingMilestone(null)
     }
@@ -372,6 +379,14 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6">
+      {alert && (
+        <CustomAlert
+          type={alert.type}
+          title={alert.title}
+          message={alert.message}
+          onClose={() => setAlert(null)}
+        />
+      )}
       {milestones.map((milestone, index) => {
         const status = getMilestoneStatus(milestone)
         const statusColor = getStatusColor(status)

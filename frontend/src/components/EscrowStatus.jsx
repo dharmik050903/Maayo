@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { escrowService } from '../services/escrowService'
+import CustomAlert from './CustomAlert'
 
 const EscrowStatus = ({ projectId }) => {
   const [escrowData, setEscrowData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [releasingPayment, setReleasingPayment] = useState(null)
+  const [alert, setAlert] = useState(null)
+
+  // Helper function to show custom alert
+  const showAlert = (type, title, message) => {
+    setAlert({ type, title, message })
+  }
 
   useEffect(() => {
     if (projectId) {
@@ -40,12 +47,12 @@ const EscrowStatus = ({ projectId }) => {
       const result = await escrowService.releaseMilestonePayment(projectId, milestoneIndex)
       
       if (result.status) {
-        alert('Milestone payment released successfully!')
+        showAlert('success', 'Payment Released', 'Milestone payment released successfully!')
         fetchEscrowStatus() // Refresh data
       }
     } catch (error) {
       console.error('Error releasing milestone payment:', error)
-      alert(error.message || 'Failed to release milestone payment')
+      showAlert('error', 'Release Failed', error.message || 'Failed to release milestone payment')
     } finally {
       setReleasingPayment(null)
     }
@@ -126,6 +133,14 @@ const EscrowStatus = ({ projectId }) => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
+      {alert && (
+        <CustomAlert
+          type={alert.type}
+          title={alert.title}
+          message={alert.message}
+          onClose={() => setAlert(null)}
+        />
+      )}
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-2">Escrow Status</h3>
         <p className="text-gray-600">Monitor your project's escrow payment and milestone progress</p>
