@@ -8,6 +8,7 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
   const [finalAmount, setFinalAmount] = useState(bid.bid_amount)
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState('amount') // 'amount' | 'payment' | 'processing'
+  const [isCheckingEscrow, setIsCheckingEscrow] = useState(false)
   
   // Debug step changes
   useEffect(() => {
@@ -33,6 +34,9 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
   useEffect(() => {
     if (bid && project) {
       setFinalAmount(project.final_amount || bid.bid_amount)
+      
+      // Check and reset escrow when modal opens
+      checkAndResetEscrow()
     }
     
     // Cleanup function
@@ -40,6 +44,34 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
       // Any cleanup needed when component unmounts
     }
   }, [bid, project])
+
+  // Function to check and reset escrow when modal opens
+  const checkAndResetEscrow = async () => {
+    try {
+      setIsCheckingEscrow(true)
+      console.log('🔍 Checking for existing escrow on modal open...')
+      // Try to create escrow - if it fails with "already exists", reset it
+      const testResponse = await escrowService.createEscrowPayment(project._id)
+      
+      if (!testResponse.status && testResponse.message?.includes('already exists')) {
+        console.log('🔄 Existing escrow found, resetting...')
+        const resetResponse = await escrowService.resetEscrowStatus(project._id)
+        
+        if (resetResponse.status) {
+          console.log('✅ Escrow reset successful on modal open')
+        } else {
+          console.error('❌ Failed to reset escrow on modal open:', resetResponse.message)
+        }
+      } else if (testResponse.status) {
+        console.log('✅ No existing escrow, ready for payment')
+      }
+    } catch (error) {
+      console.log('ℹ️ No existing escrow or error checking:', error.message)
+      // This is expected if no escrow exists
+    } finally {
+      setIsCheckingEscrow(false)
+    }
+  }
 
   const handleManualReset = async () => {
     try {
@@ -105,6 +137,7 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
       setStep('payment')
 
       // Step 2: Create escrow payment
+      console.log('🔄 Creating escrow payment...')
       let escrowResponse = await escrowService.createEscrowPayment(project._id)
       
       // If escrow already exists, reset it and try again
@@ -121,8 +154,18 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
         
         if (resetResponse.status) {
           console.log('✅ Escrow reset successful, creating new escrow...')
+          // Wait a moment for the reset to complete
+          await new Promise(resolve => setTimeout(resolve, 500))
           // Try creating escrow again
           escrowResponse = await escrowService.createEscrowPayment(project._id)
+          
+          // If still fails, try one more time
+          if (!escrowResponse.status && escrowResponse.message?.includes('already exists')) {
+            console.log('🔄 Second attempt - resetting again...')
+            await escrowService.resetEscrowStatus(project._id)
+            await new Promise(resolve => setTimeout(resolve, 1000))
+            escrowResponse = await escrowService.createEscrowPayment(project._id)
+          }
         } else {
           throw new Error(`Failed to reset escrow: ${resetResponse.message}`)
         }
@@ -131,6 +174,8 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
       if (!escrowResponse.status) {
         throw new Error(escrowResponse.message)
       }
+      
+      console.log('✅ Escrow created successfully:', escrowResponse.data)
 
       // Step 3: Open Razorpay payment gateway
       // Set a timeout to auto-reset escrow if payment takes too long (5 minutes)
@@ -190,7 +235,7 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
         },
         
         modal: {
-          ondismiss: () => {
+          ondismiss: async () => {
             // Clear timeout on payment cancellation
             if (paymentTimeout) {
               clearTimeout(paymentTimeout)
@@ -203,22 +248,21 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
             setLoading(false)
             setStep('amount')
             
+            // Auto-reset escrow when user cancels payment (await to ensure it completes)
+            console.log('🔄 Payment cancelled, auto-resetting escrow...')
+            try {
+              await escrowService.resetEscrowStatus(project._id)
+              console.log('✅ Escrow auto-reset successful after cancellation')
+            } catch (error) {
+              console.error('❌ Failed to auto-reset escrow after cancellation:', error)
+            }
+            
             // Force a small delay to ensure state updates properly
             setTimeout(() => {
               console.log('🔄 Forcing step reset to amount after cancellation')
               setStep('amount')
               setLoading(false)
             }, 100)
-            
-            // Auto-reset escrow when user cancels payment
-            console.log('🔄 Payment cancelled, auto-resetting escrow...')
-            escrowService.resetEscrowStatus(project._id)
-              .then(() => {
-                console.log('✅ Escrow auto-reset successful after cancellation')
-              })
-              .catch((error) => {
-                console.error('❌ Failed to auto-reset escrow after cancellation:', error)
-              })
           }
         }
       }
@@ -344,6 +388,16 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
             </svg>
           </button>
         </div>
+        
+        {/* Escrow checking indicator */}
+        {isCheckingEscrow && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-3"></div>
+              <span className="text-blue-700 text-sm">Checking and resetting escrow payment...</span>
+            </div>
+          </div>
+        )}
         
         {step === 'amount' && (
           <>
