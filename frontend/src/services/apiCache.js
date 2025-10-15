@@ -12,6 +12,7 @@ class ApiCacheService {
       projects: 2 * 60 * 1000,    // 2 minutes
       skills: 10 * 60 * 1000,     // 10 minutes
       bids: 1 * 60 * 1000,        // 1 minute
+      milestones: 2 * 60 * 1000,  // 2 minutes
       user: 30 * 60 * 1000        // 30 minutes
     }
   }
@@ -61,13 +62,14 @@ class ApiCacheService {
    * Set cached data
    */
   set(key, data, cacheType = 'default') {
-    const expiry = Date.now() + (this.cacheExpiry[cacheType] || 5 * 60 * 1000)
+    const expiryTime = this.cacheExpiry[cacheType] || 5 * 60 * 1000
+    const expiry = Date.now() + expiryTime
     this.cache.set(key, {
       data,
       expiry,
       timestamp: Date.now()
     })
-    console.log('💾 ApiCache: Cached data for', key, 'expires in', this.cacheExpiry[cacheType] / 1000, 'seconds')
+    console.log('💾 ApiCache: Cached data for', key, 'expires in', expiryTime / 1000, 'seconds')
   }
 
   /**
