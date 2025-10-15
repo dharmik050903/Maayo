@@ -865,7 +865,7 @@ export const escrowService = {
     try {
       console.log('Approving milestone:', { projectId, milestoneIndex })
       
-      const response = await authenticatedFetch(`${API_BASE_URL}/milestone/approve`, {
+      const response = await authenticatedFetch(`${API_BASE_URL}/escrow/release-milestone`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

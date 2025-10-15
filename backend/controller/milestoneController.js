@@ -179,9 +179,41 @@ export default class MilestoneController {
                 const EscrowController = (await import('./escrowController.js')).default;
                 const escrowController = new EscrowController();
                 
-                paymentResult = await escrowController.autoReleaseMilestonePayment(project_id, milestone_index);
+                // Create a mock request and response object to call releaseMilestonePayment
+                const mockReq = {
+                    body: {
+                        project_id: project_id,
+                        milestone_index: milestone_index
+                    },
+                    headers: {
+                        user_role: 'client',
+                        id: userId,
+                        user_email: req.headers.user_email
+                    }
+                };
+                
+                const mockRes = {
+                    status: (code) => ({
+                        json: (data) => {
+                            paymentResult = {
+                                success: data.status === true,
+                                message: data.message,
+                                data: data.data
+                            };
+                        }
+                    })
+                };
+                
+                // Use manual release for client-approved milestones
+                await escrowController.releaseMilestonePayment(mockReq, mockRes);
                 
                 console.log(`🔍 Payment result from escrow controller:`, paymentResult);
+                
+                // If paymentResult is null, it means the mock response didn't work
+                if (!paymentResult) {
+                    console.log(`⚠️ Payment result is null, falling back to manual processing`);
+                    paymentResult = { success: false, message: "Payment processing failed - requires manual processing" };
+                }
                 
                 if (paymentResult.success) {
                     console.log(`✅ Payment released for approved milestone ${milestone_index} in project ${project_id}`);
