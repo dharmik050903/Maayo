@@ -133,7 +133,7 @@ export default function PaymentHistory({ isOpen, onClose }) {
                       </div>
                       <div>
                         <p className="font-semibold text-graphite">
-                          {formatBudget(payment.amount / 100)} {payment.currency}
+                          {formatBudget(payment.amount)} {payment.currency}
                         </p>
                         <p className="text-sm text-gray-500">
                           Order ID: {payment.orderId}
