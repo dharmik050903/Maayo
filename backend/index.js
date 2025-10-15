@@ -121,11 +121,22 @@ app.options('*', (req, res) => {
     'access-control-request-headers': req.headers['access-control-request-headers']
   })
   
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*')
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, id, user_role, user_email, first_name, last_name')
-  res.header('Access-Control-Allow-Credentials', 'true')
-  res.header('Access-Control-Max-Age', '86400') // Cache preflight for 24 hours
+  // Set CORS headers for preflight requests
+  const origin = req.headers.origin
+  if (origin && (origin.includes('vercel.app') || origin.includes('localhost') || origin.includes('127.0.0.1'))) {
+    res.header('Access-Control-Allow-Origin', origin)
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, id, user_role, user_email, first_name, last_name')
+    res.header('Access-Control-Allow-Credentials', 'true')
+    res.header('Access-Control-Max-Age', '86400') // Cache preflight for 24 hours
+    console.log('✅ CORS headers set for OPTIONS request from:', origin)
+  } else {
+    res.header('Access-Control-Allow-Origin', '*')
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, id, user_role, user_email, first_name, last_name')
+    console.log('⚠️ CORS headers set with wildcard for OPTIONS request from:', origin)
+  }
+  
   res.sendStatus(200)
 })
 
@@ -139,11 +150,33 @@ app.use((req, res, next) => {
     referer: req.headers.referer,
     host: req.headers.host
   })
+  
+  // Ensure CORS headers are set on all responses
+  const origin = req.headers.origin
+  if (origin && (origin.includes('vercel.app') || origin.includes('localhost') || origin.includes('127.0.0.1'))) {
+    res.header('Access-Control-Allow-Origin', origin)
+    res.header('Access-Control-Allow-Credentials', 'true')
+    console.log('✅ CORS headers set for request from:', origin)
+  }
+  
   next()
 })
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    message: 'Backend server is running',
+    cors: {
+      origin: req.headers.origin,
+      allowed: req.headers.origin && (req.headers.origin.includes('vercel.app') || req.headers.origin.includes('localhost'))
+    }
+  })
+})
 
 connect();  
 
