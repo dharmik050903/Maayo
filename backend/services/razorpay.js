@@ -54,7 +54,7 @@ setTimeout(async () => {
     if (razorpay.contacts) {
       console.log('✅ Razorpay contacts API is available');
     } else {
-      console.log('❌ Razorpay contacts API is not available');
+      console.log('❌ Razorpay contacts API is not available - will use direct fund account approach');
     }
     
     // Test fundAccount API availability
