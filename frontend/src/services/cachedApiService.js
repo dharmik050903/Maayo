@@ -95,13 +95,21 @@ export const getAllProjectsCached = async (filters = {}) => {
 /**
  * Cached milestones API
  */
-export const getMilestonesCached = async (projectId) => {
+export const getMilestonesCached = async (projectId, forceRefresh = false) => {
   const cacheKey = apiCache.generateKey('milestones', { projectId })
   
-  // Check cache first
-  const cachedData = apiCache.get(cacheKey)
-  if (cachedData) {
-    return cachedData
+  // If force refresh, clear the cache for this specific key
+  if (forceRefresh) {
+    console.log('🔄 ApiCache: Force refresh requested, clearing milestones cache')
+    apiCache.clear('milestones')
+  }
+  
+  // Check cache first (only if not forcing refresh)
+  if (!forceRefresh) {
+    const cachedData = apiCache.get(cacheKey)
+    if (cachedData) {
+      return cachedData
+    }
   }
 
   // Check if request is already pending
@@ -112,7 +120,7 @@ export const getMilestonesCached = async (projectId) => {
   }
 
   // Make new request
-  console.log('🌐 ApiCache: Fetching milestones from API')
+  console.log('🌐 ApiCache: Fetching milestones from API', forceRefresh ? '(force refresh)' : '')
   const requestPromise = escrowService.getMilestones(projectId)
   
   // Add to pending requests
@@ -130,6 +138,9 @@ export const getMilestonesCached = async (projectId) => {
   } catch (error) {
     console.error('❌ ApiCache: Milestones API error:', error)
     throw error
+  } finally {
+    // Remove from pending requests
+    apiCache.removePending(cacheKey)
   }
 }
 

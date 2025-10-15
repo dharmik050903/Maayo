@@ -14,6 +14,9 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
   const [payingMilestone, setPayingMilestone] = useState(null)
   const [alert, setAlert] = useState(null)
 
+  // Note: This component does NOT redirect to dashboard after milestone payment success
+  // Users stay on the current page (milestone management) after successful payments
+
   // Helper function to show custom alert
   const showAlert = (type, title, message) => {
     setAlert({ type, title, message })
@@ -51,7 +54,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
       setError(null)
       
       // If force refresh, we can try to clear cache or use a different approach
-      const result = await getMilestonesCached(projectId)
+      const result = await getMilestonesCached(projectId, forceRefresh)
       console.log('📊 ClientMilestoneReview: Milestone fetch result:', result)
       
       if (result.status) {
@@ -140,6 +143,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                   
                     if (releaseResponse.status) {
                       showAlert('success', 'Payment Successful', 'Payment processed successfully! Milestone approved and payment released to freelancer.')
+                      console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
                       fetchMilestones(true) // Force refresh milestones
                     } else {
                       showAlert('error', 'Release Failed', 'Escrow created but milestone release failed: ' + releaseResponse.message)
@@ -230,6 +234,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                     
                     if (releaseResponse.status) {
                       showAlert('success', 'Payment Successful', 'Payment processed successfully! Milestone approved and payment released to freelancer.')
+                      console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
                       fetchMilestones(true) // Force refresh milestones
                     } else {
                       showAlert('error', 'Release Failed', 'Escrow created but milestone release failed: ' + releaseResponse.message)
@@ -281,6 +286,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
         
         if (releaseResponse.status) {
           showAlert('success', 'Payment Released', 'Milestone payment released successfully!')
+          console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
           fetchMilestones(true) // Force refresh milestones
         } else {
           showAlert('error', 'Release Failed', 'Failed to release milestone payment: ' + releaseResponse.message)
