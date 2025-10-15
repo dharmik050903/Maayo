@@ -116,6 +116,9 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
       }
 
       // Step 3: Open Razorpay payment gateway
+      // Set a timeout to auto-reset escrow if payment takes too long (5 minutes)
+      let paymentTimeout = null
+      
       const razorpayOptions = {
         amount: escrowResponse.data.amount,
         currency: escrowResponse.data.currency || 'INR',
@@ -130,6 +133,12 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
         },
         
         handler: async (response) => {
+          // Clear timeout on successful payment
+          if (paymentTimeout) {
+            clearTimeout(paymentTimeout)
+            console.log('✅ Payment completed, clearing timeout')
+          }
+          
           try {
             console.log('✅ Payment completed, verifying...')
             
@@ -146,20 +155,57 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
               onClose()
             } else {
               showAlert('error', 'Payment Verification Failed', verifyResponse.message)
+              // Auto-reset escrow on verification failure
+              console.log('🔄 Payment verification failed, auto-resetting escrow...')
+              await escrowService.resetEscrowStatus(project._id)
             }
           } catch (error) {
             console.error('❌ Payment verification error:', error)
             showAlert('error', 'Payment Verification Failed', error.message)
+            // Auto-reset escrow on verification error
+            console.log('🔄 Payment verification error, auto-resetting escrow...')
+            try {
+              await escrowService.resetEscrowStatus(project._id)
+            } catch (resetError) {
+              console.error('❌ Failed to auto-reset escrow:', resetError)
+            }
           }
         },
         
         modal: {
           ondismiss: () => {
-            console.log('Payment cancelled')
+            // Clear timeout on payment cancellation
+            if (paymentTimeout) {
+              clearTimeout(paymentTimeout)
+              console.log('✅ Payment cancelled, clearing timeout')
+            }
+            
+            console.log('Payment cancelled by user')
             setStep('amount')
+            // Auto-reset escrow when user cancels payment
+            console.log('🔄 Payment cancelled, auto-resetting escrow...')
+            escrowService.resetEscrowStatus(project._id)
+              .then(() => {
+                console.log('✅ Escrow auto-reset successful after cancellation')
+              })
+              .catch((error) => {
+                console.error('❌ Failed to auto-reset escrow after cancellation:', error)
+              })
           }
         }
       }
+
+      // Set timeout after defining the options
+      paymentTimeout = setTimeout(async () => {
+        console.log('⏰ Payment timeout reached (5 minutes), auto-resetting escrow...')
+        try {
+          await escrowService.resetEscrowStatus(project._id)
+          console.log('✅ Escrow auto-reset successful after timeout')
+          showAlert('warning', 'Payment Timeout', 'Payment took too long and was automatically reset. You can try again.')
+        } catch (resetError) {
+          console.error('❌ Failed to auto-reset escrow after timeout:', resetError)
+        }
+      }, 5 * 60 * 1000) // 5 minutes
 
       // Use the proper Razorpay initialization function
       // For custom handlers, we don't wait for a result - the handler manages the flow
@@ -167,6 +213,15 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
 
     } catch (error) {
       console.error('❌ Error accepting bid:', error)
+      
+      // Auto-reset escrow on any payment process failure
+      console.log('🔄 Payment process failed, auto-resetting escrow...')
+      try {
+        await escrowService.resetEscrowStatus(project._id)
+        console.log('✅ Escrow auto-reset successful after payment failure')
+      } catch (resetError) {
+        console.error('❌ Failed to auto-reset escrow after payment failure:', resetError)
+      }
       
       // Handle different types of errors
       if (error.message.includes('Unexpected token') || error.message.includes('<!DOCTYPE')) {
