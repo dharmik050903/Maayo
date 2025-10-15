@@ -99,6 +99,14 @@ class ApiCacheService {
   }
 
   /**
+   * Remove pending request
+   */
+  removePending(key) {
+    this.pendingRequests.delete(key)
+    console.log('🗑️ ApiCache: Removed pending request for', key)
+  }
+
+  /**
    * Clear cache by type or all
    */
   clear(cacheType = null) {
