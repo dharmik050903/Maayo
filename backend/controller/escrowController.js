@@ -282,9 +282,15 @@ export default class EscrowController {
             }
 
             console.log('🔍 Fetching project with ID:', project_id);
-            // Get project with accepted bid
+            // Get project with accepted bid and freelancer details
             const project = await projectinfo.findById(project_id)
-                .populate('accepted_bid_id');
+                .populate({
+                    path: 'accepted_bid_id',
+                    populate: {
+                        path: 'freelancer_id',
+                        model: 'tblpersonmaster'
+                    }
+                });
             
             if (!project) {
                 console.log('❌ Project not found:', project_id);
@@ -425,16 +431,89 @@ export default class EscrowController {
             if (razorpay.payouts && razorpay.payouts.create) {
                 console.log('✅ Using razorpay.payouts.create');
                 
+                // First, create a contact for the freelancer
+                console.log('🔍 Creating Razorpay contact for freelancer...');
+                const freelancer = project.accepted_bid_id.freelancer_id;
+                const freelancerEmail = freelancer?.email || 'freelancer@maayo.com';
+                const freelancerPhone = freelancer?.phone || freelancerBankDetails.contact_number || '9999999999';
+                
+                console.log('Freelancer details:', {
+                    name: freelancerBankDetails.account_holder_name,
+                    email: freelancerEmail,
+                    phone: freelancerPhone
+                });
+                
+                const contactData = {
+                    name: freelancerBankDetails.account_holder_name,
+                    email: freelancerEmail,
+                    contact: freelancerPhone,
+                    type: 'employee'
+                };
+                
+                let contact = null;
+                try {
+                    contact = await razorpay.contacts.create(contactData);
+                    console.log('✅ Contact created:', contact.id);
+                } catch (contactError) {
+                    console.log('⚠️ Contact creation failed, trying to find existing contact:', contactError.message);
+                    // Try to find existing contact by email
+                    try {
+                        const contacts = await razorpay.contacts.all();
+                        const existingContact = contacts.items.find(c => c.email === contactData.email);
+                        if (existingContact) {
+                            contact = existingContact;
+                            console.log('✅ Found existing contact:', contact.id);
+                        } else {
+                            throw new Error('No existing contact found');
+                        }
+                    } catch (findError) {
+                        console.log('❌ Could not find existing contact:', findError.message);
+                        throw new Error('Failed to create or find contact for freelancer');
+                    }
+                }
+                
+                // Create fund account for the contact
+                console.log('🔍 Creating fund account for contact...');
+                const fundAccountData = {
+                    contact_id: contact.id,
+                    account_type: "bank_account",
+                    bank_account: {
+                        name: freelancerBankDetails.account_holder_name,
+                        ifsc: freelancerBankDetails.ifsc_code,
+                        account_number: freelancerBankDetails.account_number
+                    }
+                };
+                
+                let fundAccount = null;
+                try {
+                    fundAccount = await razorpay.fundAccount.create(fundAccountData);
+                    console.log('✅ Fund account created:', fundAccount.id);
+                } catch (fundAccountError) {
+                    console.log('⚠️ Fund account creation failed, trying to find existing:', fundAccountError.message);
+                    // Try to find existing fund account
+                    try {
+                        const fundAccounts = await razorpay.fundAccount.all();
+                        const existingFundAccount = fundAccounts.items.find(fa => 
+                            fa.contact_id === contact.id && 
+                            fa.bank_account && 
+                            fa.bank_account.account_number === freelancerBankDetails.account_number
+                        );
+                        if (existingFundAccount) {
+                            fundAccount = existingFundAccount;
+                            console.log('✅ Found existing fund account:', fundAccount.id);
+                        } else {
+                            throw new Error('No existing fund account found');
+                        }
+                    } catch (findError) {
+                        console.log('❌ Could not find existing fund account:', findError.message);
+                        throw new Error('Failed to create or find fund account for freelancer');
+                    }
+                }
+                
                 // Create payout to freelancer (using Razorpay Payouts API)
                 const payoutData = {
-                    account_number: freelancerBankDetails.account_number,
                     fund_account: {
-                        account_type: "bank_account",
-                        bank_account: {
-                            name: freelancerBankDetails.account_holder_name,
-                            ifsc: freelancerBankDetails.ifsc_code,
-                            account_number: freelancerBankDetails.account_number
-                        }
+                        id: fundAccount.id
                     },
                     amount: Math.round(paymentAmount * 100), // Convert to paise
                     currency: "INR",

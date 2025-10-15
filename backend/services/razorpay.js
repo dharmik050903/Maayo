@@ -27,6 +27,7 @@ console.log('🔍 Razorpay instance created:', {
   hasPayments: !!razorpay.payments,
   hasPayouts: !!razorpay.payouts,
   hasFundAccount: !!razorpay.fundAccount,
+  hasContacts: !!razorpay.contacts,
   availableMethods: Object.keys(razorpay)
 });
 
@@ -47,6 +48,20 @@ setTimeout(async () => {
     } else {
       console.log('❌ Razorpay payouts API is not available');
       console.log('Available Razorpay methods:', Object.keys(razorpay));
+    }
+    
+    // Test contacts API availability
+    if (razorpay.contacts) {
+      console.log('✅ Razorpay contacts API is available');
+    } else {
+      console.log('❌ Razorpay contacts API is not available');
+    }
+    
+    // Test fundAccount API availability
+    if (razorpay.fundAccount) {
+      console.log('✅ Razorpay fundAccount API is available');
+    } else {
+      console.log('❌ Razorpay fundAccount API is not available');
     }
     
   } catch (error) {
