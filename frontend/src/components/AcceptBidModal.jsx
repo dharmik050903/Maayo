@@ -9,6 +9,7 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState('amount') // 'amount' | 'payment' | 'processing'
   const [alert, setAlert] = useState({ isOpen: false, type: 'info', title: '', message: '' })
+  const [showResetOption, setShowResetOption] = useState(false)
 
   const showAlert = (type, title, message) => {
     setAlert({
@@ -21,6 +22,27 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
 
   const closeAlert = () => {
     setAlert(prev => ({ ...prev, isOpen: false }))
+  }
+
+  const handleManualReset = async () => {
+    try {
+      setLoading(true)
+      console.log('🔄 Manual escrow reset requested...')
+      
+      const resetResponse = await escrowService.resetEscrowStatus(project._id)
+      
+      if (resetResponse.status) {
+        showAlert('success', 'Escrow Reset Successful', '✅ Escrow payment has been reset successfully. You can now proceed with the payment.')
+        setShowResetOption(false)
+      } else {
+        showAlert('error', 'Reset Failed', `Failed to reset escrow: ${resetResponse.message}`)
+      }
+    } catch (error) {
+      console.error('❌ Manual reset error:', error)
+      showAlert('error', 'Reset Failed', error.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   // Calculate platform commission (5%)
@@ -66,7 +88,28 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
       setStep('payment')
 
       // Step 2: Create escrow payment
-      const escrowResponse = await escrowService.createEscrowPayment(project._id)
+      let escrowResponse = await escrowService.createEscrowPayment(project._id)
+      
+      // If escrow already exists, reset it and try again
+      if (!escrowResponse.status && (
+        escrowResponse.message?.includes('already exists') || 
+        escrowResponse.message?.includes('duplicate') ||
+        escrowResponse.message?.includes('escrow payment already exists')
+      )) {
+        console.log('🔄 Escrow already exists, resetting and retrying...')
+        showAlert('info', 'Resetting Escrow', 'An escrow payment already exists for this project. Resetting and creating a new one...')
+        
+        // Reset the escrow status
+        const resetResponse = await escrowService.resetEscrowStatus(project._id)
+        
+        if (resetResponse.status) {
+          console.log('✅ Escrow reset successful, creating new escrow...')
+          // Try creating escrow again
+          escrowResponse = await escrowService.createEscrowPayment(project._id)
+        } else {
+          throw new Error(`Failed to reset escrow: ${resetResponse.message}`)
+        }
+      }
       
       if (!escrowResponse.status) {
         throw new Error(escrowResponse.message)
@@ -130,6 +173,10 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
         showAlert('error', 'Backend Server Error', 'Backend server is not running. Please start the backend server to accept bids.\n\nTo start the backend:\n1. Open terminal in the backend folder\n2. Run: npm start')
       } else if (error.message.includes('Failed to fetch')) {
         showAlert('error', 'Network Error', 'Unable to connect to the server. Please check your internet connection.')
+      } else if (error.message.includes('already exists')) {
+        showAlert('error', 'Escrow Payment Exists', 'An escrow payment already exists for this project. The system tried to reset it automatically but failed.\n\nPlease contact support or try refreshing the page.')
+      } else if (error.message.includes('Failed to reset escrow')) {
+        showAlert('error', 'Escrow Reset Failed', 'Unable to reset the existing escrow payment. Please contact support for assistance.')
       } else {
         showAlert('error', 'Failed to Accept Bid', error.message)
       }
@@ -165,6 +212,26 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
       } else {
         showAlert('error', 'Failed to Update Payment', error.message)
       }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleResetEscrow = async () => {
+    try {
+      setLoading(true)
+      showAlert('info', 'Resetting Escrow', 'Resetting escrow payment for this project...')
+      
+      const resetResponse = await escrowService.resetEscrowStatus(project._id)
+      
+      if (resetResponse.status) {
+        showAlert('success', 'Escrow Reset!', '✅ Escrow payment has been reset successfully. You can now proceed with payment.')
+      } else {
+        throw new Error(resetResponse.message)
+      }
+    } catch (error) {
+      console.error('❌ Error resetting escrow:', error)
+      showAlert('error', 'Failed to Reset Escrow', error.message)
     } finally {
       setLoading(false)
     }
@@ -278,6 +345,20 @@ const AcceptBidModal = ({ bid, project, onClose, onSuccess }) => {
               </p>
               <p className="text-xs text-gray-500 mt-1">
                 Note: "Update Amount" only works after a bid has been accepted
+              </p>
+            </div>
+
+            {/* Reset Escrow Button */}
+            <div className="mt-4 pt-3 border-t border-gray-200">
+              <button
+                onClick={handleResetEscrow}
+                disabled={loading}
+                className="w-full bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 disabled:opacity-50 transition-colors font-medium text-sm"
+              >
+                {loading ? 'Processing...' : '🔄 Reset Escrow Payment'}
+              </button>
+              <p className="text-xs text-gray-500 mt-1 text-center">
+                Use this if you get "escrow already exists" error
               </p>
             </div>
           </>
