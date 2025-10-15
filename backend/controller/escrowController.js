@@ -445,7 +445,8 @@ export default class EscrowController {
                             project_id: project_id,
                             freelancer_name: freelancerBankDetails.account_holder_name,
                             freelancer_ifsc: freelancerBankDetails.ifsc_code,
-                            payment_type: 'automatic_milestone_payment'
+                            payment_type: 'auto_milestone',
+                            reference_id: `mil_${project_id.slice(-8)}_${milestone_index}_${Date.now().toString().slice(-8)}`
                         }
                     };
 
@@ -495,7 +496,7 @@ export default class EscrowController {
                         mode: "IMPS",
                         purpose: "payout",
                         queue_if_low_balance: true,
-                        reference_id: `milestone_${project_id}_${milestone_index}_${Date.now()}`,
+                        reference_id: `mil_${project_id.slice(-8)}_${milestone_index}_${Date.now().toString().slice(-8)}`,
                         narration: `Automatic milestone payment for project: ${project.title}`
                     };
 
@@ -524,7 +525,7 @@ export default class EscrowController {
                 const orderData = {
                     amount: Math.round(paymentAmount * 100), // Convert to paise
                     currency: "INR",
-                    receipt: `milestone_${project_id}_${milestone_index}_${Date.now()}`,
+                    receipt: `mil_${project_id.slice(-8)}_${milestone_index}_${Date.now().toString().slice(-8)}`,
                     notes: {
                         milestone: milestone.title,
                         project: project.title,
@@ -533,7 +534,7 @@ export default class EscrowController {
                         freelancer_name: freelancerBankDetails.account_holder_name,
                         freelancer_account: freelancerBankDetails.account_number,
                         freelancer_ifsc: freelancerBankDetails.ifsc_code,
-                        payment_type: 'milestone_payment_manual_required'
+                        payment_type: 'milestone_manual'
                     }
                 };
 
@@ -1020,7 +1021,7 @@ export default class EscrowController {
                 mode: "IMPS",
                 purpose: "payout",
                 queue_if_low_balance: true,
-                reference_id: `auto_milestone_${projectId}_${milestoneIndex}_${Date.now()}`,
+                reference_id: `auto_${projectId.slice(-8)}_${milestoneIndex}_${Date.now().toString().slice(-8)}`,
                 narration: `Auto milestone payment for project: ${project.title}`
             };
 
