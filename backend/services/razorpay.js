@@ -28,6 +28,7 @@ console.log('🔍 Razorpay instance created:', {
   hasPayouts: !!razorpay.payouts,
   hasFundAccount: !!razorpay.fundAccount,
   hasContacts: !!razorpay.contacts,
+  hasTransfers: !!razorpay.transfers,
   availableMethods: Object.keys(razorpay)
 });
 
@@ -62,6 +63,13 @@ setTimeout(async () => {
       console.log('✅ Razorpay fundAccount API is available');
     } else {
       console.log('❌ Razorpay fundAccount API is not available');
+    }
+    
+    // Test transfers API availability
+    if (razorpay.transfers) {
+      console.log('✅ Razorpay transfers API is available');
+    } else {
+      console.log('❌ Razorpay transfers API is not available');
     }
     
   } catch (error) {
