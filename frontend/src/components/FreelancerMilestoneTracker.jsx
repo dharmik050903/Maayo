@@ -109,6 +109,9 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
           title: m.title,
           status: m.status,
           index: m.index,
+          is_completed: m.is_completed,
+          payment_released: m.payment_released,
+          auto_released: m.auto_released,
           fullObject: m // Show complete object structure
         })))
         setMilestones(milestonesData)
@@ -298,8 +301,19 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
     <div className="w-full">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold text-black">📋 Project Milestones</h3>
-        <div className="text-sm text-black font-semibold">
-          {milestones.filter(m => getMilestoneStatus(m) === 'completed').length} / {milestones.length} completed
+        <div className="flex items-center gap-4">
+          <div className="text-sm text-black font-semibold">
+            {milestones.filter(m => getMilestoneStatus(m) === 'completed').length} / {milestones.length} completed
+          </div>
+          <button
+            onClick={() => {
+              console.log('🔄 FreelancerMilestoneTracker: Manual refresh triggered')
+              fetchMilestones()
+            }}
+            className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+          >
+            🔄 Refresh
+          </button>
         </div>
       </div>
 

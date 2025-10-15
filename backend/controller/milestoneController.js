@@ -176,6 +176,20 @@ export default class MilestoneController {
                 
                 if (paymentResult.success) {
                     console.log(`✅ Payment released for approved milestone ${milestone_index} in project ${project_id}`);
+                    
+                    // Ensure milestone status is updated in database
+                    // The escrow controller should have already updated this, but let's verify
+                    const updatedProject = await projectinfo.findById(project_id)
+                        .populate('accepted_bid_id');
+                    const updatedBid = updatedProject.accepted_bid_id;
+                    const updatedMilestone = updatedBid.milestones[milestone_index];
+                    
+                    console.log(`🔍 Milestone ${milestone_index} status after payment release:`, {
+                        is_completed: updatedMilestone.is_completed,
+                        payment_released: updatedMilestone.payment_released,
+                        auto_released: updatedMilestone.auto_released
+                    });
+                    
                 } else {
                     console.log(`⚠️ Payment release failed for milestone ${milestone_index} in project ${project_id}: ${paymentResult.message}`);
                 }

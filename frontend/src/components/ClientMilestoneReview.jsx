@@ -209,7 +209,13 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
         })
         showAlert('success', 'Milestone Approved & Payment Made Successfully', '🎉 Milestone approved and payment released to freelancer successfully!')
         console.log('✅ ClientMilestoneReview: Milestone approved and payment released')
-        fetchMilestones(true) // Force refresh milestones
+        console.log('🔍 ClientMilestoneReview: Approval response:', approveResponse)
+        
+        // Add a small delay before refreshing to ensure backend has processed
+        setTimeout(() => {
+          console.log('🔄 ClientMilestoneReview: Refreshing milestones after approval delay')
+          fetchMilestones(true) // Force refresh milestones
+        }, 1000)
       } else {
         showAlert('error', 'Approval Failed', 'Failed to approve milestone: ' + approveResponse.message)
       }
@@ -247,7 +253,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
       showAlert('error', 'Rejection Failed', error.message || 'Failed to reject milestone')
     } finally {
       setPayingMilestone(null)
-    }
+          }
   }
 
   const handlePayMilestone = async (milestone) => {
@@ -335,7 +341,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                           status: 'completed'
                         })
                         showAlert('success', 'Payment Made Successfully', '🎉 Payment processed successfully! Milestone approved and payment released to freelancer.')
-                        console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
+                      console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
                       }
                       fetchMilestones(true) // Force refresh milestones
                     } else {
@@ -447,7 +453,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                           status: 'completed'
                         })
                         showAlert('success', 'Payment Made Successfully', '🎉 Payment processed successfully! Milestone approved and payment released to freelancer.')
-                        console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
+                      console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
                       }
                       fetchMilestones(true) // Force refresh milestones
                     } else {
@@ -520,7 +526,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
               status: 'completed'
             })
             showAlert('success', 'Payment Made Successfully', '🎉 Milestone payment released successfully!')
-            console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
+          console.log('✅ ClientMilestoneReview: Payment successful, staying on current page (no redirect)')
           }
           fetchMilestones(true) // Force refresh milestones
         } else {
@@ -670,19 +676,19 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
       </div>
       
       <div className="space-y-6">
-        {milestones.map((milestone, index) => {
-          const status = getMilestoneStatus(milestone)
-          const statusColor = getStatusColor(status)
-          const statusIcon = getStatusIcon(status)
-          
-          console.log(`🔍 Client Milestone ${index + 1} Debug:`, {
-            title: milestone.title,
-            status: milestone.status,
-            computedStatus: status,
-            index: milestone.index
-          })
-          
-          return (
+      {milestones.map((milestone, index) => {
+        const status = getMilestoneStatus(milestone)
+        const statusColor = getStatusColor(status)
+        const statusIcon = getStatusIcon(status)
+        
+        console.log(`🔍 Client Milestone ${index + 1} Debug:`, {
+          title: milestone.title,
+          status: milestone.status,
+          computedStatus: status,
+          index: milestone.index
+        })
+        
+        return (
             <div key={`milestone-${milestone.index || index}`} className="group relative overflow-hidden border-2 rounded-2xl p-6 bg-gradient-to-r from-white to-gray-50/50 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 border-gray-200 w-full">
             {/* Status indicator bar */}
             <div className={`absolute top-0 left-0 right-0 h-2 ${
@@ -755,10 +761,10 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                   {status === 'pending_approval' && (
                     <div className="flex flex-col gap-4 text-yellow-700 p-4 rounded-2xl bg-gradient-to-r from-yellow-50 to-yellow-100/50 border border-yellow-200">
                       <div className="flex items-center gap-3">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span className="text-sm font-medium">Waiting for your approval</span>
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-sm font-medium">Waiting for your approval</span>
                       </div>
                       <div className="flex flex-col gap-3 w-full">
                         <button
@@ -860,8 +866,8 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
               </div>
             )}
           </div>
-          )
-        })}
+        )
+      })}
       </div>
       
       {/* Payment Details Modal */}
