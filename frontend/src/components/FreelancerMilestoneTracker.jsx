@@ -361,8 +361,8 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       </div>
-                      <div className="text-green-700 text-sm font-semibold mb-1">Completed</div>
-                      <div className="text-xs text-green-600">Payment processed</div>
+                      <div className="text-green-700 text-sm font-semibold mb-1">Payment Released Successfully</div>
+                      <div className="text-xs text-green-600">Milestone completed and paid</div>
                     </div>
                   )}
                 </div>

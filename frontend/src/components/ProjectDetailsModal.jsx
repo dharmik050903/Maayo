@@ -242,7 +242,7 @@ const ProjectDetailsModal = ({ isOpen, onClose, project }) => {
                         'bg-gray-100 text-gray-800'
                       }`}>
                         {milestone.is_completed === 1 ? 
-                          (milestone.payment_released === 1 ? '✅ Payment Released' : '⏳ Pending Approval') :
+                          (milestone.payment_released === 1 ? '✅ Payment Released Successfully' : '⏳ Pending Approval') :
                          '📋 Pending'}
                       </span>
                     </div>

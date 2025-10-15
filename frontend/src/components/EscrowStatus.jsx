@@ -67,7 +67,7 @@ const EscrowStatus = ({ projectId }) => {
 
   const getStatusText = (isCompleted, paymentReleased) => {
     if (isCompleted === 1 && paymentReleased === 1) {
-      return 'Paid'
+      return 'Payment Released Successfully'
     } else if (isCompleted === 1 && paymentReleased === 0) {
       return 'Ready for Payment'
     } else {
