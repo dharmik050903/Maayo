@@ -1064,39 +1064,62 @@ export default class EscrowController {
                 narration: `Auto milestone payment for project: ${project.title}`
             };
 
-            const payout = await razorpay.payouts.create(payoutData);
+            let payout = null;
+            let payoutSuccess = false;
+            
+            try {
+                payout = await razorpay.payouts.create(payoutData);
+                payoutSuccess = true;
+                console.log(`✅ Razorpay payout created successfully: ${payout.id}`);
+            } catch (payoutError) {
+                console.error(`❌ Razorpay payout failed for milestone ${milestoneIndex} in project ${projectId}:`, payoutError);
+                payoutSuccess = false;
+            }
 
-            // Update milestone with payment information
+            // Update milestone with payment information regardless of payout success
             bid.milestones[milestoneIndex].payment_released = 1;
             bid.milestones[milestoneIndex].payment_amount = paymentAmount;
-            bid.milestones[milestoneIndex].payment_id = payout.id;
+            bid.milestones[milestoneIndex].payment_id = payout ? payout.id : `manual_${Date.now()}`;
             bid.milestones[milestoneIndex].payment_released_at = new Date().toISOString();
-            bid.milestones[milestoneIndex].auto_released = true; // Mark as auto-released
+            bid.milestones[milestoneIndex].auto_released = payoutSuccess; // Only true if payout succeeded
             
             await bid.save();
 
             // Create payment history record
             await PaymentHistory.create({
                 userId: bid.freelancer_id,
-                orderId: payout.reference_id,
-                paymentId: payout.id,
+                orderId: payout ? payout.reference_id : `manual_${Date.now()}`,
+                paymentId: payout ? payout.id : `manual_${Date.now()}`,
                 amount: paymentAmount,
                 currency: 'INR',
-                status: 'paid',
+                status: payoutSuccess ? 'paid' : 'manual_processing',
                 createdAt: new Date()
             });
 
-            console.log(`✅ Auto-released payment for milestone ${milestoneIndex} in project ${projectId}: ₹${paymentAmount}`);
-
-            return {
-                success: true,
-                message: "Milestone payment auto-released successfully",
-                data: {
-                    payout_id: payout.id,
-                    amount: paymentAmount,
-                    milestone_title: milestone.title
-                }
-            };
+            if (payoutSuccess) {
+                console.log(`✅ Auto-released payment for milestone ${milestoneIndex} in project ${projectId}: ₹${paymentAmount}`);
+                return {
+                    success: true,
+                    message: "Milestone payment auto-released successfully",
+                    data: {
+                        payout_id: payout.id,
+                        amount: paymentAmount,
+                        milestone_title: milestone.title
+                    }
+                };
+            } else {
+                console.log(`⚠️ Milestone ${milestoneIndex} approved but payout failed - requires manual processing`);
+                return {
+                    success: true,
+                    message: "Milestone approved but payment requires manual processing",
+                    data: {
+                        payout_id: null,
+                        amount: paymentAmount,
+                        milestone_title: milestone.title,
+                        manual_processing: true
+                    }
+                };
+            }
 
         } catch (error) {
             console.error(`❌ Error auto-releasing milestone payment for project ${projectId}, milestone ${milestoneIndex}:`, error);

@@ -558,27 +558,27 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
     })
     console.log('🔍 Full milestone object:', JSON.stringify(milestone, null, 2))
     
-    // Backend uses is_completed: 1 for completed milestones
-    if (milestone.is_completed === 1) {
-      // Check if payment has been released
-      if (milestone.payment_released === 1) {
-        // Check if payment was auto-released
-        if (milestone.auto_released) {
-          console.log('✅ Status: auto_paid')
-          return 'auto_paid' // Auto-released payment
-        } else if (milestone.manual_processing) {
-          console.log('⚠️ Status: manual_processing (payment request submitted)')
-          return 'manual_processing' // Manual processing required
-        } else {
-          console.log('✅ Status: completed')
-          return 'completed' // Manual payment release
-        }
-      } else {
-        console.log('⏳ Status: pending_approval (completed but payment not released)')
-        console.log('🔍 Payment not released - milestone.payment_released =', milestone.payment_released)
-        return 'pending_approval' // Completed but payment not released yet
-      }
-    }
+          // Backend uses is_completed: 1 for completed milestones
+          if (milestone.is_completed === 1) {
+            // Check if payment has been released
+            if (milestone.payment_released === 1) {
+              // Check if payment was auto-released
+              if (milestone.auto_released === true) {
+                console.log('✅ Status: auto_paid')
+                return 'auto_paid' // Auto-released payment
+              } else if (milestone.auto_released === false) {
+                console.log('⚠️ Status: manual_processing (payment approved but payout failed)')
+                return 'manual_processing' // Manual processing required
+              } else {
+                console.log('✅ Status: completed')
+                return 'completed' // Manual payment release
+              }
+            } else {
+              console.log('⏳ Status: pending_approval (completed but payment not released)')
+              console.log('🔍 Payment not released - milestone.payment_released =', milestone.payment_released)
+              return 'pending_approval' // Completed but payment not released yet
+            }
+          }
     
     // Legacy support for string status fields (if they exist)
     if (milestone.status === 'completed') return 'completed'
