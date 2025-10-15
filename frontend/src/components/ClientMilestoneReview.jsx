@@ -546,14 +546,11 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
       payment_released: milestone.payment_released,
       auto_released: milestone.auto_released,
       manual_processing: milestone.manual_processing,
-      status: milestone.status
+      status: milestone.status,
+      index: milestone.index,
+      title: milestone.title
     })
-    
-    // Check if payment was submitted locally but not yet reflected in database
-    if (isPaymentSubmitted(milestone.index)) {
-      console.log('📋 Status: manual_processing (locally tracked payment request)')
-      return 'manual_processing'
-    }
+    console.log('🔍 Full milestone object:', JSON.stringify(milestone, null, 2))
     
     // Backend uses is_completed: 1 for completed milestones
     if (milestone.is_completed === 1) {
