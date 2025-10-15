@@ -90,6 +90,7 @@ export default function FreelancerDashboard() {
     try {
       console.log('🔍 Checking if user already has profile in database...')
       console.log('🔍 User ID:', userId)
+      console.log('🔍 User ID type:', typeof userId)
       
       // Check localStorage first
       const storedProfileId = localStorage.getItem('freelancer_profile_id')
@@ -130,6 +131,47 @@ export default function FreelancerDashboard() {
         }
         setLoading(false)
         return
+      }
+      
+      // If no localStorage data, try to fetch from database using user ID
+      console.log('📝 No localStorage profile found, trying to fetch from database using user ID:', userId)
+      try {
+        const { response, data } = await fetchFreelancerProfile(userId)
+        
+        if (response && response.ok && data.status && data.data) {
+          console.log('✅ Profile found in database:', data.data)
+          
+          // Store the profile ID for future use
+          localStorage.setItem('freelancer_profile_id', data.data._id)
+          localStorage.setItem('freelancer_profile_data', JSON.stringify(data.data))
+          localStorage.setItem('freelancer_profile_completed', 'true')
+          
+          setFreelancerInfo(data.data)
+          setIsFirstTime(false)
+          
+          // Populate form data
+          setProfileData({
+            hourly_rate: data.data.hourly_rate || '',
+            experience_level: data.data.experience_level || '',
+            summary: data.data.overview || '',
+            education: data.data.highest_education || '',
+            work_history: data.data.work_history || ''
+          })
+          setSelectedSkills(data.data.skills?.map(skill => skill.skill_id) || [])
+          setAvailability(data.data.availability || '')
+          setResumeLink(data.data.resume_link || '')
+          setGithubLink(data.data.github_link || '')
+          setCertifications(data.data.certification?.length > 0 ? data.data.certification : [{ name: '', link: '' }])
+          setEmploymentHistory(data.data.employement_history?.length > 0 ? data.data.employement_history : [{ compayname: '', role: '', years: '', months: '' }])
+          setHasExperience(data.data.employement_history?.length > 0)
+          
+          setLoading(false)
+          return
+        } else {
+          console.log('❌ No profile found in database for user ID:', userId)
+        }
+      } catch (error) {
+        console.error('❌ Error fetching profile from database:', error)
       }
       
       // If we have stored profile ID, verify it exists in database
@@ -627,6 +669,30 @@ export default function FreelancerDashboard() {
             </div>
           </div>
         </div>
+
+        {/* Debug Section - Remove this after fixing */}
+        {!freelancerInfo && (
+          <div className="mb-8 p-4 bg-yellow-100 border border-yellow-400 rounded-lg">
+            <h3 className="text-lg font-semibold text-yellow-800 mb-2">Debug Info</h3>
+            <div className="text-sm text-yellow-700 space-y-1">
+              <p><strong>User ID:</strong> {userData?._id}</p>
+              <p><strong>Loading:</strong> {loading ? 'Yes' : 'No'}</p>
+              <p><strong>Is First Time:</strong> {isFirstTime ? 'Yes' : 'No'}</p>
+              <p><strong>Freelancer Info:</strong> {freelancerInfo ? 'Loaded' : 'Not loaded'}</p>
+              <p><strong>Profile ID in localStorage:</strong> {localStorage.getItem('freelancer_profile_id') || 'None'}</p>
+              <p><strong>Profile Completed in localStorage:</strong> {localStorage.getItem('freelancer_profile_completed') || 'None'}</p>
+            </div>
+            <button
+              onClick={() => {
+                console.log('🔄 Manual refresh triggered')
+                checkExistingProfile(userData?._id)
+              }}
+              className="mt-3 px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
+            >
+              Refresh Profile Data
+            </button>
+          </div>
+        )}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12">

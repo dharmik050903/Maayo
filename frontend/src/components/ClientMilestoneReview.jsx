@@ -763,11 +763,11 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                         </svg>
                         <span className="text-sm font-medium">Waiting for your approval</span>
                       </div>
-                      <div className="flex flex-col sm:flex-row gap-3">
+                      <div className="flex flex-col gap-3 w-full">
                         <button
                           onClick={() => handleApproveMilestone(milestone)}
                           disabled={payingMilestone === milestone.index}
-                          className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold flex items-center justify-center gap-2"
+                          className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold flex items-center justify-center gap-2"
                         >
                           {payingMilestone === milestone.index ? (
                             <>
@@ -786,7 +786,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                         <button
                           onClick={() => handleRejectMilestone(milestone)}
                           disabled={payingMilestone === milestone.index}
-                          className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold flex items-center justify-center gap-2"
+                          className="w-full px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold flex items-center justify-center gap-2"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -839,30 +839,6 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                     </div>
                   )}
                 </div>
-                
-                {status === 'pending_approval' && (
-                  <Button
-                    variant="accent"
-                    size="lg"
-                    onClick={() => handlePayMilestone(milestone)}
-                    disabled={payingMilestone === milestone.index}
-                    className="w-full lg:w-auto px-8 py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                  >
-                    {payingMilestone === milestone.index ? (
-                      <div className="flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                        Processing...
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center gap-2">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 6h8M7 10h8M9 14h5c1.5 0 2.5-1 2.5-2.5S15.5 9 14 9h-2" />
-                        </svg>
-                        Accept
-                      </div>
-                    )}
-                  </Button>
-                )}
               </div>
             </div>
             
