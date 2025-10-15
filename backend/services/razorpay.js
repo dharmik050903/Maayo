@@ -21,15 +21,34 @@ const razorpay = new Razorpay({
   key_secret: keySecret,
 });
 
+// Debug Razorpay instance
+console.log('🔍 Razorpay instance created:', {
+  hasOrders: !!razorpay.orders,
+  hasPayments: !!razorpay.payments,
+  hasPayouts: !!razorpay.payouts,
+  hasFundAccount: !!razorpay.fundAccount,
+  availableMethods: Object.keys(razorpay)
+});
+
 // Test Razorpay connection (async to avoid blocking module load)
 setTimeout(async () => {
   try {
-    await razorpay.orders.create({
+    // Test basic orders API
+    const testOrder = await razorpay.orders.create({
       amount: 100,
       currency: 'INR',
       receipt: 'test_receipt'
     });
-    console.log('✅ Razorpay connection test successful');
+    console.log('✅ Razorpay orders API test successful');
+    
+    // Test payouts API availability
+    if (razorpay.payouts) {
+      console.log('✅ Razorpay payouts API is available');
+    } else {
+      console.log('❌ Razorpay payouts API is not available');
+      console.log('Available Razorpay methods:', Object.keys(razorpay));
+    }
+    
   } catch (error) {
     console.error('❌ Razorpay connection test failed:', error.message || error);
     console.error('Full error:', error);

@@ -416,38 +416,93 @@ export default class EscrowController {
             }
 
             console.log('🔍 Creating Razorpay payout...');
-            // Create payout to freelancer (using Razorpay Payouts API)
-            const payoutData = {
-                account_number: freelancerBankDetails.account_number,
-                fund_account: {
+            console.log('Razorpay instance:', razorpay);
+            console.log('Razorpay payouts:', razorpay.payouts);
+            
+            // Check if payouts API is available and try different approaches
+            let payout = null;
+            
+            if (razorpay.payouts && razorpay.payouts.create) {
+                console.log('✅ Using razorpay.payouts.create');
+                
+                // Create payout to freelancer (using Razorpay Payouts API)
+                const payoutData = {
+                    account_number: freelancerBankDetails.account_number,
+                    fund_account: {
+                        account_type: "bank_account",
+                        bank_account: {
+                            name: freelancerBankDetails.account_holder_name,
+                            ifsc: freelancerBankDetails.ifsc_code,
+                            account_number: freelancerBankDetails.account_number
+                        }
+                    },
+                    amount: Math.round(paymentAmount * 100), // Convert to paise
+                    currency: "INR",
+                    mode: "IMPS",
+                    purpose: "payout",
+                    queue_if_low_balance: true,
+                    reference_id: `milestone_${project_id}_${milestone_index}_${Date.now()}`,
+                    narration: `Milestone payment for project: ${project.title}`
+                };
+
+                console.log('Payout data:', {
+                    ...payoutData,
+                    fund_account: {
+                        ...payoutData.fund_account,
+                        bank_account: {
+                            ...payoutData.fund_account.bank_account,
+                            account_number: '***' + payoutData.fund_account.bank_account.account_number.slice(-4)
+                        }
+                    }
+                });
+
+                payout = await razorpay.payouts.create(payoutData);
+                
+            } else if (razorpay.fundAccount && razorpay.fundAccount.create) {
+                console.log('✅ Using razorpay.fundAccount.create (alternative approach)');
+                
+                // Alternative approach using fundAccount API
+                const fundAccountData = {
                     account_type: "bank_account",
                     bank_account: {
                         name: freelancerBankDetails.account_holder_name,
                         ifsc: freelancerBankDetails.ifsc_code,
                         account_number: freelancerBankDetails.account_number
                     }
-                },
-                amount: Math.round(paymentAmount * 100), // Convert to paise
-                currency: "INR",
-                mode: "IMPS",
-                purpose: "payout",
-                queue_if_low_balance: true,
-                reference_id: `milestone_${project_id}_${milestone_index}_${Date.now()}`,
-                narration: `Milestone payment for project: ${project.title}`
-            };
-
-            console.log('Payout data:', {
-                ...payoutData,
-                fund_account: {
-                    ...payoutData.fund_account,
-                    bank_account: {
-                        ...payoutData.fund_account.bank_account,
-                        account_number: '***' + payoutData.fund_account.bank_account.account_number.slice(-4)
-                    }
+                };
+                
+                const fundAccount = await razorpay.fundAccount.create(fundAccountData);
+                console.log('Fund account created:', fundAccount.id);
+                
+                // Create payout using fund account
+                const payoutData = {
+                    fund_account: {
+                        id: fundAccount.id
+                    },
+                    amount: Math.round(paymentAmount * 100),
+                    currency: "INR",
+                    mode: "IMPS",
+                    purpose: "payout",
+                    queue_if_low_balance: true,
+                    reference_id: `milestone_${project_id}_${milestone_index}_${Date.now()}`,
+                    narration: `Milestone payment for project: ${project.title}`
+                };
+                
+                // Try different payout creation methods
+                if (razorpay.payouts && razorpay.payouts.create) {
+                    payout = await razorpay.payouts.create(payoutData);
+                } else {
+                    throw new Error('Payouts API not available in current Razorpay SDK version');
                 }
-            });
-
-            const payout = await razorpay.payouts.create(payoutData);
+                
+            } else {
+                console.log('❌ No suitable payout method available');
+                console.log('Available Razorpay methods:', Object.keys(razorpay));
+                return res.status(500).json({ 
+                    status: false, 
+                    message: "Payouts API not available. Please check Razorpay SDK version and configuration." 
+                });
+            }
             console.log('✅ Razorpay payout created successfully:', {
                 payout_id: payout.id,
                 status: payout.status,
