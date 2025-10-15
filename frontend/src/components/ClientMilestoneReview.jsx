@@ -61,6 +61,17 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
         const milestonesData = result.data.milestones || []
         console.log('✅ ClientMilestoneReview: Milestones found:', milestonesData.length)
         console.log('📊 ClientMilestoneReview: Milestone data:', milestonesData)
+        console.log('🔍 ClientMilestoneReview: Detailed milestone analysis:')
+        milestonesData.forEach((milestone, index) => {
+          console.log(`  Milestone ${index + 1}:`, {
+            title: milestone.title,
+            is_completed: milestone.is_completed,
+            payment_released: milestone.payment_released,
+            auto_released: milestone.auto_released,
+            status: milestone.status,
+            amount: milestone.amount
+          })
+        })
         setMilestones(milestonesData)
         
         if (milestonesData.length === 0) {
@@ -327,6 +338,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
         }
       } else {
         console.log('⏳ Status: pending_approval (completed but payment not released)')
+        console.log('🔍 Payment not released - milestone.payment_released =', milestone.payment_released)
         return 'pending_approval' // Completed but payment not released yet
       }
     }

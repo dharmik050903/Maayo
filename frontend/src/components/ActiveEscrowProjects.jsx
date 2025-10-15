@@ -246,15 +246,17 @@ const ActiveEscrowProjects = ({ searchTerm = '' }) => {
       {/* Project Detail Modal */}
       {showProjectDetail && selectedProject && (
         <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-start justify-center p-4 pt-8">
-          <div 
-            className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden cursor-pointer hover:shadow-3xl transition-all duration-300 transform hover:scale-[1.02]"
-            onClick={(e) => {
-              console.log('🖱️ ActiveEscrowProjects: Modal clicked!')
-              handleModalClick()
-            }}
+          <div
+            className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden hover:shadow-3xl transition-all duration-300 transform hover:scale-[1.02]"
           >
             <div className="p-4">
-              <div className="flex items-center justify-between mb-4">
+              <div 
+                className="flex items-center justify-between mb-4 cursor-pointer"
+                onClick={(e) => {
+                  console.log('🖱️ ActiveEscrowProjects: Header clicked!')
+                  handleModalClick()
+                }}
+              >
                 <div className="flex items-center gap-3">
                   <h2 className="text-xl font-bold text-graphite">{selectedProject.title}</h2>
                   <span className="px-2 py-1 bg-gradient-to-r from-violet to-purple text-white rounded-md text-xs font-semibold">
