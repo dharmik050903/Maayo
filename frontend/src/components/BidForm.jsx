@@ -279,7 +279,7 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
           <div className="space-y-2">
             <label htmlFor="bid_amount" className="block text-sm font-semibold text-graphite mb-2 sm:mb-3">
-              Your Bid Amount ($) *
+              Your Bid Amount (₹) *
             </label>
             <input
               type="number"
@@ -455,7 +455,7 @@ const BidForm = ({ project, onBidSubmitted, onCancel }) => {
               </div>
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-graphite">
-                  Amount ($) *
+                  Amount (₹) *
                 </label>
                 <input
                   type="number"

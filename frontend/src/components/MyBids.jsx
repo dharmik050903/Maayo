@@ -502,7 +502,7 @@ const MyBids = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-graphite mb-2">
-                    Bid Amount ($) *
+                    Bid Amount (₹) *
                   </label>
                   <input
                     type="number"

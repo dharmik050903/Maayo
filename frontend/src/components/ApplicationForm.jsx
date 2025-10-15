@@ -514,7 +514,6 @@ export default function ApplicationForm({ job, onSuccess, onCancel }) {
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="INR">INR</option>
-              <option value="USD">USD</option>
               <option value="EUR">EUR</option>
             </select>
             <select
