@@ -217,6 +217,8 @@ const FreelancerMilestoneTracker = ({ projectId, projectTitle }) => {
           return 'auto_paid' // Auto-released payment
         } else if (milestone.auto_released === false) {
           return 'manual_processing' // Manual processing required
+        } else if (milestone.manual_processing === true && milestone.payment_initiated === true) {
+          return 'manual_processing' // Payment initiated but requires manual processing
         } else {
           return 'completed' // Manual payment release
         }

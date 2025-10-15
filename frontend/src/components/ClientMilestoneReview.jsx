@@ -569,6 +569,9 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
               } else if (milestone.auto_released === false) {
                 console.log('⚠️ Status: manual_processing (payment approved but payout failed)')
                 return 'manual_processing' // Manual processing required
+              } else if (milestone.manual_processing === true && milestone.payment_initiated === true) {
+                console.log('⚠️ Status: manual_processing (payment initiated but requires manual processing)')
+                return 'manual_processing' // Payment initiated but requires manual processing
               } else {
                 console.log('✅ Status: completed')
                 return 'completed' // Manual payment release

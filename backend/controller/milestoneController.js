@@ -202,6 +202,25 @@ export default class MilestoneController {
                 } else {
                     console.log(`⚠️ Payment release failed for milestone ${milestone_index} in project ${project_id}: ${paymentResult.message}`);
                     console.log(`🔍 Full payment result error:`, paymentResult);
+                    
+                    // Even if payment release fails, mark milestone as approved for manual processing
+                    console.log(`🔄 Marking milestone ${milestone_index} as approved despite payment failure`);
+                    
+                    // Update milestone status to show it's approved but needs manual processing
+                    const updatedProject = await projectinfo.findById(project_id)
+                        .populate('accepted_bid_id');
+                    const updatedBid = updatedProject.accepted_bid_id;
+                    const updatedMilestone = updatedBid.milestones[milestone_index];
+                    
+                    // Mark as payment initiated and approved, but not released
+                    updatedMilestone.payment_released = 0;
+                    updatedMilestone.payment_initiated = true;
+                    updatedMilestone.payment_initiated_at = new Date().toISOString();
+                    updatedMilestone.manual_processing = true;
+                    
+                    await updatedBid.save();
+                    
+                    console.log(`✅ Milestone ${milestone_index} marked as approved for manual processing`);
                 }
             } catch (paymentError) {
                 console.error(`❌ Error releasing payment for milestone ${milestone_index} in project ${project_id}:`, paymentError);
@@ -210,11 +229,13 @@ export default class MilestoneController {
 
             return res.status(200).json({
                 status: true,
-                message: paymentResult.success ? "Milestone approved and payment released successfully" : "Milestone approved but payment release failed",
+                message: paymentResult.success ? "Milestone approved and payment released successfully" : "Milestone approved but payment requires manual processing",
                 data: {
                     milestone_title: milestone.title,
                     approved_at: new Date().toISOString(),
                     payment_released: paymentResult.success,
+                    payment_initiated: true,
+                    manual_processing: !paymentResult.success,
                     payment_result: paymentResult
                 }
             });
