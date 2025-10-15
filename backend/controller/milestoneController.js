@@ -174,6 +174,8 @@ export default class MilestoneController {
                 
                 paymentResult = await escrowController.autoReleaseMilestonePayment(project_id, milestone_index);
                 
+                console.log(`🔍 Payment result from escrow controller:`, paymentResult);
+                
                 if (paymentResult.success) {
                     console.log(`✅ Payment released for approved milestone ${milestone_index} in project ${project_id}`);
                     
@@ -192,6 +194,7 @@ export default class MilestoneController {
                     
                 } else {
                     console.log(`⚠️ Payment release failed for milestone ${milestone_index} in project ${project_id}: ${paymentResult.message}`);
+                    console.log(`🔍 Full payment result error:`, paymentResult);
                 }
             } catch (paymentError) {
                 console.error(`❌ Error releasing payment for milestone ${milestone_index} in project ${project_id}:`, paymentError);

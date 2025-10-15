@@ -997,10 +997,17 @@ export default class EscrowController {
                 return { success: false, message: "Project not found" };
             }
 
+            console.log(`🔍 Project details for auto-release:`, {
+                projectId: project._id,
+                title: project.title,
+                escrow_status: project.escrow_status,
+                has_accepted_bid: !!project.accepted_bid_id
+            });
+
             // Check if escrow is completed
             if (project.escrow_status !== 'completed') {
-                console.error(`❌ Escrow not completed for project ${projectId}`);
-                return { success: false, message: "Escrow payment not completed" };
+                console.error(`❌ Escrow not completed for project ${projectId}. Current status: ${project.escrow_status}`);
+                return { success: false, message: `Escrow payment not completed. Current status: ${project.escrow_status}` };
             }
 
             const bid = project.accepted_bid_id;
@@ -1033,11 +1040,23 @@ export default class EscrowController {
             }
 
             // Get freelancer's bank details
+            console.log(`🔍 Looking for bank details for freelancer: ${bid.freelancer_id}`);
             const freelancerBankDetails = await BankDetails.findOne({
                 user_id: bid.freelancer_id,
                 is_active: 1,
                 is_primary: 1
             });
+
+            console.log(`🔍 Bank details found:`, freelancerBankDetails ? 'Yes' : 'No');
+            if (freelancerBankDetails) {
+                console.log(`🔍 Bank details:`, {
+                    account_holder_name: freelancerBankDetails.account_holder_name,
+                    account_number: freelancerBankDetails.account_number ? '***' + freelancerBankDetails.account_number.slice(-4) : 'N/A',
+                    ifsc_code: freelancerBankDetails.ifsc_code,
+                    is_active: freelancerBankDetails.is_active,
+                    is_primary: freelancerBankDetails.is_primary
+                });
+            }
 
             if (!freelancerBankDetails) {
                 console.error(`❌ Freelancer bank details not found for project ${projectId}`);
