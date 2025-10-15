@@ -44,18 +44,20 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
     }
   }, [projectId])
 
-  const fetchMilestones = async () => {
+  const fetchMilestones = async (forceRefresh = false) => {
     try {
-      console.log('🔄 ClientMilestoneReview: Fetching milestones for project:', projectId)
+      console.log('🔄 ClientMilestoneReview: Fetching milestones for project:', projectId, forceRefresh ? '(force refresh)' : '')
       setLoading(true)
       setError(null)
       
+      // If force refresh, we can try to clear cache or use a different approach
       const result = await getMilestonesCached(projectId)
       console.log('📊 ClientMilestoneReview: Milestone fetch result:', result)
       
       if (result.status) {
         const milestonesData = result.data.milestones || []
         console.log('✅ ClientMilestoneReview: Milestones found:', milestonesData.length)
+        console.log('📊 ClientMilestoneReview: Milestone data:', milestonesData)
         setMilestones(milestonesData)
         
         if (milestonesData.length === 0) {
@@ -136,12 +138,12 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                     milestone.index
                   )
                   
-                  if (releaseResponse.status) {
-                    showAlert('success', 'Payment Successful', 'Payment processed successfully! Milestone approved and payment released to freelancer.')
-                    fetchMilestones() // Refresh milestones
-                  } else {
-                    showAlert('error', 'Release Failed', 'Escrow created but milestone release failed: ' + releaseResponse.message)
-                  }
+                    if (releaseResponse.status) {
+                      showAlert('success', 'Payment Successful', 'Payment processed successfully! Milestone approved and payment released to freelancer.')
+                      fetchMilestones(true) // Force refresh milestones
+                    } else {
+                      showAlert('error', 'Release Failed', 'Escrow created but milestone release failed: ' + releaseResponse.message)
+                    }
                 } else {
                   showAlert('error', 'Verification Failed', 'Escrow payment verification failed: ' + verifyResponse.message)
                 }
@@ -228,7 +230,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
                     
                     if (releaseResponse.status) {
                       showAlert('success', 'Payment Successful', 'Payment processed successfully! Milestone approved and payment released to freelancer.')
-                      fetchMilestones() // Refresh milestones
+                      fetchMilestones(true) // Force refresh milestones
                     } else {
                       showAlert('error', 'Release Failed', 'Escrow created but milestone release failed: ' + releaseResponse.message)
                     }
@@ -279,7 +281,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
         
         if (releaseResponse.status) {
           showAlert('success', 'Payment Released', 'Milestone payment released successfully!')
-          fetchMilestones() // Refresh milestones
+          fetchMilestones(true) // Force refresh milestones
         } else {
           showAlert('error', 'Release Failed', 'Failed to release milestone payment: ' + releaseResponse.message)
         }
@@ -298,6 +300,12 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
 
   const getMilestoneStatus = (milestone) => {
     console.log('🔍 Client getMilestoneStatus input:', milestone)
+    console.log('🔍 Milestone details:', {
+      is_completed: milestone.is_completed,
+      payment_released: milestone.payment_released,
+      auto_released: milestone.auto_released,
+      status: milestone.status
+    })
     
     // Backend uses is_completed: 1 for completed milestones
     if (milestone.is_completed === 1) {
@@ -305,11 +313,14 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
       if (milestone.payment_released === 1) {
         // Check if payment was auto-released
         if (milestone.auto_released) {
+          console.log('✅ Status: auto_paid')
           return 'auto_paid' // Auto-released payment
         } else {
+          console.log('✅ Status: completed')
           return 'completed' // Manual payment release
         }
       } else {
+        console.log('⏳ Status: pending_approval (completed but payment not released)')
         return 'pending_approval' // Completed but payment not released yet
       }
     }
@@ -319,6 +330,7 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
     if (milestone.status === 'pending_approval') return 'pending_approval'
     if (milestone.status === 'in_progress') return 'in_progress'
     
+    console.log('📋 Status: pending (not completed yet)')
     return 'pending' // Not completed yet
   }
 
@@ -387,6 +399,25 @@ const ClientMilestoneReview = ({ projectId, projectTitle }) => {
           onClose={() => setAlert(null)}
         />
       )}
+      
+      {/* Header with refresh button */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Milestone Review</h2>
+          <p className="text-gray-600">Review and approve completed milestones</p>
+        </div>
+        <button
+          onClick={() => fetchMilestones(true)}
+          disabled={loading}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Refresh
+        </button>
+      </div>
+      
       {milestones.map((milestone, index) => {
         const status = getMilestoneStatus(milestone)
         const statusColor = getStatusColor(status)
